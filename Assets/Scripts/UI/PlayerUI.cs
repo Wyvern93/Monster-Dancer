@@ -20,10 +20,20 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] TextMeshProUGUI levelText;
 
     [SerializeField] TextMeshProUGUI MapTimeText;
+    [SerializeField] TextMeshProUGUI StageText;
     [SerializeField] GameObject damageText;
 
     public Image crosshair;
     RectTransform crosshair_transform;
+
+    [SerializeField] CanvasGroup canvasGroup;
+    [SerializeField] SpriteRenderer beatIndicatorSpr;
+
+    [SerializeField] Image bossBar;
+    private RectTransform bossBarTransform;
+    [SerializeField] CanvasGroup bossBarGroup;
+    [SerializeField] TextMeshProUGUI bossBarName;
+    [SerializeField] TextMeshProUGUI bossBarHPText;
     // Start is called before the first frame update
     void Awake()
     {
@@ -32,19 +42,59 @@ public class PlayerUI : MonoBehaviour
         expTransform = expBar.GetComponent<RectTransform>();
         crosshair_transform = crosshair.GetComponent<RectTransform>();
         Cursor.visible = false;
+
+        bossBarTransform = bossBar.GetComponent<RectTransform>();
+        bossBarGroup.alpha = 0;
     }
 
-    private void Start()
+    public void CreatePools()
     {
         PoolManager.CreatePool(typeof(DamageText), damageText, 100);
+    }
+
+    public  void SetBossBarName(string name)
+    {
+        bossBarName.text = name;
+    }
+
+    public void HideBossBar()
+    {
+        bossBarGroup.alpha = 0;
     }
 
     // Update is called once per frame
     void Update()
     {
-        hurtEffect.color = Color.Lerp(hurtEffect.color, new Color(1, 1, 1, 0), Time.deltaTime * 8f);
-        crosshair_transform.localPosition = Mouse.current.position.value / new Vector2(Screen.width, Screen.height) * new Vector2(640, 360) - new Vector2(320, 180);
-        UpdateStageTime();
+        hurtEffect.color = Color.Lerp(hurtEffect.color, new Color(1, 1, 1, 0), Time.unscaledDeltaTime * 8f);
+        if (InputManager.playerDevice == InputManager.InputDeviceType.Keyboard || Player.instance == null)
+        {
+            crosshair_transform.localPosition = Mouse.current.position.value / new Vector2(Screen.width, Screen.height) * new Vector2(640, 360) - new Vector2(320, 180);
+        }
+        else
+        {
+            Vector2 offset = (Vector2)Player.instance.transform.position + (InputManager.GetRightStick().normalized * 128f);
+            if (InputManager.GetRightStick() == Vector2.zero) offset = crosshair_transform.localPosition;
+            crosshair_transform.localPosition = Vector3.MoveTowards(crosshair_transform.localPosition, offset, Time.unscaledDeltaTime * 1280f); //Mouse.current.position.value / new Vector2(Screen.width, Screen.height) * new Vector2(640, 360) - new Vector2(320, 180);
+        }
+        
+        if (Map.Instance != null) 
+        {
+            UpdateStageTime();
+            bossBarGroup.alpha = Mathf.MoveTowards(bossBarGroup.alpha, Map.isBossWave() ? 1 : 0, Time.deltaTime);
+        }
+    }
+
+    public void SetStageText(string text)
+    {
+        StageText.text = text;
+    }
+
+    public void UpdateBossBar(int current, int max)
+    {
+        float health = (float)current / (float)max;
+        float width = (int)(190f * health);
+        bossBarTransform.sizeDelta = new Vector2(width, bossBarTransform.sizeDelta.y);
+        bossBarHPText.text = $"{current}/{max}";
     }
 
     public void SpawnDamageText(Vector2 position, int number)
@@ -63,10 +113,10 @@ public class PlayerUI : MonoBehaviour
 
     public void UpdateHealth()
     {
-        float health = (float)Player.instance.CurrentHP / (float)Player.instance.MaxHP;
+        float health = (float)Player.instance.CurrentHP / (float)Player.instance.currentStats.MaxHP;
         float width = (int)(190f * health);
         hpTransform.sizeDelta = new Vector2(width, hpTransform.sizeDelta.y);
-        hpText.text = $"{Player.instance.CurrentHP}/{Player.instance.MaxHP}";
+        hpText.text = $"{Player.instance.CurrentHP}/{Player.instance.currentStats.MaxHP}";
     }
 
     public void UpdateSpecial()
@@ -87,9 +137,31 @@ public class PlayerUI : MonoBehaviour
 
     public void UpdateStageTime()
     {
+        MapTimeText.text = GetStageTime();
+    }
+
+    public string GetStageTime()
+    {
         int totalSeconds = (int)Map.StageTime;
         int minutes = totalSeconds / 60;
         int seconds = totalSeconds % 60;
-        MapTimeText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+        return string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
+
+    public string GetStageName()
+    {
+        return StageText.text;
+    }
+
+    public void HideUI()
+    {
+        canvasGroup.alpha = 0;
+        beatIndicatorSpr.color = Color.clear;
+    }
+
+    public void ShowUI()
+    {
+        canvasGroup.alpha = 1;
+        beatIndicatorSpr.color = Color.white;
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Pool
 {
-    private GameObject prefab;
+    public GameObject prefab;
     private int initialSize;
 
     private Queue<GameObject> objects;
@@ -36,6 +36,14 @@ public class Pool
         {
             GameObject obj = GameObject.Instantiate(prefab);
             return obj;
+        }
+    }
+
+    public void DestroyPool()
+    {
+        foreach (GameObject obj in objects)
+        {
+            GameObject.Destroy(obj);
         }
     }
 

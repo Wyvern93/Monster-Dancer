@@ -18,14 +18,33 @@ public abstract class Enemy : MonoBehaviour
     protected float SpriteX = 1f;
 
     public int MaxHP, CurrentHP;
+    public int SpawnIndex;
+    public int AItype;
 
-    [SerializeField] protected AudioClip hurtSfx;
     protected Material spriteRendererMat;
     protected Color emissionColor = new Color(1, 0, 0, 0);
     public bool CanMove()
     {
         if (isMoving) return false;
         else return true;
+    }
+
+    public static Enemy GetEnemyOfType(EnemyType enemyType)
+    {
+        switch (enemyType)
+        {
+            default:
+            case EnemyType.TestEnemy: return PoolManager.Get<TestEnemy>();
+        }
+    }
+
+    public static int GetEnemyCost(EnemyType enemyType)
+    {
+        switch (enemyType)
+        {
+            default:
+            case EnemyType.TestEnemy: return 1;
+        }
     }
 
     private void Awake()
@@ -58,17 +77,17 @@ public abstract class Enemy : MonoBehaviour
         SpriteX = Mathf.MoveTowards(SpriteX, facingRight ? 1 : -1, Time.deltaTime * 24f);
         Sprite.transform.localScale = new Vector3(SpriteX, 1, 1) * SpriteSize;
 
-        emissionColor = Color.Lerp(emissionColor, new Color(1, 0, 0, 0), Time.deltaTime * 8f);
+        emissionColor = Color.Lerp(emissionColor, new Color(1, 1, 1, 0), Time.deltaTime * 8f);
         spriteRendererMat.SetColor("_EmissionColor", emissionColor);
     }
 
-    public void TakeDamage(int damage)
+    public virtual void TakeDamage(int damage)
     {
         if (!CanTakeDamage()) return;
 
-        CurrentHP = CurrentHP - damage;
+        CurrentHP = Mathf.Clamp(CurrentHP - damage, 0, MaxHP);
         Player.TriggerCameraShake(0.3f, 0.2f);
-        AudioController.PlaySound(hurtSfx);
+        AudioController.PlaySound(AudioController.instance.sounds.enemyHurtSound);
         emissionColor = new Color(1, 1, 1, 1);
         UIManager.Instance.PlayerUI.SpawnDamageText(transform.position, damage);
 
@@ -78,13 +97,14 @@ public abstract class Enemy : MonoBehaviour
         }
     }
 
-    public void Die()
+    public virtual void Die()
     {
-        AudioController.PlaySound(Map.Instance.enemyDeathSound);
+        AudioController.PlaySound(AudioController.instance.sounds.enemyDeathSound);
         Gem gem = PoolManager.Get<Gem>();
         gem.transform.position = transform.position;
         KillEffect deathFx = PoolManager.Get<KillEffect>();
         deathFx.transform.position = transform.position;
         PoolManager.Return(gameObject, GetType());
+        Map.EnemiesAlive--;
     }
 }

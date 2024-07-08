@@ -47,8 +47,14 @@ AudioMixerController:
   m_StartSnapshot: {fileID: 24500006}
   m_SuspendThreshold: -80
   m_EnableSuspend: 1
-  m_UpdateMode: 0
-  m_ExposedParameters: []
+  m_UpdateMode: 1
+  m_ExposedParameters:
+  - guid: 930b762fc9552c2428734091fc74d8d3
+    name: MainVol
+  - guid: 264f6646bfb8da44288326e118470f9b
+    name: MusicVol
+  - guid: c9afb8b1bb674834884b884b4b780ca3
+    name: SfxVol
   m_AudioMixerGroupViews:
   - guids:
     - 81a593ef657ff544c8bc34734a142f4a

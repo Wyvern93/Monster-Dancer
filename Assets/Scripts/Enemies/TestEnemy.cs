@@ -9,11 +9,11 @@ public class TestEnemy : Enemy
     {
         EntityAction.WAIT,
         EntityAction.SPAWN_BULLETS,
-        EntityAction.WAIT,
+        EntityAction.SPAWN_BULLETS,
         EntityAction.WAIT,
         EntityAction.MOVE_TOWARDS_PLAYER,
         EntityAction.MOVE_TOWARDS_PLAYER,
-        EntityAction.MOVE_TOWARDS_PLAYER
+        EntityAction.MOVE_TOWARDS_PLAYER,
     };
 
     private int actionIndex = 0;
@@ -55,10 +55,34 @@ public class TestEnemy : Enemy
     {
         
     }
-
+    /*
     void MoveTowardsPlayer()
     {
         direction = new Vector2(Player.position.x < transform.position.x ? -1 : Player.position.x > transform.position.x ? 1 : 0, Player.position.y < transform.position.y ? -1 : Player.position.y > transform.position.y ? 1 : 0);
+        if (direction.x == -1) facingRight = false;
+        if (direction.x == 1) facingRight = true;
+
+        if (!isMoving)
+        {
+            Move((Vector2)transform.position + direction);
+        }
+    }*/
+
+    void MoveTowardsPlayer()
+    {
+        bool horizontalMovement = false;
+        if (Mathf.Abs(transform.position.x - Player.position.x) > Mathf.Abs(transform.position.y - Player.position.y)) horizontalMovement = true;
+
+        direction = Vector2.zero;
+        if (horizontalMovement)
+        {
+            direction.x = Player.position.x < transform.position.x ? -1 : 1;
+        }
+        else
+        {
+            direction.y = Player.position.y < transform.position.y ? -1 : 1;
+        }
+
         if (direction.x == -1) facingRight = false;
         if (direction.x == 1) facingRight = true;
 
@@ -131,11 +155,16 @@ public class TestEnemy : Enemy
 
     private IEnumerator SpawnBullet(Vector2 direction)
     {
+        // First beat warning
+        while (!BeatManager.isGameBeat) yield return new WaitForEndOfFrame();
         BulletSpawnEffect spawnEffect = PoolManager.Get<BulletSpawnEffect>();
-        
         spawnEffect.transform.position = new Vector3(transform.position.x + direction.x, transform.position.y + direction.y);
-        yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        yield return new WaitForEndOfFrame();
 
+        // Second beat finish
+        while (spawnEffect.gameObject.activeSelf) yield return new WaitForEndOfFrame();
+
+        // Spawn
         Bullet bullet = PoolManager.Get<Bullet>();
         bullet.transform.position = new Vector3(spawnEffect.transform.position.x, spawnEffect.transform.position.y);
         bullet.direction = direction;

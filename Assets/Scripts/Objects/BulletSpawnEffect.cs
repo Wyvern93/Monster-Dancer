@@ -4,16 +4,24 @@ using UnityEngine;
 
 public class BulletSpawnEffect : MonoBehaviour
 {
+    int beats = 0;
     // Start is called before the first frame update
     void Start()
     {
         
     }
 
+    private void OnEnable()
+    {
+        beats = 0;
+    }
+
     // Update is called once per frame
     void Update()
     {
-        if (BeatManager.isGameBeat)
+        if (BeatManager.isGameBeat) beats++;
+
+        if (beats >= 2)
         {
             PoolManager.Return(gameObject, typeof(BulletSpawnEffect));
         }

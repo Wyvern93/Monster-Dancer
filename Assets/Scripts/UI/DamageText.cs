@@ -9,7 +9,7 @@ public class DamageText : MonoBehaviour
     private float velocity, hvelocity;
     private Color Color = Color.white;
     public TextMeshProUGUI text;
-    private float alpha = 4.0f;
+    private float alpha = 2.0f;
     // Start is called before the first frame update
     void Start()
     {
@@ -18,7 +18,7 @@ public class DamageText : MonoBehaviour
 
     private void OnEnable()
     {
-        alpha = 4.0f;
+        alpha = 2.0f;
         Color = Color.white;
         velocity = 100f;
         hvelocity = Random.Range(-20f, 20f);
@@ -28,9 +28,10 @@ public class DamageText : MonoBehaviour
     void Update()
     {
         alpha -= Time.deltaTime * 3f;
-        velocity -= Time.deltaTime * 150f;
+        velocity -= Time.deltaTime * 250f;
         rectTransform.anchoredPosition += new Vector2(Time.deltaTime * hvelocity, velocity * Time.deltaTime);
         Color = new Color(1, 1, 1, alpha);
+        text.color = Color;
         if (Color.a <= 0.01f)
         {
             PoolManager.Return(gameObject, GetType());

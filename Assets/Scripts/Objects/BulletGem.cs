@@ -19,15 +19,17 @@ public class BulletGem : MonoBehaviour
 
     public void OnTriggerEnter2D(Collider2D collision)
     {
+        if (!BeatManager.isPlaying) return;
         if (collision.CompareTag("Player") && collision.name == "Player")
         {
-            AudioController.PlaySound(Map.Instance.gemSound);
+            AudioController.PlaySound(AudioController.instance.sounds.gemSound);
             Player.AddExp(1);
             PoolManager.Return(gameObject, GetType());
         }
     }
     public void OnTriggerStay2D(Collider2D collision)
     {
+        if (!BeatManager.isPlaying) return;
         if (collision.name == "GemTrigger")
         {
             transform.position = Vector3.MoveTowards(transform.position, Player.instance.transform.position, Time.deltaTime * speed);

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PoolManager : MonoBehaviour
@@ -16,10 +17,32 @@ public class PoolManager : MonoBehaviour
 
     public static void CreatePool(Type objectType, GameObject prefab, int initialSize)
     {
+        Debug.Log("Trying to make pool of type " + objectType);
         if (!instance.pools.ContainsKey(objectType))
         {
+            Debug.Log("No pool existing so making one");
             Pool newPool = new Pool(prefab.gameObject, initialSize);
             instance.pools[objectType] = newPool;
+        }
+    }
+
+    public static void ResetPools()
+    {
+        
+        foreach (KeyValuePair<Type,Pool> poolType in instance.pools)
+        {
+            RemovePool(poolType.Key);
+        }
+        instance.pools.Clear();
+    }
+
+    public static void RemovePool(Type objectType)
+    {
+        if (instance.pools.ContainsKey(objectType))
+        {
+            Debug.Log("Removed pool " + objectType);
+            Pool pool = instance.pools[objectType];
+            pool.DestroyPool();
         }
     }
 
