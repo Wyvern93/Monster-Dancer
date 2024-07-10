@@ -231,6 +231,8 @@ MonoBehaviour:
     MovRange: 0
   enhancements: []
   attackPrefab: {fileID: 238526771677291766, guid: 4af89ea480ae3f04eaeed59c29c97ba3, type: 3}
+  explosiveCarrot: {fileID: 6176280003804827367, guid: 3022bd6a79b7630479f72639d2475f67, type: 3}
+  carrotExplosionPrefab: {fileID: 2605593471026702462, guid: 941e5a73124b6514cacc803978b84e0a, type: 3}
   references:
     version: 2
     RefIds: []

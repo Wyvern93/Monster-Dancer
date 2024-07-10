@@ -12,7 +12,6 @@ public class WaveGroup
     {
         for (int i = 0; i < spawns.Count; i++)
         {
-            UnityEngine.Debug.Log("WaveGroup tries to spawn");
             if (spawns[i].spawnType == SpawnType.AROUND_PLAYER)
             {
                 Map.Instance.StartCoroutine(Map.SpawnEnemyAroundPlayer(spawns[i], i));

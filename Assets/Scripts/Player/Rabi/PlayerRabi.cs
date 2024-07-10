@@ -5,7 +5,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerRabi : Player
 {
-
+    [SerializeField] GameObject explosiveCarrot;
+    [SerializeField] GameObject carrotExplosionPrefab;
     protected override void Awake()
     {
         base.Awake();
@@ -18,19 +19,28 @@ public class PlayerRabi : Player
     {
         base.Start();
         PoolManager.CreatePool(typeof(RabiAttack), attackPrefab, 4);
+        PoolManager.CreatePool(typeof(ExplosiveCarrot), explosiveCarrot, 10);
+        PoolManager.CreatePool(typeof(CarrotExplosion), carrotExplosionPrefab, 10);
 
         abilityValues.Add("Attack_Number", 2); // 4 Upgrades
-        abilityValues.Add("Attack_Size", 1f); // 20 Upgrades
+        abilityValues.Add("Attack_Size", 2.5f); // 20 Upgrades
         abilityValues.Add("Attack_Velocity", 2); // 20 Upgrades
+        abilityValues.Add("Attack_Time", 2f); // 10 Upgrades
 
         abilityValues.Add("Max_Attack_Number", 10);
         abilityValues.Add("Max_Attack_Size", 3);
         abilityValues.Add("Max_Attack_Velocity", 3);
+        abilityValues.Add("Max_Attack_Time", 4);
+
+        equippedAbilities[0] = new CarrotBarrageAbility();
+        equippedAbilities[0].OnEquip();
     }
 
     public override void Despawn()
     {
         PoolManager.RemovePool(typeof(RabiAttack));
+        PoolManager.RemovePool(typeof(ExplosiveCarrot));
+        PoolManager.RemovePool(typeof(CarrotExplosion));
         Destroy(gameObject);
     }
 
@@ -92,8 +102,8 @@ public class PlayerRabi : Player
 
     public override void OnAttack()
     {
-        if (direction.x < 0) facingRight = false;
-        else facingRight = true;
+        if (UIManager.Instance.PlayerUI.crosshair.transform.position.x > transform.position.x) facingRight = true;
+        else facingRight = false;
         StartCoroutine(AttackCoroutine());
     }
 
@@ -122,5 +132,10 @@ public class PlayerRabi : Player
             yield return new WaitForSeconds(attackduration);
         }
         yield break;
+    }
+
+    public override void OnAbility1Use()
+    {
+        equippedAbilities[0].OnCast();
     }
 }

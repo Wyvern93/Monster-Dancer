@@ -105,6 +105,6 @@ public abstract class Enemy : MonoBehaviour
         KillEffect deathFx = PoolManager.Get<KillEffect>();
         deathFx.transform.position = transform.position;
         PoolManager.Return(gameObject, GetType());
-        Map.EnemiesAlive--;
+        Map.Instance.EnemiesAlive--;
     }
 }

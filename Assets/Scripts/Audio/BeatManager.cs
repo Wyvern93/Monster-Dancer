@@ -37,6 +37,7 @@ public class BeatManager : MonoBehaviour
     public static bool isGameBeat; // If this is active, all monsters, attacks and entities not controlled by player input trigger
     private BeatTrigger lastFrameState, currentFrameState; // These are used to check when we enter the first frame of input and first frame after input
     private bool canCastGameBeat;
+    public static float lastBeatTime;
 
     private MapTrack currentMapTrack;
 
@@ -50,7 +51,7 @@ public class BeatManager : MonoBehaviour
         instance.secondsPerBeat = 60f / track.tempo;
         instance.music.clip = track.music;
         instance.offset = track.offset;
-        instance.nextBeat = track.offset;
+        instance.nextBeat = track.offset + audio_offset;
         instance.lastBeat = 0;
         instance.currentTime = instance.music.time + audio_offset;
     }
@@ -107,6 +108,7 @@ public class BeatManager : MonoBehaviour
     {   if (!instance.canCastGameBeat) return;
         instance.canCastGameBeat = false;
         isGameBeat = true;
+        lastBeatTime = Time.time;
     }
 
     public static bool closestIsNextBeat()
@@ -161,7 +163,7 @@ public class BeatManager : MonoBehaviour
 
     private void CalculateNextBeat(float time)
     {
-        beats = (int)((time - offset) / secondsPerBeat);
+        beats = (int)((time - offset - audio_offset) / secondsPerBeat);
         nextBeat = offset + audio_offset + (secondsPerBeat * beats);
     }
 
@@ -175,8 +177,11 @@ public class BeatManager : MonoBehaviour
         }
         if (lastFrameState != BeatTrigger.FAIL && currentFrameState == BeatTrigger.FAIL) // After last Frame of Input
         {
-            if (canCastGameBeat) isGameBeat = true;
-
+            if (canCastGameBeat)
+            {
+                lastBeatTime = Time.time;
+                isGameBeat = true;
+            }
             canCastGameBeat = false;
         }
         lastFrameState = currentFrameState;
@@ -230,6 +235,7 @@ public class BeatManager : MonoBehaviour
 
     public static bool isBeatAfter()
     {
+        
         instance.currentTime = instance.music.time + audio_offset;
 
         float difftolast = Mathf.Abs(instance.currentTime - instance.lastBeat);

@@ -28,6 +28,7 @@ public class TestBoss : Boss
 
     protected override void OnBeat()
     {
+        Debug.Log("isGameBeat");
         if (CanMove())
         {
             if (isJumping) return;
@@ -150,8 +151,8 @@ public class TestBoss : Boss
         spawnEffect.transform.position = new Vector3(transform.position.x + direction.x, transform.position.y + direction.y);
         yield return new WaitForEndOfFrame();
 
+        // The spawnEffect lasts a beat long
         while (spawnEffect.gameObject.activeSelf) yield return new WaitForEndOfFrame();
-        //yield return new WaitForSeconds(BeatManager.GetBeatDuration());
 
         Bullet bullet = PoolManager.Get<Bullet>();
         bullet.transform.position = new Vector3(spawnEffect.transform.position.x, spawnEffect.transform.position.y);
@@ -172,9 +173,12 @@ public class TestBoss : Boss
         Vector2 position = Player.position;
         transform.position = position;
 
-        while (!BeatManager.isGameBeat) yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
+        while (!BeatManager.isGameBeat)
+        {
+            yield return null;
+        }
         yield return new WaitForSeconds(BeatManager.GetBeatDuration() * 2);
-
         StartCoroutine(SpawnBullet(new Vector2(-1, -1)));
         StartCoroutine(SpawnBullet(new Vector2(-1, 1)));
         StartCoroutine(SpawnBullet(new Vector2(-1, 0)));
@@ -184,7 +188,9 @@ public class TestBoss : Boss
         StartCoroutine(SpawnBullet(new Vector2(1, 1)));
         StartCoroutine(SpawnBullet(new Vector2(1, 0)));
 
+        Debug.Log("Wait for 1 beat");
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        Debug.Log("Start falling at" + Time.time);
         while (Sprite.transform.localPosition.y > 0)
         {
             Sprite.transform.localPosition = Vector3.MoveTowards(Sprite.transform.localPosition, Vector3.zero, Time.deltaTime * 32f);

@@ -21,8 +21,6 @@ public class Wave
     }
     public void Spawn()
     {
-        Debug.Log("Wave tries to spawn");
-        Map.WaveNumberOfEnemies = GetEnemyCount();
         for (int i = 0; i < groups.Count; i++) 
         {
             groups[i].Spawn();

@@ -21,16 +21,16 @@ public class Map : MonoBehaviour
     public static float StageTime;
 
     private int beatsBeforeWave = 40;
-    private int beats = 36;
+    public int beats = 36;
 
     private int waves = 0;
 
     public List<Wave> partAWaves;
     public List<Wave> partBWaves;
-    private int CurrentDifficultyPoints = 0;
+    public int CurrentDifficultyPoints = 0;
     public int part; // 0 = partA, 1 = BossA, 2 = partB, 3 = BossB
 
-    public static int EnemiesAlive, WaveNumberOfEnemies;
+    public int EnemiesAlive, WaveNumberOfEnemies;
 
     public string stageID;
 
@@ -52,6 +52,8 @@ public class Map : MonoBehaviour
         StageTime = 0;
         part = 0;
         beats = 36;
+        EnemiesAlive = 0;
+        WaveNumberOfEnemies = 0;
     }
     void Start()
     {
@@ -92,7 +94,8 @@ public class Map : MonoBehaviour
         possibleWaves[0].Spawn();
         waves++;
         AudioController.PlaySound(AudioController.instance.sounds.warningWaveSound);
-        WaveNumberOfEnemies = possibleWaves[0].GetEnemyCount();
+        Debug.Log("Spawning a wave of " + possibleWaves[0].GetEnemyCount());
+        WaveNumberOfEnemies = EnemiesAlive + possibleWaves[0].GetEnemyCount();
     }
 
     private List<Wave> ShuffleWaves(List<Wave> list)
@@ -130,11 +133,12 @@ public class Map : MonoBehaviour
             beats++;
             if (part == 0)
             {
-                if (waves < 21 && (beats >= beatsBeforeWave || EnemiesAlive < WaveNumberOfEnemies * 0.2f))
+                if (waves < 21 && (beats >= beatsBeforeWave || EnemiesAlive < WaveNumberOfEnemies * 0.2f || EnemiesAlive == 0))
                 {
                     beats = 0;
                     SpawnNextWave(partAWaves); // Normal A Wave
                 }
+                // Is next boss wave
                 if (waves == 21 && EnemiesAlive == 0)
                 {
                     beatsBeforeWave = 99999999;
@@ -145,7 +149,7 @@ public class Map : MonoBehaviour
 
             if (part == 2)
             {
-                if (waves < 42 && (beats >= beatsBeforeWave || EnemiesAlive < WaveNumberOfEnemies * 0.2f))
+                if (waves < 42 && (beats >= beatsBeforeWave || EnemiesAlive < WaveNumberOfEnemies * 0.2f || EnemiesAlive == 0))
                 {
                     beats = 0;
                     SpawnNextWave(partBWaves); // Normal A Wave
@@ -182,7 +186,7 @@ public class Map : MonoBehaviour
 
     public static IEnumerator SpawnEnemyAroundPlayer(SpawnData spawnData, int index)
     {
-        EnemiesAlive++;
+        Instance.EnemiesAlive++;
         SpawnEffect spawnEffect = PoolManager.Get<SpawnEffect>();
         float angle, x, y;
         while (true)
@@ -210,7 +214,7 @@ public class Map : MonoBehaviour
 
     public static IEnumerator SpawnEnemyAtPos(SpawnData spawnData, int index)
     {
-        EnemiesAlive++;
+        Instance.EnemiesAlive++;
         SpawnEffect spawnEffect = PoolManager.Get<SpawnEffect>();
         
         Vector3 spawnPos = new Vector3(Mathf.RoundToInt(spawnData.spawnPosition.x), Mathf.RoundToInt(spawnData.spawnPosition.y));

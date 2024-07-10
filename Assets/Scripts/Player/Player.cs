@@ -39,6 +39,10 @@ public class Player : MonoBehaviour
     protected Color emissionColor = new Color(1,0,0,0);
 
     bool canAttack = true;
+    bool canUseAbility1 = true;
+    bool canUseAbility2 = true;
+    bool canUseAbility3 = true;
+    bool canUseUltimate = true;
     bool isDead = false;
 
     [Header("Stats")]
@@ -51,6 +55,10 @@ public class Player : MonoBehaviour
     public Dictionary<string, float> abilityValues;
 
     [SerializeReference] public List<Enhancement> enhancements;
+
+    [Header("Abilities")]
+    public List<PlayerAbility> playerAbilities;
+    public PlayerAbility[] equippedAbilities;
 
     [Header("Prefabs")]
     public GameObject attackPrefab;
@@ -70,7 +78,7 @@ public class Player : MonoBehaviour
     {
         instance.transform.position = Vector3.zero;
         position = Vector3.zero;
-        BeatManager.SetRingPosition(Vector3.zero);
+        //BeatManager.SetRingPosition(Vector3.zero);
         Camera.main.transform.position = new Vector3(position.x, position.y, -10);
         instance.animator.speed = 1 / BeatManager.GetBeatDuration();
         instance.animator.updateMode = AnimatorUpdateMode.Normal;
@@ -80,6 +88,7 @@ public class Player : MonoBehaviour
     {
         instance = this;
         abilityValues = new Dictionary<string, float>();
+        equippedAbilities = new PlayerAbility[4];
         spriteRendererMat = Sprite.material;
         Level = 1;
         MaxExp = Level ^ 3 + 50;
@@ -117,12 +126,13 @@ public class Player : MonoBehaviour
         Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -10f);
         facingRight = true;
         position = transform.position;
-        BeatManager.SetRingPosition(transform.position);
+        //BeatManager.SetRingPosition(transform.position);
     }
 
     // Update is called once per frame
     void Update()
     {
+        //BeatManager.SetRingPosition(transform.position);
         if (GameManager.isLoading) return;
         if (!isDead)
         {
@@ -131,7 +141,6 @@ public class Player : MonoBehaviour
         
         HandleSprite();
         HandleCamera();
-        BeatManager.SetRingPosition(position);
 
         if (BeatManager.isGameBeat)
         {
@@ -140,7 +149,12 @@ public class Player : MonoBehaviour
             animator.speed = 1 / BeatManager.GetBeatDuration();
             animator.updateMode = AnimatorUpdateMode.Normal;
         }
-        
+
+        foreach (PlayerAbility ability in equippedAbilities)
+        {
+            if (ability != null) ability.OnUpdate();
+        }
+
     }
 
     public void SetDirection(Vector2 dir)
@@ -152,7 +166,17 @@ public class Player : MonoBehaviour
     {
         PlayerAttack atkEntity = PoolManager.Get<PlayerAttack>();
         atkEntity.Attack(direction);
+        if (direction.x < 0) facingRight = false;
+        else facingRight = true;
     }
+
+    public virtual void OnAbility1Use() { }
+
+    public virtual void OnAbility2Use() { }
+
+    public virtual void OnAbility3Use() { }
+
+    public virtual void OnUltimateUse() { }
 
     void HandleInput()
     {
@@ -203,6 +227,86 @@ public class Player : MonoBehaviour
             }
         }
 
+        if (InputManager.ActionPress(InputActionType.ABILITY1))
+        {
+            if (equippedAbilities[0] != null)
+            {
+                BeatTrigger result = BeatManager.GetBeatSuccess();
+                if (result != BeatTrigger.FAIL && !waitForNextBeat && canUseAbility1 && equippedAbilities[0].CanCast())
+                {
+                    OnAbility1Use();
+                    canUseAbility1 = false;
+                }
+                else
+                {
+                    TriggerCameraShake(0.04f, 0.2f);
+                    BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
+                    waitForNextBeat = true;
+                    canUseAbility1 = false;
+                }
+            }
+        }
+
+        if (InputManager.ActionPress(InputActionType.ABILITY2))
+        {
+            if (equippedAbilities[1] != null)
+            {
+                BeatTrigger result = BeatManager.GetBeatSuccess();
+                if (result != BeatTrigger.FAIL && !waitForNextBeat && canUseAbility2 && equippedAbilities[1].CanCast())
+                {
+                    OnAbility2Use();
+                    canUseAbility2 = false;
+                }
+                else
+                {
+                    TriggerCameraShake(0.04f, 0.2f);
+                    BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
+                    waitForNextBeat = true;
+                    canUseAbility2 = false;
+                }
+            }
+        }
+
+        if (InputManager.ActionPress(InputActionType.ABILITY3))
+        {
+            if (equippedAbilities[2] != null)
+            {
+                BeatTrigger result = BeatManager.GetBeatSuccess();
+                if (result != BeatTrigger.FAIL && !waitForNextBeat && canUseAbility3 && equippedAbilities[2].CanCast())
+                {
+                    OnAbility3Use();
+                    canUseAbility3 = false;
+                }
+                else
+                {
+                    TriggerCameraShake(0.04f, 0.2f);
+                    BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
+                    waitForNextBeat = true;
+                    canUseAbility3 = false;
+                }
+            }
+        }
+
+        if (InputManager.ActionPress(InputActionType.ULTIMATE))
+        {
+            if (equippedAbilities[3] != null && CurrentSP == MaxSP)
+            {
+                BeatTrigger result = BeatManager.GetBeatSuccess();
+                if (result != BeatTrigger.FAIL && !waitForNextBeat && canUseUltimate && equippedAbilities[3].CanCast())
+                {
+                    OnUltimateUse();
+                    canUseUltimate = false;
+                }
+                else
+                {
+                    TriggerCameraShake(0.04f, 0.2f);
+                    BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
+                    waitForNextBeat = true;
+                    canUseUltimate = false;
+                }
+            }
+        }
+
         // Handle Movement
         if (!waitForNextBeat && !isPerformingAction)
         {
@@ -242,9 +346,13 @@ public class Player : MonoBehaviour
             waitForNextBeat = false;
         }
 
-        if (!canAttack && !BeatManager.closestIsNextBeat() && BeatManager.GetBeatSuccess() == BeatTrigger.FAIL)
+        if (!BeatManager.closestIsNextBeat() && BeatManager.GetBeatSuccess() == BeatTrigger.FAIL)
         {
-            canAttack = true;
+            if (!canAttack) canAttack = true;
+            if (!canUseAbility1) canUseAbility1 = true;
+            if (!canUseAbility2) canUseAbility2 = true;
+            if (!canUseAbility3) canUseAbility3 = true;
+            if (!canUseUltimate) canUseUltimate = true;
         }
     }
 
@@ -330,7 +438,7 @@ public class Player : MonoBehaviour
         yield break;
     }
 
-    private void HandleSprite()
+    protected void HandleSprite()
     {
         SpriteSize = Mathf.MoveTowards(SpriteSize, 1f, Time.deltaTime * 4f);
         SpriteX = Mathf.MoveTowards(SpriteX, facingRight ? 1 : -1, Time.deltaTime * 24f);
@@ -340,7 +448,7 @@ public class Player : MonoBehaviour
         spriteRendererMat.SetColor("_EmissionColor", emissionColor);
     }
 
-    private void HandleCamera()
+    protected void HandleCamera()
     {
         Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, new Vector3(transform.position.x, transform.position.y, -10), Time.deltaTime * 8f) + CameraOffset;
         Camera.main.transform.position = new Vector3(Mathf.Clamp(Camera.main.transform.position.x, -10, 9.5f), Mathf.Clamp(Camera.main.transform.position.y, -6.88f, 6.25f), Camera.main.transform.position.z);

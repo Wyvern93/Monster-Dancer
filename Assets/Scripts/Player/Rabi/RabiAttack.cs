@@ -48,7 +48,9 @@ public class RabiAttack : PlayerAttack
 
         float velocity = 12f * Player.instance.abilityValues["Attack_Velocity"];
         dir = direction;
-        while (time <= BeatManager.GetActionDuration() * 2)
+
+        float abilityDuration = Player.instance.abilityValues["Attack_Time"];
+        while (time <= BeatManager.GetActionDuration() * abilityDuration)
         {
             time += Time.deltaTime;
             transform.position += ((Vector3)dir * velocity * Time.deltaTime);
