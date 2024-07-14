@@ -148,4 +148,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rectTransform: {fileID: 7088524718754874549}
+  color: {r: 0, g: 0, b: 0, a: 0}
   text: {fileID: 8031485457547735119}

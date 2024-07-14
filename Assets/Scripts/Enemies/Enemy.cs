@@ -18,14 +18,35 @@ public abstract class Enemy : MonoBehaviour
     protected float SpriteX = 1f;
 
     public int MaxHP, CurrentHP;
+    public int SpawnIndex;
+    public int AItype;
 
-    [SerializeField] protected AudioClip hurtSfx;
     protected Material spriteRendererMat;
     protected Color emissionColor = new Color(1, 0, 0, 0);
+
+    private bool isDead;
     public bool CanMove()
     {
         if (isMoving) return false;
         else return true;
+    }
+
+    public static Enemy GetEnemyOfType(EnemyType enemyType)
+    {
+        switch (enemyType)
+        {
+            default:
+            case EnemyType.TestEnemy: return PoolManager.Get<TestEnemy>();
+        }
+    }
+
+    public static int GetEnemyCost(EnemyType enemyType)
+    {
+        switch (enemyType)
+        {
+            default:
+            case EnemyType.TestEnemy: return 1;
+        }
     }
 
     private void Awake()
@@ -33,6 +54,11 @@ public abstract class Enemy : MonoBehaviour
         spriteRendererMat = Sprite.material;
         facingRight = true;
         OnInitialize();
+    }
+
+    private void OnEnable()
+    {
+        isDead = false;
     }
 
     protected abstract void OnInitialize();
@@ -58,33 +84,39 @@ public abstract class Enemy : MonoBehaviour
         SpriteX = Mathf.MoveTowards(SpriteX, facingRight ? 1 : -1, Time.deltaTime * 24f);
         Sprite.transform.localScale = new Vector3(SpriteX, 1, 1) * SpriteSize;
 
-        emissionColor = Color.Lerp(emissionColor, new Color(1, 0, 0, 0), Time.deltaTime * 8f);
+        emissionColor = Color.Lerp(emissionColor, new Color(1, 1, 1, 0), Time.deltaTime * 8f);
         spriteRendererMat.SetColor("_EmissionColor", emissionColor);
     }
 
-    public void TakeDamage(int damage)
+    public virtual void TakeDamage(int damage, bool isCritical)
     {
-        if (!CanTakeDamage()) return;
-
-        CurrentHP = CurrentHP - damage;
-        Player.TriggerCameraShake(0.3f, 0.2f);
-        AudioController.PlaySound(hurtSfx);
-        emissionColor = new Color(1, 1, 1, 1);
-        UIManager.Instance.PlayerUI.SpawnDamageText(transform.position, damage);
-
-        if (CurrentHP <= 0)
+        if (!CanTakeDamage())
         {
+            UIManager.Instance.PlayerUI.SpawnDamageText(transform.position, 0, DamageTextType.Dodge);
+            return;
+        }
+
+        CurrentHP = Mathf.Clamp(CurrentHP - damage, 0, MaxHP);
+        Player.TriggerCameraShake(0.4f, 0.2f);
+        AudioController.PlaySound(AudioController.instance.sounds.enemyHurtSound);
+        emissionColor = new Color(1, 1, 1, 1);
+        UIManager.Instance.PlayerUI.SpawnDamageText(transform.position, damage, isCritical ? DamageTextType.Critical : DamageTextType.Normal);
+
+        if (CurrentHP <= 0 && !isDead)
+        {
+            isDead = true;
             Die();
         }
     }
 
-    public void Die()
+    public virtual void Die()
     {
-        AudioController.PlaySound(Map.Instance.enemyDeathSound);
+        AudioController.PlaySound(AudioController.instance.sounds.enemyDeathSound);
         Gem gem = PoolManager.Get<Gem>();
         gem.transform.position = transform.position;
         KillEffect deathFx = PoolManager.Get<KillEffect>();
         deathFx.transform.position = transform.position;
+        Map.Instance.EnemiesAlive--;
         PoolManager.Return(gameObject, GetType());
     }
 }

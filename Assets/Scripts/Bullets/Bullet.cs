@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class Bullet : MonoBehaviour
 {
@@ -18,6 +17,7 @@ public class Bullet : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!BeatManager.isPlaying) return;
         if (BeatManager.isGameBeat) OnBeat();
     }
 
@@ -25,8 +25,18 @@ public class Bullet : MonoBehaviour
     {
         circleCollider.enabled = true;
         spriteRenderer.color = Color.white;
-        beatsLeft = 4;
+        beatsLeft = 6;
         OnBeat();
+    }
+
+    public void Despawn()
+    {
+        if (beatsLeft > 0)
+        {
+            beatsLeft = 0;
+            Debug.Log("despawn");
+            StartCoroutine(DespawnCoroutine());
+        }
     }
 
     protected void OnBeat()
@@ -35,12 +45,12 @@ public class Bullet : MonoBehaviour
         if (beatsLeft == 1) spriteRenderer.color = Color.red;
         if (beatsLeft == 0)
         {
-            StartCoroutine(Despawn());
+            StartCoroutine(DespawnCoroutine());
         }
         StartCoroutine(MoveInDirection(direction));
     }
 
-    IEnumerator Despawn()
+    IEnumerator DespawnCoroutine()
     {
         circleCollider.enabled = false;
         float time = 0;
@@ -110,6 +120,7 @@ public class Bullet : MonoBehaviour
 
     public void OnTriggerEnter2D(Collider2D collision)
     {
+        if (!BeatManager.isPlaying) return;
         if (collision.CompareTag("Player") && collision.name == "Player")
         {
             Player.instance.TakeDamage(1);
@@ -117,7 +128,7 @@ public class Bullet : MonoBehaviour
 
         if  (collision.CompareTag("Player") && collision.name == "GrazeTrigger")
         {
-            AudioController.PlaySound(Map.Instance.grazeSound);
+            AudioController.PlaySound(AudioController.instance.sounds.grazeSound);
             Player.AddSP(5);
         }
     }

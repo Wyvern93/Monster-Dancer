@@ -5,9 +5,11 @@ using UnityEngine.UI;
 
 public class BeatManager : MonoBehaviour
 {
+    private static BeatManager instance;
+
     [SerializeField] private AudioSource music, beatTest;
     [SerializeField] private float offset, tempo;
-    [SerializeField] private float audio_offset;
+    public static float audio_offset;
 
     public float secondsPerBeat, nextBeat, lastBeat;
     public float currentTime;
@@ -19,16 +21,10 @@ public class BeatManager : MonoBehaviour
     public static bool isBeat;
     public static int beats;
 
+    
     [Header("UI")]
-    [SerializeField] Image BeatIndicator;
-    [SerializeField] GameObject BeatCarrousel;
-    private float CarrouselPos;
-
-    private static BeatManager instance;
-
-    [SerializeField] Image TestImage;
-
     [SerializeField] Animator beatPulseAnimator;
+    SpriteRenderer beatPulseSprite;
     [SerializeField] GameObject playerRing;
     [SerializeField] SpriteRenderer beatScore;
     private float beatScoreSpeed;
@@ -41,6 +37,57 @@ public class BeatManager : MonoBehaviour
     public static bool isGameBeat; // If this is active, all monsters, attacks and entities not controlled by player input trigger
     private BeatTrigger lastFrameState, currentFrameState; // These are used to check when we enter the first frame of input and first frame after input
     private bool canCastGameBeat;
+    public static float lastBeatTime;
+
+    private MapTrack currentMapTrack;
+
+    public static bool isPlaying;
+
+    public static void SetTrack(MapTrack track)
+    {
+        instance.music.Stop();
+        beats = 0;
+        instance.currentMapTrack = track;
+        instance.secondsPerBeat = 60f / track.tempo;
+        instance.music.clip = track.music;
+        instance.offset = track.offset;
+        instance.nextBeat = track.offset + audio_offset;
+        instance.lastBeat = 0;
+        instance.currentTime = instance.music.time + audio_offset;
+    }
+
+    public static void Stop()
+    {
+        isPlaying = false;
+        instance.beatPulseSprite.color = Color.clear;
+        instance.music.time = 0;
+        instance.music.Stop();
+        beats = 0;
+    }
+
+    public static void StartTrack()
+    {
+        instance.beatPulseSprite.color = Color.white;
+        instance.music.volume = 1f;
+        instance.music.Play();
+
+        isPlaying = true;
+    }
+
+    public static void FadeOut()
+    {
+        instance.StartCoroutine(instance.FadeOutCoroutine());
+    }
+
+    private IEnumerator FadeOutCoroutine()
+    {
+        while (music.volume > 0)
+        {
+            music.volume = Mathf.MoveTowards(music.volume, 0f, Time.deltaTime / 2f);
+            yield return new WaitForEndOfFrame();
+        }
+        yield break;
+    }
 
     public static float GetBeatDuration()
     {
@@ -50,6 +97,7 @@ public class BeatManager : MonoBehaviour
     private void Awake()
     {
         instance = this;
+        beatPulseSprite = beatPulseAnimator.GetComponent<SpriteRenderer>();
     }
 
     public static float GetActionDuration()
@@ -58,8 +106,12 @@ public class BeatManager : MonoBehaviour
     }
     public static void OnPlayerAction()
     {
+        if (GameManager.compassless) instance.canCastGameBeat = true;
+        if (!instance.canCastGameBeat) return;
+        if (GameManager.isPaused) return;
         instance.canCastGameBeat = false;
         isGameBeat = true;
+        lastBeatTime = Time.time;
     }
 
     public static bool closestIsNextBeat()
@@ -77,9 +129,6 @@ public class BeatManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        QualitySettings.vSyncCount = 1;
-        Application.targetFrameRate = 60;
-        secondsPerBeat = 60f / tempo;
     }
 
     // Update is called once per frame
@@ -91,11 +140,11 @@ public class BeatManager : MonoBehaviour
         }
         if (isBeat) isBeat = false;
         
-        if (music.time < 1 && beats > 20)
+        if (currentTime < 1 && beats > 20)
         {
             beats = 1;
             lastBeat = 0;
-            nextBeat = offset + (secondsPerBeat * beats);
+            nextBeat = offset + audio_offset + (secondsPerBeat * beats);
         }
         currentTime = music.time + audio_offset;
         
@@ -108,7 +157,7 @@ public class BeatManager : MonoBehaviour
         {
             beats++;
             lastBeat = nextBeat;
-            nextBeat = offset + (secondsPerBeat * beats);
+            nextBeat = offset + audio_offset + (secondsPerBeat * beats);
             OnBeat();
         }
         UpdateUI();
@@ -117,8 +166,8 @@ public class BeatManager : MonoBehaviour
 
     private void CalculateNextBeat(float time)
     {
-        beats = (int)((time - offset) / secondsPerBeat);
-        nextBeat = offset + (secondsPerBeat * beats);
+        beats = (int)((time - offset - audio_offset) / secondsPerBeat);
+        nextBeat = offset + audio_offset + (secondsPerBeat * beats);
     }
 
     private void CheckForGameBeat()
@@ -131,8 +180,11 @@ public class BeatManager : MonoBehaviour
         }
         if (lastFrameState != BeatTrigger.FAIL && currentFrameState == BeatTrigger.FAIL) // After last Frame of Input
         {
-            if (canCastGameBeat) isGameBeat = true;
-
+            if (canCastGameBeat)
+            {
+                lastBeatTime = Time.time;
+                if (!GameManager.isPaused && !GameManager.compassless) isGameBeat = true;
+            }
             canCastGameBeat = false;
         }
         lastFrameState = currentFrameState;
@@ -153,22 +205,14 @@ public class BeatManager : MonoBehaviour
     private void OnBeat()
     {
         beatPulseAnimator.SetTrigger("OnBeat");
-        beatPulseAnimator.speed = 1 / secondsPerBeat;
+        //beatPulseAnimator.speed = 1 / secondsPerBeat;
         
-        TestImage.color = Color.red;
         isBeat = true;
         beatTest.Play();
-        CarrouselPos = 0;
     }
 
     private void UpdateUI()
     {
-        float speed = 80f; //80f per secondsPerBeat
-
-        float carrouselOffset = offset / -80 * secondsPerBeat;
-        CarrouselPos -= speed * (Time.deltaTime / secondsPerBeat);
-        BeatCarrousel.GetComponent<RectTransform>().anchoredPosition = new Vector2(CarrouselPos + carrouselOffset, 0);
-
         if (beatScoreAlpha > 0)
         {
             beatScoreAlpha -= Time.deltaTime * 8f;
@@ -176,11 +220,26 @@ public class BeatManager : MonoBehaviour
             beatScore.transform.localPosition = new Vector3(0, beatScore.transform.localPosition.y + beatScoreSpeed * Time.deltaTime, 0);
         }
         beatScore.color = new Color(1, 1, 1, beatScoreAlpha);
+        if (!music.isPlaying) beatPulseAnimator.speed = 0f;
+        else beatPulseAnimator.speed = 1 / secondsPerBeat;
+    }
+
+    public void StartMusic()
+    {
+        beatPulseAnimator.GetComponent<SpriteRenderer>().color = Color.white;
+        music.Play();
+    }
+
+    public void StopMusic()
+    {
+        beatPulseAnimator.speed = 0;
+        beatPulseAnimator.GetComponent<SpriteRenderer>().color = Color.clear;
     }
 
     public static bool isBeatAfter()
     {
-        instance.currentTime = instance.music.time + instance.audio_offset;
+        
+        instance.currentTime = instance.music.time + audio_offset;
 
         float difftolast = Mathf.Abs(instance.currentTime - instance.lastBeat);
         float difftonext = Mathf.Abs(instance.nextBeat - instance.currentTime);
@@ -190,10 +249,11 @@ public class BeatManager : MonoBehaviour
 
     public static BeatTrigger GetBeatSuccess()
     {
+        if (GameManager.compassless) return BeatTrigger.PERFECT;
         float successRange = instance.secondsPerBeat / 4f;
         float perfectRange = instance.secondsPerBeat / 12f;
 
-        instance.currentTime = instance.music.time + instance.audio_offset;
+        instance.currentTime = instance.music.time + audio_offset;
 
         float difftolast = Mathf.Abs(instance.currentTime - instance.lastBeat);
         float difftonext = Mathf.Abs(instance.nextBeat - instance.currentTime);

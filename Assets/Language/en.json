@@ -1,0 +1,52 @@
+{
+    "localizedText": [
+        {
+            "id": "mainmenu.play",
+            "text": "PLAY"
+        },
+        {
+            "id": "mainmenu.shop",
+            "text": "SHOP"
+        },
+		{
+            "id": "mainmenu.achievements",
+            "text": "ACHIEVEMENTS"
+        },
+        {
+            "id": "mainmenu.settings",
+            "text": "SETTINGS"
+        },
+        {
+            "id": "mainmenu.exit",
+            "text": "EXIT"
+        },
+		{
+            "id": "playerui.stage",
+            "text": "STAGE"
+        },
+		{
+            "id": "playerui.stageboss",
+            "text": "STAGE-BOSS"
+        },
+		{
+            "id": "gameover.retry",
+            "text": "RETRY"
+        },
+		{
+            "id": "gameover.mainmenu",
+            "text": "BACK TO MENU"
+        },
+		{
+            "id": "gameover.time",
+            "text": "Time survived: "
+        },
+		{
+            "id": "gameover.enemiesdefeated",
+            "text": "Enemies defeated: "
+        },
+		{
+            "id": "gameover.laststage",
+            "text": "Last stage: "
+        }
+    ]
+}
