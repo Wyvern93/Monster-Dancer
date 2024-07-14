@@ -29,18 +29,28 @@ public class Bullet : MonoBehaviour
         OnBeat();
     }
 
+    public void Despawn()
+    {
+        if (beatsLeft > 0)
+        {
+            beatsLeft = 0;
+            Debug.Log("despawn");
+            StartCoroutine(DespawnCoroutine());
+        }
+    }
+
     protected void OnBeat()
     {
         beatsLeft--;
         if (beatsLeft == 1) spriteRenderer.color = Color.red;
         if (beatsLeft == 0)
         {
-            StartCoroutine(Despawn());
+            StartCoroutine(DespawnCoroutine());
         }
         StartCoroutine(MoveInDirection(direction));
     }
 
-    IEnumerator Despawn()
+    IEnumerator DespawnCoroutine()
     {
         circleCollider.enabled = false;
         float time = 0;

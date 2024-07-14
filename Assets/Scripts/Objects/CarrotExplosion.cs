@@ -6,7 +6,7 @@ public class CarrotExplosion : MonoBehaviour
 
     public void OnEnable()
     {
-        Player.TriggerCameraShake(0.2f, 0.2f);
+        Player.TriggerCameraShake(0.3f, 0.2f);
         AudioController.PlaySound(explosionSound);
     }
     public void OnAnimationEnd()
@@ -19,7 +19,12 @@ public class CarrotExplosion : MonoBehaviour
         if (collision.CompareTag("Enemy"))
         {
             Enemy enemy = collision.GetComponent<Enemy>();
-            enemy.TakeDamage(Player.instance.currentStats.Atk * 12);
+
+            float damage = Player.instance.currentStats.Atk * 12f;
+            bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
+            if (isCritical) damage *= Player.instance.currentStats.CritDmg;
+
+            enemy.TakeDamage((int)damage, isCritical);
         }
     }
 }

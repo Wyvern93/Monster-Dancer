@@ -12,6 +12,7 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] TextMeshProUGUI hpText;
     [SerializeField] Image hurtEffect;
 
+    [SerializeField] GameObject spHud;
     [SerializeField] Image spBar;
     private RectTransform spTransform;
 
@@ -22,6 +23,7 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] TextMeshProUGUI MapTimeText;
     [SerializeField] TextMeshProUGUI StageText;
     [SerializeField] GameObject damageText;
+    [SerializeField] Transform damageTextParent;
 
     public Image crosshair;
     RectTransform crosshair_transform;
@@ -34,6 +36,8 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] CanvasGroup bossBarGroup;
     [SerializeField] TextMeshProUGUI bossBarName;
     [SerializeField] TextMeshProUGUI bossBarHPText;
+
+    [SerializeField] List<PlayerUIIcon> abilityIcons;
     // Start is called before the first frame update
     void Awake()
     {
@@ -45,6 +49,11 @@ public class PlayerUI : MonoBehaviour
 
         bossBarTransform = bossBar.GetComponent<RectTransform>();
         bossBarGroup.alpha = 0;
+
+        foreach (PlayerUIIcon icon in abilityIcons)
+        {
+            icon.Display(null, 0, false);
+        }
     }
 
     public void CreatePools()
@@ -97,13 +106,92 @@ public class PlayerUI : MonoBehaviour
         bossBarHPText.text = $"{current}/{max}";
     }
 
-    public void SpawnDamageText(Vector2 position, int number)
+    public void SetWeaponIcon(Sprite sprite, int level)
+    {
+        abilityIcons[0].Display(sprite, level, false);
+    }
+
+    public void SetWeaponLevel(int level)
+    {
+        abilityIcons[0].SetLevel(level, false);
+    }
+
+    public void SetUltimateIcon(Sprite sprite, int level, bool maxed)
+    {
+        abilityIcons[1].Display(sprite, level, maxed);
+    }
+
+    public void SetUltimateLevel(int level, bool maxed)
+    {
+        abilityIcons[1].SetLevel(level, maxed);
+    }
+
+    public void SetActiveIcon(Sprite sprite, int level, bool maxed)
+    {
+        abilityIcons[2].Display(sprite, level, maxed);
+    }
+
+    public void SetActiveLevel(int level, bool maxed)
+    {
+        abilityIcons[2].SetLevel(level, maxed);
+    }
+
+    public void SetPassiveIcon(Sprite sprite, int level, bool maxed, int id)
+    {
+        abilityIcons[id + 3].Display(sprite, level, maxed);
+    }
+
+    public void SetPassiveLevel(int level, bool maxed, int id)
+    {
+        abilityIcons[id + 3].SetLevel(level, maxed);
+    }
+
+
+    public void ShowSPBar()
+    {
+        spHud.SetActive(true);
+    }
+
+    public void HideSPBar()
+    {
+        spHud.SetActive(false);
+    }
+
+    public void SpawnDamageText(Vector2 position, int number, DamageTextType textType)
     {
         DamageText damageText = PoolManager.Get<DamageText>();
-        damageText.transform.SetParent(transform, true);
+        damageText.transform.SetParent(damageTextParent, true);
         damageText.transform.localScale = Vector3.one;
         damageText.transform.position = position;
         damageText.text.text = number.ToString();
+
+        switch (textType)
+        {
+            default:
+            case DamageTextType.Normal:
+                damageText.color = Color.white;
+                damageText.text.fontSize = 8f;
+                break;
+            case DamageTextType.Critical:
+                damageText.color = Color.yellow;
+                damageText.text.fontSize = 12f;
+                damageText.text.text += "!";
+                break;
+            case DamageTextType.Heal:
+                damageText.color = Color.green;
+                damageText.text.fontSize = 8f;
+                break;
+            case DamageTextType.CriticalHeal:
+                damageText.color = Color.green;
+                damageText.text.fontSize = 12f;
+                damageText.text.text += "!";
+                break;
+            case DamageTextType.Dodge:
+                damageText.color = Color.white;
+                damageText.text.fontSize = 12f;
+                damageText.text.text = "DODGE";
+                break;
+        }
     }
 
     public void DoHurtEffect()
@@ -114,7 +202,7 @@ public class PlayerUI : MonoBehaviour
     public void UpdateHealth()
     {
         float health = (float)Player.instance.CurrentHP / (float)Player.instance.currentStats.MaxHP;
-        float width = (int)(190f * health);
+        float width = (int)(176 * health);
         hpTransform.sizeDelta = new Vector2(width, hpTransform.sizeDelta.y);
         hpText.text = $"{Player.instance.CurrentHP}/{Player.instance.currentStats.MaxHP}";
     }
@@ -122,7 +210,7 @@ public class PlayerUI : MonoBehaviour
     public void UpdateSpecial()
     {
         float special = (float)Player.instance.CurrentSP / (float)Player.instance.MaxSP;
-        float width = (int)(133 * special);
+        float width = (int)(135 * special);
         spTransform.sizeDelta = new Vector2(width, spTransform.sizeDelta.y);
     }
 

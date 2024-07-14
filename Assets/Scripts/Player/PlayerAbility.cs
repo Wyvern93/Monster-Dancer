@@ -1,17 +1,19 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public abstract class PlayerAbility
 {
     public int maxCooldown;
     public int currentCooldown;
 
-    public PlayerAbility ()
+    public PlayerAbility (int maxCD)
     {
-        maxCooldown = 1;
+        maxCooldown = maxCD;
         currentCooldown = 0;
     }
 
+    public abstract Sprite GetIcon();
     public abstract void OnUpdate();
     public abstract void OnEquip();
     public abstract void OnCast();

@@ -10,11 +10,15 @@ public class GameManager : MonoBehaviour
     private static GameManager instance;
     public static string currentScene = "";
     public static RunData runData;
+    public static bool isPaused;
 
     [SerializeField] GameObject selectedCharacter;
     public static bool isLoading;
 
     public List<Enhancement> EnhancementList;
+    public static bool compassless;
+    public IconList iconList;
+
     private void Awake()
     {
         instance = this;
@@ -24,6 +28,7 @@ public class GameManager : MonoBehaviour
 
         SaveManager.LoadFiles();
         Localization.LoadLanguage(SaveManager.PersistentSaveData.GetData<string>("settings.language"));
+        IconList.instance = iconList;
     }
 
     public static void SetSettings()
@@ -68,6 +73,10 @@ public class GameManager : MonoBehaviour
             LoadPlayer(runData.characterPrefab);
             LoadMap("SampleScene");
         }
+        if (Keyboard.current.f1Key.wasPressedThisFrame)
+        {
+            compassless = !compassless;
+        }
     }
 
     public static void LoadMap(string map)
@@ -79,6 +88,14 @@ public class GameManager : MonoBehaviour
     {
         GameObject playerObj = Instantiate(character);
         playerObj.name = "Player";
+        instance.LoadDefaultAugments();
+        UIManager.Instance.PlayerUI.HideSPBar();
+    }
+
+    public void LoadDefaultAugments()
+    {
+        runData.posibleEnhancements = new List<Enhancement>()
+        { new StatDMGEnhancement(), new StatHPEnhancement(), new StatEXPPercentEnhancement(), new StatCritChanceEnhancement() };
     }
 
     private IEnumerator LoadMapCoroutine(string map)

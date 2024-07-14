@@ -3,7 +3,7 @@ using System;
 [Serializable]
 public class PlayerStats
 {
-    public int MaxHP, Def, Atk, Pen, CritChance, CritDmg, ExpRange, ExpMulti, Haste, Rerolls, MovRange;
+    public float MaxHP, Def, Atk, Pen, CritChance, CritDmg, ExpRange, ExpMulti, Haste, Rerolls, MovRange;
 
     public PlayerStats Copy()
     {

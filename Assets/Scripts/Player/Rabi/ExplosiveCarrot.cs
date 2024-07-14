@@ -33,7 +33,7 @@ public class ExplosiveCarrot : MonoBehaviour
             carrotSpr.transform.localEulerAngles = new Vector3(0, 0, carrotSpr.transform.localEulerAngles.z + ((angle * Mathf.Abs(height)) * Time.deltaTime));
             force = Mathf.Clamp(force, -20f, 20f);
             height = Mathf.Clamp(height, 0, 10);
-            transform.position = Vector3.Lerp(transform.position, origin + ((Vector3)direction * 2f), Time.deltaTime * 4f);
+            transform.position = Vector3.Lerp(transform.position, origin + ((Vector3)direction * 2f), Time.deltaTime * 8f);
             
             yield return new WaitForEndOfFrame();
         }

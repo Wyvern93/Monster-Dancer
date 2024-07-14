@@ -97,18 +97,12 @@ public class InputManager : MonoBehaviour
                     return Keyboard.current.spaceKey;
                 case InputActionType.MENU_CANCEL:
                     return Keyboard.current.escapeKey;
-                case InputActionType.ATTACK:
-                    return Mouse.current.leftButton;
                 case InputActionType.CANCEL:
                     return Mouse.current.rightButton;
-                case InputActionType.ABILITY1:
-                    return Keyboard.current.leftShiftKey;
-                case InputActionType.ABILITY2:
-                    return Keyboard.current.leftCtrlKey;
-                case InputActionType.ABILITY3:
-                    return Keyboard.current.spaceKey;
+                case InputActionType.ABILITY:
+                    return Mouse.current.leftButton;
                 case InputActionType.ULTIMATE:
-                    return Mouse.current.middleButton;
+                    return Mouse.current.rightButton;
             }
         }
         else
@@ -127,18 +121,12 @@ public class InputManager : MonoBehaviour
                     return pGamepad.buttonSouth;
                 case InputActionType.MENU_CANCEL:
                     return pGamepad.buttonEast;
-                case InputActionType.ATTACK:
-                    return pGamepad.rightTrigger;
                 case InputActionType.CANCEL:
                     return pGamepad.bButton;
-                case InputActionType.ABILITY1:
-                    return pGamepad.buttonSouth;
-                case InputActionType.ABILITY2:
-                    return pGamepad.buttonWest;
-                case InputActionType.ABILITY3:
-                    return pGamepad.buttonNorth;
+                case InputActionType.ABILITY:
+                    return pGamepad.leftShoulder;
                 case InputActionType.ULTIMATE:
-                    return pGamepad.leftTrigger;
+                    return pGamepad.rightShoulder;
             }
         }
         

@@ -23,6 +23,8 @@ public abstract class Enemy : MonoBehaviour
 
     protected Material spriteRendererMat;
     protected Color emissionColor = new Color(1, 0, 0, 0);
+
+    private bool isDead;
     public bool CanMove()
     {
         if (isMoving) return false;
@@ -54,6 +56,11 @@ public abstract class Enemy : MonoBehaviour
         OnInitialize();
     }
 
+    private void OnEnable()
+    {
+        isDead = false;
+    }
+
     protected abstract void OnInitialize();
 
     // Update is called once per frame
@@ -81,18 +88,23 @@ public abstract class Enemy : MonoBehaviour
         spriteRendererMat.SetColor("_EmissionColor", emissionColor);
     }
 
-    public virtual void TakeDamage(int damage)
+    public virtual void TakeDamage(int damage, bool isCritical)
     {
-        if (!CanTakeDamage()) return;
+        if (!CanTakeDamage())
+        {
+            UIManager.Instance.PlayerUI.SpawnDamageText(transform.position, 0, DamageTextType.Dodge);
+            return;
+        }
 
         CurrentHP = Mathf.Clamp(CurrentHP - damage, 0, MaxHP);
-        Player.TriggerCameraShake(0.3f, 0.2f);
+        Player.TriggerCameraShake(0.4f, 0.2f);
         AudioController.PlaySound(AudioController.instance.sounds.enemyHurtSound);
         emissionColor = new Color(1, 1, 1, 1);
-        UIManager.Instance.PlayerUI.SpawnDamageText(transform.position, damage);
+        UIManager.Instance.PlayerUI.SpawnDamageText(transform.position, damage, isCritical ? DamageTextType.Critical : DamageTextType.Normal);
 
-        if (CurrentHP <= 0)
+        if (CurrentHP <= 0 && !isDead)
         {
+            isDead = true;
             Die();
         }
     }
@@ -104,7 +116,7 @@ public abstract class Enemy : MonoBehaviour
         gem.transform.position = transform.position;
         KillEffect deathFx = PoolManager.Get<KillEffect>();
         deathFx.transform.position = transform.position;
-        PoolManager.Return(gameObject, GetType());
         Map.Instance.EnemiesAlive--;
+        PoolManager.Return(gameObject, GetType());
     }
 }

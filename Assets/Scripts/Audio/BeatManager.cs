@@ -105,7 +105,10 @@ public class BeatManager : MonoBehaviour
         return instance.secondsPerBeat / 2f;
     }
     public static void OnPlayerAction()
-    {   if (!instance.canCastGameBeat) return;
+    {
+        if (GameManager.compassless) instance.canCastGameBeat = true;
+        if (!instance.canCastGameBeat) return;
+        if (GameManager.isPaused) return;
         instance.canCastGameBeat = false;
         isGameBeat = true;
         lastBeatTime = Time.time;
@@ -180,7 +183,7 @@ public class BeatManager : MonoBehaviour
             if (canCastGameBeat)
             {
                 lastBeatTime = Time.time;
-                isGameBeat = true;
+                if (!GameManager.isPaused && !GameManager.compassless) isGameBeat = true;
             }
             canCastGameBeat = false;
         }
@@ -246,6 +249,7 @@ public class BeatManager : MonoBehaviour
 
     public static BeatTrigger GetBeatSuccess()
     {
+        if (GameManager.compassless) return BeatTrigger.PERFECT;
         float successRange = instance.secondsPerBeat / 4f;
         float perfectRange = instance.secondsPerBeat / 12f;
 

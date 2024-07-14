@@ -71,7 +71,10 @@ public class TestEnemy : Enemy
     void MoveTowardsPlayer()
     {
         bool horizontalMovement = false;
-        if (Mathf.Abs(transform.position.x - Player.position.x) > Mathf.Abs(transform.position.y - Player.position.y)) horizontalMovement = true;
+
+        Vector3 playerPos = Player.instance.GetClosestPlayer(transform.position);
+
+        if (Mathf.Abs(transform.position.x - playerPos.x) > Mathf.Abs(transform.position.y - playerPos.y)) horizontalMovement = true;
 
         direction = Vector2.zero;
         if (horizontalMovement)
@@ -94,7 +97,8 @@ public class TestEnemy : Enemy
 
     void SpawnBullets()
     {
-        direction = new Vector2(Player.position.x < transform.position.x ? -1 : Player.position.x > transform.position.x ? 1 : 0, Player.position.y < transform.position.y ? -1 : Player.position.y > transform.position.y ? 1 : 0);
+        Vector3 playerPos = Player.instance.GetClosestPlayer(transform.position);
+        direction = new Vector2(playerPos.x < transform.position.x ? -1 : playerPos.x > transform.position.x ? 1 : 0, playerPos.y < transform.position.y ? -1 : playerPos.y > transform.position.y ? 1 : 0);
         StartCoroutine(SpawnBullet(direction));
     }
 
@@ -169,6 +173,7 @@ public class TestEnemy : Enemy
         bullet.transform.position = new Vector3(spawnEffect.transform.position.x, spawnEffect.transform.position.y);
         bullet.direction = direction;
         bullet.OnSpawn();
+        //bullet.beatsLeft = 30;
         yield break;
     }
 }

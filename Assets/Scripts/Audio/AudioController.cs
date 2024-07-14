@@ -47,10 +47,11 @@ public class AudioController : MonoBehaviour
         clipsPlaying.Clear();
     }
 
-    public static void PlaySound(AudioClip sound)
+    public static void PlaySound(AudioClip sound, float pitch = 1f)
     {
         if (instance.clipsPlaying.Contains(sound)) return;
         instance.clipsPlaying.Add(sound);
+        instance.sfx.pitch = pitch;
         instance.sfx.PlayOneShot(sound);
     }
     public static void PlayMusic(AudioClip music, bool loop = true)

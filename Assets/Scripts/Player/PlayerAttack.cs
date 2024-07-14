@@ -29,7 +29,12 @@ public class PlayerAttack : MonoBehaviour
         if (collision.CompareTag("Enemy"))
         {
             Enemy enemy = collision.GetComponent<Enemy>();
-            enemy.TakeDamage(Player.instance.currentStats.Atk);
+
+            float damage = Player.instance.currentStats.Atk;
+            bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
+            if (isCritical) damage *= Player.instance.currentStats.CritDmg;
+
+            enemy.TakeDamage((int)damage, isCritical);
         }
     }
 }

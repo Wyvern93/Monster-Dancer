@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,6 +13,7 @@ public class Player : MonoBehaviour
     public Animator animator;
 
     protected Vector2 direction, oldDir;
+    public bool isMoving;
     public bool facingRight { get; protected set; }
 
     [SerializeField] protected SpriteRenderer Sprite;
@@ -19,12 +21,15 @@ public class Player : MonoBehaviour
     protected float SpriteX = 1f;
 
     public static Vector2 position {  get; protected set; }
+    public static Vector2 originPos;
 
     public bool onbeat;
     public bool waitForNextBeat;
 
     protected float ScreenShakeStrength;
     protected float ScreenShakeTime;
+
+    private Vector3 targetCameraPos;
     protected Vector2 ScreenShakeDir;
     protected Vector3 CameraOffset;
     protected PlayerAction action;
@@ -38,12 +43,9 @@ public class Player : MonoBehaviour
     protected Material spriteRendererMat;
     protected Color emissionColor = new Color(1,0,0,0);
 
-    bool canAttack = true;
-    bool canUseAbility1 = true;
-    bool canUseAbility2 = true;
-    bool canUseAbility3 = true;
-    bool canUseUltimate = true;
-    bool isDead = false;
+    protected bool canUseActiveAbility = true;
+    protected bool canUseUltimate = true;
+    public bool isDead = false;
 
     [Header("Stats")]
     public PlayerStats baseStats;
@@ -58,15 +60,51 @@ public class Player : MonoBehaviour
 
     [Header("Abilities")]
     public List<PlayerAbility> playerAbilities;
-    public PlayerAbility[] equippedAbilities;
+    public List<PlayerAbility> equippedPassiveAbilities;
+    public PlayerAbility activeAbility;
+    public PlayerAbility ultimateAbility;
 
     [Header("Prefabs")]
     public GameObject attackPrefab;
+
+    public List<GameObject> playerClones;
+    public bool isInvulnerable;
+
+    public Vector3 GetClosestPlayer(Vector2 pos)
+    {
+        if (playerClones.Count == 0) return position;
+
+        Vector3 finalPos = playerClones[0].transform.position;
+        float dist = Vector2.Distance(pos, finalPos);
+        foreach (var playerClone in playerClones)
+        {
+            float newdist = Vector2.Distance(pos, playerClone.transform.position);
+            if (newdist < dist)
+            {
+                dist = newdist;
+                finalPos = playerClone.transform.position;
+            }
+        }
+        return finalPos;
+    }
 
     public bool CanMove()
     {
         if (isPerformingAction) return false;
         else return BeatManager.GetBeatSuccess() != BeatTrigger.FAIL;
+    }
+
+    public int getPassiveAbilityIndex(System.Type abilityType)
+    {
+        PlayerAbility searchAbility = equippedPassiveAbilities.FirstOrDefault<PlayerAbility>(x=> x.GetType() ==abilityType);
+        if (searchAbility != null)
+        {
+            return equippedPassiveAbilities.IndexOf(searchAbility);
+        }
+        else
+        {
+            return equippedPassiveAbilities.Count();
+        }
     }
 
     public virtual void Despawn()
@@ -78,7 +116,7 @@ public class Player : MonoBehaviour
     {
         instance.transform.position = Vector3.zero;
         position = Vector3.zero;
-        //BeatManager.SetRingPosition(Vector3.zero);
+        instance.targetCameraPos = new Vector3(position.x, position.y, -10);
         Camera.main.transform.position = new Vector3(position.x, position.y, -10);
         instance.animator.speed = 1 / BeatManager.GetBeatDuration();
         instance.animator.updateMode = AnimatorUpdateMode.Normal;
@@ -88,19 +126,25 @@ public class Player : MonoBehaviour
     {
         instance = this;
         abilityValues = new Dictionary<string, float>();
-        equippedAbilities = new PlayerAbility[4];
+        equippedPassiveAbilities = new List<PlayerAbility>();
         spriteRendererMat = Sprite.material;
         Level = 1;
-        MaxExp = Level ^ 3 + 50;
+        MaxExp = CalculateExpCurve(Level);
 
-        enhancements.Add(new StatHPEnhancement());
-        enhancements.Add(new StatHPEnhancement());
         CalculateStats();
-        CurrentHP = currentStats.MaxHP;
+        CurrentHP = (int)currentStats.MaxHP;
+        CurrentSP = 0;
 
         UIManager.Instance.PlayerUI.UpdateHealth();
         UIManager.Instance.PlayerUI.UpdateExp();
         UIManager.Instance.PlayerUI.UpdateSpecial();
+    }
+
+    public int CalculateExpCurve(int lv)
+    {
+        int nextLevel = (int)Mathf.Pow(lv, 2);
+        int lastLevel = (int)Mathf.Pow(lv - 1, 2);
+        return (nextLevel - lastLevel) + 50;
     }
 
     public void CalculateStats()
@@ -126,13 +170,11 @@ public class Player : MonoBehaviour
         Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -10f);
         facingRight = true;
         position = transform.position;
-        //BeatManager.SetRingPosition(transform.position);
     }
 
     // Update is called once per frame
     void Update()
     {
-        //BeatManager.SetRingPosition(transform.position);
         if (GameManager.isLoading) return;
         if (!isDead)
         {
@@ -150,11 +192,12 @@ public class Player : MonoBehaviour
             animator.updateMode = AnimatorUpdateMode.Normal;
         }
 
-        foreach (PlayerAbility ability in equippedAbilities)
+        foreach (PlayerAbility ability in equippedPassiveAbilities)
         {
             if (ability != null) ability.OnUpdate();
         }
-
+        if (activeAbility != null) { activeAbility.OnUpdate(); }
+        if (ultimateAbility != null) { ultimateAbility.OnUpdate();}
     }
 
     public void SetDirection(Vector2 dir)
@@ -170,11 +213,13 @@ public class Player : MonoBehaviour
         else facingRight = true;
     }
 
-    public virtual void OnAbility1Use() { }
+    public virtual void OnPassiveAbility1Use() { }
 
-    public virtual void OnAbility2Use() { }
+    public virtual void OnPassiveAbility2Use() { }
 
-    public virtual void OnAbility3Use() { }
+    public virtual void OnPassiveAbility3Use() { }
+
+    public virtual void OnActiveAbilityUse() { }
 
     public virtual void OnUltimateUse() { }
 
@@ -210,8 +255,12 @@ public class Player : MonoBehaviour
             if (direction.x == 1) facingRight = true;
         }
 
-        if (InputManager.ActionPress(InputActionType.ATTACK)) 
+        if (BeatManager.isGameBeat && !GameManager.compassless) 
         {
+            PerformAutomatedAction();
+
+
+            /*
             BeatTrigger result = BeatManager.GetBeatSuccess();
             if (result != BeatTrigger.FAIL && !waitForNextBeat && canAttack)
             {
@@ -224,128 +273,101 @@ public class Player : MonoBehaviour
                 BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
                 waitForNextBeat = true;
                 canAttack = false;
-            }
+            }*/
         }
 
-        if (InputManager.ActionPress(InputActionType.ABILITY1))
+        if (InputManager.ActionPress(InputActionType.ABILITY))
         {
-            if (equippedAbilities[0] != null)
+            if (activeAbility != null)
             {
                 BeatTrigger result = BeatManager.GetBeatSuccess();
-                if (result != BeatTrigger.FAIL && !waitForNextBeat && canUseAbility1 && equippedAbilities[0].CanCast())
+                if (result != BeatTrigger.FAIL && !waitForNextBeat && activeAbility.CanCast())
                 {
-                    OnAbility1Use();
-                    canUseAbility1 = false;
+                    OnActiveAbilityUse();
                 }
                 else
                 {
                     TriggerCameraShake(0.04f, 0.2f);
                     BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
                     waitForNextBeat = true;
-                    canUseAbility1 = false;
                 }
             }
-        }
 
-        if (InputManager.ActionPress(InputActionType.ABILITY2))
-        {
-            if (equippedAbilities[1] != null)
-            {
-                BeatTrigger result = BeatManager.GetBeatSuccess();
-                if (result != BeatTrigger.FAIL && !waitForNextBeat && canUseAbility2 && equippedAbilities[1].CanCast())
-                {
-                    OnAbility2Use();
-                    canUseAbility2 = false;
-                }
-                else
-                {
-                    TriggerCameraShake(0.04f, 0.2f);
-                    BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
-                    waitForNextBeat = true;
-                    canUseAbility2 = false;
-                }
-            }
-        }
-
-        if (InputManager.ActionPress(InputActionType.ABILITY3))
-        {
-            if (equippedAbilities[2] != null)
-            {
-                BeatTrigger result = BeatManager.GetBeatSuccess();
-                if (result != BeatTrigger.FAIL && !waitForNextBeat && canUseAbility3 && equippedAbilities[2].CanCast())
-                {
-                    OnAbility3Use();
-                    canUseAbility3 = false;
-                }
-                else
-                {
-                    TriggerCameraShake(0.04f, 0.2f);
-                    BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
-                    waitForNextBeat = true;
-                    canUseAbility3 = false;
-                }
-            }
         }
 
         if (InputManager.ActionPress(InputActionType.ULTIMATE))
         {
-            if (equippedAbilities[3] != null && CurrentSP == MaxSP)
+            if (ultimateAbility != null)
             {
                 BeatTrigger result = BeatManager.GetBeatSuccess();
-                if (result != BeatTrigger.FAIL && !waitForNextBeat && canUseUltimate && equippedAbilities[3].CanCast())
+                if (result != BeatTrigger.FAIL && !waitForNextBeat && ultimateAbility.CanCast())
                 {
                     OnUltimateUse();
-                    canUseUltimate = false;
                 }
                 else
                 {
                     TriggerCameraShake(0.04f, 0.2f);
                     BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
                     waitForNextBeat = true;
-                    canUseUltimate = false;
                 }
             }
         }
 
         // Handle Movement
-        if (!waitForNextBeat && !isPerformingAction)
+        if (GameManager.compassless && action != PlayerAction.None)
         {
-            BeatTrigger score = BeatManager.GetBeatSuccess();
-            if (action != PlayerAction.None)
+            PerformAction(action);
+        }
+        else
+        {
+            if (!waitForNextBeat && !isPerformingAction)
             {
-                // Too late to the beat = fail
-                if (!BeatManager.closestIsNextBeat() && score == BeatTrigger.FAIL)
+                BeatTrigger score = BeatManager.GetBeatSuccess();
+                if (action != PlayerAction.None)
                 {
-                    TriggerCameraShake(0.04f, 0.2f);
-                    BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
-                    action = PlayerAction.None;
-                }
-                else if (BeatManager.closestIsNextBeat() && score == BeatTrigger.FAIL)
-                {
-                    TriggerCameraShake(0.04f, 0.2f);
-                    BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
-                    waitForNextBeat = true;
-                    action = PlayerAction.None;
-                }
-                else if (!isPerformingAction)
-                {
-                    if (BeatManager.GetBeatSuccess() == BeatTrigger.SUCCESS || score == BeatTrigger.PERFECT)
+                    // Too late to the beat = fail
+                    if (!BeatManager.closestIsNextBeat() && score == BeatTrigger.FAIL)
                     {
-                        if (BeatManager.isBeatAfter() || BeatManager.isBeat)
+                        TriggerCameraShake(0.04f, 0.2f);
+                        BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
+                        action = PlayerAction.None;
+                    }
+                    else if (BeatManager.closestIsNextBeat() && score == BeatTrigger.FAIL)
+                    {
+                        TriggerCameraShake(0.04f, 0.2f);
+                        BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
+                        waitForNextBeat = true;
+                        action = PlayerAction.None;
+                    }
+                    else if (!isPerformingAction)
+                    {
+                        if (BeatManager.GetBeatSuccess() == BeatTrigger.SUCCESS || score == BeatTrigger.PERFECT)
                         {
-                            BeatManager.TriggerBeatScore(score);
-                            PerformAction(action);
-                            waitForNextBeat = true;
+                            if (BeatManager.isBeatAfter() || BeatManager.isBeat)
+                            {
+                                BeatManager.TriggerBeatScore(score);
+                                PerformAction(action);
+                                waitForNextBeat = true;
+                            }
                         }
                     }
                 }
             }
+        
         }
-        if (waitForNextBeat && !BeatManager.closestIsNextBeat() && BeatManager.GetBeatSuccess() == BeatTrigger.FAIL)
+        if (GameManager.compassless)
         {
             waitForNextBeat = false;
         }
-
+        else
+        {
+            if (waitForNextBeat && !BeatManager.closestIsNextBeat() && BeatManager.GetBeatSuccess() == BeatTrigger.FAIL)
+            {
+                waitForNextBeat = false;
+            }
+        }
+        
+        /*
         if (!BeatManager.closestIsNextBeat() && BeatManager.GetBeatSuccess() == BeatTrigger.FAIL)
         {
             if (!canAttack) canAttack = true;
@@ -353,11 +375,20 @@ public class Player : MonoBehaviour
             if (!canUseAbility2) canUseAbility2 = true;
             if (!canUseAbility3) canUseAbility3 = true;
             if (!canUseUltimate) canUseUltimate = true;
-        }
+        }*/
+    }
+
+    public void PerformAutomatedAction()
+    {
+        OnAttack();
+        if (equippedPassiveAbilities.Count > 0) OnPassiveAbility1Use();
+        if (equippedPassiveAbilities.Count > 1) OnPassiveAbility2Use();
+        if (equippedPassiveAbilities.Count > 2) OnPassiveAbility3Use();
     }
 
     private void PerformAction(PlayerAction Playeraction)
     {
+        if (isMoving) return;
         if (isPerformingAction) return;
         action = PlayerAction.None;
         isPerformingAction = true;
@@ -367,9 +398,11 @@ public class Player : MonoBehaviour
                 Move((Vector2)transform.position + direction);
                 break;
         }
+        PerformAutomatedAction();
+        BeatManager.OnPlayerAction();
     }
 
-    public void Move(Vector2 targetPos)
+    public virtual void Move(Vector2 targetPos)
     {
         StartCoroutine(MoveCoroutine(targetPos));
     }
@@ -377,6 +410,7 @@ public class Player : MonoBehaviour
     protected virtual IEnumerator MoveCoroutine(Vector2 targetPos)
     {
         SpriteSize = 1.2f;
+        isMoving = true;
         Vector3 originalPos = transform.position;
         float height = 0;
         float time = 0;
@@ -388,8 +422,6 @@ public class Player : MonoBehaviour
         if (Map.isWallAt(targetPos)) targetPos = originalPos;
 
         position = targetPos;
-        BeatManager.OnPlayerAction();
-
 
         while (time <= 0.125f)
         {
@@ -414,14 +446,14 @@ public class Player : MonoBehaviour
         position = targetPos;
 
         isPerformingAction = false;
+        isMoving = false;
         yield break;
     }
 
     public static void TriggerCameraShake(float strength, float time)
     {
-        instance.ScreenShakeStrength = strength;
-        instance.ScreenShakeTime = time;
-        instance.StartCoroutine(instance.CameraShakeCoroutine());
+        if (strength > instance.ScreenShakeStrength) instance.ScreenShakeStrength = strength;
+        if (time > instance.ScreenShakeTime) instance.ScreenShakeTime = time;
     }
 
     private IEnumerator CameraShakeCoroutine()
@@ -429,6 +461,10 @@ public class Player : MonoBehaviour
         float timeExponential = 1 / ScreenShakeTime;
         while (ScreenShakeTime > 0f)
         {
+            while (Time.timeScale <= 0.01f)
+            {
+                yield return new WaitForEndOfFrame();
+            }
             ScreenShakeTime -= Time.deltaTime;
             CameraOffset = (Vector3)Random.insideUnitCircle * ScreenShakeStrength;
             ScreenShakeStrength = Mathf.MoveTowards(ScreenShakeTime, 0, timeExponential * Time.deltaTime);
@@ -450,12 +486,24 @@ public class Player : MonoBehaviour
 
     protected void HandleCamera()
     {
-        Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, new Vector3(transform.position.x, transform.position.y, -10), Time.deltaTime * 8f) + CameraOffset;
+        targetCameraPos = Vector3.Lerp(targetCameraPos, new Vector3(transform.position.x, transform.position.y, -10), Time.deltaTime * 8f);
+
+        // Camera ScreenShake
+        if (ScreenShakeTime > 0)
+        {
+            ScreenShakeTime = Mathf.MoveTowards(ScreenShakeTime, 0, Time.deltaTime);
+            float currentShakeStrength = ScreenShakeStrength * ScreenShakeTime;
+            ScreenShakeDir = Random.insideUnitCircle * currentShakeStrength;
+        }
+        CameraOffset = Vector3.MoveTowards(CameraOffset, ScreenShakeDir, Time.deltaTime * 24f);
+
+        Camera.main.transform.position = targetCameraPos + CameraOffset;
         Camera.main.transform.position = new Vector3(Mathf.Clamp(Camera.main.transform.position.x, -10, 9.5f), Mathf.Clamp(Camera.main.transform.position.y, -6.88f, 6.25f), Camera.main.transform.position.z);
     }
 
-    public void TakeDamage(int damage)
+    public virtual void TakeDamage(int damage)
     {
+        if (isInvulnerable) return;
         if (isDead) return;
         CurrentHP = Mathf.Clamp(CurrentHP - damage, 0, 9999);
         TriggerCameraShake(0.3f, 0.2f);
@@ -473,6 +521,7 @@ public class Player : MonoBehaviour
 
     public static void AddExp(int n)
     {
+        n = (int)(n * instance.currentStats.ExpMulti);
         if (instance.isDead) return;
         instance.CurrentExp += n;
         if (instance.CurrentExp >= instance.MaxExp)
@@ -493,9 +542,10 @@ public class Player : MonoBehaviour
 
     public void OnLevelUp()
     {
-        MaxExp = Level ^ 3 + 50;
+        MaxExp = CalculateExpCurve(Level);
         AudioController.PlaySound(AudioController.instance.sounds.playerLvlUpSfx);
         CalculateStats();
+        EnhancementMenu.instance.Open();
     }
 
     public void Die()

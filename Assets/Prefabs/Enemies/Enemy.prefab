@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 2017603239726065263}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 2.45}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -110,7 +110,7 @@ Transform:
   m_GameObject: {fileID: 2652843271933679152}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 2.45}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -223,7 +223,6 @@ MonoBehaviour:
   CurrentHP: 40
   SpawnIndex: 0
   AItype: 0
-  hurtSfx: {fileID: 8300000, guid: 5fbee34d639a002479c25b36f6fd6294, type: 3}
 --- !u!50 &1868561314014851747
 Rigidbody2D:
   serializedVersion: 4

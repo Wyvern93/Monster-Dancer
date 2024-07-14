@@ -139,7 +139,7 @@ TextureImporter:
         width: 33
         height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 16, y: 2, z: 16, w: 2}
       outline: []
       physicsShape: []
@@ -147,6 +147,27 @@ TextureImporter:
       bones: []
       spriteID: 2990ff1bc375ec94382dbdbb827b3e9c
       internalID: 1892185745
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: button_ui_2
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 0
+        width: 33
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 16, y: 2, z: 16, w: 2}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bca83179d31a50946b67f62d55d14fbe
+      internalID: -1409726055
       vertices: []
       indices: 
       edges: []
@@ -164,6 +185,7 @@ TextureImporter:
     nameFileIdTable:
       button_ui_0: 555272965
       button_ui_1: 1892185745
+      button_ui_2: -1409726055
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

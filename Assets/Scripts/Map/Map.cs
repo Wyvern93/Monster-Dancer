@@ -128,12 +128,13 @@ public class Map : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (EnemiesAlive < 0) EnemiesAlive = 0;
         if (BeatManager.isGameBeat && BeatManager.isPlaying)
         {
             beats++;
             if (part == 0)
             {
-                if (waves < 21 && (beats >= beatsBeforeWave || EnemiesAlive < WaveNumberOfEnemies * 0.2f || EnemiesAlive == 0))
+                if (waves < 21 && (beats >= beatsBeforeWave || EnemiesAlive < WaveNumberOfEnemies * 0.2f || EnemiesAlive <= 0))
                 {
                     beats = 0;
                     SpawnNextWave(partAWaves); // Normal A Wave
@@ -149,7 +150,7 @@ public class Map : MonoBehaviour
 
             if (part == 2)
             {
-                if (waves < 42 && (beats >= beatsBeforeWave || EnemiesAlive < WaveNumberOfEnemies * 0.2f || EnemiesAlive == 0))
+                if (waves < 42 && (beats >= beatsBeforeWave || EnemiesAlive < WaveNumberOfEnemies * 0.2f || EnemiesAlive <= 0))
                 {
                     beats = 0;
                     SpawnNextWave(partBWaves); // Normal A Wave
