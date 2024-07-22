@@ -6,6 +6,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerRabi : Player
 {
+    [SerializeField] Rigidbody2D rb;
+
     [Header("Ability Prefabs")]
     [SerializeField] GameObject explosiveCarrot;
     [SerializeField] GameObject carrotExplosionPrefab;
@@ -154,12 +156,25 @@ public class PlayerRabi : Player
         float time = 0;
         if (direction == Vector2.zero)
         {
-            direction = oldDir;
-            targetPos = (Vector2)originPos + oldDir;
+            direction = (oldDir * currentStats.Speed);
+            targetPos = (Vector2)originPos + (oldDir * currentStats.Speed);
         }
-        if (Map.isWallAt(targetPos)) targetPos = originPos;
-
-        position = targetPos;
+        Vector2 dir = Vector2.zero;
+        if (InputManager.playerDevice == InputManager.InputDeviceType.Keyboard)
+        {
+            dir.x = Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed ? -1 : Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed ? 1 : 0;
+            dir.y = Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed ? -1 : Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed ? 1 : 0;
+        }
+        else
+        {
+            Vector2 leftStick = InputManager.GetLeftStick();
+            dir = leftStick;
+        }
+        if (dir == Vector2.zero)
+        {
+            dir.x = facingRight ? 1 : -1;
+        }
+        dir.Normalize();
 
         animator.Play("Rabi_Move");
         animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration() / 1.5f);
@@ -168,22 +183,22 @@ public class PlayerRabi : Player
         {
             if (isCastingBunnyHop)
             {
-                position = originPos;
+                rb.velocity = Vector2.zero;
                 yield break;
             }
             
-            if (Map.isWallAt(targetPos)) targetPos = originPos;
+            //if (Map.isWallAt(targetPos)) targetPos = originPos;
 
-            transform.position = Vector3.Lerp(originPos, (Vector3)targetPos, time * 8f);
+            //transform.position = Vector3.Lerp(originPos, (Vector3)targetPos, time * 8f);
+            rb.velocity = dir * currentStats.Speed * 8;
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
+        rb.velocity = Vector2.zero;
         animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration() / 2);
         animator.Play("Rabi_Idle");
         yield return new WaitForEndOfFrame();
         Sprite.transform.localPosition = Vector3.zero;
-        transform.position = targetPos;
-        position = targetPos;
 
         isPerformingAction = false;
         isMoving = false;
@@ -201,11 +216,13 @@ public class PlayerRabi : Player
         else
         {
             Vector2 leftStick = InputManager.GetLeftStick();
-            dir.x = leftStick.x > 0.4f ? 1 : leftStick.x < -0.4f ? -1 : 0;
-            dir.y = leftStick.y > 0.4f ? 1 : leftStick.y < -0.4f ? -1 : 0;
+            dir = leftStick;
         }
-        if (dir.x != 0 && dir.y != 0) dir.y = 0;
-        if (dir == Vector2.zero) dir = facingRight ? Vector2.right : Vector2.left;
+        if (dir == Vector2.zero)
+        {
+            dir.x = facingRight ? 1 : -1;
+        }
+        dir.Normalize();
         isCastingBunnyHop = true;
         direction = dir;
         isPerformingAction = true;
@@ -219,19 +236,6 @@ public class PlayerRabi : Player
 
         int finalDistance = 0;
         Vector2 targetPos;
-        for (int i = 1; i <= tiles; i++)
-        {
-            targetPos = originPos + (dir * i);
-            if (Map.isWallAt(targetPos))
-            {
-                finalDistance = i - 1;
-                break;
-            }
-            else
-            {
-                finalDistance++;
-            }
-        }
 
         dashHitBox.enabled = true;
         targetPos = originPos + (dir * finalDistance);
@@ -239,23 +243,22 @@ public class PlayerRabi : Player
         animator.Play("Rabi_Dash");
         spriteTrail.Play(Sprite, 25, 0.005f, Sprite.transform, new Color(0, 1, 1, 0.5f));
         AudioController.PlaySound(dashSound);
+
         float time = 0;
         while (time <= BeatManager.GetBeatDuration() / 2)
         {
-            if (Map.isWallAt(targetPos)) targetPos = originPos;
-
-            transform.position = Vector3.Lerp(originPos, (Vector3)targetPos, time * 6f);
+            rb.velocity = dir * currentStats.Speed * 16;
+            //transform.position = Vector3.Lerp(originPos, (Vector3)targetPos, time * 6f);
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
-        transform.position = targetPos;
+        rb.velocity = Vector2.zero;
+
         spriteTrail.Stop();
         dashHitBox.enabled = false;
         animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration() / 2);
         animator.Play("Rabi_Idle");
         Sprite.transform.localPosition = Vector3.zero;
-        transform.position = targetPos;
-        position = targetPos;
 
         isPerformingAction = false;
         isCastingBunnyHop = false;
@@ -299,7 +302,7 @@ public class PlayerRabi : Player
         dir *= 2;
         isCastingBunnyHop = true;
         direction = dir;
-        StartCoroutine(BunnyHopCoroutine(position + dir));
+        StartCoroutine(BunnyHopCoroutine((Vector2)transform.position + dir));
         
     }
 
@@ -316,8 +319,6 @@ public class PlayerRabi : Player
             targetPos = (Vector2)originPos + oldDir;
         }
         if (Map.isWallAt(targetPos)) targetPos = originPos;
-
-        position = targetPos;
 
         animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration() / 2);
         animator.Play("Rabi_BunnyHop");
@@ -346,7 +347,6 @@ public class PlayerRabi : Player
         animator.Play("Rabi_Idle");
         Sprite.transform.localPosition = Vector3.zero;
         transform.position = targetPos;
-        position = targetPos;
 
         isPerformingAction = false;
         isCastingBunnyHop = false;

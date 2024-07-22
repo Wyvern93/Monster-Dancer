@@ -86,7 +86,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!95 &4284550755660226288
 Animator:
   serializedVersion: 5
@@ -121,6 +121,7 @@ GameObject:
   - component: {fileID: 8099202659478067292}
   - component: {fileID: 7232690413544996010}
   - component: {fileID: 4465351908415658744}
+  - component: {fileID: 1054918596558404662}
   m_Layer: 7
   m_Name: Rabi
   m_TagString: Player
@@ -185,7 +186,7 @@ MonoBehaviour:
     ExpMulti: 1
     Haste: 0
     Rerolls: 0
-    MovRange: 1
+    Speed: 1
   perLevelStats:
     MaxHP: 0
     Def: 0
@@ -197,7 +198,7 @@ MonoBehaviour:
     ExpMulti: 0
     Haste: 0
     Rerolls: 0
-    MovRange: 0
+    Speed: 0
   currentStats:
     MaxHP: 0
     Def: 0
@@ -209,7 +210,7 @@ MonoBehaviour:
     ExpMulti: 0
     Haste: 0
     Rerolls: 0
-    MovRange: 0
+    Speed: 0
   flatBonusStats:
     MaxHP: 0
     Def: 0
@@ -221,7 +222,7 @@ MonoBehaviour:
     ExpMulti: 0
     Haste: 0
     Rerolls: 0
-    MovRange: 0
+    Speed: 0
   percentBonusStats:
     MaxHP: 0
     Def: 0
@@ -233,13 +234,14 @@ MonoBehaviour:
     ExpMulti: 0
     Haste: 0
     Rerolls: 0
-    MovRange: 0
+    Speed: 0
   music_theme: {fileID: 8300000, guid: 91327df76b7541940a4738d91fcb8c17, type: 3}
   enhancements: []
   attackPrefab: {fileID: 238526771677291766, guid: 4af89ea480ae3f04eaeed59c29c97ba3, type: 3}
   playerClones: []
   isInvulnerable: 0
   grazeSprite: {fileID: 8249613087250414989}
+  rb: {fileID: 7232690413544996010}
   explosiveCarrot: {fileID: 6176280003804827367, guid: 3022bd6a79b7630479f72639d2475f67, type: 3}
   carrotExplosionPrefab: {fileID: 2605593471026702462, guid: 941e5a73124b6514cacc803978b84e0a, type: 3}
   rabiClonePrefab: {fileID: 2259806814164270096, guid: 62879664afbba8f4a813d773bdc57f27, type: 3}
@@ -303,7 +305,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.1, y: 0.1}
+  m_Size: {x: 0.3, y: 0.3}
   m_EdgeRadius: 0
 --- !u!50 &7232690413544996010
 Rigidbody2D:
@@ -313,14 +315,14 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1877061861415643658}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -331,7 +333,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!114 &4465351908415658744
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -346,6 +348,51 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   perSpriteTime: 0
   numOfSprites: 0
+--- !u!61 &1054918596558404662
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1877061861415643658}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 3840
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.4, y: 0.4}
+  m_EdgeRadius: 0
 --- !u!1 &3940814989997327143
 GameObject:
   m_ObjectHideFlags: 0
@@ -429,7 +476,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &4120857474136078284
 GameObject:
   m_ObjectHideFlags: 0
@@ -593,7 +640,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &4926858411828031574
 GameObject:
   m_ObjectHideFlags: 0

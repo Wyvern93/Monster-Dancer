@@ -21,7 +21,6 @@ public class Player : MonoBehaviour
     public float SpriteSize = 1f;
     protected float SpriteX = 1f;
 
-    public static Vector2 position {  get; protected set; }
     public static Vector2 originPos;
 
     public bool onbeat;
@@ -79,7 +78,7 @@ public class Player : MonoBehaviour
 
     public Vector3 GetClosestPlayer(Vector2 pos)
     {
-        if (playerClones.Count == 0) return position;
+        if (playerClones.Count == 0) return transform.position;
 
         Vector3 finalPos = playerClones[0].transform.position;
         float dist = Vector2.Distance(pos, finalPos);
@@ -124,9 +123,8 @@ public class Player : MonoBehaviour
     public static void ResetPosition()
     {
         instance.transform.position = Vector3.zero;
-        position = Vector3.zero;
-        instance.targetCameraPos = new Vector3(position.x, position.y, -10);
-        Camera.main.transform.position = new Vector3(position.x, position.y, -60);
+        instance.targetCameraPos = new Vector3(instance.transform.position.x, instance.transform.position.y, -60);
+        Camera.main.transform.position = instance.targetCameraPos;
         instance.animator.speed = 1 / BeatManager.GetBeatDuration();
         instance.animator.updateMode = AnimatorUpdateMode.Normal;
         instance.Sprite.sortingLayerID = 0;
@@ -181,7 +179,6 @@ public class Player : MonoBehaviour
     {
         Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -60f);
         facingRight = true;
-        position = transform.position;
     }
 
     // Update is called once per frame
@@ -445,8 +442,6 @@ public class Player : MonoBehaviour
         }
         if (Map.isWallAt(targetPos)) targetPos = originalPos;
 
-        position = targetPos;
-
         while (time <= 0.125f)
         {
             if (Map.isWallAt(targetPos)) targetPos = originalPos;
@@ -467,7 +462,6 @@ public class Player : MonoBehaviour
         }
         Sprite.transform.localPosition = Vector3.zero;
         transform.position = targetPos;
-        position = targetPos;
 
         isPerformingAction = false;
         isMoving = false;

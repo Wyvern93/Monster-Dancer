@@ -63,6 +63,7 @@ public class Map : MonoBehaviour
 
     public void SpawnNextWave(List<Wave> waveList)
     {
+        
         CurrentDifficultyPoints = waves * GameManager.runData.currentLoop;
         List<Wave> possibleWaves = new List<Wave>();
         int minimumCost = CurrentDifficultyPoints - 2;
@@ -201,8 +202,8 @@ public class Map : MonoBehaviour
         while (true)
         {
             angle = Random.Range(0, 360f);
-            x = Player.position.x + (Instance.Radius * Mathf.Cos(angle));
-            y = Player.position.y + (Instance.Radius * Mathf.Sin(angle));
+            x = Player.instance.transform.position.x + (Instance.Radius * Mathf.Cos(angle));
+            y = Player.instance.transform.position.y + (Instance.Radius * Mathf.Sin(angle));
             x = Mathf.Clamp(x, -19f, 18f);
             y = Mathf.Clamp(y, -11f, 10f);
             if (!isWallAt(new Vector2(Mathf.RoundToInt(x), Mathf.RoundToInt(y)))) break;
@@ -251,8 +252,8 @@ public class Map : MonoBehaviour
         while (true)
         {
             angle = Random.Range(0, 360f);
-            x = Player.position.x + (Radius * Mathf.Cos(angle));
-            y = Player.position.y + (Radius * Mathf.Sin(angle));
+            x = Player.instance.transform.position.x + (Radius * Mathf.Cos(angle));
+            y = Player.instance.transform.position.y + (Radius * Mathf.Sin(angle));
             if (!isWallAt(new Vector2(Mathf.RoundToInt(x), Mathf.RoundToInt(y)))) break;
         }
         spawnEffect.transform.position = new Vector3(Mathf.RoundToInt(x), Mathf.RoundToInt(y));

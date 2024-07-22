@@ -66,7 +66,7 @@ public class MoonBeam : MonoBehaviour
         Vector2 direction = difference;
 
         if (direction == Vector2.zero) direction = Vector2.right;
-        transform.position = (Vector3)Player.position + new Vector3(0, 1.5f, 10f);
+        transform.position = (Vector3)Player.instance.transform.position + new Vector3(0, 1.5f, 10f);
 
         //transform.localEulerAngles = new Vector3(0, 0, Vector2.SignedAngle(Vector2.down, animDir));
         pitch = 1;
@@ -91,7 +91,7 @@ public class MoonBeam : MonoBehaviour
         Vector2 direction = difference;
 
         if (direction == Vector2.zero) direction = Vector2.right;
-        transform.position = (Vector3)Player.position + new Vector3(0, 2f, 10f);
+        transform.position = Player.instance.transform.position + new Vector3(0, 2f, 10f);
         float targetDir = Vector2.SignedAngle(Vector2.down, animDir);
         //transform.localEulerAngles = new Vector3(0, 0, Mathf.MoveTowardsAngle(transform.localEulerAngles.z, targetDir, Time.deltaTime * 160f));
         transform.localEulerAngles = new Vector3(0, 0, transform.localEulerAngles.z + Time.deltaTime * 100f);
