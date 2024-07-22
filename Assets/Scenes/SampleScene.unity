@@ -10231,7 +10231,7 @@ Transform:
   m_GameObject: {fileID: 957297601}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 0.5, z: 1}
+  m_LocalPosition: {x: 0.5, y: 0.5, z: -1.45}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -13121,19 +13121,15 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   enemyPrefab: {fileID: 3749299729089549600, guid: 162d1becf8e5d1e4a82625a090f02d08, type: 3}
-  enemyDeathSound: {fileID: 8300000, guid: 0b546d187a7d62a48bb3e552dd5a96fe, type: 3}
-  enemyHurtSound: {fileID: 8300000, guid: 5fbee34d639a002479c25b36f6fd6294, type: 3}
-  gemSound: {fileID: 8300000, guid: f94582505d353394895623015314e570, type: 3}
-  warningWaveSound: {fileID: 8300000, guid: c08cdcc19f090f34cbc062271fa1dce0, type: 3}
-  warningBossWaveSound: {fileID: 8300000, guid: 2350a17887863ce4092bbdfadc4b47e5, type: 3}
-  grazeSound: {fileID: 8300000, guid: 62d283562feabd44aa68c0b3c3333b82, type: 3}
   gemPrefab: {fileID: 4795574251949385546, guid: f3d1e021090a9cb47b63a117bbf4051a, type: 3}
   bulletgemPrefab: {fileID: 45344397304882020, guid: 3ea39a67225427b4097f4cb6f903f1df, type: 3}
   killEffectPrefab: {fileID: 2734080936948315660, guid: 4f9e5af27fd82fc4e8ee6d41d2181cbc, type: 3}
   enemySpawnPrefab: {fileID: 3260398882840493583, guid: 2dfa14a83fa4a444d91967cacb60bc6d, type: 3}
   bulletPrefab: {fileID: 4304205336588513967, guid: f85489ff9a5180d4bbdfab25edca5d99, type: 3}
   bulletSpawnPrefab: {fileID: 6211546877563030127, guid: a318b196e9e7299429600e1e03bde1d9, type: 3}
+  coinPrefab: {fileID: 4423098858076168819, guid: 0ce17a29d88e0104088acc29a051b0bd, type: 3}
   bossAPrefab: {fileID: 7497710279759314874, guid: 5494eb97a06f6964d8f6c1abcda96eda, type: 3}
+  beats: 36
   partAWaves:
   - groups:
     - spawns:
@@ -13591,8 +13587,11 @@ MonoBehaviour:
         spawnType: 0
         spawnPosition: {x: 0, y: 0}
         AItype: 0
+  CurrentDifficultyPoints: 0
   part: 0
+  WaveNumberOfEnemies: 0
   stageID: 1
+  enemiesAlive: []
 --- !u!4 &1153843789
 Transform:
   m_ObjectHideFlags: 0
@@ -13646,7 +13645,7 @@ Transform:
   m_GameObject: {fileID: 1275991904}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 0.5, z: 2}
+  m_LocalPosition: {x: 0.5, y: 0.5, z: -0.45}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

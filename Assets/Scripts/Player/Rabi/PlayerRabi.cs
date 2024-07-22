@@ -1,49 +1,85 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerRabi : Player
 {
+    [Header("Ability Prefabs")]
     [SerializeField] GameObject explosiveCarrot;
     [SerializeField] GameObject carrotExplosionPrefab;
     [SerializeField] GameObject rabiClonePrefab;
     [SerializeField] GameObject smokeExplosionPrefab;
 
     [SerializeField] GameObject moonBeamPrefab;
+    [SerializeField] GameObject orbitalMoonPrefab;
 
-    private bool isCastingBunnyHop;
+    [SerializeField] GameObject carrotJuicePrefab;
+    [SerializeField] GameObject carrotJuiceBottlePrefab;
+    [SerializeField] GameObject lunarPulsePrefab;
+    [SerializeField] GameObject lunarRainBeamPrefab;
+    [SerializeField] GameObject truckPrefab;
+    [SerializeField] GameObject carrotBulletPrefab;
+
+    [SerializeField] SpriteTrail spriteTrail;
+    [SerializeField] CircleCollider2D dashHitBox;
+    [SerializeField] AudioClip dashSound;
+
+
+    public bool isCastingBunnyHop;
+    public bool isCastingMoonBeam;
+
     protected override void Awake()
     {
         base.Awake();
 
-        animator.speed = 1 / BeatManager.GetBeatDuration();
+        animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration() / 2);
         animator.Play("Rabi_Idle");
     }
 
     public override void Start()
     {
         base.Start();
-        PoolManager.CreatePool(typeof(RabiAttack), attackPrefab, 4);
-        PoolManager.CreatePool(typeof(ExplosiveCarrot), explosiveCarrot, 10);
-        PoolManager.CreatePool(typeof(SmokeExplosion), smokeExplosionPrefab, 4);
-        PoolManager.CreatePool(typeof(RabiClone), rabiClonePrefab, 4);
-        PoolManager.CreatePool(typeof(CarrotExplosion), carrotExplosionPrefab, 10);
+        PoolManager.CreatePool(typeof(RabiAttack), attackPrefab, 20);
+        PoolManager.CreatePool(typeof(ExplosiveCarrot), explosiveCarrot, 120);
+        PoolManager.CreatePool(typeof(SmokeExplosion), smokeExplosionPrefab, 10);
+        PoolManager.CreatePool(typeof(RabiClone), rabiClonePrefab, 10);
+        PoolManager.CreatePool(typeof(CarrotExplosion), carrotExplosionPrefab, 120);
         PoolManager.CreatePool(typeof(MoonBeam), moonBeamPrefab, 4);
+        PoolManager.CreatePool(typeof(OrbitalMoon), orbitalMoonPrefab, 12);
+        PoolManager.CreatePool(typeof(CarrotJuice), carrotJuicePrefab, 12);
+        PoolManager.CreatePool(typeof(CarrotJuiceBottle), carrotJuiceBottlePrefab, 12);
+        PoolManager.CreatePool(typeof(LunarPulse), lunarPulsePrefab, 12);
+        PoolManager.CreatePool(typeof(LunarRainRay), lunarRainBeamPrefab, 30);
+        PoolManager.CreatePool(typeof(CarrotDeliveryTruck), truckPrefab, 20);
+        PoolManager.CreatePool(typeof(CarrotBullet), carrotBulletPrefab, 150);
 
-        GameManager.runData.posibleEnhancements.AddRange(new List<Enhancement>() 
+        GameManager.runData.possibleSkillEnhancements = new List<Enhancement>()
         { 
-            new RabiAttackSizeEnhancement(),
-            new RabiAttackProjectilesEnhancement(),
-            new RabiAttackVelocityEnhancement(),
-            new RabiAttackTimeEnhancement(),
+            new MoonlightDaggersEnhancement(),
+            new MoonlightDaggersMasterfulEnhancement(),
+            new MoonlightDaggersPowerfulEnhancement(),
             new CarrotBarrageAbilityEnhancement(),
             new BunnyHopAbilityEnhancement(),
-            new MoonBeamAbilityEnhancement()
-        });
-        //ultimateAbility = new MoonBeamAbility();
+            new MoonBeamAbilityEnhancement(),
+            new OrbitalMoonAbilityEnhancement(),
+            new CarrotJuiceAbilityEnhancement(),
+            new LunarPulseAbilityEnhancement(),
+            new RabbitReflexesAbilityEnhancement(),
+            new LunarRainAbilityEnhancement(),
+            new IllusionDashAbilityEnhancement(),
+            new CarrotDeliveryAbilityEnhancement()
+        };
+        
+        //LunarPulseAbility orbitalmoon = new LunarPulseAbility();
+        //orbitalmoon.OnEquip();
+        //equippedPassiveAbilities.Add(orbitalmoon);
+        //abilityValues.Add("ability.lunarpulse.level", 1);
+        
+        //ultimateAbility = new CarrotDeliveryAbility();
         //ultimateAbility.OnEquip();
-        //instance.abilityValues.Add("ability.moonbeam.level", 1);
+        //instance.abilityValues.Add("ability.carrotdelivery.level", 1);
         //CurrentSP = MaxSP;
 
         abilityValues.Add("Attack_Number", 2); // 4 Upgrades
@@ -56,7 +92,8 @@ public class PlayerRabi : Player
         abilityValues.Add("Max_Attack_Velocity", 3);
         abilityValues.Add("Max_Attack_Time", 4);
 
-        UIManager.Instance.PlayerUI.SetWeaponIcon(IconList.instance.moonlightDaggers, 1);
+        MoonlightDaggersEnhancement attack = new MoonlightDaggersEnhancement();
+        attack.OnEquip();
     }
 
     public override void Despawn()
@@ -64,7 +101,28 @@ public class PlayerRabi : Player
         PoolManager.RemovePool(typeof(RabiAttack));
         PoolManager.RemovePool(typeof(ExplosiveCarrot));
         PoolManager.RemovePool(typeof(CarrotExplosion));
+        PoolManager.RemovePool(typeof(RabiClone));
+        PoolManager.RemovePool(typeof(SmokeExplosion));
+        PoolManager.RemovePool(typeof(MoonBeam));
+        PoolManager.RemovePool(typeof(OrbitalMoon));
+        PoolManager.RemovePool(typeof(CarrotJuice));
+        PoolManager.RemovePool(typeof(CarrotJuiceBottle));
+        PoolManager.RemovePool(typeof(LunarPulse));
+        PoolManager.RemovePool(typeof(LunarRainRay));
+        PoolManager.RemovePool(typeof(CarrotDeliveryTruck));
+        PoolManager.RemovePool(typeof(CarrotBullet));
+
         Destroy(gameObject);
+    }
+
+    public override List<Enhancement> GetAttackEnhancementList() 
+    {
+        return new List<Enhancement>()
+        {
+            new MoonlightDaggersEnhancement(),
+            new MoonlightDaggersMasterfulEnhancement(),
+            new MoonlightDaggersPowerfulEnhancement()
+        };
     }
 
     protected override IEnumerator DeathCoroutine()
@@ -72,6 +130,7 @@ public class PlayerRabi : Player
         BeatManager.Stop();
         animator.updateMode = AnimatorUpdateMode.UnscaledTime;
         Sprite.sortingLayerName = "UI";
+        animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration());
         animator.Play("Rabi_Dead");
 
         UIManager.Instance.PlayerUI.HideUI();
@@ -119,6 +178,7 @@ public class PlayerRabi : Player
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
+        animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration() / 2);
         animator.Play("Rabi_Idle");
         yield return new WaitForEndOfFrame();
         Sprite.transform.localPosition = Vector3.zero;
@@ -130,8 +190,84 @@ public class PlayerRabi : Player
         yield break;
     }
 
+    public void DoIllusionDash(int tiles)
+    {
+        Vector2 dir = Vector2.zero;
+        if (InputManager.playerDevice == InputManager.InputDeviceType.Keyboard)
+        {
+            dir.x = Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed ? -1 : Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed ? 1 : 0;
+            dir.y = Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed ? -1 : Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed ? 1 : 0;
+        }
+        else
+        {
+            Vector2 leftStick = InputManager.GetLeftStick();
+            dir.x = leftStick.x > 0.4f ? 1 : leftStick.x < -0.4f ? -1 : 0;
+            dir.y = leftStick.y > 0.4f ? 1 : leftStick.y < -0.4f ? -1 : 0;
+        }
+        if (dir.x != 0 && dir.y != 0) dir.y = 0;
+        if (dir == Vector2.zero) dir = facingRight ? Vector2.right : Vector2.left;
+        isCastingBunnyHop = true;
+        direction = dir;
+        isPerformingAction = true;
+        StartCoroutine(IllusionDashCoroutine(dir, tiles));
+    }
+
+    private IEnumerator IllusionDashCoroutine(Vector2 dir, int tiles)
+    {
+        isMoving = true;
+        originPos = transform.position;
+
+        int finalDistance = 0;
+        Vector2 targetPos;
+        for (int i = 1; i <= tiles; i++)
+        {
+            targetPos = originPos + (dir * i);
+            if (Map.isWallAt(targetPos))
+            {
+                finalDistance = i - 1;
+                break;
+            }
+            else
+            {
+                finalDistance++;
+            }
+        }
+
+        dashHitBox.enabled = true;
+        targetPos = originPos + (dir * finalDistance);
+        animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration() / 4);
+        animator.Play("Rabi_Dash");
+        spriteTrail.Play(Sprite, 25, 0.005f, Sprite.transform, new Color(0, 1, 1, 0.5f));
+        AudioController.PlaySound(dashSound);
+        float time = 0;
+        while (time <= BeatManager.GetBeatDuration() / 2)
+        {
+            if (Map.isWallAt(targetPos)) targetPos = originPos;
+
+            transform.position = Vector3.Lerp(originPos, (Vector3)targetPos, time * 6f);
+            time += Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
+        transform.position = targetPos;
+        spriteTrail.Stop();
+        dashHitBox.enabled = false;
+        animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration() / 2);
+        animator.Play("Rabi_Idle");
+        Sprite.transform.localPosition = Vector3.zero;
+        transform.position = targetPos;
+        position = targetPos;
+
+        isPerformingAction = false;
+        isCastingBunnyHop = false;
+        isMoving = false;
+
+        yield break;
+    }
+    
+
     public override void OnAttack()
     {
+        if (isCastingMoonBeam) return;
         if (UIManager.Instance.PlayerUI.crosshair.transform.position.x > transform.position.x) facingRight = true;
         else facingRight = false;
         StartCoroutine(AttackCoroutine());
@@ -205,6 +341,8 @@ public class PlayerRabi : Player
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
+        transform.position = targetPos;
+        animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration() / 2);
         animator.Play("Rabi_Idle");
         Sprite.transform.localPosition = Vector3.zero;
         transform.position = targetPos;
@@ -248,6 +386,15 @@ public class PlayerRabi : Player
         if (equippedPassiveAbilities[0].CanCast()) equippedPassiveAbilities[0].OnCast();
     }
 
+    public override void OnPassiveAbility2Use()
+    {
+        if (equippedPassiveAbilities[1].CanCast()) equippedPassiveAbilities[1].OnCast();
+    }
+    public override void OnPassiveAbility3Use()
+    {
+        if (equippedPassiveAbilities[2].CanCast()) equippedPassiveAbilities[2].OnCast();
+    }
+
     public override void OnActiveAbilityUse() 
     {
         activeAbility.OnCast();
@@ -263,11 +410,20 @@ public class PlayerRabi : Player
         if (isCastingBunnyHop) return;
         if (isInvulnerable) return;
         if (isDead) return;
+
+        RabbitReflexesAbility reflexes = (RabbitReflexesAbility)equippedPassiveAbilities.FirstOrDefault(x=> x.GetType() == typeof(RabbitReflexesAbility));
+        if (reflexes != null)
+        {
+            reflexes.OnDamage();
+        }
+
         CurrentHP = Mathf.Clamp(CurrentHP - damage, 0, 9999);
         TriggerCameraShake(0.3f, 0.2f);
         UIManager.Instance.PlayerUI.UpdateHealth();
         UIManager.Instance.PlayerUI.DoHurtEffect();
         AudioController.PlaySound(AudioController.instance.sounds.playerHurtSfx);
+
+        UIManager.Instance.PlayerUI.SpawnDamageText(transform.position, damage, DamageTextType.PlayerDamage);
 
         emissionColor = new Color(1, 0, 0, 1);
 

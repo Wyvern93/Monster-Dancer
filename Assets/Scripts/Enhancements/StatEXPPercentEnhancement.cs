@@ -14,14 +14,9 @@ public class StatEXPPercentEnhancement : Enhancement
         return "statExpPercentUp";
     }
 
-    public override int getPriority()
+    public override int getWeight()
     {
-        return 0;
-    }
-
-    public override float getRarity()
-    {
-        return 30;
+        return 3;
     }
 
     public override Sprite getIcon()
@@ -56,7 +51,7 @@ public class StatEXPPercentEnhancement : Enhancement
 
     public override void OnEquip()
     {
-        if (isUnique()) GameManager.runData.RemoveEnhancement(this);
+        if (isUnique()) GameManager.runData.RemoveStatEnhancement(this);
         Player.instance.enhancements.Add(new StatEXPPercentEnhancement());
         Player.instance.CalculateStats();
     }

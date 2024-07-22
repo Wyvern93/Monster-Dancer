@@ -103,10 +103,16 @@ public class RabiAttack : PlayerAttack
         {
             Enemy enemy = collision.GetComponent<Enemy>();
 
-            float damage = Player.instance.currentStats.Atk;
+            float damage = Player.instance.abilityValues["Attack_Damage"] * Player.instance.currentStats.Atk;
             bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
             if (isCritical) damage *= Player.instance.currentStats.CritDmg;
             enemy.TakeDamage((int)damage, isCritical);
+        }
+
+        if (collision.CompareTag("FairyCage"))
+        {
+            FairyCage cage = collision.GetComponent<FairyCage>();
+            cage.OnHit();
         }
     }
 }

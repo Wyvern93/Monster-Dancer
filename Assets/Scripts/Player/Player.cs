@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
@@ -56,19 +57,25 @@ public class Player : MonoBehaviour
     public PlayerStats percentBonusStats;
     public Dictionary<string, float> abilityValues;
 
+    public AudioClip music_theme;
+
     [SerializeReference] public List<Enhancement> enhancements;
 
     [Header("Abilities")]
-    public List<PlayerAbility> playerAbilities;
     public List<PlayerAbility> equippedPassiveAbilities;
     public PlayerAbility activeAbility;
     public PlayerAbility ultimateAbility;
+
+    [Header("Items")]
+    public List<PlayerItem> playerItems;
 
     [Header("Prefabs")]
     public GameObject attackPrefab;
 
     public List<GameObject> playerClones;
     public bool isInvulnerable;
+    [SerializeField] public SpriteRenderer grazeSprite;
+
 
     public Vector3 GetClosestPlayer(Vector2 pos)
     {
@@ -87,6 +94,8 @@ public class Player : MonoBehaviour
         }
         return finalPos;
     }
+
+    public virtual List<Enhancement> GetAttackEnhancementList() { return null; }
 
     public bool CanMove()
     {
@@ -117,7 +126,7 @@ public class Player : MonoBehaviour
         instance.transform.position = Vector3.zero;
         position = Vector3.zero;
         instance.targetCameraPos = new Vector3(position.x, position.y, -10);
-        Camera.main.transform.position = new Vector3(position.x, position.y, -10);
+        Camera.main.transform.position = new Vector3(position.x, position.y, -60);
         instance.animator.speed = 1 / BeatManager.GetBeatDuration();
         instance.animator.updateMode = AnimatorUpdateMode.Normal;
         instance.Sprite.sortingLayerID = 0;
@@ -127,6 +136,7 @@ public class Player : MonoBehaviour
         instance = this;
         abilityValues = new Dictionary<string, float>();
         equippedPassiveAbilities = new List<PlayerAbility>();
+        playerItems = new List<PlayerItem>();
         spriteRendererMat = Sprite.material;
         Level = 1;
         MaxExp = CalculateExpCurve(Level);
@@ -134,6 +144,8 @@ public class Player : MonoBehaviour
         CalculateStats();
         CurrentHP = (int)currentStats.MaxHP;
         CurrentSP = 0;
+
+        grazeSprite.color = Color.clear;
 
         UIManager.Instance.PlayerUI.UpdateHealth();
         UIManager.Instance.PlayerUI.UpdateExp();
@@ -167,7 +179,7 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     public virtual void Start()
     {
-        Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -10f);
+        Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -60f);
         facingRight = true;
         position = transform.position;
     }
@@ -176,6 +188,7 @@ public class Player : MonoBehaviour
     void Update()
     {
         if (GameManager.isLoading) return;
+        if (GameManager.isPaused) return;
         if (!isDead)
         {
             HandleInput();
@@ -198,6 +211,16 @@ public class Player : MonoBehaviour
         }
         if (activeAbility != null) { activeAbility.OnUpdate(); }
         if (ultimateAbility != null) { ultimateAbility.OnUpdate();}
+
+        if (activeAbility == null) UIManager.Instance.PlayerUI.activeCDImage.fillAmount = 0;
+        else
+        {
+            float currentCD = activeAbility.currentCooldown;
+            float maxCD = activeAbility.maxCooldown;
+
+            UIManager.Instance.PlayerUI.activeCDImage.fillAmount = (currentCD / maxCD);
+        }
+        UIManager.Instance.PlayerUI.activeCDImage.transform.position = Sprite.transform.position + new Vector3(0.7f, 0.9f, 1f);
     }
 
     public void SetDirection(Vector2 dir)
@@ -289,7 +312,8 @@ public class Player : MonoBehaviour
                 {
                     TriggerCameraShake(0.04f, 0.2f);
                     BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
-                    waitForNextBeat = true;
+                    
+                    //waitForNextBeat = true;
                 }
             }
 
@@ -308,7 +332,7 @@ public class Player : MonoBehaviour
                 {
                     TriggerCameraShake(0.04f, 0.2f);
                     BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
-                    waitForNextBeat = true;
+                    //waitForNextBeat = true;
                 }
             }
         }
@@ -553,7 +577,7 @@ public class Player : MonoBehaviour
         isDead = true;
         StopAllCoroutines();
         CameraOffset = Vector3.zero;
-        Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
+        Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -60);
         emissionColor = Color.clear;
         spriteRendererMat.SetColor("_EmissionColor", emissionColor);
 

@@ -17,10 +17,8 @@ public class PoolManager : MonoBehaviour
 
     public static void CreatePool(Type objectType, GameObject prefab, int initialSize)
     {
-        Debug.Log("Trying to make pool of type " + objectType);
         if (!instance.pools.ContainsKey(objectType))
         {
-            Debug.Log("No pool existing so making one");
             Pool newPool = new Pool(prefab.gameObject, initialSize);
             instance.pools[objectType] = newPool;
         }
@@ -40,13 +38,12 @@ public class PoolManager : MonoBehaviour
     {
         if (instance.pools.ContainsKey(objectType))
         {
-            Debug.Log("Removed pool " + objectType);
             Pool pool = instance.pools[objectType];
             pool.DestroyPool();
         }
     }
 
-    public static T Get<T>() where T : MonoBehaviour
+    public static T Get<T>() where T : Component
     {
         var type = typeof(T);
         if (instance.pools.ContainsKey(type))

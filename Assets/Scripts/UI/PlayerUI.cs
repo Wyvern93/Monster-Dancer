@@ -36,7 +36,8 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] CanvasGroup bossBarGroup;
     [SerializeField] TextMeshProUGUI bossBarName;
     [SerializeField] TextMeshProUGUI bossBarHPText;
-
+    public Image activeCDImage;
+    public TextMeshProUGUI coinText;
     [SerializeField] List<PlayerUIIcon> abilityIcons;
     // Start is called before the first frame update
     void Awake()
@@ -106,14 +107,14 @@ public class PlayerUI : MonoBehaviour
         bossBarHPText.text = $"{current}/{max}";
     }
 
-    public void SetWeaponIcon(Sprite sprite, int level)
+    public void SetWeaponIcon(Sprite sprite, int level, bool maxed)
     {
-        abilityIcons[0].Display(sprite, level, false);
+        abilityIcons[0].Display(sprite, level, maxed);
     }
 
-    public void SetWeaponLevel(int level)
+    public void SetWeaponLevel(int level, bool maxed)
     {
-        abilityIcons[0].SetLevel(level, false);
+        abilityIcons[0].SetLevel(level, maxed);
     }
 
     public void SetUltimateIcon(Sprite sprite, int level, bool maxed)
@@ -170,25 +171,29 @@ public class PlayerUI : MonoBehaviour
             default:
             case DamageTextType.Normal:
                 damageText.color = Color.white;
-                damageText.text.fontSize = 8f;
+                damageText.text.fontSize = 12f;
+                break;
+            case DamageTextType.PlayerDamage:
+                damageText.color = Color.red;
+                damageText.text.fontSize = 12f;
                 break;
             case DamageTextType.Critical:
                 damageText.color = Color.yellow;
-                damageText.text.fontSize = 12f;
+                damageText.text.fontSize = 20f;
                 damageText.text.text += "!";
                 break;
             case DamageTextType.Heal:
                 damageText.color = Color.green;
-                damageText.text.fontSize = 8f;
+                damageText.text.fontSize = 12f;
                 break;
             case DamageTextType.CriticalHeal:
                 damageText.color = Color.green;
-                damageText.text.fontSize = 12f;
+                damageText.text.fontSize = 20f;
                 damageText.text.text += "!";
                 break;
             case DamageTextType.Dodge:
                 damageText.color = Color.white;
-                damageText.text.fontSize = 12f;
+                damageText.text.fontSize = 20f;
                 damageText.text.text = "DODGE";
                 break;
         }

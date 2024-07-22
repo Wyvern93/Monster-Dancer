@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour
@@ -8,10 +9,41 @@ public class Bullet : MonoBehaviour
     [SerializeField] CircleCollider2D circleCollider;
     public Vector2 direction;
     public int beatsLeft;
+
+    public bool superGrazed, grazed;
+    private SpriteRenderer grazePulse;
+    public Enemy enemySource;
+
     // Start is called before the first frame update
     void Start()
     {
         
+    }
+
+    public void SetSuperGrazed()
+    {
+        if (superGrazed) return;
+        AudioController.PlaySound(AudioController.instance.sounds.superGrazeSound);
+        superGrazed = true;
+        grazePulse = PoolManager.Get<SpriteRenderer>();
+        grazePulse.sprite = spriteRenderer.sprite;
+        grazePulse.transform.parent = spriteRenderer.transform;
+        grazePulse.transform.localPosition = new Vector3(0, 0, 0.25f);
+        grazePulse.transform.localEulerAngles = Vector3.zero;
+        grazePulse.transform.localScale = Vector3.one;
+        grazePulse.color = new Color(1, 1, 0, 0);
+    }
+
+    public void Pulse()
+    {
+        grazePulse.transform.localScale = Vector3.one;
+        grazePulse.color = new Color(1, 1, 0, 1);
+
+    }
+
+    public void Graze()
+    {
+        grazed = true;
     }
 
     // Update is called once per frame
@@ -19,6 +51,10 @@ public class Bullet : MonoBehaviour
     {
         if (!BeatManager.isPlaying) return;
         if (BeatManager.isGameBeat) OnBeat();
+
+        if (!superGrazed) return;
+        grazePulse.color = Color.Lerp(grazePulse.color, new Color(1, 1, 0, 0), Time.deltaTime * 16f);
+        grazePulse.transform.localScale = Vector3.Lerp(grazePulse.transform.localScale, Vector3.one * 1.5f, Time.deltaTime * 16f);
     }
 
     public void OnSpawn()
@@ -42,9 +78,10 @@ public class Bullet : MonoBehaviour
     protected void OnBeat()
     {
         beatsLeft--;
-        if (beatsLeft == 1) spriteRenderer.color = Color.red;
+        if (superGrazed) Pulse();
         if (beatsLeft == 0)
         {
+            spriteRenderer.color = Color.red;
             StartCoroutine(DespawnCoroutine());
         }
         StartCoroutine(MoveInDirection(direction));
@@ -63,10 +100,28 @@ public class Bullet : MonoBehaviour
         }
         spriteRenderer.transform.localScale = Vector3.one;
 
-        BulletGem gem = PoolManager.Get<BulletGem>();
-        gem.transform.position = transform.position;
+        if (enemySource != null) if (!enemySource.isActiveAndEnabled) SpawnDrop();
+
+        if (superGrazed)
+        {
+            RabbitReflexesAbility reflexes = (RabbitReflexesAbility)Player.instance.equippedPassiveAbilities.FirstOrDefault(x => x.GetType() == typeof(RabbitReflexesAbility));
+            if (reflexes != null)
+            {
+                reflexes.OnBulletDespawn(this);
+            }
+        }
+
+        superGrazed = false;
+        grazePulse = null;
+        grazed = false;
 
         PoolManager.Return(gameObject, typeof(Bullet));
+    }
+
+    public void SpawnDrop()
+    {
+        BulletGem gem = PoolManager.Get<BulletGem>();
+        gem.transform.position = (Vector2)transform.position + (Random.insideUnitCircle * 0.2f);
     }
 
     IEnumerator MoveInDirection(Vector2 direction)
@@ -76,13 +131,13 @@ public class Bullet : MonoBehaviour
         Vector3 originalPos = transform.position;
         Vector3 targetPos = (Vector3)direction + originalPos;
         float time = 0;
+        
         while (time <= BeatManager.GetBeatDuration())
         {
             transform.position = Vector3.Lerp(transform.position, (Vector3)targetPos, time / 1.5f);
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
-
         transform.position = targetPos;
         yield break;
     }
@@ -124,12 +179,6 @@ public class Bullet : MonoBehaviour
         if (collision.CompareTag("Player") && collision.name == "Player")
         {
             Player.instance.TakeDamage(1);
-        }
-
-        if  (collision.CompareTag("Player") && collision.name == "GrazeTrigger")
-        {
-            AudioController.PlaySound(AudioController.instance.sounds.grazeSound);
-            Player.AddSP(5);
         }
     }
 }

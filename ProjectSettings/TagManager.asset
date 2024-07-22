@@ -7,6 +7,8 @@ TagManager:
   - Enemy
   - Trigger
   - Bullet
+  - Fairy
+  - FairyCage
   layers:
   - Default
   - TransparentFX

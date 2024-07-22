@@ -5,8 +5,7 @@ using UnityEngine;
 public abstract class Enhancement
 {
     public abstract bool isUnique();
-    public abstract float getRarity();
-    public abstract int getPriority();
+    public abstract int getWeight();
     public abstract void OnStatCalculate(ref PlayerStats flatBonus, ref PlayerStats percentBonus);
 
     public abstract string getId();

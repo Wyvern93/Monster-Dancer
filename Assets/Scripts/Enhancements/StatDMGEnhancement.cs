@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class StatDMGEnhancement : Enhancement
 {
-    public const int dmgBonus = 5;
+    public const int dmgBonus = 10;
 
     public override string GetDescription()
     {
-        return "Increases Damage by <color=\"green\">5%</color>.";
+        return "Increases Damage by <color=\"green\">10%</color>.";
     }
 
     public override string getId()
@@ -14,14 +14,9 @@ public class StatDMGEnhancement : Enhancement
         return "statDMGup";
     }
 
-    public override int getPriority()
+    public override int getWeight()
     {
-        return 0;
-    }
-
-    public override float getRarity()
-    {
-        return 20;
+        return 2;
     }
 
     public override Sprite getIcon()
@@ -55,13 +50,13 @@ public class StatDMGEnhancement : Enhancement
 
     public override void OnEquip()
     {
-        if (isUnique()) GameManager.runData.RemoveEnhancement(this);
+        if (isUnique()) GameManager.runData.RemoveStatEnhancement(this);
         Player.instance.enhancements.Add(new StatDMGEnhancement());
         Player.instance.CalculateStats();
     }
 
     public override void OnStatCalculate(ref PlayerStats flatBonus, ref PlayerStats percentBonus)
     {
-        percentBonus.Atk += 0.05f;
+        percentBonus.Atk += 0.1f;
     }
 }

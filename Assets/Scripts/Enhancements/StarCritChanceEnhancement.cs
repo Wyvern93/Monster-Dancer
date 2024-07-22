@@ -13,14 +13,9 @@ public class StatCritChanceEnhancement : Enhancement
         return "statCritChanceup";
     }
 
-    public override int getPriority()
+    public override int getWeight()
     {
-        return 0;
-    }
-
-    public override float getRarity()
-    {
-        return 40;
+        return 2;
     }
 
     public override Sprite getIcon()
@@ -55,7 +50,7 @@ public class StatCritChanceEnhancement : Enhancement
 
     public override void OnEquip()
     {
-        if (isUnique()) GameManager.runData.RemoveEnhancement(this);
+        if (isUnique()) GameManager.runData.RemoveStatEnhancement(this);
         Player.instance.enhancements.Add(new StatCritChanceEnhancement());
         Player.instance.CalculateStats();
     }

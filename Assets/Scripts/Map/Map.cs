@@ -16,6 +16,7 @@ public class Map : MonoBehaviour
     public GameObject enemySpawnPrefab;
     public GameObject bulletPrefab;
     public GameObject bulletSpawnPrefab;
+    public GameObject coinPrefab;
 
     public GameObject bossAPrefab;
     public static float StageTime;
@@ -30,9 +31,11 @@ public class Map : MonoBehaviour
     public int CurrentDifficultyPoints = 0;
     public int part; // 0 = partA, 1 = BossA, 2 = partB, 3 = BossB
 
-    public int EnemiesAlive, WaveNumberOfEnemies;
+    public int WaveNumberOfEnemies;
 
     public string stageID;
+
+    public List<Enemy> enemiesAlive;
 
     public static bool isBossWave()
     {
@@ -46,13 +49,11 @@ public class Map : MonoBehaviour
         BeatManager.SetTrack(tracks[0]);
         Player.ResetPosition();
         UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stage")} {stageID}-1");
-        EnemiesAlive = 0;
         WaveNumberOfEnemies = 0;
         waves = 0;
         StageTime = 0;
         part = 0;
         beats = 36;
-        EnemiesAlive = 0;
         WaveNumberOfEnemies = 0;
     }
     void Start()
@@ -95,7 +96,7 @@ public class Map : MonoBehaviour
         waves++;
         AudioController.PlaySound(AudioController.instance.sounds.warningWaveSound);
         Debug.Log("Spawning a wave of " + possibleWaves[0].GetEnemyCount());
-        WaveNumberOfEnemies = EnemiesAlive + possibleWaves[0].GetEnemyCount();
+        WaveNumberOfEnemies = enemiesAlive.Count + possibleWaves[0].GetEnemyCount();
     }
 
     private List<Wave> ShuffleWaves(List<Wave> list)
@@ -112,10 +113,17 @@ public class Map : MonoBehaviour
         return list;
     }
 
+    public static Enemy GetRandomEnemy()
+    {
+        if (Instance.enemiesAlive.Count == 0) return null;
+        return Instance.enemiesAlive[Random.Range(0, Instance.enemiesAlive.Count - 1)];
+    }
+
     public virtual void SetPools()
     {
-        PoolManager.CreatePool(typeof(Gem), gemPrefab, 10);
+        PoolManager.CreatePool(typeof(Gem), gemPrefab, 30);
         PoolManager.CreatePool(typeof(BulletGem), bulletgemPrefab, 100);
+        PoolManager.CreatePool(typeof(Coin), coinPrefab, 50);
         PoolManager.CreatePool(typeof(TestEnemy), enemyPrefab, 10);
         PoolManager.CreatePool(typeof(TestBoss), bossAPrefab, 1);
         PoolManager.CreatePool(typeof(KillEffect), killEffectPrefab, 10);
@@ -128,19 +136,18 @@ public class Map : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (EnemiesAlive < 0) EnemiesAlive = 0;
         if (BeatManager.isGameBeat && BeatManager.isPlaying)
         {
             beats++;
             if (part == 0)
             {
-                if (waves < 21 && (beats >= beatsBeforeWave || EnemiesAlive < WaveNumberOfEnemies * 0.2f || EnemiesAlive <= 0))
+                if (waves < 21 && (beats >= beatsBeforeWave || enemiesAlive.Count < WaveNumberOfEnemies * 0.2f || enemiesAlive.Count <= 0))
                 {
                     beats = 0;
                     SpawnNextWave(partAWaves); // Normal A Wave
                 }
                 // Is next boss wave
-                if (waves == 21 && EnemiesAlive == 0)
+                if (waves == 21 && enemiesAlive.Count == 0)
                 {
                     beatsBeforeWave = 99999999;
                     StartCoroutine(StartBossASequence());
@@ -150,12 +157,12 @@ public class Map : MonoBehaviour
 
             if (part == 2)
             {
-                if (waves < 42 && (beats >= beatsBeforeWave || EnemiesAlive < WaveNumberOfEnemies * 0.2f || EnemiesAlive <= 0))
+                if (waves < 42 && (beats >= beatsBeforeWave || enemiesAlive.Count < WaveNumberOfEnemies * 0.2f || enemiesAlive.Count <= 0))
                 {
                     beats = 0;
                     SpawnNextWave(partBWaves); // Normal A Wave
                 }
-                if (waves == 42 && EnemiesAlive == 0)
+                if (waves == 42 && enemiesAlive.Count == 0)
                 {
                     beatsBeforeWave = 99999999;
                     StartCoroutine(StartBossBSequence());
@@ -176,6 +183,7 @@ public class Map : MonoBehaviour
     {
         PoolManager.RemovePool(typeof(Gem));
         PoolManager.RemovePool(typeof(BulletGem));
+        PoolManager.RemovePool(typeof(Coin));
         PoolManager.RemovePool(typeof(TestEnemy));
         PoolManager.RemovePool(typeof(TestBoss));
         PoolManager.RemovePool(typeof(KillEffect));
@@ -187,7 +195,7 @@ public class Map : MonoBehaviour
 
     public static IEnumerator SpawnEnemyAroundPlayer(SpawnData spawnData, int index)
     {
-        Instance.EnemiesAlive++;
+        
         SpawnEffect spawnEffect = PoolManager.Get<SpawnEffect>();
         float angle, x, y;
         while (true)
@@ -215,7 +223,6 @@ public class Map : MonoBehaviour
 
     public static IEnumerator SpawnEnemyAtPos(SpawnData spawnData, int index)
     {
-        Instance.EnemiesAlive++;
         SpawnEffect spawnEffect = PoolManager.Get<SpawnEffect>();
         
         Vector3 spawnPos = new Vector3(Mathf.RoundToInt(spawnData.spawnPosition.x), Mathf.RoundToInt(spawnData.spawnPosition.y));
@@ -261,10 +268,10 @@ public class Map : MonoBehaviour
 
     public IEnumerator StartBossASequence()
     {
-        UIManager.Instance.PlayerUI.UpdateBossBar(1000, 1000);
+        UIManager.Instance.PlayerUI.UpdateBossBar(2000, 2000);
         UIManager.Instance.PlayerUI.SetBossBarName("TestBoss Name");
         UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stageboss")}");
-        BeatManager.FadeOut();
+        BeatManager.FadeOut(Time.deltaTime / 2f);
         yield return new WaitForSeconds(2f);
 
         SpawnEffect spawnEffect = PoolManager.Get<SpawnEffect>();
@@ -293,10 +300,10 @@ public class Map : MonoBehaviour
 
     public IEnumerator StartBossBSequence()
     {
-        UIManager.Instance.PlayerUI.UpdateBossBar(1000, 1000);
+        UIManager.Instance.PlayerUI.UpdateBossBar(2000, 2000);
         UIManager.Instance.PlayerUI.SetBossBarName("TestBoss Name");
         UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stageboss")}-2");
-        BeatManager.FadeOut();
+        BeatManager.FadeOut(Time.deltaTime / 2f);
         yield return new WaitForSeconds(2f);
 
         SpawnEffect spawnEffect = PoolManager.Get<SpawnEffect>();
@@ -332,7 +339,7 @@ public class Map : MonoBehaviour
     public virtual IEnumerator BossADeathCoroutine()
     {
         UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stage")} {stageID}-2");
-        BeatManager.FadeOut();
+        BeatManager.FadeOut(Time.deltaTime / 2f);
         yield return new WaitForSeconds(2f);
 
         BeatManager.SetTrack(tracks[2]);
@@ -347,7 +354,7 @@ public class Map : MonoBehaviour
 
     public virtual IEnumerator VictoryCoroutine()
     {
-        BeatManager.FadeOut();
+        BeatManager.FadeOut(Time.deltaTime / 2f);
         yield return new WaitForSeconds(2f);
 
         // VICTORY MENU BEHAVIOUR HERE

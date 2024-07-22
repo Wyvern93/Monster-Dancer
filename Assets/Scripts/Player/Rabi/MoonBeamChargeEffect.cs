@@ -56,6 +56,7 @@ public class MoonBeamChargeEffect : MonoBehaviour
                 beamDuration--;
                 if (beamDuration == 1f)
                 {
+                    AudioController.FadeOut();
                     particles.Stop();
                 }
             }

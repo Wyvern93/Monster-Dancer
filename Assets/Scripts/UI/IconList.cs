@@ -10,11 +10,22 @@ public class IconList
     public Sprite critChanceUp;
     public Sprite expMultiUp;
 
+    [Header("Bonus")]
+    public Sprite coins;
+    public Sprite heal;
+
     [Header("Rabi")]
     public Sprite moonlightDaggers;
     public Sprite carrotBarrage;
     public Sprite bunnyhop;
     public Sprite moonBeam;
+    public Sprite orbitalMoon;
+    public Sprite carrotJuice;
+    public Sprite lunarPulse;
+    public Sprite rabbitReflexes;
+    public Sprite lunarRain;
+    public Sprite illusionDash;
+    public Sprite carrotDelivery;
 
     public static IconList instance;
 }

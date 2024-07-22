@@ -74,16 +74,31 @@ public class BeatManager : MonoBehaviour
         isPlaying = true;
     }
 
-    public static void FadeOut()
+    public static void FadeOut(float speed)
     {
-        instance.StartCoroutine(instance.FadeOutCoroutine());
+        instance.StartCoroutine(instance.FadeOutCoroutine(speed));
     }
 
-    private IEnumerator FadeOutCoroutine()
+    public static void FadeIn(float speed)
+    {
+        instance.StartCoroutine(instance.FadeInCoroutine(speed));
+    }
+
+    private IEnumerator FadeOutCoroutine(float speed)
     {
         while (music.volume > 0)
         {
-            music.volume = Mathf.MoveTowards(music.volume, 0f, Time.deltaTime / 2f);
+            music.volume = Mathf.MoveTowards(music.volume, 0f, speed);
+            yield return new WaitForEndOfFrame();
+        }
+        yield break;
+    }
+
+    private IEnumerator FadeInCoroutine(float speed)
+    {
+        while (music.volume < 1)
+        {
+            music.volume = Mathf.MoveTowards(music.volume, 1f, speed);
             yield return new WaitForEndOfFrame();
         }
         yield break;
