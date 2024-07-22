@@ -28,14 +28,14 @@ public class RabiAttack : PlayerAttack
 
         // Read direction
         Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
-        Vector2 difference = (crosshairPos - Player.position).normalized;
+        Vector2 difference = (crosshairPos - (Vector2)Player.instance.transform.position).normalized;
         Vector2 animDir;
 
         animDir = new Vector2(difference.y, -difference.x);
         direction = difference;
 
         if (direction == Vector2.zero) direction = Vector2.right;
-        transform.position = (Vector3)Player.position + (Vector3)direction;
+        transform.position = Player.instance.transform.position + (Vector3)direction;
 
         spr_renderer.enabled = true;
         boxCollider.enabled = true;

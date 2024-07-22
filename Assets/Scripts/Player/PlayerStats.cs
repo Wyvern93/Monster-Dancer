@@ -3,7 +3,7 @@ using System;
 [Serializable]
 public class PlayerStats
 {
-    public float MaxHP, Def, Atk, Pen, CritChance, CritDmg, ExpRange, ExpMulti, Haste, Rerolls, MovRange;
+    public float MaxHP, Def, Atk, Pen, CritChance, CritDmg, ExpRange, ExpMulti, Haste, Rerolls, Speed;
 
     public PlayerStats Copy()
     {
@@ -18,7 +18,7 @@ public class PlayerStats
         copy.ExpMulti = ExpMulti;
         copy.Haste = Haste;
         copy.Rerolls = Rerolls;
-        copy.MovRange = MovRange;
+        copy.Speed = Speed;
 
         return copy;
     }
@@ -36,7 +36,7 @@ public class PlayerStats
         result.ExpMulti += b.ExpMulti;
         result.Haste += b.Haste;
         result.Rerolls += b.Rerolls;
-        result.MovRange += b.MovRange;
+        result.Speed += b.Speed;
 
         return result;
     }
@@ -53,7 +53,7 @@ public class PlayerStats
         result.ExpMulti *= 1 + b.ExpMulti;
         result.Haste *= 1 + b.Haste;
         result.Rerolls *= 1 + b.Rerolls;
-        result.MovRange *= 1 + b.MovRange;
+        result.Speed *= 1 + b.Speed;
 
         return result;
     }
@@ -71,7 +71,7 @@ public class PlayerStats
         result.ExpMulti *= b;
         result.Haste *= b;
         result.Rerolls *= b;
-        result.MovRange *= b;
+        result.Speed *= b;
 
         return result;
     }

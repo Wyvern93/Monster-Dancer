@@ -13,6 +13,7 @@ public class Bullet : MonoBehaviour
     public bool superGrazed, grazed;
     private SpriteRenderer grazePulse;
     public Enemy enemySource;
+    public int atk = 1;
 
     // Start is called before the first frame update
     void Start()
@@ -57,7 +58,7 @@ public class Bullet : MonoBehaviour
         grazePulse.transform.localScale = Vector3.Lerp(grazePulse.transform.localScale, Vector3.one * 1.5f, Time.deltaTime * 16f);
     }
 
-    public void OnSpawn()
+    public virtual void OnSpawn()
     {
         circleCollider.enabled = true;
         spriteRenderer.color = Color.white;
@@ -70,7 +71,6 @@ public class Bullet : MonoBehaviour
         if (beatsLeft > 0)
         {
             beatsLeft = 0;
-            Debug.Log("despawn");
             StartCoroutine(DespawnCoroutine());
         }
     }
@@ -126,8 +126,7 @@ public class Bullet : MonoBehaviour
 
     IEnumerator MoveInDirection(Vector2 direction)
     {
-        Vector2 normalized = new Vector2(Mathf.Clamp(direction.x, -1, 1), Mathf.Clamp(direction.y, -1, 1));
-        spriteRenderer.transform.localEulerAngles = new Vector3(0, 0, getAngleFromVector(normalized));
+        spriteRenderer.transform.localEulerAngles = new Vector3(0, 0, Vector2.SignedAngle(Vector2.down, direction) - 90);
         Vector3 originalPos = transform.position;
         Vector3 targetPos = (Vector3)direction + originalPos;
         float time = 0;
@@ -178,7 +177,18 @@ public class Bullet : MonoBehaviour
         if (!BeatManager.isPlaying) return;
         if (collision.CompareTag("Player") && collision.name == "Player")
         {
-            Player.instance.TakeDamage(1);
+            Player.instance.TakeDamage(atk);
+        }
+    }
+
+    public void OnTriggerStay2D(Collider2D collision)
+    {
+        if (!BeatManager.isPlaying) return;
+        if (!BeatManager.isGameBeat) return;
+
+        if (collision.CompareTag("Player") && collision.name == "Player")
+        {
+            Player.instance.TakeDamage(atk);
         }
     }
 }

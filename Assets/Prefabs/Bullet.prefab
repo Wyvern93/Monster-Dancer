@@ -86,7 +86,10 @@ MonoBehaviour:
   circleCollider: {fileID: 6197538661282317349}
   direction: {x: 0, y: 0}
   beatsLeft: 0
-  trail: {fileID: 0}
+  superGrazed: 0
+  grazed: 0
+  enemySource: {fileID: 0}
+  atk: 1
 --- !u!1 &4953425373151706718
 GameObject:
   m_ObjectHideFlags: 0
@@ -170,7 +173,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!1 &5611201182156251957
 GameObject:
   m_ObjectHideFlags: 0
@@ -254,4 +257,4 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1

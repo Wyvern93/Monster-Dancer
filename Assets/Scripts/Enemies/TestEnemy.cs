@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class TestEnemy : Enemy
 {
@@ -30,10 +32,6 @@ public class TestEnemy : Enemy
     {
         if (CanMove())
         {
-            if ((Vector2)transform.position == Player.position) // If it doesn't, that means no prediction is needed
-            {
-                Player.instance.TakeDamage(1);
-            }
             if (actionList[actionIndex] == EntityAction.MOVE_TOWARDS_PLAYER)
             {
                 MoveTowardsPlayer();
@@ -56,18 +54,6 @@ public class TestEnemy : Enemy
     {
         
     }
-    /*
-    void MoveTowardsPlayer()
-    {
-        direction = new Vector2(Player.position.x < transform.position.x ? -1 : Player.position.x > transform.position.x ? 1 : 0, Player.position.y < transform.position.y ? -1 : Player.position.y > transform.position.y ? 1 : 0);
-        if (direction.x == -1) facingRight = false;
-        if (direction.x == 1) facingRight = true;
-
-        if (!isMoving)
-        {
-            Move((Vector2)transform.position + direction);
-        }
-    }*/
 
     void MoveTowardsPlayer()
     {
@@ -78,14 +64,6 @@ public class TestEnemy : Enemy
         if (Mathf.Abs(transform.position.x - playerPos.x) > Mathf.Abs(transform.position.y - playerPos.y)) horizontalMovement = true;
 
         direction = Vector2.zero;
-        if (horizontalMovement)
-        {
-            direction.x = Player.position.x < transform.position.x ? -1 : 1;
-        }
-        else
-        {
-            direction.y = Player.position.y < transform.position.y ? -1 : 1;
-        }
 
         if (direction.x == -1) facingRight = false;
         if (direction.x == 1) facingRight = true;
@@ -100,7 +78,8 @@ public class TestEnemy : Enemy
     {
         Vector3 playerPos = Player.instance.GetClosestPlayer(transform.position);
         direction = new Vector2(playerPos.x < transform.position.x ? -1 : playerPos.x > transform.position.x ? 1 : 0, playerPos.y < transform.position.y ? -1 : playerPos.y > transform.position.y ? 1 : 0);
-        StartCoroutine(SpawnBullet(direction));
+        Vector2 dir = (playerPos - transform.position).normalized;
+        StartCoroutine(SpawnBullet(dir));
     }
 
     public void Move(Vector2 targetPos)
@@ -118,36 +97,22 @@ public class TestEnemy : Enemy
 
     IEnumerator MoveCoroutine(Vector2 targetPos)
     {
-        if (targetPos == Player.position)
-        {
-            Player.instance.TakeDamage(1);
-        }
-
         isMoving = true;
 
         SpriteSize = 1.2f;
         Vector3 originalPos = transform.position;
-        if (Map.isWallAt(targetPos)) targetPos = transform.position;
-        float height = 0;
         float time = 0;
-        while (time <= 0.125)
+        Vector3 playerPos = Player.instance.GetClosestPlayer(transform.position);
+        Vector2 dir = (playerPos - transform.position).normalized;
+        float speed = 0.8f;
+        while (time <= BeatManager.GetBeatDuration() / 3f)
         {
-            if (time < 0.0625f)
-            {
-                height = Mathf.Clamp(height + Time.deltaTime * 4f, 0f, 0.3f);
-            }
-            else
-            {
-                height = Mathf.Clamp(height - Time.deltaTime * 4f, 0f, 0.3f);
-            }
-
-            transform.position = Vector3.Lerp(originalPos, (Vector3)targetPos, time * 8f);
+            rb.velocity = dir * speed * 8;
             time += Time.deltaTime;
-            Sprite.transform.localPosition = new Vector3(0, height, 0);
             yield return new WaitForEndOfFrame();
         }
+        rb.velocity = Vector2.zero;
         Sprite.transform.localPosition = Vector3.zero;
-        transform.position = targetPos;
 
         isMoving = false;
         yield break;

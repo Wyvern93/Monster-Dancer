@@ -87,7 +87,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!114 &4467507750484739688
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -120,7 +120,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   perSpriteTime: 0
   numOfSprites: 0
-  currentSprite: {fileID: 0}
 --- !u!58 &4618875912973091974
 CircleCollider2D:
   m_ObjectHideFlags: 0

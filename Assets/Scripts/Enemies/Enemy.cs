@@ -14,6 +14,7 @@ public abstract class Enemy : MonoBehaviour
     public bool facingRight { get; protected set; }
 
     [SerializeField] protected SpriteRenderer Sprite;
+    [SerializeField] protected Rigidbody2D rb;
     public float SpriteSize = 1f;
     protected float SpriteX = 1f;
 
@@ -26,6 +27,7 @@ public abstract class Enemy : MonoBehaviour
 
     private bool isDead;
     public int experience;
+    public int atk = 1;
     public bool CanMove()
     {
         if (isMoving) return false;
@@ -149,6 +151,26 @@ public abstract class Enemy : MonoBehaviour
             Coin coin = PoolManager.Get<Coin>();
             coin.dir = Random.insideUnitCircle * 2.4f;
             coin.transform.position = transform.position;
+        }
+    }
+
+    public void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (!BeatManager.isPlaying) return;
+        if (collision.CompareTag("Player") && collision.name == "Player")
+        {
+            Player.instance.TakeDamage(atk);
+        }
+    }
+
+    public void OnTriggerStay2D(Collider2D collision)
+    {
+        if (!BeatManager.isPlaying) return;
+        if (!BeatManager.isGameBeat) return;
+
+        if (collision.CompareTag("Player") && collision.name == "Player")
+        {
+            Player.instance.TakeDamage(atk);
         }
     }
 }

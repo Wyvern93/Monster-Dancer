@@ -34,11 +34,6 @@ public class TestBoss : Boss
         {
             if (isJumping) return;
 
-            if ((Vector2)transform.position == Player.position) // If it doesn't, that means no prediction is needed
-            {
-                Player.instance.TakeDamage(5);
-            }
-
             if (actionList[actionIndex] == EntityAction.MOVE_TOWARDS_PLAYER)
             {
                 MoveTowardsPlayer();
@@ -72,16 +67,16 @@ public class TestBoss : Boss
     void MoveTowardsPlayer()
     {
         bool horizontalMovement = false;
-        if (Mathf.Abs(transform.position.x - Player.position.x) > Mathf.Abs(transform.position.y - Player.position.y)) horizontalMovement = true;
+        if (Mathf.Abs(transform.position.x - Player.instance.transform.position.x) > Mathf.Abs(transform.position.y - Player.instance.transform.position.y)) horizontalMovement = true;
 
         direction = Vector2.zero;
         if (horizontalMovement)
         {
-            direction.x = Player.position.x < transform.position.x ? -1 : 1;
+            direction.x = Player.instance.transform.position.x < transform.position.x ? -1 : 1;
         }
         else
         {
-            direction.y = Player.position.y < transform.position.y ? -1 : 1;
+            direction.y = Player.instance.transform.position.y < transform.position.y ? -1 : 1;
         }
 
         if (direction.x == -1) facingRight = false;
@@ -95,7 +90,7 @@ public class TestBoss : Boss
 
     void SpawnBullets()
     {
-        direction = new Vector2(Player.position.x < transform.position.x ? -1 : Player.position.x > transform.position.x ? 1 : 0, Player.position.y < transform.position.y ? -1 : Player.position.y > transform.position.y ? 1 : 0);
+        direction = new Vector2(Player.instance.transform.position.x < transform.position.x ? -1 : Player.instance.transform.position.x > transform.position.x ? 1 : 0, Player.instance.transform.position.y < transform.position.y ? -1 : Player.instance.transform.position.y > transform.position.y ? 1 : 0);
         StartCoroutine(SpawnBullet(direction));
     }
 
@@ -106,11 +101,6 @@ public class TestBoss : Boss
 
     IEnumerator MoveCoroutine(Vector2 targetPos)
     {
-        if (targetPos == Player.position)
-        {
-            Player.instance.TakeDamage(1);
-        }
-
         isMoving = true;
 
         SpriteSize = 1.2f;
@@ -172,7 +162,7 @@ public class TestBoss : Boss
             Sprite.transform.localPosition = Vector3.MoveTowards(Sprite.transform.localPosition, new Vector3(Sprite.transform.localPosition.x, 12, Sprite.transform.localPosition.z), Time.deltaTime * 32f);
             yield return new WaitForEndOfFrame();
         }
-        Vector2 position = Player.position;
+        Vector2 position = Player.instance.transform.position;
         transform.position = position;
 
         yield return new WaitForEndOfFrame();
