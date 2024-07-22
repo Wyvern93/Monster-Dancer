@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     public List<Enhancement> EnhancementList;
     public static bool compassless;
     public IconList iconList;
+    public GameObject spriteTrailPrefab;
 
     private void Awake()
     {
@@ -58,6 +59,8 @@ public class GameManager : MonoBehaviour
         runData.currentMap = "SampleScene";
         runData.characterPrefab = selectedCharacter;
         runData.isInfinite = false;
+
+        PoolManager.CreatePool(typeof(SpriteRenderer), spriteTrailPrefab, 100);
         
         //LoadPlayer(runData.characterPrefab);
         //LoadMap(runData.currentMap);
@@ -94,7 +97,7 @@ public class GameManager : MonoBehaviour
 
     public void LoadDefaultAugments()
     {
-        runData.posibleEnhancements = new List<Enhancement>()
+        runData.possibleStatEnhancements = new List<Enhancement>()
         { new StatDMGEnhancement(), new StatHPEnhancement(), new StatEXPPercentEnhancement(), new StatCritChanceEnhancement() };
     }
 

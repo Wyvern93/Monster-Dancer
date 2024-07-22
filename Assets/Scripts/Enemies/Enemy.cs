@@ -25,6 +25,7 @@ public abstract class Enemy : MonoBehaviour
     protected Color emissionColor = new Color(1, 0, 0, 0);
 
     private bool isDead;
+    public int experience;
     public bool CanMove()
     {
         if (isMoving) return false;
@@ -84,7 +85,7 @@ public abstract class Enemy : MonoBehaviour
         SpriteX = Mathf.MoveTowards(SpriteX, facingRight ? 1 : -1, Time.deltaTime * 24f);
         Sprite.transform.localScale = new Vector3(SpriteX, 1, 1) * SpriteSize;
 
-        emissionColor = Color.Lerp(emissionColor, new Color(1, 1, 1, 0), Time.deltaTime * 8f);
+        emissionColor = Color.Lerp(emissionColor, new Color(1, 1, 1, 0), Time.deltaTime * 16f);
         spriteRendererMat.SetColor("_EmissionColor", emissionColor);
     }
 
@@ -112,11 +113,42 @@ public abstract class Enemy : MonoBehaviour
     public virtual void Die()
     {
         AudioController.PlaySound(AudioController.instance.sounds.enemyDeathSound);
-        Gem gem = PoolManager.Get<Gem>();
-        gem.transform.position = transform.position;
+
+        SpawnDrops();
+
         KillEffect deathFx = PoolManager.Get<KillEffect>();
         deathFx.transform.position = transform.position;
-        Map.Instance.EnemiesAlive--;
+        Map.Instance.enemiesAlive.Remove(this);
         PoolManager.Return(gameObject, GetType());
+    }
+
+    public void SpawnDrops()
+    {
+        int numSmallGems = experience % 5;
+        int numBigGems = (experience - numSmallGems) / 5;
+
+        int numCoins = 0;
+        if (Random.Range(0, 40) <= 1) numCoins = 1;
+
+        for (int sgem = 0; sgem < numSmallGems; sgem++)
+        {
+            BulletGem gem = PoolManager.Get<BulletGem>();
+            gem.dir = Random.insideUnitCircle * 2.4f;
+            gem.transform.position = transform.position;//(Vector2)transform.position + (Random.insideUnitCircle * 0.4f);
+        }
+
+        for (int bgem = 0; bgem < numBigGems; bgem++)
+        {
+            Gem gem = PoolManager.Get<Gem>();
+            gem.dir = Random.insideUnitCircle * 2.4f;
+            gem.transform.position = transform.position;
+        }
+
+        for (int coins = 0; coins < numCoins; coins++)
+        {
+            Coin coin = PoolManager.Get<Coin>();
+            coin.dir = Random.insideUnitCircle * 2.4f;
+            coin.transform.position = transform.position;
+        }
     }
 }

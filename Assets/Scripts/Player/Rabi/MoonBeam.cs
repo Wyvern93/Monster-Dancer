@@ -39,8 +39,8 @@ public class MoonBeam : MonoBehaviour
     {
         int abilityLevel = (int)Player.instance.abilityValues["ability.moonbeam.level"];
 
-        if (abilityLevel >= 2) abilityDamage = 12.5f;
-        else abilityDamage = 10f;
+        if (abilityLevel >= 2) abilityDamage = 25f;
+        else abilityDamage = 20f;
 
         if (abilityLevel >= 3) beamSpeed = 125f;
         else beamSpeed = 100f;
@@ -138,6 +138,12 @@ public class MoonBeam : MonoBehaviour
                 UIManager.Instance.PlayerUI.UpdateHealth();
             }
         }
-        
+
+        if (collision.CompareTag("FairyCage"))
+        {
+            FairyCage cage = collision.GetComponent<FairyCage>();
+            cage.OnHit();
+        }
+
     }
 }

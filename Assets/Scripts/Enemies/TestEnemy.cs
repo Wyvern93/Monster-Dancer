@@ -20,6 +20,7 @@ public class TestEnemy : Enemy
 
     public override void OnSpawn()
     {
+        Map.Instance.enemiesAlive.Add(this);
         CurrentHP = MaxHP;
         emissionColor = new Color(1, 1, 1, 0);
         isMoving = false;
@@ -172,6 +173,7 @@ public class TestEnemy : Enemy
         Bullet bullet = PoolManager.Get<Bullet>();
         bullet.transform.position = new Vector3(spawnEffect.transform.position.x, spawnEffect.transform.position.y);
         bullet.direction = direction;
+        bullet.enemySource = this;
         bullet.OnSpawn();
         //bullet.beatsLeft = 30;
         yield break;

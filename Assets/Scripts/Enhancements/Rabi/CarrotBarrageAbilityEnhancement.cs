@@ -5,29 +5,29 @@ public class CarrotBarrageAbilityEnhancement : Enhancement
 {
     public override string GetDescription()
     {
-        int level = getLevel();
+        int level = getLevel() + 1;
         if (level == 1)
         {
-            return "\nRabi throws <color=\"green\">4</color> carrots that explode after a second";
+            return "Rabi throws <color=\"green\">4</color> carrots that explode after a second";
         }
         if (level == 2)
         {
-            return "\nRabi throws <color=\"green\">4->6</color> carrots";
+            return "Rabi throws <color=\"green\">4->6</color> carrots";
         }
         if (level == 3)
         {
-            return "\nRabi throws <color=\"green\">6->8</color> carrots";
+            return "Rabi throws <color=\"green\">6->8</color> carrots";
         }
         if (level == 4)
         {
-            return "\nRabi throws <color=\"green\">8->12</color> carrots";
+            return "Rabi throws <color=\"green\">8->12</color> carrots";
         }
         return "";
     }
 
     public override int getLevel()
     {
-        if (!Player.instance.abilityValues.ContainsKey("ability.carrotbarrage.level")) return 1;
+        if (!Player.instance.abilityValues.ContainsKey("ability.carrotbarrage.level")) return 0;
         else return (int)Player.instance.abilityValues["ability.carrotbarrage.level"];
     }
 
@@ -46,14 +46,9 @@ public class CarrotBarrageAbilityEnhancement : Enhancement
         return "Passive";
     }
 
-    public override int getPriority()
+    public override int getWeight()
     {
-        return 1;
-    }
-
-    public override float getRarity()
-    {
-        return 0;
+        return 4;
     }
 
     public override bool isAvailable()
@@ -81,7 +76,7 @@ public class CarrotBarrageAbilityEnhancement : Enhancement
 
     public override void OnEquip()
     {
-        if (isUnique()) GameManager.runData.RemoveEnhancement(this);
+        if (isUnique()) GameManager.runData.RemoveSkillEnhancement(this);
         Player.instance.enhancements.Add(new CarrotBarrageAbilityEnhancement());
         if (!Player.instance.abilityValues.ContainsKey("ability.carrotbarrage.level"))
         {

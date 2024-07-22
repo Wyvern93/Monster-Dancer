@@ -35,8 +35,9 @@ public class Boss : Enemy
     public override void Die()
     {
         AudioController.PlaySound(AudioController.instance.sounds.enemyDeathSound);
-        Gem gem = PoolManager.Get<Gem>();
-        gem.transform.position = transform.position;
+
+        SpawnDrops();
+
         KillEffect deathFx = PoolManager.Get<KillEffect>();
         deathFx.transform.position = transform.position;
         Map.Instance.OnBossDeath();

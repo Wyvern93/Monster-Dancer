@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
 
@@ -29,7 +30,7 @@ public class MoonBeamAbility : PlayerAbility
 
     public override List<Enhancement> getEnhancementList()
     {
-        throw new System.NotImplementedException();
+        return new List<Enhancement>() { new MoonBeamAbilityEnhancement() };
     }
 
     public override string getID()
@@ -47,12 +48,12 @@ public class MoonBeamAbility : PlayerAbility
 
     public IEnumerator UltimateCast()
     {
-        
         Camera cam = Camera.main;
         PlayerRabi rabi = (PlayerRabi)Player.instance;
+        rabi.isCastingMoonBeam = true;
+        rabi.animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration());
         rabi.animator.Play("Rabi_Ultimate");
         rabi.isMoving = true;
-
         MoonBeam moonBeam = PoolManager.Get<MoonBeam>();
         moonBeam.transform.position = new Vector3(rabi.transform.position.x, rabi.transform.position.y + 1.5f, 10f);
         moonBeam.transform.localEulerAngles = new Vector3(0, 0, 45f);
@@ -60,7 +61,9 @@ public class MoonBeamAbility : PlayerAbility
         while (moonBeam.isActiveAndEnabled) yield return new WaitForEndOfFrame();
 
         rabi.isMoving = false;
+        rabi.animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration() / 2);
         rabi.animator.Play("Rabi_Idle");
+        rabi.isCastingMoonBeam = false;
         yield break;
     }
 

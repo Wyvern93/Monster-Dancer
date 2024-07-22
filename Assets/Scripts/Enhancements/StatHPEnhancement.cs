@@ -14,14 +14,9 @@ public class StatHPEnhancement : Enhancement
         return "statHPup";
     }
 
-    public override int getPriority()
+    public override int getWeight()
     {
-        return 0;
-    }
-
-    public override float getRarity()
-    {
-        return 20;
+        return 3;
     }
 
     public override bool isAvailable()
@@ -56,9 +51,10 @@ public class StatHPEnhancement : Enhancement
 
     public override void OnEquip()
     {
-        if (isUnique()) GameManager.runData.RemoveEnhancement(this);
+        if (isUnique()) GameManager.runData.RemoveStatEnhancement(this);
         Player.instance.enhancements.Add(new StatHPEnhancement());
         Player.instance.CalculateStats();
+        Player.instance.CurrentHP += hpBonus;
         UIManager.Instance.PlayerUI.UpdateHealth();
     }
 

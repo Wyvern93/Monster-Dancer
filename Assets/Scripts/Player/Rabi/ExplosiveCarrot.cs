@@ -21,7 +21,7 @@ public class ExplosiveCarrot : MonoBehaviour
 
     IEnumerator Throw()
     {
-        carrotSpr.sortingOrder = 3;
+        //carrotSpr.sortingOrder = 3;
         spinSource.Play();
         Vector3 origin = transform.position;
         float angle = direction.x < 0 ? -800 : 800;
@@ -29,7 +29,7 @@ public class ExplosiveCarrot : MonoBehaviour
         {
             height += force * Time.deltaTime;
             force -= Time.deltaTime * 60f;
-            carrotSpr.transform.localPosition = new Vector3(0, height, 0);
+            carrotSpr.transform.localPosition = new Vector3(0, height, height * 2);
             carrotSpr.transform.localEulerAngles = new Vector3(0, 0, carrotSpr.transform.localEulerAngles.z + ((angle * Mathf.Abs(height)) * Time.deltaTime));
             force = Mathf.Clamp(force, -20f, 20f);
             height = Mathf.Clamp(height, 0, 10);
@@ -57,7 +57,7 @@ public class ExplosiveCarrot : MonoBehaviour
             }
             yield return new WaitForEndOfFrame();
         }
-        carrotSpr.sortingOrder = 2;
+        //carrotSpr.sortingOrder = 2;
 
         CarrotExplosion carrotExplosion = PoolManager.Get<CarrotExplosion>();
         carrotExplosion.transform.position = transform.position;

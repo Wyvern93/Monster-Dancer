@@ -5,12 +5,13 @@ public class BunnyHopAbility : PlayerAbility
 {
     public int minCooldown = 1;
     int level;
-    public BunnyHopAbility() : base(4)
+    public BunnyHopAbility() : base(20)
     {
     }
 
     public override bool CanCast()
     {
+        if (((PlayerRabi)Player.instance).isCastingBunnyHop) return false;
         return currentCooldown == 0;
     }
 
@@ -31,7 +32,7 @@ public class BunnyHopAbility : PlayerAbility
 
     public override List<Enhancement> getEnhancementList()
     {
-        throw new System.NotImplementedException();
+        return new List<Enhancement>() { new BunnyHopAbilityEnhancement() };
     }
 
     public override string getID()
@@ -41,20 +42,18 @@ public class BunnyHopAbility : PlayerAbility
 
     public override void OnCast()
     {
-        int targetCD = 0;
         level = (int)Player.instance.abilityValues["ability.bunnyhop.level"];
-
         if (level == 1)
         {
-            targetCD = 16;
+            maxCooldown = 20;
         }
         else if (level == 2)
         {
-            targetCD = 12;
+            maxCooldown = 16;
         }
-        else if (level == 3)
+        else if (level >= 3)
         {
-            targetCD = 8;
+            maxCooldown = 12;
         }
 
         currentCooldown = maxCooldown;

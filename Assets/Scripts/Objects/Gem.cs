@@ -5,6 +5,7 @@ using UnityEngine;
 public class Gem : MonoBehaviour
 {
     private float speed;
+    public Vector2 dir;
     // Start is called before the first frame update
     void Start()
     {
@@ -14,7 +15,11 @@ public class Gem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (dir.magnitude > 0)
+        {
+            transform.position += (Vector3)dir * 3f * Time.deltaTime;
+            dir = Vector2.MoveTowards(dir, Vector2.zero, Time.deltaTime * 5f);
+        }
     }
 
     public void OnTriggerEnter2D(Collider2D collision)

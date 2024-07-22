@@ -4,5 +4,6 @@ public enum DamageTextType
     Critical,
     Heal,
     CriticalHeal,
-    Dodge
+    Dodge,
+    PlayerDamage
 }

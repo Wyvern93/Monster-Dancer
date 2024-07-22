@@ -5,29 +5,29 @@ public class MoonBeamAbilityEnhancement : Enhancement
 {
     public override string GetDescription()
     {
-        int level = getLevel();
+        int level = getLevel() + 1;
         if (level == 1)
         {
-            return "Rabi calls the power of the moon and projects it as three beams of moonlight that destroy projectiles and damages enemies for <color=\"yellow\">12</color> beats.";
+            return "Rabi calls the power of the moon and projects it as three beams of moonlight that destroy projectiles and damage enemies for <color=\"yellow\">12</color> beats";
         }
         if (level == 2)
         {
-            return "Increases the damage of the beams by <color=\"yellow\">25%</color>.";
+            return "Increases the damage of the beams by <color=\"yellow\">25%</color>";
         }
         if (level == 3)
         {
-            return "nIncreases the speed of the beams by <color=\"yellow\">25%</color>.";
+            return "Increases the speed of the beams by <color=\"yellow\">25%</color>";
         }
         if (level == 4)
         {
-            return "Increases the duration of the Moon Beams from <color=\"yellow\">12->18</color> beats and Rabi recovers <color=\"yellow\">2%</color> HP with every hit.";
+            return "Increases the duration of the Moon Beams from <color=\"yellow\">12->18</color> beats and Rabi recovers <color=\"yellow\">2%</color> HP with every hit";
         }
         return "";
     }
 
     public override int getLevel()
     {
-        if (!Player.instance.abilityValues.ContainsKey("ability.moonbeam.level")) return 1;
+        if (!Player.instance.abilityValues.ContainsKey("ability.moonbeam.level")) return 0;
         else return (int)Player.instance.abilityValues["ability.moonbeam.level"];
     }
 
@@ -46,25 +46,20 @@ public class MoonBeamAbilityEnhancement : Enhancement
         return "rabi.moonbeam";
     }
 
-    public override int getPriority()
+    public override int getWeight()
     {
-        return 2;
-    }
-
-    public override float getRarity()
-    {
-        return 50;
+        return 1;
     }
 
     public override bool isAvailable()
     {
-        bool available = true;
+        bool available = false;
         if (Player.instance.ultimateAbility == null) available = true;
         else
         {
             if (Player.instance.ultimateAbility.getID() == "rabi.moonbeam")
             {
-                if (Player.instance.abilityValues["ability.moonbeam.level"] >= 4) available = false;
+                if (Player.instance.abilityValues["ability.moonbeam.level"] < 4) available = true;
             }
         }
 
@@ -83,7 +78,7 @@ public class MoonBeamAbilityEnhancement : Enhancement
 
     public override void OnEquip()
     {
-        if (isUnique()) GameManager.runData.RemoveEnhancement(this);
+        if (isUnique()) GameManager.runData.RemoveSkillEnhancement(this);
         Player.instance.enhancements.Add(new MoonBeamAbilityEnhancement());
         if (!Player.instance.abilityValues.ContainsKey("ability.moonbeam.level"))
         {
@@ -95,7 +90,7 @@ public class MoonBeamAbilityEnhancement : Enhancement
         else
         {
             Player.instance.abilityValues["ability.moonbeam.level"] += 1;
-            int level = (int)Player.instance.abilityValues["ability.bunnyhop.level"];
+            int level = (int)Player.instance.abilityValues["ability.moonbeam.level"];
             UIManager.Instance.PlayerUI.SetUltimateLevel(level, level >= 4);
         }
         Player.instance.CalculateStats();

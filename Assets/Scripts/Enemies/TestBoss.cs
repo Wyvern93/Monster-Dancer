@@ -20,6 +20,7 @@ public class TestBoss : Boss
     [SerializeField] BoxCollider2D boxCollider;
     public override void OnSpawn()
     {
+        Map.Instance.enemiesAlive.Add(this);
         CurrentHP = MaxHP;
         emissionColor = new Color(1, 1, 1, 0);
         isMoving = false;
@@ -157,6 +158,7 @@ public class TestBoss : Boss
         Bullet bullet = PoolManager.Get<Bullet>();
         bullet.transform.position = new Vector3(spawnEffect.transform.position.x, spawnEffect.transform.position.y);
         bullet.direction = direction * 2f;
+        bullet.enemySource = this;
         bullet.OnSpawn();
         yield break;
     }

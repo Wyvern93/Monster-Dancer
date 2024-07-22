@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 2017603239726065263}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 2.45}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -110,7 +110,7 @@ Transform:
   m_GameObject: {fileID: 2652843271933679152}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 2.45}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -219,10 +219,11 @@ MonoBehaviour:
   beatContact: 0
   Sprite: {fileID: 7096805929543767706}
   SpriteSize: 1
-  MaxHP: 40
-  CurrentHP: 40
+  MaxHP: 100
+  CurrentHP: 100
   SpawnIndex: 0
   AItype: 0
+  experience: 7
 --- !u!50 &1868561314014851747
 Rigidbody2D:
   serializedVersion: 4

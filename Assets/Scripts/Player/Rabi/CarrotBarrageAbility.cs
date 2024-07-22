@@ -25,7 +25,7 @@ public class CarrotBarrageAbility : PlayerAbility
 
     public override List<Enhancement> getEnhancementList()
     {
-        throw new System.NotImplementedException();
+        return new List<Enhancement>() { new CarrotBarrageAbilityEnhancement() };
     }
 
     public override Sprite GetIcon()
