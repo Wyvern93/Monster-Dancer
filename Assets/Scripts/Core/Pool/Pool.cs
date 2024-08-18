@@ -6,7 +6,7 @@ using UnityEngine;
 public class Pool
 {
     public GameObject prefab;
-    private int initialSize;
+    public int initialSize;
 
     private Queue<GameObject> objects;
 
@@ -17,6 +17,17 @@ public class Pool
         objects = new Queue<GameObject>();
 
         for (int i = 0; i < initialSize; i++)
+        {
+            GameObject obj = GameObject.Instantiate(prefab);
+            obj.SetActive(false);
+            objects.Enqueue(obj);
+        }
+    }
+
+    public void ExpandPool(int targetSize)
+    {
+        int amount = targetSize - initialSize;
+        for (int i = 0; i < amount; i++)
         {
             GameObject obj = GameObject.Instantiate(prefab);
             obj.SetActive(false);

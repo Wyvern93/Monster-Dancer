@@ -188,10 +188,7 @@ MonoBehaviour:
   defeatEffect: {fileID: 5748955037701923418, guid: b4f414eef991b904c9caf749c4ee0a1e, type: 3}
   allBullets: []
   allEnemies: []
-  bigCarrotPrefab: {fileID: 2397063300123557567, guid: 585d9f67632b1374084611989eda2516, type: 3}
-  carrotPrefab: {fileID: 4917214594332586201, guid: b7ababc13e7dc3b4b924f0beaa605b2b, type: 3}
-  blueCarrotPrefab: {fileID: 1624157579257059485, guid: fb22574754682ca49aa3b1497deb0423, type: 3}
-  bigBulletPrefab: {fileID: 5370834661037820292, guid: 8681706279d475d4ba5d00af6f936d93, type: 3}
+  baseBulletPrefab: {fileID: 1992495900768505411, guid: e795107e4bb1a7c49a994d557da02879, type: 3}
   magicCircle: {fileID: 412132086061709858}
 --- !u!95 &8898053680327511531
 Animator:

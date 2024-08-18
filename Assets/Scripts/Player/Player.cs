@@ -80,6 +80,7 @@ public class Player : MonoBehaviour
 
     [SerializeField] LayerMask transparencyLayerMask;
 
+    public float invulTime;
 
     public Vector3 GetClosestPlayer(Vector2 pos)
     {
@@ -200,9 +201,14 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (GameManager.isLoading) return;
-        if (GameManager.isPaused) return;
-        if (!canDoAnything) return;
+        if (GameManager.isLoading || GameManager.isPaused || !canDoAnything)
+        {
+            UIManager.Instance.PlayerUI.activeCDImage.fillAmount = 0;
+            activeAbility.currentCooldown = 0;
+            UIManager.Instance.PlayerUI.activeCDImage.transform.position = Sprite.transform.position + new Vector3(0.7f, 0.9f, 1f);
+            return;
+        }
+        invulTime = Mathf.MoveTowards(invulTime, 0, Time.deltaTime);
 
         if (!isDead)
         {
@@ -476,7 +482,6 @@ public class Player : MonoBehaviour
         // Handle Movement
         if (action != PlayerAction.None && BeatManager.isGameBeat)
         {
-            Debug.Log(action);
             PerformAction(action);
         }
         waitForNextBeat = false;
@@ -623,6 +628,12 @@ public class Player : MonoBehaviour
     {
         if (isInvulnerable) return;
         if (isDead) return;
+
+        if (invulTime > 0) return;
+        else
+        {
+            invulTime = 0.2f;
+        }
         CurrentHP = Mathf.Clamp(CurrentHP - damage, 0, 9999);
         
         UIManager.Instance.PlayerUI.UpdateHealth();

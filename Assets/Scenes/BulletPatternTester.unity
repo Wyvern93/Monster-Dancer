@@ -10076,6 +10076,8 @@ MonoBehaviour:
   - {fileID: 1148289011}
   - {fileID: 403678701}
   - {fileID: 542219498}
+  ultimateIcon: {fileID: 0}
+  ultimateLevelText: {fileID: 0}
 --- !u!114 &1544861775
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13112,8 +13114,9 @@ MonoBehaviour:
   carrotPrefab: {fileID: 4917214594332586201, guid: b7ababc13e7dc3b4b924f0beaa605b2b, type: 3}
   blueCarrotPrefab: {fileID: 1624157579257059485, guid: fb22574754682ca49aa3b1497deb0423, type: 3}
   bigBulletPrefab: {fileID: 5370834661037820292, guid: 8681706279d475d4ba5d00af6f936d93, type: 3}
+  baseBulletPrefab: {fileID: 1992495900768505411, guid: e795107e4bb1a7c49a994d557da02879, type: 3}
   player: {fileID: 1274553551}
-  pattern: 1
+  pattern: 3
   attackBeat: 0
 --- !u!4 &1920993821
 Transform:

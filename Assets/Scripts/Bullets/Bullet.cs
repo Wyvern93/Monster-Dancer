@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    [SerializeField] protected SpriteRenderer spriteRenderer;
+    [SerializeField] public SpriteRenderer spriteRenderer;
     [SerializeField] protected CircleCollider2D circleCollider;
     public Vector2 direction;
     public int lifetime;
@@ -19,6 +19,7 @@ public class Bullet : MonoBehaviour
     protected Material spriteRendererMat;
     private float emission = 0;
     protected float beatScale = 1;
+    public int beat;
 
     private void Awake()
     {
@@ -63,7 +64,7 @@ public class Bullet : MonoBehaviour
         if (BeatManager.isGameBeat)
         {
             OnBeat();
-            beatScale = 1.4f;
+            beatScale = 1.25f;
         }
 
         emission -= Time.deltaTime * 3f;
@@ -82,6 +83,7 @@ public class Bullet : MonoBehaviour
     {
         if (Map.Instance != null) Map.Instance.bulletsSpawned.Add(this);
 
+        beat = 0;
         beatScale = 1;
         circleCollider.enabled = false;
         spriteRenderer.color = Color.clear;
@@ -113,12 +115,14 @@ public class Bullet : MonoBehaviour
         {
             lifetime = 0;
         }
+        if (!gameObject.activeSelf) return;
         StartCoroutine(DespawnCoroutine(false));
     }
 
     public virtual void ForceDespawn()
     {
         lifetime = 0;
+        if (!gameObject.activeSelf) return;
         StartCoroutine(DespawnCoroutine(true));
     }
 

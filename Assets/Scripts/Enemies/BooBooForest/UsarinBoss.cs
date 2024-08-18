@@ -10,10 +10,7 @@ public class UsarinBoss : Boss
     public List<Bullet> allBullets;
     public List<Enemy> allEnemies;
 
-    [SerializeField] GameObject bigCarrotPrefab;
-    [SerializeField] GameObject carrotPrefab;
-    [SerializeField] GameObject blueCarrotPrefab;
-    [SerializeField] GameObject bigBulletPrefab;
+    [SerializeField] GameObject baseBulletPrefab;
 
     private enum UsarinBossState
     {
@@ -30,10 +27,11 @@ public class UsarinBoss : Boss
     private bool magicCircleVisible;
 
     private Vector3 targetPos;
+    private bool orbitRight, starOrbitRight;
     private float orbitalBaseAngle;
-    private bool orbitRight;
+    private float starOrbitAngle;
 
-    List<BlueUsarinCarrotBullet> sideBullets;
+    List<BulletBase> sideBullets;
 
     public override void OnSpawn()
     {
@@ -56,12 +54,9 @@ public class UsarinBoss : Boss
         magicCircle.transform.localScale = Vector3.one * 1.5f;
         magicCircleVisible = false;
         orbitRight = true;
-        sideBullets = new List<BlueUsarinCarrotBullet>();
+        sideBullets = new List<BulletBase>();
 
-        PoolManager.CreatePool(typeof(BigUsarinCarrotBullet), bigCarrotPrefab, 100);
-        PoolManager.CreatePool(typeof(UsarinCarrotBullet), carrotPrefab, 100);
-        PoolManager.CreatePool(typeof(BlueUsarinCarrotBullet), blueCarrotPrefab, 350);
-        PoolManager.CreatePool(typeof(BigUsarinBullet), bigBulletPrefab, 100);
+        PoolManager.CreatePool(typeof(BulletBase), baseBulletPrefab, 500);
         animator.Play("usarin_intro");
     }
 
@@ -213,8 +208,8 @@ public class UsarinBoss : Boss
         if (attackBeat == 6) FindTargetPositionAroundPlayer();
         if (attackBeat > 6)
         {
-            if (attackBeat == 10)attackBeat = -1;
-            if (attackBeat > 6) Move();
+            if (attackBeat == 10) attackBeat = -1;
+            Move();
 
         }
         attackBeat++;
@@ -225,8 +220,8 @@ public class UsarinBoss : Boss
         float angle = 0;
         if (attackBeat == 2) angle = 225;
         else if (attackBeat == 3) angle = 315;
-        else if (attackBeat == 4) angle = 160;
-        else if (attackBeat == 5) angle = 15;
+        else if (attackBeat == 4) angle = 150;
+        else if (attackBeat == 5) angle = 25;
         else yield break;
 
         yield return ShootCircleOfBullets(angle);
@@ -235,24 +230,31 @@ public class UsarinBoss : Boss
     private IEnumerator ShootCircleOfBullets(float angle)
     {
         Vector2 patternDir = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
-        List<UsarinCarrotBullet> bullets = new List<UsarinCarrotBullet>();
+        List<BulletBase> bullets = new List<BulletBase>();
         for (int i = 0; i < 8; i++)
         {
             float offsetAngle = i * 45f;
             Vector2 offsetDir = new Vector2(Mathf.Cos(offsetAngle * Mathf.Deg2Rad), Mathf.Sin(offsetAngle * Mathf.Deg2Rad));
             AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
-            UsarinCarrotBullet bullet = PoolManager.Get<UsarinCarrotBullet>();
+            BulletBase bullet = PoolManager.Get<BulletBase>();
             bullet.transform.position = transform.position + (Vector3.up * 0.5f) + (Vector3)(offsetDir * 0.8f) + (Vector3)(patternDir * (1.5f));
             bullet.direction = patternDir;
-            bullet.origSpeed = 0;// attackBeat < 2 ? 12f : 20f;
-            bullet.speed = 0;// attackBeat < 2 ? 12f : 20f;
+            bullet.speed = 0;
             bullet.atk = 3;
             bullet.lifetime = 8;
             bullet.transform.localScale = Vector3.one;
+            bullet.behaviours = new List<BulletBehaviour>
+            {
+                new SpriteLookAngleBehaviour() { start = 0, end = -1 },
+            };
             bullet.OnSpawn();
             allBullets.Add(bullet);
             if (!allBullets.Contains(bullet)) allBullets.Add(bullet);
             bullets.Add(bullet);
+
+
+            bullet.animator.Play("orangecarrot");
+
             yield return new WaitForSeconds(BeatManager.GetBeatDuration() / 8f);
         }
 
@@ -267,16 +269,15 @@ public class UsarinBoss : Boss
         }
 
         center /= 8f;
-        Vector3 playerPos = Player.instance.GetClosestPlayer(center);
+        Vector3 playerPos = Player.instance.transform.position;
         Vector2 dir = (playerPos - center).normalized;
 
-        foreach (UsarinCarrotBullet bullet in bullets)
+        foreach (BulletBase bullet in bullets)
         {
-            bullet.phase = 3;
+            bullet.behaviours.Add(new SpeedOverTimeBehaviour() { speedPerBeat = 1, start = 3, end = 6, targetSpeed = 12 });
             bullet.direction = dir;
             bullet.angle = Vector2.SignedAngle(Vector2.down, dir) - 90;
             bullet.speed = 9;
-            bullet.origSpeed = 9;
         }
         yield break;
     }
@@ -288,18 +289,25 @@ public class UsarinBoss : Boss
             float offsetAngle = i * 10f;
             Vector2 offsetDir = new Vector2(Mathf.Cos(offsetAngle * Mathf.Deg2Rad), Mathf.Sin(offsetAngle * Mathf.Deg2Rad));
 
-            BlueUsarinCarrotBullet bullet = PoolManager.Get<BlueUsarinCarrotBullet>();
+            BulletBase bullet = PoolManager.Get<BulletBase>();
+
             bullet.transform.position = transform.position + (Vector3.up * 0.5f) + (Vector3)(offsetDir * 0.3f);
             bullet.direction = offsetDir;
-            bullet.origSpeed = 8;// attackBeat < 2 ? 12f : 20f;
-            bullet.speed = 8;// attackBeat < 2 ? 12f : 20f;
-            bullet.atk = 2;
-            bullet.lifetime = 8;
+            bullet.speed = 8;
+            bullet.atk = 10;
+            bullet.lifetime = 10;
             bullet.transform.localScale = Vector3.one;
-            bullet.targetSpeed = 6;
+            bullet.behaviours = new List<BulletBehaviour>
+            {
+                new SpeedOverTimeBehaviour() { speedPerBeat = 1, start = 0, end = 3, targetSpeed = 6 },
+                new SpriteWaveBehaviour() { start = 0, end = -1 },
+                new RotateOverBeatBehaviour() { start = 0, end = -1, rotateAmount = 70 }
+            };
+            bullet.animator.Play("notebullet");
             bullet.OnSpawn();
-            if (!allBullets.Contains(bullet)) allBullets.Add(bullet);
+            allBullets.Add(bullet);
         }
+
         AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
         yield break;
     }
@@ -319,48 +327,46 @@ public class UsarinBoss : Boss
         }
         if (isPreparingAttack) return; // Wait until the attack is charged;
 
-        StartCoroutine(ShootBulletsPhase2());
-        if (attackBeat < 16) // Carrot Bullets
+        if (attackBeat % 18 == 0)
         {
+            orbitRight = !orbitRight;
 
         }
-
-        if (attackBeat % 4 == 0)
+        if (attackBeat % 6 == 0)
         {
             StartCoroutine(ShootBigBullets());
         }
-
-        if (attackBeat % 16 == 0)
-        {
-            //orbitRight = !orbitRight;
-
-        }
+        StartCoroutine(ShootBulletsPhase2());
         if (attackBeat == -1) orbitRight = !orbitRight;
         attackBeat++;
     }
 
     private IEnumerator ShootBulletsPhase2()
     {
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 5; i++)
         {
-            float angle = (orbitalBaseAngle + (i * 120)) * Mathf.Deg2Rad;
+            float angle = (orbitalBaseAngle + (i * 72)) * Mathf.Deg2Rad;
             Vector2 angleDir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
 
-            BigUsarinCarrotBullet bullet = PoolManager.Get<BigUsarinCarrotBullet>();
-            bullet.transform.position = transform.position + (Vector3.up * 0.5f);
-            bullet.direction = angleDir;
-            bullet.origSpeed = 14f;
-            bullet.speed = 14f;
-            bullet.atk = 2;
-            bullet.lifetime = 12;
-            bullet.transform.localScale = Vector3.one;
-            bullet.rotateRight = orbitRight;
-            bullet.OnSpawn();
-            if (!allBullets.Contains(bullet)) allBullets.Add(bullet);
-        }
+            BulletBase bullet = PoolManager.Get<BulletBase>();
 
+            bullet.transform.position = transform.position + (Vector3.up) + (Vector3)(angleDir * 0.5f);
+            bullet.direction = angleDir;
+            bullet.speed = 6;
+            bullet.atk = 10;
+            bullet.lifetime = 10;
+            bullet.transform.localScale = Vector3.one;
+            bullet.behaviours = new List<BulletBehaviour>
+            {
+                new SpriteWaveBehaviour() { start = 0, end = -1 }
+            };
+            bullet.animator.Play(orbitRight ? "notebullet" : "rednotebullet");
+            bullet.OnSpawn();
+            allBullets.Add(bullet);
+        }
         AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
-        orbitalBaseAngle += orbitRight ? 11 : -11;
+        orbitalBaseAngle += orbitRight ? 8 : -8;
+
         yield break;
     }
 
@@ -368,21 +374,33 @@ public class UsarinBoss : Boss
     {
         for (int i = 0; i < 5; i++)
         {
-            float angle = (-orbitalBaseAngle + (i * 72)) * Mathf.Deg2Rad;
-            Vector2 angleDir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+            for (int i2 = 0; i2 < 3; i2++)
+            {
+                float angle = (orbitalBaseAngle + (i * 72f)) * Mathf.Deg2Rad;
+                Vector2 angleDir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
 
-            BigUsarinBullet bullet = PoolManager.Get<BigUsarinBullet>();
-            bullet.transform.position = transform.position + (Vector3.up * 1f);
-            bullet.direction = angleDir;
-            bullet.origSpeed = 7f;
-            bullet.speed = 7f;
-            bullet.atk = 5;
-            bullet.lifetime = 12;
-            bullet.transform.localScale = Vector3.one;
-            bullet.OnSpawn();
-            if (!allBullets.Contains(bullet)) allBullets.Add(bullet);
+                BulletBase bullet = PoolManager.Get<BulletBase>();
+
+                bullet.transform.position = transform.position + (Vector3.up) + (Vector3)(angleDir * 0.3f);
+                bullet.direction = angleDir;
+                bullet.speed = 5;
+                bullet.atk = 10;
+                bullet.lifetime = 10;
+                bullet.transform.localScale = Vector3.one;
+                bullet.behaviours = new List<BulletBehaviour>
+                {
+                    new SpriteSpinBehaviour() { start = 0, end = -1 },
+                    new SpeedOverTimeBehaviour() { start = 0, end = 1, speedPerBeat = 5, targetSpeed = 0},
+                    new SpeedOverTimeBehaviour() { start = 2, end = 5, speedPerBeat = 1f + (i2), targetSpeed = 8f + (i2)},
+                    new RotateOverBeatBehaviour() { start = 2, end = -1, rotateAmount = starOrbitRight ? -40f : 40}
+                };
+                bullet.animator.Play("starbullet");
+                bullet.OnSpawn();
+                allBullets.Add(bullet);
+            }
         }
-
+        starOrbitRight = !starOrbitRight;
+        starOrbitAngle += 36;
         AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
         yield break;
     }
@@ -413,14 +431,17 @@ public class UsarinBoss : Boss
 
             StartCoroutine(ChargeAttack1Coroutine(false));
         }
-        if (attackBeat % 6 == 0) // Carrot Bullets
+        if (attackBeat % 8 == 0) // Carrot Bullets
         {
-            StartCoroutine(ShootSpinningCarrots());
             StartCoroutine(ShootSideCarrots());
         }
+        if (attackBeat % 10 == 0) // Carrot Bullets
+        {
+            StartCoroutine(ShootSpinningCarrots());
+        }
 
-        if (attackBeat % 6 == 0) FindTargetPositionAroundPlayer();
-        if (attackBeat % 6 != 0)
+        if (attackBeat % 10 == 0) FindTargetPositionAroundPlayer();
+        if (attackBeat % 10 != 0)
         {
             Move();
         }
@@ -430,54 +451,55 @@ public class UsarinBoss : Boss
 
     private IEnumerator ShootSpinningCarrots()
     {
-        List<BigUsarinCarrotBullet> bullets = new List<BigUsarinCarrotBullet>();
+        List<BulletBase> bullets = new List<BulletBase>();
         for (int i = 0; i < 21; i++)
         {
-            float angle = ((i * 2) - 21) * Mathf.Deg2Rad;
+            float angle = (((i * 2) - 21) + 90) * Mathf.Deg2Rad;
             Vector2 angleDir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
 
-            BigUsarinCarrotBullet bullet = PoolManager.Get<BigUsarinCarrotBullet>();
+            BulletBase bullet = PoolManager.Get<BulletBase>();
             bullet.transform.position = transform.position + (Vector3.up * 2f);
             bullet.direction = angleDir;
-            bullet.origSpeed = 15f;
             bullet.speed = 15f;
-            bullet.atk = 2;
+            bullet.atk = 10;
             bullet.lifetime = 30;
             bullet.transform.localScale = Vector3.one;
-            bullet.ai = 1;
+            bullet.behaviours = new List<BulletBehaviour>
+                {
+                    new SpriteSpinBehaviour() { start = 0, end = 4 },
+                    new SpriteLookAngleBehaviour() { start = 5, end = -1},
+                };
+            bullet.animator.Play("bigcarrot");
             bullet.OnSpawn();
             allBullets.Add(bullet);
             bullets.Add(bullet);
-            if (!allBullets.Contains(bullet)) allBullets.Add(bullet);
         }
 
         AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
 
         yield return new WaitForSeconds(BeatManager.GetBeatDuration() * 4);
-        Vector2 arenaPos = Map.Instance.bossArea.transform.position; // Change this to the arena with the boss
+        Vector2 arenaPos = Map.Instance.bossArea.transform.position;
         for (int i = 0; i < 21; i++)
         {
             float xoffset = i - 10;
             bullets[i].transform.position = arenaPos + (Vector2.up * 10) + (Vector2.right * xoffset);
-            bullets[i].origSpeed = 6;
-            bullets[i].angle = -90 + Random.Range(-30f, 30f);
+            bullets[i].speed = 5;
+            bullets[i].angle = -90 + Random.Range(-20f, 20f);
             bullets[i].direction = Vector2.down;
-            bullets[i].ai = 2;
         }
-
         yield break;
     }
 
     private IEnumerator ShootSideCarrots()
     {
-        Vector2 arenaPos = Map.Instance.bossArea.transform.position; // Change this to the arena with the boss
+        Vector2 arenaPos = Map.Instance.bossArea.transform.position;
 
         if (attackBeat % 24 == 0)
         {
             orbitRight = !orbitRight;
             string anim = orbitRight ? "bluecarrot" : "orangecarrot";
-            List<BlueUsarinCarrotBullet> temp = new List<BlueUsarinCarrotBullet>(sideBullets);
-            foreach (BlueUsarinCarrotBullet bullet in temp)
+            List<BulletBase> temp = new List<BulletBase>(sideBullets);
+            foreach (BulletBase bullet in temp)
             {
                 if (!bullet.gameObject.activeSelf)
                 {
@@ -495,20 +517,21 @@ public class UsarinBoss : Boss
             float angle = ((orbitRight ? 0f : 180f) + Random.Range(-20f, 20f)) * Mathf.Deg2Rad;
             Vector2 angleDir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
 
-            BlueUsarinCarrotBullet bullet = PoolManager.Get<BlueUsarinCarrotBullet>();
+            BulletBase bullet = PoolManager.Get<BulletBase>();
             float yoffset = (i / 3f) - 3;
             bullet.transform.position = arenaPos + ((orbitRight ? Vector2.left : Vector2.right) * 14) + (Vector2.up * yoffset * 2);
             bullet.direction = angleDir;
-            bullet.origSpeed = 5f;
-            bullet.speed = 5f;
-            bullet.atk = 2;
+            bullet.speed = 4f;
+            bullet.atk = 10;
             bullet.lifetime = 50;
             bullet.transform.localScale = Vector3.one;
-            bullet.ai = 1;
+            bullet.behaviours = new List<BulletBehaviour>
+            {
+                    new SpriteLookAngleBehaviour() { start = 0, end = -1 },
+            };
             bullet.animator.Play(orbitRight ? "bluecarrot" : "orangecarrot");
             bullet.OnSpawn();
-            if (!allBullets.Contains(bullet)) allBullets.Add(bullet);
-
+            allBullets.Add(bullet);
             sideBullets.Add(bullet);
         }
 

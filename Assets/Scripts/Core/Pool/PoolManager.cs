@@ -22,6 +22,13 @@ public class PoolManager : MonoBehaviour
             Pool newPool = new Pool(prefab.gameObject, initialSize);
             instance.pools[objectType] = newPool;
         }
+        else
+        {
+            if (instance.pools[objectType].initialSize < initialSize)
+            {
+                instance.pools[objectType].ExpandPool(initialSize);
+            }
+        }
     }
 
     public static void ResetPools()

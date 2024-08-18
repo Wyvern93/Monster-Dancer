@@ -343,7 +343,7 @@ public class PlayerRabi : Player
         }
         if (dir == Vector2.zero) dir = facingRight ? Vector2.right : Vector2.left;
         dir.Normalize();
-        dir *= 3;
+        dir *= currentStats.Speed * 2;
         /*
         Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
         Vector2 difference = (crosshairPos - (Vector2)transform.position);

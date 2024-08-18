@@ -296,7 +296,7 @@ public class BeatManager : MonoBehaviour
     public static BeatTrigger GetBeatSuccess()
     {
         if (compassless) return BeatTrigger.PERFECT;
-        float successRange = instance.secondsPerBeat / 4f;
+        float successRange = instance.secondsPerBeat / 3f;
         float perfectRange = instance.secondsPerBeat / 12f;
 
         instance.currentTime = instance.music.time + audio_offset;
