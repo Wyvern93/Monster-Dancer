@@ -48,7 +48,7 @@ public class CarrotDeliveryAbilityEnhancement : Enhancement
 
     public override int getWeight()
     {
-        return 2;
+        return 3;
     }
 
     public override bool isAvailable()

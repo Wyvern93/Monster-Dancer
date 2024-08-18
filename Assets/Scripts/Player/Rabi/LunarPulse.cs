@@ -1,3 +1,4 @@
+using Unity.Burst.CompilerServices;
 using UnityEngine;
 
 public class LunarPulse : MonoBehaviour
@@ -16,8 +17,8 @@ public class LunarPulse : MonoBehaviour
         transform.localScale = Vector3.one * 0.5f;
         level = (int)Player.instance.abilityValues["ability.lunarpulse.level"];
 
-        dmg = level < 4 ? 10f : 15f;
-        size = level < 2 ? 2f : 4f;
+        dmg = level < 4 ? 10f : 20f;
+        size = level < 2 ? 2f : 2.5f;
     }
 
     public void Update()
@@ -25,8 +26,11 @@ public class LunarPulse : MonoBehaviour
         if (transform.localScale.magnitude < size)
         {
             transform.localScale = Vector3.MoveTowards(transform.localScale, Vector3.one * size, size * Time.deltaTime);
-            alpha = Mathf.MoveTowards(alpha, 0f, Time.deltaTime * 1.5f);
-            Debug.Log(transform.localScale.magnitude);
+            if (transform.localScale.magnitude > size - 0.5f)
+            {
+                alpha = Mathf.MoveTowards(alpha, 0f, Time.deltaTime * 2f);
+            }
+            
         }
         spriteRenderer.color = new Color(1, 1, 1, alpha);
         if (transform.localScale.magnitude >= size)
@@ -48,6 +52,12 @@ public class LunarPulse : MonoBehaviour
             if (isCritical) damage *= Player.instance.currentStats.CritDmg;
 
             enemy.TakeDamage((int)damage, isCritical);
+
+            if (level >= 3)
+            {
+                Vector2 dir = enemy.transform.position - Player.instance.transform.position;
+                enemy.PushEnemy(dir, 2f);
+            }
         }
 
         if (collision.CompareTag("FairyCage"))

@@ -40,6 +40,7 @@ public class PoolManager : MonoBehaviour
         {
             Pool pool = instance.pools[objectType];
             pool.DestroyPool();
+            instance.pools.Remove(objectType);
         }
     }
 
@@ -65,7 +66,7 @@ public class PoolManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError($"Pool for type {objtype} doesn't exist.");
+            Destroy(obj);
         }
     }
 }

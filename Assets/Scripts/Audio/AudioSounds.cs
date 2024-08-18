@@ -11,11 +11,15 @@ public class AudioSounds
     [Header("Player Sounds")]
     public AudioClip playerHurtSfx;
     public AudioClip playerLvlUpSfx;
+    public AudioClip playerSpecialAvailableSfx;
 
     [Header("Enemy Sounds")]
     public AudioClip enemyHurtSound;
     public AudioClip enemyDeathSound;
+    public AudioClip bossDeath;
     public AudioClip bossWalk;
+    public AudioClip shootBullet;
+    public AudioClip bossChargeAttack;
 
     [Header("Object Sounds")]
     public AudioClip gemSound;
@@ -29,4 +33,7 @@ public class AudioSounds
     [Header("Map Sounds")]
     public AudioClip warningWaveSound;
     public AudioClip warningBossWaveSound;
+
+    [Header("Music")]
+    public AudioClip stageComplete;
 }

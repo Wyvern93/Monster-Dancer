@@ -3,7 +3,7 @@ using UnityEngine;
 public class CarrotExplosion : MonoBehaviour
 {
     [SerializeField] AudioClip explosionSound;
-
+    public float dmg;
     public void OnEnable()
     {
         Player.TriggerCameraShake(0.3f, 0.2f);
@@ -20,7 +20,7 @@ public class CarrotExplosion : MonoBehaviour
         {
             Enemy enemy = collision.GetComponent<Enemy>();
 
-            float damage = Player.instance.currentStats.Atk * 80f;
+            float damage = Player.instance.currentStats.Atk * dmg;
             bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
             if (isCritical) damage *= Player.instance.currentStats.CritDmg;
 

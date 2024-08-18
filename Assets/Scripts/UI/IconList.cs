@@ -9,6 +9,7 @@ public class IconList
     public Sprite dmgUp;
     public Sprite critChanceUp;
     public Sprite expMultiUp;
+    public Sprite movSpeedUp;
 
     [Header("Bonus")]
     public Sprite coins;

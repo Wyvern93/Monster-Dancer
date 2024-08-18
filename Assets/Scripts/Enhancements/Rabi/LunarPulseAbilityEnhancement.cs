@@ -8,19 +8,19 @@ public class LunarPulseAbilityEnhancement : Enhancement
         int level = getLevel() + 1;
         if (level == 1)
         {
-            return "Rabi emits a pulse with the power of the moon that damages enemies every <color=\"green\">2</color> beats";
+            return "Rabi emits a pulse with the power of the moon that damages enemies every <color=\"green\">4</color> beats";
         }
         if (level == 2)
         {
-            return "Lunar Pulses are <color=\"green\">200%</color> bigger and emit every <color=\"green\">2->1</color> beat";
+            return "Lunar Pulses are <color=\"green\">25%</color> bigger and emit every <color=\"green\">4->3</color> beat";
         }
         if (level == 3)
         {
-            return "Emit <color=\"green\">1->2</color> Lunar Pulses";
+            return "Emits a pulse every <color=\"green\">3->2</color> Beats and knocks enemy back";
         }
         if (level == 4)
         {
-            return "Emit<color=\"green\">2->4</color> Lunar Pulses, increases damage by <color=\"green\">50%</color>";
+            return "Emits every pulse and increases damage by <color=\"green\">100%</color>";
         }
         return "";
     }
@@ -55,9 +55,10 @@ public class LunarPulseAbilityEnhancement : Enhancement
     {
         bool available = true;
         if (Player.instance.equippedPassiveAbilities.Count == 3) available = false;
-        else if(Player.instance.equippedPassiveAbilities.Find(x => x.getID() == "rabi.lunarpulse") != null)
+        if(Player.instance.equippedPassiveAbilities.Find(x => x.getID() == "rabi.lunarpulse") != null)
         {
-            if (Player.instance.abilityValues["ability.lunarpulse.level"] >= 4) available = false;
+            if (Player.instance.abilityValues["ability.lunarpulse.level"] < 4) available = true;
+            else available = false;
         }
 
 

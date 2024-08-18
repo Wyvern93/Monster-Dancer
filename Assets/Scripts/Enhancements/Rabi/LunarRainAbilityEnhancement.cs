@@ -6,22 +6,13 @@ public class LunarRainAbilityEnhancement : Enhancement
     public override string GetDescription()
     {
         int level = getLevel() + 1;
-        if (level == 1)
-        {
-            return "Every <color=\"green\">4</color> beats a Lunar Beam falls on an enemy, dealing damage";
-        }
-        if (level == 2)
-        {
-            return "Lunar Beams fall every <color=\"green\">4->2</color> beats";
-        }
-        if (level == 3)
-        {
-            return "<color=\"green\">2</color> Lunar Beams fall every time";
-        }
-        if (level == 4)
-        {
-            return "When an enemy dies rom Lunar Rain, another Lunar Beam falls";
-        }
+        if (level == 1) return "Lunar beams fall from the sky onto enemies closeby, dealing damage";
+        if (level == 2) return "Increases damage by 30%";
+        if (level == 3) return "Lunar Beams fall every <color=\"green\">4->2</color> beats";
+        if (level == 4) return "Increase damage by 30%";
+        if (level == 5) return "Lunar Beams fall every <color=\"green\">2->1</color> beat";
+        if (level == 6) return "<color=\"green\">2</color> Lunar Beams fall every time";
+        if (level == 7) return "When an enemy dies from Lunar Rain, another Lunar Beam falls";
         return "";
     }
 
@@ -55,9 +46,10 @@ public class LunarRainAbilityEnhancement : Enhancement
     {
         bool available = true;
         if (Player.instance.equippedPassiveAbilities.Count == 3) available = false;
-        else if(Player.instance.equippedPassiveAbilities.Find(x => x.getID() == "rabi.lunarrain") != null)
+        if(Player.instance.equippedPassiveAbilities.Find(x => x.getID() == "rabi.lunarrain") != null)
         {
-            if (Player.instance.abilityValues["ability.lunarrain.level"] >= 4) available = false;
+            if (Player.instance.abilityValues["ability.lunarrain.level"] < 7) available = true;
+            else available = false;
         }
 
 
@@ -88,7 +80,7 @@ public class LunarRainAbilityEnhancement : Enhancement
         {
             Player.instance.abilityValues["ability.lunarrain.level"] += 1;
             int level = (int)Player.instance.abilityValues["ability.lunarrain.level"];
-            UIManager.Instance.PlayerUI.SetPassiveLevel(level, level >= 4, Player.instance.getPassiveAbilityIndex(typeof(LunarRainAbility)));
+            UIManager.Instance.PlayerUI.SetPassiveLevel(level, level >= 7, Player.instance.getPassiveAbilityIndex(typeof(LunarRainAbility)));
         }
         Player.instance.CalculateStats();
     }

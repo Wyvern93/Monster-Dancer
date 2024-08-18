@@ -31,7 +31,7 @@ public class AudioCalibrationMenu : MonoBehaviour
         UIManager.Fade(false);
 
         GameManager.LoadPlayer(GameManager.runData.characterPrefab);
-        GameManager.LoadMap("SampleScene");
+        GameManager.LoadMap("Stage1a");
     }
 
     public void Open()

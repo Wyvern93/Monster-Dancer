@@ -92,6 +92,11 @@ public class SaveData
         }
     }
 
+    public bool ContainsKey(string key)
+    {
+        return Data.Find(x=> x.key == key) != null;
+    }
+
     public T GetData<T>(string key)
     {
         var kv = Data.Find(x => x.key == key);
@@ -142,5 +147,6 @@ public class SaveData
         SetData("enhancement.statHASTEup.unlocked", true);
         SetData("enhancement.statREROLLSup.unlocked", true);
         SetData("enhancement.statMOVRANGEup.unlocked", true);
+        SetData("rerolls.level", 0);
     }
 }

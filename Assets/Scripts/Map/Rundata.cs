@@ -5,6 +5,7 @@ public class RunData
 {
     public bool isInfinite;
     public int currentLoop = 0;
+    public int stageMulti = 1;
     public GameObject characterPrefab;
     public string currentMap;
     public int coins;

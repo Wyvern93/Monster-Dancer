@@ -131,13 +131,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 156adb8efab634c419a49fc105e585c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rb: {fileID: 90281232345309421}
   isPerformingAction: 0
   animator: {fileID: 551442119919301200}
+  isMoving: 0
+  canDoAnything: 0
+  facingRight: 0
   Sprite: {fileID: 4491087840922922414}
   SpriteSize: 1
   onbeat: 0
   waitForNextBeat: 0
-  MaxHP: 14
   CurrentHP: 14
   MaxSP: 250
   CurrentSP: 0
@@ -145,9 +148,79 @@ MonoBehaviour:
   CurrentExp: 0
   Level: 0
   baseAtk: 12
-  playerHurtSfx: {fileID: 8300000, guid: f7d6a8fb719e21143b2dcd17e503924c, type: 3}
-  playerLvlUpSfx: {fileID: 8300000, guid: ab74f86b5e4ece943831fb20c88000cc, type: 3}
-  attackEntity: {fileID: 1436826464497264834}
+  isDead: 0
+  baseStats:
+    MaxHP: 0
+    Def: 0
+    Atk: 0
+    Pen: 0
+    CritChance: 0
+    CritDmg: 0
+    ExpRange: 0
+    ExpMulti: 0
+    Haste: 0
+    Rerolls: 0
+    Speed: 0
+  perLevelStats:
+    MaxHP: 0
+    Def: 0
+    Atk: 0
+    Pen: 0
+    CritChance: 0
+    CritDmg: 0
+    ExpRange: 0
+    ExpMulti: 0
+    Haste: 0
+    Rerolls: 0
+    Speed: 0
+  currentStats:
+    MaxHP: 0
+    Def: 0
+    Atk: 0
+    Pen: 0
+    CritChance: 0
+    CritDmg: 0
+    ExpRange: 0
+    ExpMulti: 0
+    Haste: 0
+    Rerolls: 0
+    Speed: 0
+  flatBonusStats:
+    MaxHP: 0
+    Def: 0
+    Atk: 0
+    Pen: 0
+    CritChance: 0
+    CritDmg: 0
+    ExpRange: 0
+    ExpMulti: 0
+    Haste: 0
+    Rerolls: 0
+    Speed: 0
+  percentBonusStats:
+    MaxHP: 0
+    Def: 0
+    Atk: 0
+    Pen: 0
+    CritChance: 0
+    CritDmg: 0
+    ExpRange: 0
+    ExpMulti: 0
+    Haste: 0
+    Rerolls: 0
+    Speed: 0
+  music_theme: {fileID: 0}
+  enhancements: []
+  attackPrefab: {fileID: 0}
+  playerClones: []
+  isInvulnerable: 0
+  grazeSprite: {fileID: 0}
+  transparencyLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  references:
+    version: 2
+    RefIds: []
 --- !u!61 &2089996916027890664
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -595,4 +668,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spr_renderer: {fileID: 5609371440676166799}
   boxCollider: {fileID: 6707052567959401902}
-  attackSound: {fileID: 8300000, guid: 7b96591a9d08b6c4bb5446f634a2cf77, type: 3}
+  dir: {x: 0, y: 0}

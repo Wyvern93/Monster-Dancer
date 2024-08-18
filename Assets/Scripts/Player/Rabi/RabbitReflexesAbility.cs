@@ -57,7 +57,7 @@ public class RabbitReflexesAbility : PlayerAbility
     {
         level = (int)Player.instance.abilityValues["ability.rabbitreflexes.level"];
         if (charges < 20) charges += 1;
-        if (level >= 4) bullet.beatsLeft /= 2;
+        if (level >= 4) bullet.lifetime /= 2;
     }
 
     public override void OnEquip()

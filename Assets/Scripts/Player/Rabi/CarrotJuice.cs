@@ -20,7 +20,7 @@ public class CarrotJuice : MonoBehaviour
         if (level >= 3) transform.localScale = Vector3.one * 2f;
         else transform.localScale = Vector3.one;
 
-        dmg = level < 4 ? level < 2 ? 0.25f : 0.5f : 2f;
+        dmg = level < 4 ? level < 2 ? 4f : 6f : 9f;
 
         animator.Play("CarrotJuice_Spawn");
         enemies = new List<Enemy>();
@@ -56,7 +56,7 @@ public class CarrotJuice : MonoBehaviour
             cd = 0.1f;
             for (int i = 0; i < enemies.Count; i++)
             {
-                float damage = Player.instance.currentStats.Atk * 12 * dmg;
+                float damage = Player.instance.currentStats.Atk * dmg;
                 if (damage < 1) damage = 1;
                 bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
                 if (isCritical) damage *= Player.instance.currentStats.CritDmg;

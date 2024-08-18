@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Gem : MonoBehaviour
+public class Gem : Drop
 {
     private float speed;
     public Vector2 dir;
+    public int exp;
     // Start is called before the first frame update
     void Start()
     {
@@ -28,7 +29,7 @@ public class Gem : MonoBehaviour
         if (collision.CompareTag("Player") && collision.name == "Player")
         {
             AudioController.PlaySound(AudioController.instance.sounds.gemSound);
-            Player.AddExp(5);
+            Player.AddExp(exp);
             PoolManager.Return(gameObject, GetType());
         }
     }

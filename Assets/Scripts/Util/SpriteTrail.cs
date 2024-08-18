@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.U2D;
 
 public class SpriteTrail : MonoBehaviour
 {
@@ -10,13 +8,15 @@ public class SpriteTrail : MonoBehaviour
 
     private float currentOffset;
     private Transform targetObj;
+    private Vector3 sprOffset;
+    private float size;
 
     private bool playing;
 
     List<SpriteRenderer> sprites = new List<SpriteRenderer>();
     SpriteRenderer spriteReference;
     Color spriteColor;
-    public void Play(SpriteRenderer reference, int numSprites, float offset, Transform obj, Color color)
+    public void Play(SpriteRenderer reference, int numSprites, float offset, Transform obj, Color color, Vector3 spriteOffset, float size = 1)
     {
         ClearSprites();
         spriteColor = color;
@@ -26,6 +26,8 @@ public class SpriteTrail : MonoBehaviour
         currentOffset = 0;
         targetObj = obj;
         playing = true;
+        this.size = size;
+        sprOffset = spriteOffset;
     }
 
     public void Stop()
@@ -44,6 +46,7 @@ public class SpriteTrail : MonoBehaviour
 
     public void Update()
     {
+        if (GameManager.isPaused) return;
         if (spriteReference == null) return;
 
         if (currentOffset <= 0)
@@ -76,9 +79,10 @@ public class SpriteTrail : MonoBehaviour
         SpriteRenderer spr = PoolManager.Get<SpriteRenderer>();
         spr.sprite = spriteReference.sprite;
         spr.sortingOrder = 2;
-        spr.transform.position = targetObj.position + new Vector3(0,0, -0.5f);
+        spr.transform.position = targetObj.position + sprOffset;
         spr.color = new Color(1, 1, 1, 0.3f);
         spr.material.SetColor("_EmissionColor", spriteColor);
+        spr.transform.localScale = targetObj.transform.localScale * size;
         sprites.Add(spr);
     }
 

@@ -1,0 +1,357 @@
+fileFormatVersion: 2
+guid: cefd17e506fb615428e3f6e9fd8e50dd
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 12
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 512
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: stage1_tilemap2_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 129
+        width: 127
+        height: 191
+      alignment: 9
+      pivot: {x: 0.503937, y: 0.12565444}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape:
+      - - {x: -47.5, y: -19.5}
+        - {x: -47.5, y: -81.5}
+        - {x: 48.5, y: -80.5}
+        - {x: 48.5, y: -19.5}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 752488bd44175384489f834cf6f50cf8
+      internalID: -753293228
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: stage1_tilemap2_1
+      rect:
+        serializedVersion: 2
+        x: 127
+        y: 208
+        width: 125
+        height: 32
+      alignment: 9
+      pivot: {x: 0.512, y: 0.25}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape:
+      - - {x: -56.5, y: -16}
+        - {x: -56.5, y: -4}
+        - {x: 61.5, y: -4}
+        - {x: 61.5, y: -16}
+      tessellationDetail: 0
+      bones: []
+      spriteID: bd1599ea63d29e04db60f65afa732284
+      internalID: 924835367
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: stage1_tilemap2_2
+      rect:
+        serializedVersion: 2
+        x: 127
+        y: 176
+        width: 125
+        height: 32
+      alignment: 9
+      pivot: {x: 0.512, y: 0.25}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape:
+      - - {x: -56.5, y: -16}
+        - {x: -56.5, y: 16}
+        - {x: -50.5, y: 16}
+        - {x: -50.5, y: -16}
+      - - {x: 55.5, y: -16}
+        - {x: 55.5, y: 16}
+        - {x: 61.5, y: 16}
+        - {x: 61.5, y: -16}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0a5eb3bd418a2894ba14f52dc32c1af5
+      internalID: -690425473
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: stage1_tilemap2_3
+      rect:
+        serializedVersion: 2
+        x: 127
+        y: 144
+        width: 125
+        height: 32
+      alignment: 9
+      pivot: {x: 0.512, y: 0.25}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape:
+      - - {x: -56.5, y: -15}
+        - {x: -56.5, y: 16}
+        - {x: -50.5, y: 16}
+        - {x: -50.5, y: -15}
+      - - {x: 55.5, y: -15}
+        - {x: 55.5, y: 16}
+        - {x: 61.5, y: 16}
+        - {x: 61.5, y: -15}
+      - - {x: -50.5, y: -15}
+        - {x: -50.5, y: -7}
+        - {x: 55.5, y: -7}
+        - {x: 56.5, y: -15}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9c3670fde9c4edd4d8b82fe0592e6025
+      internalID: -1756762833
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: stage1_tilemap2_4
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 192
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.25, y: 0.25}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape:
+      - - {x: -16, y: -16}
+        - {x: -16, y: 11}
+        - {x: 0, y: 11}
+        - {x: 0, y: -16}
+      tessellationDetail: 0
+      bones: []
+      spriteID: d8f295657400d5044baba05afeaf0a06
+      internalID: -237596203
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: stage1_tilemap2_6
+      rect:
+        serializedVersion: 2
+        x: 284
+        y: 144
+        width: 116
+        height: 64
+      alignment: 9
+      pivot: {x: 0.5862069, y: 0.625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3f3fd456fea1cee45b74b523d685988d
+      internalID: -1173827228
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: stage1_tilemap2_5
+      rect:
+        serializedVersion: 2
+        x: 136
+        y: 63
+        width: 117
+        height: 81
+      alignment: 9
+      pivot: {x: 0.47008547, y: 0.09876543}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3fbba185afdba294e9431e911d272c6f
+      internalID: -1161687512
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: stage1_tilemap2_7
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 106
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.25, y: 0.4375}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0d462c3d27eefe843ba4ee3410fb8eb6
+      internalID: -623264588
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: stage1_tilemap2_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 4
+        width: 136
+        height: 125
+      alignment: 9
+      pivot: {x: 0.47058824, y: 0.552}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4e95011cb2bb1964397e63a2ff96bdc8
+      internalID: -1279905825
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      stage1_tilemap2_0: -753293228
+      stage1_tilemap2_1: 924835367
+      stage1_tilemap2_2: -690425473
+      stage1_tilemap2_3: -1756762833
+      stage1_tilemap2_4: -237596203
+      stage1_tilemap2_5: -1161687512
+      stage1_tilemap2_6: -1173827228
+      stage1_tilemap2_7: -623264588
+      stage1_tilemap2_8: -1279905825
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

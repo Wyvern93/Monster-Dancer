@@ -13,7 +13,7 @@ public class LunarRainRay : MonoBehaviour
     {
         level = (int)Player.instance.abilityValues["ability.lunarrain.level"];
 
-        dmg = level < 4 ? 20f : 30f;
+        dmg = level < 4 ? level < 2 ? 14f : 18f : 24f;
 
         AudioController.PlaySound(sound, Random.Range(0.8f, 1.2f));
     }
@@ -39,7 +39,7 @@ public class LunarRainRay : MonoBehaviour
             if (isCritical) damage *= Player.instance.currentStats.CritDmg;
 
             bool damageAnotherEnemy = false;
-            if ((int)Player.instance.abilityValues["ability.lunarrain.level"] >= 4)
+            if ((int)Player.instance.abilityValues["ability.lunarrain.level"] >= 7)
             {
                 if (enemy.CurrentHP - damage <= 0)
                 {
@@ -51,13 +51,7 @@ public class LunarRainRay : MonoBehaviour
 
             if (damageAnotherEnemy)
             {
-                Enemy e = Map.GetRandomEnemy();
-                int attempts = 5;
-                while (e == null && attempts > 0)
-                {
-                    e = Map.GetRandomEnemy();
-                    attempts--;
-                }
+                Enemy e = Map.GetRandomClosebyEnemy();
                 if (e == null) return;
 
                 LunarRainRay ray = PoolManager.Get<LunarRainRay>();

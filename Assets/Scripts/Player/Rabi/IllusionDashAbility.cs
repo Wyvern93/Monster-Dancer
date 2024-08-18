@@ -5,7 +5,7 @@ public class IllusionDashAbility : PlayerAbility
 {
     public int minCooldown = 1;
     int level;
-    public IllusionDashAbility() : base(20)
+    public IllusionDashAbility() : base(24)
     {
     }
 
@@ -44,13 +44,12 @@ public class IllusionDashAbility : PlayerAbility
     {
         level = (int)Player.instance.abilityValues["ability.illusiondash.level"];
 
-        maxCooldown = level < 4 ? 20 : 10;
-        int tiles = level < 2 ? 4 : 5;
+        maxCooldown = level < 6 ? level < 3 ? 24 : 20 : 16;
 
         currentCooldown = maxCooldown;
 
         PlayerRabi rabi = (PlayerRabi)Player.instance;
-        rabi.DoIllusionDash(tiles);
+        rabi.DoIllusionDash(level);
     }
 
     public override void OnEquip()
@@ -60,6 +59,9 @@ public class IllusionDashAbility : PlayerAbility
 
     public override void OnUpdate()
     {
-        if (BeatManager.isGameBeat && currentCooldown > 0) currentCooldown--;
+        if (BeatManager.isGameBeat && currentCooldown > 0)
+        {
+            currentCooldown--;
+        }
     }
 }

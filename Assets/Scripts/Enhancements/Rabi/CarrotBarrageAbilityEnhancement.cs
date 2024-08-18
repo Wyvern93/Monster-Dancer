@@ -55,9 +55,11 @@ public class CarrotBarrageAbilityEnhancement : Enhancement
     {
         bool available = true;
         if (Player.instance.equippedPassiveAbilities.Count == 3) available = false;
-        else if(Player.instance.equippedPassiveAbilities.Find(x => x.getID() == "rabi.carrotbarrage") != null)
+
+        if(Player.instance.equippedPassiveAbilities.Find(x => x.getID() == "rabi.carrotbarrage") != null)
         {
-            if (Player.instance.abilityValues["ability.carrotbarrage.level"] >= 4) available = false;
+            if (Player.instance.abilityValues["ability.carrotbarrage.level"] < 4) available = true;
+            else available = false;
         }
 
 

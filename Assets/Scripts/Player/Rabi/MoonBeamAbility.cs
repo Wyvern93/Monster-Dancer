@@ -61,7 +61,7 @@ public class MoonBeamAbility : PlayerAbility
         while (moonBeam.isActiveAndEnabled) yield return new WaitForEndOfFrame();
 
         rabi.isMoving = false;
-        rabi.animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration() / 2);
+        rabi.animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration());
         rabi.animator.Play("Rabi_Idle");
         rabi.isCastingMoonBeam = false;
         yield break;

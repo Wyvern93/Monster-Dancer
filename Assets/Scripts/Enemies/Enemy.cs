@@ -8,6 +8,7 @@ using UnityEngine.UIElements;
 public abstract class Enemy : MonoBehaviour
 {
     public bool beatContact;
+    public bool isElite;
     public bool isMoving { get; protected set; }
 
     protected Vector2 direction;
@@ -19,6 +20,7 @@ public abstract class Enemy : MonoBehaviour
     protected float SpriteX = 1f;
 
     public int MaxHP, CurrentHP;
+    private int origHealth;
     public int SpawnIndex;
     public int AItype;
 
@@ -27,10 +29,21 @@ public abstract class Enemy : MonoBehaviour
 
     private bool isDead;
     public int experience;
+    public int baseExperience;
     public int atk = 1;
+    public float speed;
+
+    protected Vector3 velocity;
+    protected Vector3 knockback;
+
+    protected Animator animator;
+
+    public Vector3 eventMove;
+    public int lifeTime;
     public bool CanMove()
     {
         if (isMoving) return false;
+        if (GameManager.isPaused) return false;
         else return true;
     }
 
@@ -40,6 +53,38 @@ public abstract class Enemy : MonoBehaviour
         {
             default:
             case EnemyType.TestEnemy: return PoolManager.Get<TestEnemy>();
+            case EnemyType.BooJr: return PoolManager.Get<GhostJr>();
+            case EnemyType.BooJrElite: return PoolManager.Get<GhostJrElite>();
+            case EnemyType.CarrotFan: return PoolManager.Get<CarrotFan>();
+            case EnemyType.Dancearune: return PoolManager.Get<Dancearune>();
+            case EnemyType.DancearuneElite: return PoolManager.Get<DancearuneElite>();
+            case EnemyType.NomSlime: return PoolManager.Get<NomSlime>();
+            case EnemyType.NomSlimeElite: return PoolManager.Get<NomSlimeElite>();
+            case EnemyType.Poisy: return PoolManager.Get<Poisy>();
+            case EnemyType.PoisyElite: return PoolManager.Get<PoisyElite>();
+            case EnemyType.Skeleko: return PoolManager.Get<Skeleko>();
+            case EnemyType.SlimeDancer: return PoolManager.Get<SlimeDancer>();
+            case EnemyType.Tronco: return PoolManager.Get<Tronco>();
+            case EnemyType.ZombieBride: return PoolManager.Get<ZombieBride>();
+            case EnemyType.ZombieThief: return PoolManager.Get<ZombieThief>();
+            case EnemyType.UsarinRunning: return PoolManager.Get<UsarinRunning>();
+
+            case EnemyType.ZippyBat: return PoolManager.Get<ZippyBat>();
+            case EnemyType.Rhytmia: return PoolManager.Get<Rhythmia>();
+            case EnemyType.RhytmiaElite: return PoolManager.Get<RhythmiaElite>();
+            case EnemyType.VampiLoli: return PoolManager.Get<VampiLoli>();
+            case EnemyType.Fungoo: return PoolManager.Get<Fungoo>();
+            case EnemyType.FungooElite: return PoolManager.Get<FungooElite>();
+            case EnemyType.Kappa: return PoolManager.Get<Kappa>();
+            case EnemyType.MuscleHare: return PoolManager.Get<MuscleHare>();
+            case EnemyType.MuscleHareElite: return PoolManager.Get<MuscleHareElite>();
+            case EnemyType.OjouGuardian: return PoolManager.Get<OjouGuardian>();
+            case EnemyType.Purrfessor: return PoolManager.Get<Purrfessor>();
+            case EnemyType.StayinUndead: return PoolManager.Get<StayinUndead>();
+            case EnemyType.StayinUndeadElite: return PoolManager.Get<StayinUndeadElite>();
+            case EnemyType.WiggleViper: return PoolManager.Get<WiggleViper>();
+
+            case EnemyType.Usarin: return PoolManager.Get<UsarinBoss>();
         }
     }
 
@@ -56,6 +101,7 @@ public abstract class Enemy : MonoBehaviour
     {
         spriteRendererMat = Sprite.material;
         facingRight = true;
+        animator = GetComponentInChildren<Animator>();
         OnInitialize();
     }
 
@@ -64,17 +110,55 @@ public abstract class Enemy : MonoBehaviour
         isDead = false;
     }
 
+    public virtual void CalculateHealth()
+    {
+        if (GameManager.runData == null) return;
+        if (origHealth == 0) origHealth = MaxHP;
+        float minutes = (Map.StageTime / 100f) + (6 * GameManager.runData.stageMulti);
+        float scale = 1 + Mathf.Clamp(minutes - 1, 0, 10000);
+        // Minute 0 -> 1x
+        // Minute 10 -> 10x
+        int baseHealth = (int)(origHealth * scale);
+        MaxHP = baseHealth;
+
+        if (baseExperience == 0) baseExperience = experience;
+        experience = baseExperience * (1 + GameManager.runData.stageMulti);
+
+        float baseSize = isElite || this is Boss ? 2 : 1;
+        float multi = 1 + (Map.StageTime / 600f);
+        transform.localScale = Vector3.one * baseSize * multi;
+    }
+
     protected abstract void OnInitialize();
 
     // Update is called once per frame
     void Update()
     {
+        if (GameManager.isPaused) return;
         OnBehaviourUpdate();
         if (BeatManager.isGameBeat) OnBeat();
 
         HandleSprite();
+        HandleKnockback();
+        rb.velocity = velocity + (knockback * 2);
     }
-    public abstract void OnSpawn();
+    public virtual void OnSpawn()
+    {
+        CalculateHealth();
+        if (Map.Instance != null) Map.Instance.enemiesAlive.Add(this);
+
+    }
+
+    protected void HandleKnockback()
+    {
+        knockback = Vector3.MoveTowards(knockback, Vector3.zero, Time.deltaTime * 12f);
+    }
+
+    public void PushEnemy(Vector2 pushDir, float force)
+    {
+        knockback = pushDir.normalized * force;
+    }
+
     protected abstract void OnBehaviourUpdate();
 
     protected abstract void OnBeat();
@@ -100,7 +184,7 @@ public abstract class Enemy : MonoBehaviour
         }
 
         CurrentHP = Mathf.Clamp(CurrentHP - damage, 0, MaxHP);
-        Player.TriggerCameraShake(0.4f, 0.2f);
+        //Player.TriggerCameraShake(0.4f, 0.2f);
         AudioController.PlaySound(AudioController.instance.sounds.enemyHurtSound);
         emissionColor = new Color(1, 1, 1, 1);
         UIManager.Instance.PlayerUI.SpawnDamageText(transform.position, damage, isCritical ? DamageTextType.Critical : DamageTextType.Normal);
@@ -112,11 +196,23 @@ public abstract class Enemy : MonoBehaviour
         }
     }
 
+    public void ForceDespawn(bool sound = true)
+    {
+        if (sound)
+        {
+            AudioController.PlaySound(AudioController.instance.sounds.enemyDeathSound);
+            KillEffect deathFx = PoolManager.Get<KillEffect>();
+            deathFx.transform.position = transform.position;
+        }
+        
+        PoolManager.Return(gameObject, GetType());
+    }
+
     public virtual void Die()
     {
         AudioController.PlaySound(AudioController.instance.sounds.enemyDeathSound);
 
-        SpawnDrops();
+        if (!Map.isBossWave) SpawnDrops();
 
         KillEffect deathFx = PoolManager.Get<KillEffect>();
         deathFx.transform.position = transform.position;
@@ -130,21 +226,57 @@ public abstract class Enemy : MonoBehaviour
         int numBigGems = (experience - numSmallGems) / 5;
 
         int numCoins = 0;
-        if (Random.Range(0, 40) <= 1) numCoins = 1;
-
-        for (int sgem = 0; sgem < numSmallGems; sgem++)
+        if (Random.Range(0, 40) <= 1)
         {
-            BulletGem gem = PoolManager.Get<BulletGem>();
-            gem.dir = Random.insideUnitCircle * 2.4f;
-            gem.transform.position = transform.position;//(Vector2)transform.position + (Random.insideUnitCircle * 0.4f);
+            numCoins = 1;
+            for (int i = 0; i < 20; i++)
+            {
+                if (Random.Range(0, 40) <= 1) numCoins++;
+            }
         }
+        
+        
+        
 
-        for (int bgem = 0; bgem < numBigGems; bgem++)
+        int expToUse = experience;
+        while (expToUse > 0)
         {
-            Gem gem = PoolManager.Get<Gem>();
-            gem.dir = Random.insideUnitCircle * 2.4f;
-            gem.transform.position = transform.position;
+            if (expToUse <= 10)
+            {
+                BulletGem gem = PoolManager.Get<BulletGem>();
+                gem.dir = Random.insideUnitCircle * 2.4f;
+                gem.transform.position = transform.position;//(Vector2)transform.position + (Random.insideUnitCircle * 0.4f);
+                gem.exp = expToUse;
+                expToUse -= expToUse;
+            }
+            else if (expToUse <= 25)
+            {
+                Gem gem = PoolManager.Get<Gem>();
+                gem.dir = Random.insideUnitCircle * 2.4f;
+                gem.transform.position = transform.position;
+                gem.exp = Mathf.Clamp(expToUse, 0, 25);
+                expToUse -= expToUse;
+                gem.animator.Play("MonsterGem");
+            }
+            else if (expToUse > 25)
+            {
+                Gem gem = PoolManager.Get<Gem>();
+                gem.dir = Random.insideUnitCircle * 2.4f;
+                gem.transform.position = transform.position;
+                gem.animator.Play("SuperMonsterGem");
+                if (expToUse > 50)
+                {
+                    gem.exp = 50;
+                    expToUse -= 50;
+                }
+                else
+                {
+                    gem.exp = expToUse;
+                    expToUse = 0;
+                }
+            }
         }
+        
 
         for (int coins = 0; coins < numCoins; coins++)
         {

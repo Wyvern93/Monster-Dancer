@@ -21,8 +21,9 @@ public class BulletSpawnEffect : MonoBehaviour
     {
         if (BeatManager.isGameBeat) beats++;
 
-        if (beats >= 2)
+        if (beats >= 1)
         {
+            transform.parent = null;
             PoolManager.Return(gameObject, typeof(BulletSpawnEffect));
         }
     }
