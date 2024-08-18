@@ -56,7 +56,8 @@ public class GameManager : MonoBehaviour
 
         runData = new RunData();
         runData.currentLoop = 1;
-        runData.currentMap = "SampleScene";
+        runData.stageMulti = 0;
+        runData.currentMap = "Stage1a";
         runData.characterPrefab = selectedCharacter;
         runData.isInfinite = false;
 
@@ -74,17 +75,23 @@ public class GameManager : MonoBehaviour
         {
             Player.instance.Despawn();
             LoadPlayer(runData.characterPrefab);
-            LoadMap("SampleScene");
+            LoadMap("Stage1a");
         }
         if (Keyboard.current.f1Key.wasPressedThisFrame)
         {
-            compassless = !compassless;
+            BeatManager.compassless = !BeatManager.compassless;
+            BeatManager.UpdatePulseAnimator();
         }
     }
 
     public static void LoadMap(string map)
     {
         instance.StartCoroutine(instance.LoadMapCoroutine(map));
+    }
+
+    public static void LoadNextStage(string map)
+    {
+        instance.StartCoroutine(instance.LoadNextStageCoroutine(map));
     }
 
     public static void LoadPlayer(GameObject character)
@@ -98,10 +105,35 @@ public class GameManager : MonoBehaviour
     public void LoadDefaultAugments()
     {
         runData.possibleStatEnhancements = new List<Enhancement>()
-        { new StatDMGEnhancement(), new StatHPEnhancement(), new StatEXPPercentEnhancement(), new StatCritChanceEnhancement() };
+        { new StatDMGEnhancement(), new StatHPEnhancement(), new StatEXPPercentEnhancement(), new StatCritChanceEnhancement(), new MovSpeedEnhancement() };
     }
 
     private IEnumerator LoadMapCoroutine(string map)
+    {
+        isLoading = true;
+        UIManager.Instance.PlayerUI.HideUI();
+        UIManager.Fade(false);
+        yield return new WaitForSeconds(0.5f); //UIManager.WaitForFade();
+        if (Map.Instance) Map.StopMap();
+
+        Debug.Log(currentScene);
+        if (currentScene != "")
+        {
+            AsyncOperation unload = SceneManager.UnloadSceneAsync(currentScene);
+            while (!unload.isDone) yield return new WaitForEndOfFrame();
+        }
+        AsyncOperation load = SceneManager.LoadSceneAsync(map, LoadSceneMode.Additive);
+        while (!load.isDone) yield return new WaitForEndOfFrame();
+        UIManager.Fade(true);
+        UIManager.Instance.PlayerUI.CreatePools();
+        currentScene = map;
+        BeatManager.StartTrack();
+        UIManager.Instance.PlayerUI.ShowUI();
+        isLoading = false;
+        yield break;
+    }
+
+    private IEnumerator LoadNextStageCoroutine(string map)
     {
         isLoading = true;
         UIManager.Instance.PlayerUI.HideUI();
@@ -122,6 +154,22 @@ public class GameManager : MonoBehaviour
         BeatManager.StartTrack();
         UIManager.Instance.PlayerUI.ShowUI();
         isLoading = false;
+        Player.instance.transform.position = Map.Instance.startPosition.position + Vector3.left * 12f;
+        Camera.main.transform.position = new Vector3(Map.Instance.startPosition.position.x, Map.Instance.startPosition.position.y, Camera.main.transform.position.z);
+        
+        float goalPos = Map.Instance.startPosition.position.x;
+        if (Player.instance is PlayerRabi) Player.instance.animator.Play("Rabi_Move");
+        while (Player.instance.transform.position.x < goalPos)
+        {
+            Player.instance.transform.position += (Vector3.right * 4f * Time.deltaTime);
+            yield return new WaitForEndOfFrame();
+        }
+        Player.instance.canDoAnything = true;
+        Player.ResetPosition();
+        Player.instance.transform.position = Map.Instance.startPosition.position;
+        Player.instance.SetCameraPos(Map.Instance.startPosition.position);
+        
+        if (Player.instance is PlayerRabi) Player.instance.animator.Play("Rabi_Idle");
         yield break;
     }
 }

@@ -25,9 +25,14 @@ public class RabiClone : MonoBehaviour
 
     public void OnDespawn()
     {
-        SmokeExplosion smoke = PoolManager.Get<SmokeExplosion>();
-        smoke.transform.position = transform.position;
+        //SmokeExplosion smoke = PoolManager.Get<SmokeExplosion>();
+        //smoke.transform.position = transform.position;
         Player.instance.playerClones.Remove(gameObject);
+
+        CarrotExplosion carrotExplosion = PoolManager.Get<CarrotExplosion>();
+        carrotExplosion.transform.position = transform.position;
+        carrotExplosion.dmg = 30;
+
         PoolManager.Return(gameObject, GetType());
     }
 

@@ -160,9 +160,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acbc54204cbeb974ba0eacf75fb7ce21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rb: {fileID: 7232690413544996010}
   isPerformingAction: 0
   animator: {fileID: 4284550755660226288}
   isMoving: 0
+  canDoAnything: 0
+  facingRight: 0
   Sprite: {fileID: 8181644374423735234}
   SpriteSize: 1
   onbeat: 0
@@ -176,7 +179,7 @@ MonoBehaviour:
   baseAtk: 1
   isDead: 0
   baseStats:
-    MaxHP: 60
+    MaxHP: 75
     Def: 10
     Atk: 1
     Pen: 0
@@ -186,7 +189,7 @@ MonoBehaviour:
     ExpMulti: 1
     Haste: 0
     Rerolls: 0
-    Speed: 1
+    Speed: 1.3
   perLevelStats:
     MaxHP: 0
     Def: 0
@@ -241,7 +244,9 @@ MonoBehaviour:
   playerClones: []
   isInvulnerable: 0
   grazeSprite: {fileID: 8249613087250414989}
-  rb: {fileID: 7232690413544996010}
+  transparencyLayerMask:
+    serializedVersion: 2
+    m_Bits: 4096
   explosiveCarrot: {fileID: 6176280003804827367, guid: 3022bd6a79b7630479f72639d2475f67, type: 3}
   carrotExplosionPrefab: {fileID: 2605593471026702462, guid: 941e5a73124b6514cacc803978b84e0a, type: 3}
   rabiClonePrefab: {fileID: 2259806814164270096, guid: 62879664afbba8f4a813d773bdc57f27, type: 3}
@@ -254,6 +259,7 @@ MonoBehaviour:
   lunarRainBeamPrefab: {fileID: 4172276046508891517, guid: 5de72d26e97fd0d4c89ed387e6f6ad49, type: 3}
   truckPrefab: {fileID: 1989313302280288747, guid: b9245f131d496854db9bf5a27a4cc957, type: 3}
   carrotBulletPrefab: {fileID: 5213826588971438917, guid: 9ea086bc5d89b384699a26f5d17bd759, type: 3}
+  moonlightShockwavePrefab: {fileID: 4163177863434745036, guid: def8eb86107984148ad0e97d62c8ef22, type: 3}
   spriteTrail: {fileID: 4465351908415658744}
   dashHitBox: {fileID: 7102733586936279029}
   dashSound: {fileID: 8300000, guid: 7903361135f538e44bab3cd4f2380af2, type: 3}
@@ -294,7 +300,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 0.3}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -305,7 +311,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.3, y: 0.3}
+  m_Size: {x: 0.3, y: 0.4}
   m_EdgeRadius: 0
 --- !u!50 &7232690413544996010
 Rigidbody2D:
@@ -380,7 +386,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 0.15}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -868,7 +874,7 @@ CircleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 1}
   serializedVersion: 2
   m_Radius: 1.5
 --- !u!50 &1760803071661726549

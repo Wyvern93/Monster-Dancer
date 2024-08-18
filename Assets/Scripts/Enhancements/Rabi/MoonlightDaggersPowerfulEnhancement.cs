@@ -5,7 +5,7 @@ public class MoonlightDaggersPowerfulEnhancement : Enhancement
 {
     public override string GetDescription()
     {
-        return "Rabi awakens her Moonlight Daggers, shooting big projectiles that deal high amounts of damage";
+        return "Shorter waves that explode on contact with enemies dealing <color=\"green\">50%</color> of the weapon's damage";
     }
 
     public override string getId()
@@ -15,7 +15,7 @@ public class MoonlightDaggersPowerfulEnhancement : Enhancement
 
     public override int getLevel()
     {
-        return 9;
+        return 6;
     }
 
     public override string getName()
@@ -30,13 +30,13 @@ public class MoonlightDaggersPowerfulEnhancement : Enhancement
 
     public override int getWeight()
     {
-        return 1;
+        return 4;
     }
 
     public override bool isAvailable()
     {
         if (!Player.instance.abilityValues.ContainsKey("attack.moonlightdaggers.level")) return false;
-        return Player.instance.abilityValues["attack.moonlightdaggers.level"] == 9;
+        return Player.instance.abilityValues["attack.moonlightdaggers.level"] == 6;
     }
 
     public override bool isUnique()
@@ -64,9 +64,12 @@ public class MoonlightDaggersPowerfulEnhancement : Enhancement
             int level = (int)Player.instance.abilityValues["attack.moonlightdaggers.level"];
             UIManager.Instance.PlayerUI.SetWeaponLevel(level, true);
 
-            Player.instance.abilityValues["Attack_Number"] = 4f;
-            Player.instance.abilityValues["Attack_Size"] = 3f;
-            Player.instance.abilityValues["Attack_Damage"] = 24f;
+            Player.instance.abilityValues["Attack_Number"] = 2f;
+            Player.instance.abilityValues["Attack_Size"] = 1.2f;
+            Player.instance.abilityValues["Attack_Time"] = 0.75f;
+            Player.instance.abilityValues["Attack_Damage"] = 17f;
+            Player.instance.abilityValues["Attack_Cooldown"] = 1;
+            Player.instance.abilityValues["Attack_Explode"] = 1;
         }
         
         Player.instance.CalculateStats();

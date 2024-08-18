@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEditor.Playables;
 using UnityEngine;
 
 public class LunarRainAbility : PlayerAbility
@@ -40,22 +39,16 @@ public class LunarRainAbility : PlayerAbility
     public override void OnCast()
     {
         int level = (int)Player.instance.abilityValues["ability.lunarrain.level"];
-        maxCooldown = level < 2 ? 4 : 2;
+        maxCooldown = level < 5 ? level < 5 ? 4 : 2 : 1;
         currentCooldown = maxCooldown;
 
         CastRay();
-        if (level >= 3) CastRay();
+        if (level >= 6) CastRay();
     }
 
     public void CastRay()
     {
-        Enemy e = Map.GetRandomEnemy();
-        int attempts = 5;
-        while (e == null && attempts > 0)
-        {
-            e = Map.GetRandomEnemy();
-            attempts--;
-        }
+        Enemy e = Map.GetRandomClosebyEnemy();
         if (e == null) return;
 
         LunarRainRay ray = PoolManager.Get<LunarRainRay>();

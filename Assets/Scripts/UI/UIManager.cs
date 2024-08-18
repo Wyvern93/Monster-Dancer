@@ -14,6 +14,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] Image gameOverBG;
     [SerializeField] GameOverMenu gameOverMenu;
     [SerializeField] AudioCalibrationMenu calibrationMenu;
+    [SerializeField] public GameObject StageFinish;
     private void Awake()
     {
         Instance = this;

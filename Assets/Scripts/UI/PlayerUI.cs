@@ -39,6 +39,9 @@ public class PlayerUI : MonoBehaviour
     public Image activeCDImage;
     public TextMeshProUGUI coinText;
     [SerializeField] List<PlayerUIIcon> abilityIcons;
+
+    [SerializeField] Image ultimateIcon;
+    [SerializeField] TextMeshProUGUI ultimateLevelText;
     // Start is called before the first frame update
     void Awake()
     {
@@ -90,7 +93,7 @@ public class PlayerUI : MonoBehaviour
         if (Map.Instance != null) 
         {
             UpdateStageTime();
-            bossBarGroup.alpha = Mathf.MoveTowards(bossBarGroup.alpha, Map.isBossWave() ? 1 : 0, Time.deltaTime);
+            bossBarGroup.alpha = Mathf.MoveTowards(bossBarGroup.alpha, Map.isBossWave ? 1 : 0, Time.deltaTime);
         }
     }
 
@@ -102,7 +105,7 @@ public class PlayerUI : MonoBehaviour
     public void UpdateBossBar(int current, int max)
     {
         float health = (float)current / (float)max;
-        float width = (int)(190f * health);
+        float width = (int)(182f * health);
         bossBarTransform.sizeDelta = new Vector2(width, bossBarTransform.sizeDelta.y);
         bossBarHPText.text = $"{current}/{max}";
     }
@@ -119,32 +122,37 @@ public class PlayerUI : MonoBehaviour
 
     public void SetUltimateIcon(Sprite sprite, int level, bool maxed)
     {
-        abilityIcons[1].Display(sprite, level, maxed);
+        ultimateIcon.sprite = sprite;
+        ultimateLevelText.text = "Lv" + level;
+        ultimateLevelText.color = maxed ? Color.yellow : Color.white;
+        //abilityIcons[1].Display(sprite, level, maxed);
     }
 
     public void SetUltimateLevel(int level, bool maxed)
     {
-        abilityIcons[1].SetLevel(level, maxed);
+        ultimateLevelText.text = "Lv" + level;
+        ultimateLevelText.color = maxed ? Color.yellow : Color.white;
+        //abilityIcons[1].SetLevel(level, maxed);
     }
 
     public void SetActiveIcon(Sprite sprite, int level, bool maxed)
     {
-        abilityIcons[2].Display(sprite, level, maxed);
+        //abilityIcons[2].Display(sprite, level, maxed);
     }
 
     public void SetActiveLevel(int level, bool maxed)
     {
-        abilityIcons[2].SetLevel(level, maxed);
+        //abilityIcons[2].SetLevel(level, maxed);
     }
 
     public void SetPassiveIcon(Sprite sprite, int level, bool maxed, int id)
     {
-        abilityIcons[id + 3].Display(sprite, level, maxed);
+        abilityIcons[id + 1].Display(sprite, level, maxed);
     }
 
     public void SetPassiveLevel(int level, bool maxed, int id)
     {
-        abilityIcons[id + 3].SetLevel(level, maxed);
+        abilityIcons[id + 1].SetLevel(level, maxed);
     }
 
 
@@ -201,13 +209,13 @@ public class PlayerUI : MonoBehaviour
 
     public void DoHurtEffect()
     {
-        hurtEffect.color = new Color(1, 1, 1, 0.15f);
+        hurtEffect.color = new Color(1, 1, 1, 0.1f);
     }
 
     public void UpdateHealth()
     {
         float health = (float)Player.instance.CurrentHP / (float)Player.instance.currentStats.MaxHP;
-        float width = (int)(176 * health);
+        float width = (int)(87f * health);
         hpTransform.sizeDelta = new Vector2(width, hpTransform.sizeDelta.y);
         hpText.text = $"{Player.instance.CurrentHP}/{Player.instance.currentStats.MaxHP}";
     }
@@ -215,8 +223,9 @@ public class PlayerUI : MonoBehaviour
     public void UpdateSpecial()
     {
         float special = (float)Player.instance.CurrentSP / (float)Player.instance.MaxSP;
-        float width = (int)(135 * special);
-        spTransform.sizeDelta = new Vector2(width, spTransform.sizeDelta.y);
+        float width = (int)(135f * special);
+        spBar.fillAmount = 1f - special;
+        //spTransform.sizeDelta = new Vector2(width, spTransform.sizeDelta.y);
     }
 
     public void UpdateExp()
@@ -224,7 +233,7 @@ public class PlayerUI : MonoBehaviour
         levelText.text = Player.instance.Level.ToString();
 
         float exp = (float)Player.instance.CurrentExp / (float)Player.instance.MaxExp;
-        float width = (int)(605f * exp);
+        float width = (int)(106f * exp);
         expTransform.sizeDelta = new Vector2(width, expTransform.sizeDelta.y);
     }
 

@@ -8,19 +8,31 @@ public class IllusionDashAbilityEnhancement : Enhancement
         int level = getLevel() + 1;
         if (level == 1)
         {
-            return "Rabi dashes through enemies and bullets, dealing damage and becoming <color=\"yellow\">invulnerable</color>";
+            return "Controllable <color=\"green\">invulnerable</color> dash that dealing damage around and destroys projectiles";
         }
         if (level == 2)
         {
-            return "Dashes <color=\"yellow\">4->5</color> tiles";
+            return "Increase damage by <color=\"green\">25%</color>";
         }
         if (level == 3)
         {
-            return "Increases damage by <color=\"yellow\">50%</color>";
+            return "Decrease the cooldown by <color=\"green\">20%</color>";
         }
         if (level == 4)
         {
-            return "Decreases the cooldown from <color=\"yellow\">20->10</color> beats";
+            return "Increase speed by <color=\"green\">25%</color>";
+        }
+        if (level == 5)
+        {
+            return "Increase damage by <color=\"green\">33%</color>";
+        }
+        if (level == 6)
+        {
+            return "Decrease the cooldown by <color=\"green\">25%</color>";
+        }
+        if (level == 7)
+        {
+            return "Knock back enemies and last <color=\"green\">66%</color> more time";
         }
         return "";
     }
@@ -59,7 +71,7 @@ public class IllusionDashAbilityEnhancement : Enhancement
         {
             if (Player.instance.activeAbility.getID() == "rabi.illusiondash")
             {
-                if (Player.instance.abilityValues["ability.illusiondash.level"] < 4) available = true;
+                if (Player.instance.abilityValues["ability.illusiondash.level"] < 7) available = true;
             }
         }
 

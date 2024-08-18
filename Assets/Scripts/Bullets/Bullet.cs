@@ -5,16 +5,25 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    [SerializeField] SpriteRenderer spriteRenderer;
-    [SerializeField] CircleCollider2D circleCollider;
+    [SerializeField] protected SpriteRenderer spriteRenderer;
+    [SerializeField] protected CircleCollider2D circleCollider;
     public Vector2 direction;
-    public int beatsLeft;
+    public int lifetime;
+    public float speed;
 
     public bool superGrazed, grazed;
-    private SpriteRenderer grazePulse;
+    protected SpriteRenderer grazePulse;
     public Enemy enemySource;
     public int atk = 1;
 
+    protected Material spriteRendererMat;
+    private float emission = 0;
+    protected float beatScale = 1;
+
+    private void Awake()
+    {
+        spriteRendererMat = spriteRenderer.material;
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -51,43 +60,82 @@ public class Bullet : MonoBehaviour
     void Update()
     {
         if (!BeatManager.isPlaying) return;
-        if (BeatManager.isGameBeat) OnBeat();
+        if (BeatManager.isGameBeat)
+        {
+            OnBeat();
+            beatScale = 1.4f;
+        }
+
+        emission -= Time.deltaTime * 3f;
+        if (emission < -0.1) emission = 0.2f;
+        beatScale = Mathf.MoveTowards(beatScale, 1, Time.deltaTime * 2f);
+        spriteRenderer.transform.localScale = Vector3.one * beatScale;
+        spriteRendererMat.SetColor("_EmissionColor", new Color(1, 1, 1, emission));
+        OnBulletUpdate();
 
         if (!superGrazed) return;
-        grazePulse.color = Color.Lerp(grazePulse.color, new Color(1, 1, 0, 0), Time.deltaTime * 16f);
-        grazePulse.transform.localScale = Vector3.Lerp(grazePulse.transform.localScale, Vector3.one * 1.5f, Time.deltaTime * 16f);
     }
+
+    public virtual void OnBulletUpdate() { }
 
     public virtual void OnSpawn()
     {
-        circleCollider.enabled = true;
-        spriteRenderer.color = Color.white;
-        beatsLeft = 6;
-        OnBeat();
+        if (Map.Instance != null) Map.Instance.bulletsSpawned.Add(this);
+
+        beatScale = 1;
+        circleCollider.enabled = false;
+        spriteRenderer.color = Color.clear;
+        StartCoroutine(BulletSpawnCoroutine());
+        if (BeatManager.isGameBeat) OnBeat();
     }
 
-    public void Despawn()
+    protected IEnumerator BulletSpawnCoroutine()
     {
-        if (beatsLeft > 0)
+        float finalSize = transform.localScale.x;
+        transform.localScale = Vector3.one * finalSize * 2f;
+        spriteRenderer.color = new Color(1,0,0,0);
+
+        while (transform.localScale.x > finalSize + 0.02f)
         {
-            beatsLeft = 0;
-            StartCoroutine(DespawnCoroutine());
+            spriteRenderer.color = Color.Lerp(spriteRenderer.color, Color.white, Time.deltaTime * 16f);
+            transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * finalSize, Time.deltaTime * 8f);
+            yield return new WaitForEndOfFrame();
         }
+        transform.localScale = Vector3.one * finalSize;
+        spriteRenderer.color = Color.white;
+        circleCollider.enabled = true;
+        yield break;
     }
 
-    protected void OnBeat()
+    public virtual void Despawn()
     {
-        beatsLeft--;
+        if (lifetime > 0)
+        {
+            lifetime = 0;
+        }
+        StartCoroutine(DespawnCoroutine(false));
+    }
+
+    public virtual void ForceDespawn()
+    {
+        lifetime = 0;
+        StartCoroutine(DespawnCoroutine(true));
+    }
+
+    public virtual void OnBeat()
+    {
+        lifetime--;
         if (superGrazed) Pulse();
-        if (beatsLeft == 0)
+        if (lifetime == 0)
         {
             spriteRenderer.color = Color.red;
-            StartCoroutine(DespawnCoroutine());
+            Despawn();
+            //StartCoroutine(DespawnCoroutine(false));
         }
         StartCoroutine(MoveInDirection(direction));
     }
 
-    IEnumerator DespawnCoroutine()
+    protected IEnumerator DespawnCoroutine(bool forced)
     {
         circleCollider.enabled = false;
         float time = 0;
@@ -115,7 +163,9 @@ public class Bullet : MonoBehaviour
         grazePulse = null;
         grazed = false;
 
-        PoolManager.Return(gameObject, typeof(Bullet));
+        if (!forced && Map.Instance != null) Map.Instance.bulletsSpawned.Remove(this);
+        transform.parent = null;
+        PoolManager.Return(gameObject, GetType());
     }
 
     public void SpawnDrop()
@@ -124,7 +174,7 @@ public class Bullet : MonoBehaviour
         gem.transform.position = (Vector2)transform.position + (Random.insideUnitCircle * 0.2f);
     }
 
-    IEnumerator MoveInDirection(Vector2 direction)
+    protected virtual IEnumerator MoveInDirection(Vector2 direction)
     {
         spriteRenderer.transform.localEulerAngles = new Vector3(0, 0, Vector2.SignedAngle(Vector2.down, direction) - 90);
         Vector3 originalPos = transform.position;
@@ -172,7 +222,7 @@ public class Bullet : MonoBehaviour
         return 0;
     }
 
-    public void OnTriggerEnter2D(Collider2D collision)
+    public virtual void OnTriggerEnter2D(Collider2D collision)
     {
         if (!BeatManager.isPlaying) return;
         if (collision.CompareTag("Player") && collision.name == "Player")
@@ -181,7 +231,7 @@ public class Bullet : MonoBehaviour
         }
     }
 
-    public void OnTriggerStay2D(Collider2D collision)
+    public virtual void OnTriggerStay2D(Collider2D collision)
     {
         if (!BeatManager.isPlaying) return;
         if (!BeatManager.isGameBeat) return;

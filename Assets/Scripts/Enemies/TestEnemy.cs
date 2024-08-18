@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class TestEnemy : Enemy
 {
@@ -32,13 +30,18 @@ public class TestEnemy : Enemy
     {
         if (CanMove())
         {
+            if (actionList[actionIndex] == EntityAction.SPAWN_BULLETS)
+            {
+                if (Vector2.Distance(transform.position, Player.instance.transform.position) > 10) MoveTowardsPlayer();
+                else SpawnBullets();
+            }
             if (actionList[actionIndex] == EntityAction.MOVE_TOWARDS_PLAYER)
             {
                 MoveTowardsPlayer();
             }
-            if (actionList[actionIndex] == EntityAction.SPAWN_BULLETS)
+            if (actionList[actionIndex] == EntityAction.WAIT)
             {
-                SpawnBullets();
+                if (Vector2.Distance(transform.position, Player.instance.transform.position) > 10) MoveTowardsPlayer();
             }
             actionIndex++;
             if (actionIndex == actionList.Count) actionIndex = 0;
@@ -87,14 +90,6 @@ public class TestEnemy : Enemy
         StartCoroutine(MoveCoroutine(targetPos));
     }
 
-    private IEnumerator MoveTwice(Vector2 direction)
-    {
-        Vector2 targetPos = (Vector2)transform.position + direction;
-        yield return MoveCoroutine(targetPos);
-        targetPos += direction;
-        yield return MoveCoroutine(targetPos);
-    }
-
     IEnumerator MoveCoroutine(Vector2 targetPos)
     {
         isMoving = true;
@@ -107,11 +102,11 @@ public class TestEnemy : Enemy
         float speed = 0.8f;
         while (time <= BeatManager.GetBeatDuration() / 3f)
         {
-            rb.velocity = dir * speed * 8;
+            velocity = dir * speed * 8;
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
-        rb.velocity = Vector2.zero;
+        velocity = Vector2.zero;
         Sprite.transform.localPosition = Vector3.zero;
 
         isMoving = false;

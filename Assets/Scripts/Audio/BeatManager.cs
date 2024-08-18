@@ -23,7 +23,7 @@ public class BeatManager : MonoBehaviour
 
     
     [Header("UI")]
-    [SerializeField] Animator beatPulseAnimator;
+    [SerializeField] public Animator beatPulseAnimator;
     SpriteRenderer beatPulseSprite;
     [SerializeField] GameObject playerRing;
     [SerializeField] SpriteRenderer beatScore;
@@ -35,6 +35,7 @@ public class BeatManager : MonoBehaviour
     [SerializeField] Sprite perfectSprite;
 
     public static bool isGameBeat; // If this is active, all monsters, attacks and entities not controlled by player input trigger
+    public static bool menuGameBeat;
     private BeatTrigger lastFrameState, currentFrameState; // These are used to check when we enter the first frame of input and first frame after input
     private bool canCastGameBeat;
     public static float lastBeatTime;
@@ -42,6 +43,13 @@ public class BeatManager : MonoBehaviour
     private MapTrack currentMapTrack;
 
     public static bool isPlaying;
+
+    public static bool compassless;
+
+    public static void UpdatePulseAnimator()
+    {
+        instance.beatPulseAnimator.gameObject.SetActive(!compassless);
+    }
 
     public static void SetTrack(MapTrack track)
     {
@@ -53,6 +61,8 @@ public class BeatManager : MonoBehaviour
         instance.offset = track.offset;
         instance.nextBeat = track.offset + audio_offset;
         instance.lastBeat = 0;
+        instance.loopStartOffset = track.loopStart;
+        instance.loopTriggerOffset = track.loopEnd;
         instance.currentTime = instance.music.time + audio_offset;
     }
 
@@ -88,7 +98,7 @@ public class BeatManager : MonoBehaviour
     {
         while (music.volume > 0)
         {
-            music.volume = Mathf.MoveTowards(music.volume, 0f, speed);
+            music.volume = Mathf.MoveTowards(music.volume, 0f, speed * Time.deltaTime);
             yield return new WaitForEndOfFrame();
         }
         yield break;
@@ -98,7 +108,7 @@ public class BeatManager : MonoBehaviour
     {
         while (music.volume < 1)
         {
-            music.volume = Mathf.MoveTowards(music.volume, 1f, speed);
+            music.volume = Mathf.MoveTowards(music.volume, 1f, speed * Time.deltaTime);
             yield return new WaitForEndOfFrame();
         }
         yield break;
@@ -121,9 +131,14 @@ public class BeatManager : MonoBehaviour
     }
     public static void OnPlayerAction()
     {
-        if (GameManager.compassless) instance.canCastGameBeat = true;
         if (!instance.canCastGameBeat) return;
-        if (GameManager.isPaused) return;
+        if (GameManager.isPaused)
+        {
+            menuGameBeat = true;
+            return;
+        }
+        
+        if (compassless) return;
         instance.canCastGameBeat = false;
         isGameBeat = true;
         lastBeatTime = Time.time;
@@ -168,6 +183,7 @@ public class BeatManager : MonoBehaviour
             JumpToLoop();
         }
 
+        if (compassless) CheckForGameBeat();
         if (music.time >= nextBeat)
         {
             beats++;
@@ -175,32 +191,43 @@ public class BeatManager : MonoBehaviour
             nextBeat = offset + audio_offset + (secondsPerBeat * beats);
             OnBeat();
         }
+        
         UpdateUI();
-        CheckForGameBeat();
+        if (!compassless) CheckForGameBeat();
     }
 
     private void CalculateNextBeat(float time)
     {
         beats = (int)((time - offset - audio_offset) / secondsPerBeat);
         nextBeat = offset + audio_offset + (secondsPerBeat * beats);
+        lastBeat = nextBeat - secondsPerBeat;
     }
 
     private void CheckForGameBeat()
     {
         currentFrameState = GetBeatSuccess();
         isGameBeat = false;
-        if (lastFrameState == BeatTrigger.FAIL &&  currentFrameState != BeatTrigger.FAIL) // First Frame of Input
+        menuGameBeat = false;
+        if (!compassless)
+        {
+            if (lastFrameState == BeatTrigger.FAIL && currentFrameState != BeatTrigger.FAIL) // First Frame of Input
+            {
+                canCastGameBeat = true;
+            }
+            if (lastFrameState != BeatTrigger.FAIL && currentFrameState == BeatTrigger.FAIL) // After last Frame of Input
+            {
+                if (canCastGameBeat)
+                {
+                    lastBeatTime = Time.time;
+                    if (!GameManager.isPaused) isGameBeat = true;
+                    menuGameBeat = true;
+                }
+                canCastGameBeat = false;
+            }
+        }
+        else
         {
             canCastGameBeat = true;
-        }
-        if (lastFrameState != BeatTrigger.FAIL && currentFrameState == BeatTrigger.FAIL) // After last Frame of Input
-        {
-            if (canCastGameBeat)
-            {
-                lastBeatTime = Time.time;
-                if (!GameManager.isPaused && !GameManager.compassless) isGameBeat = true;
-            }
-            canCastGameBeat = false;
         }
         lastFrameState = currentFrameState;
     }
@@ -221,7 +248,11 @@ public class BeatManager : MonoBehaviour
     {
         beatPulseAnimator.SetTrigger("OnBeat");
         //beatPulseAnimator.speed = 1 / secondsPerBeat;
-        
+        if (compassless)
+        {
+            isGameBeat = true;
+            menuGameBeat = true;
+        }
         isBeat = true;
         beatTest.Play();
     }
@@ -264,7 +295,7 @@ public class BeatManager : MonoBehaviour
 
     public static BeatTrigger GetBeatSuccess()
     {
-        if (GameManager.compassless) return BeatTrigger.PERFECT;
+        if (compassless) return BeatTrigger.PERFECT;
         float successRange = instance.secondsPerBeat / 4f;
         float perfectRange = instance.secondsPerBeat / 12f;
 

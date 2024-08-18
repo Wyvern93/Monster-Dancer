@@ -48,7 +48,7 @@ public class MoonBeamAbilityEnhancement : Enhancement
 
     public override int getWeight()
     {
-        return 1;
+        return 3;
     }
 
     public override bool isAvailable()

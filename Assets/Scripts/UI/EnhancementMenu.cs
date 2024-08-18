@@ -1,9 +1,11 @@
 using JetBrains.Annotations;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class EnhancementMenu : MonoBehaviour
 {
@@ -14,6 +16,9 @@ public class EnhancementMenu : MonoBehaviour
 
     [SerializeField] List<EnhancementUIButton> enhancementUIButtons;
     [SerializeField] Animator animator;
+    [SerializeField] Button rerollButton;
+    [SerializeField] TextMeshProUGUI rerollText;
+    [SerializeField] GameObject moneyIcon;
 
     List<Enhancement> chosenEnhancements;
 
@@ -22,6 +27,12 @@ public class EnhancementMenu : MonoBehaviour
     public TextMeshProUGUI Atk;
     public TextMeshProUGUI CritChance;
     public TextMeshProUGUI ExpMulti;
+    public TextMeshProUGUI MovSpeed;
+
+
+    private int Rerolls;
+    private int CurrentRerolls, rerollsUsed, rerollPrice;
+    
 
     public void Awake()
     {
@@ -49,25 +60,45 @@ public class EnhancementMenu : MonoBehaviour
         canvasGroup.blocksRaycasts = true;
         Time.timeScale = 0f;
         GameManager.isPaused = true;
+        if (!SaveManager.PersistentSaveData.ContainsKey("rerolls.level"))
+        {
+            SaveManager.PersistentSaveData.SetData("rerolls.level", 2);
+            SaveManager.PersistentSaveData.SaveFile();
+        }
+        Rerolls = SaveManager.PersistentSaveData.GetData<int>("rerolls.level");
+        rerollButton.interactable = Rerolls > 1;
+        CurrentRerolls = Rerolls;
+        rerollsUsed = 0;
+        rerollText.text = $"Reroll ({CurrentRerolls})";
+        rerollPrice = 0;
+        moneyIcon.SetActive(false);
     }
 
     private void UpdateStats()
     {
         maxHP.text = $"MAX HP: {Player.instance.currentStats.MaxHP}";
-        Atk.text = $"ATK: +{(Player.instance.currentStats.Atk - 1) * 100}%";
+        Atk.text = $"ATK: +{Mathf.Round((Player.instance.currentStats.Atk - 1) * 100f)}%";
         CritChance.text = $"CRIT CHANCE: {Player.instance.currentStats.CritChance}%";
-        ExpMulti.text = $"EXP MULTI: +{(Player.instance.currentStats.ExpMulti - 1) * 100}%";
+        ExpMulti.text = $"EXP MULTI: +{Mathf.Round((Player.instance.currentStats.ExpMulti - 1) * 100f)}%";
+        MovSpeed.text = $"MOV SPEED: +{Mathf.Round((Player.instance.currentStats.Speed - 1) * 100f)}%";
     }
 
     public void Close()
     {
+        
         animator.Play("EnhancementMenu_Closed");
-        Time.timeScale = 1.0f;
         canvasGroup.alpha = 0.0f;
         canvasGroup.interactable = false;
         canvasGroup.blocksRaycasts = false;
         EventSystem.current.SetSelectedGameObject(null);
+        StartCoroutine(CloseMenuCoroutine());
+    }
+
+    protected IEnumerator CloseMenuCoroutine()
+    {
+        while (!BeatManager.menuGameBeat) yield return new WaitForEndOfFrame();
         GameManager.isPaused = false;
+        Time.timeScale = 1.0f;
     }
 
     public Enhancement FindEnhancement(int n)
@@ -154,8 +185,10 @@ public class EnhancementMenu : MonoBehaviour
 
 
         finalList.RemoveAll(x => !x.isAvailable());
+        if (finalList.Count == 0) return null;
         Enhancement finalEnhancement = null;
         int attempts = 50;
+
         while (finalEnhancement == null)
         {
             int n = Random.Range(0, finalList.Count - 1);
@@ -220,6 +253,8 @@ public class EnhancementMenu : MonoBehaviour
         int attempts = 50;
 
         finalList.RemoveAll(x => !x.isAvailable());
+        if (finalList.Count == 0) return null;
+
         while (finalEnhancement == null)
         {
             int n = Random.Range(0, finalList.Count - 1);
@@ -297,6 +332,9 @@ public class EnhancementMenu : MonoBehaviour
 
     public void Reroll()
     {
+        if (rerollPrice > 0) GameManager.runData.coins -= rerollPrice;
+        UIManager.Instance.PlayerUI.coinText.text = GameManager.runData.coins.ToString();
+
         chosenEnhancements = new List<Enhancement>();
         enhancements = new List<Enhancement>
         {
@@ -307,5 +345,24 @@ public class EnhancementMenu : MonoBehaviour
         };
 
         DisplayEnhancements();
+        CurrentRerolls--;
+        if (CurrentRerolls <= 0)
+        {
+            moneyIcon.SetActive(true);
+        }
+        rerollsUsed++;
+        if (CurrentRerolls > 0)
+        {
+            rerollText.text = $"Reroll ({CurrentRerolls})";
+        }
+        else
+        {
+            if (rerollPrice == 0) rerollPrice = 50;
+            else rerollPrice = (int)Mathf.Pow(rerollPrice, 1.2f);
+            rerollText.text = $"Reroll ({rerollPrice})";
+        }
+
+        rerollButton.interactable = GameManager.runData.coins >= rerollPrice;
+        EventSystem.current.SetSelectedGameObject(null);
     }
 }

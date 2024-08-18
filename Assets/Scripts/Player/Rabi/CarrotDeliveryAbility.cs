@@ -54,9 +54,9 @@ public class CarrotDeliveryAbility : PlayerAbility
 
         CarrotDeliveryTruck truck = PoolManager.Get<CarrotDeliveryTruck>();
 
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(BeatManager.GetBeatDuration());
 
-        rabi.animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration() / 2);
+        rabi.animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration());
         rabi.animator.Play("Rabi_Idle");
         yield break;
     }

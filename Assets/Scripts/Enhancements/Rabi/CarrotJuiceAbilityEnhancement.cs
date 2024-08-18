@@ -12,7 +12,7 @@ public class CarrotJuiceAbilityEnhancement : Enhancement
         }
         if (level == 2)
         {
-            return "Throws carrot bottles every <color=\"green\">20->12</color> beats and deals <color=\"green\">25->50%</color> of your damage";
+            return "Throws carrot bottles every <color=\"green\">20->12</color> beats and deals <color=\"green\">50%</color> more damage";
         }
         if (level == 3)
         {
@@ -20,7 +20,7 @@ public class CarrotJuiceAbilityEnhancement : Enhancement
         }
         if (level == 4)
         {
-            return "Rabi throws <color=\"green\">1->2</color> carrot juice bottles, increases damage from  <color=\"green\">50->200%</color>";
+            return "Rabi throws <color=\"green\">1->2</color> carrot juice bottles, increases damage a <color=\"green\">50%</color>";
         }
         return "";
     }
@@ -54,9 +54,10 @@ public class CarrotJuiceAbilityEnhancement : Enhancement
     {
         bool available = true;
         if (Player.instance.equippedPassiveAbilities.Count == 3) available = false;
-        else if(Player.instance.equippedPassiveAbilities.Find(x => x.getID() == "rabi.carrotjuice") != null)
+        if(Player.instance.equippedPassiveAbilities.Find(x => x.getID() == "rabi.carrotjuice") != null)
         {
-            if (Player.instance.abilityValues["ability.carrotjuice.level"] >= 4) available = false;
+            if (Player.instance.abilityValues["ability.carrotjuice.level"] < 4) available = true;
+            else available = false;
         }
 
 

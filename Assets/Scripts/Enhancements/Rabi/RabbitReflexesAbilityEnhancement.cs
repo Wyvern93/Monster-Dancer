@@ -43,7 +43,7 @@ public class RabbitReflexesAbilityEnhancement : Enhancement
 
     public override string getType()
     {
-        return "Active";
+        return "Passive";
     }
 
     public override int getWeight()
@@ -55,9 +55,10 @@ public class RabbitReflexesAbilityEnhancement : Enhancement
     {
         bool available = true;
         if (Player.instance.equippedPassiveAbilities.Count == 3) available = false;
-        else if (Player.instance.equippedPassiveAbilities.Find(x => x.getID() == "rabi.rabbitreflexes") != null)
+        if (Player.instance.equippedPassiveAbilities.Find(x => x.getID() == "rabi.rabbitreflexes") != null)
         {
-            if (Player.instance.abilityValues["ability.rabbitreflexes.level"] >= 4) available = false;
+            if (Player.instance.abilityValues["ability.rabbitreflexes.level"] < 4) available = true;
+            else available = false;
         }
 
 
@@ -82,7 +83,7 @@ public class RabbitReflexesAbilityEnhancement : Enhancement
         {
             Player.instance.abilityValues.Add("ability.rabbitreflexes.level", 1);
             Player.instance.equippedPassiveAbilities.Add(new RabbitReflexesAbility());
-            UIManager.Instance.PlayerUI.SetPassiveIcon(IconList.instance.carrotBarrage, 1, false, Player.instance.getPassiveAbilityIndex(typeof(RabbitReflexesAbility)));
+            UIManager.Instance.PlayerUI.SetPassiveIcon(IconList.instance.rabbitReflexes, 1, false, Player.instance.getPassiveAbilityIndex(typeof(RabbitReflexesAbility)));
             Player.instance.grazeSprite.color = new Color(1, 1, 1, 0.25f);
         }
         else

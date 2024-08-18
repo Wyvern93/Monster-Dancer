@@ -6,7 +6,7 @@ public class LunarPulseAbility : PlayerAbility
 {
     public int minCooldown = 1;
     int level;
-    public LunarPulseAbility() : base(2)
+    public LunarPulseAbility() : base(4)
     {
     }
 
@@ -49,13 +49,13 @@ public class LunarPulseAbility : PlayerAbility
     {
         level = (int)Player.instance.abilityValues["ability.lunarpulse.level"];
 
-        maxCooldown = level < 2 ? 2 : 1;
+        maxCooldown = level < 4 ? level < 3 ? level < 2 ? 4 : 3 : 2 : 1;
 
         currentCooldown = maxCooldown;
 
         PlayerRabi rabi = (PlayerRabi)Player.instance;
 
-        int numPulses = level >= 4 ? 4 : level < 4 ? 2 : 1;
+        int numPulses = 1;
 
         for (int i = 0; i < numPulses; i++)
         {

@@ -5,7 +5,7 @@ public class BunnyHopAbility : PlayerAbility
 {
     public int minCooldown = 1;
     int level;
-    public BunnyHopAbility() : base(20)
+    public BunnyHopAbility() : base(6) // 20
     {
     }
 
@@ -55,7 +55,7 @@ public class BunnyHopAbility : PlayerAbility
         {
             maxCooldown = 12;
         }
-
+        maxCooldown = 6;
         currentCooldown = maxCooldown;
 
         PlayerRabi rabi = (PlayerRabi)Player.instance;

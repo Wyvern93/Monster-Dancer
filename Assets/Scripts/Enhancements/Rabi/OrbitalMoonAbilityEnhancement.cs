@@ -6,23 +6,17 @@ public class OrbitalMoonAbilityEnhancement : Enhancement
     public override string GetDescription()
     {
         int level = getLevel() + 1;
-        if (level == 1)
+        switch (level)
         {
-            return "<color=\"green\">3</color> moons orbit Rabi, dealing damage to enemies and some times blocking projectiles";
+            default:
+            case 1: return "<color=\"green\">2</color> moons orbit Rabi that deal damage and have a chance to block projectiles";
+            case 2: return "Increase damage by <color=\"green\">20%</color>";
+            case 3: return "Spins <color=\"green\">25%</color> faster and orbits for<color=\"green\">6->12</color> beats";
+            case 4: return "Increase damage by <color=\"green\">30%</color>";
+            case 5: return "Adds a <color=\"green\">third</color> moon";
+            case 6: return "Moons have a <color=\"green\">10->25%</color> chance to destroy projectiles and are <color=\"green\">50%</color> bigger";
+            case 7: return "Add small knockback on hit and never disappears";
         }
-        if (level == 2)
-        {
-            return "Moons have a chance of <color=\"green\">20->35%</color> of blocking projectiles and reduce the cooldown from <color=\"green\">20->16</color> beats";
-        }
-        if (level == 3)
-        {
-            return "Spins <color=\"green\">25%</color> faster and deals<color=\"green\">50%</color> more damage";
-        }
-        if (level == 4)
-        {
-            return "<color=\"green\">3->4</color> moons orbit Rabi";
-        }
-        return "";
     }
 
     public override int getLevel()
@@ -55,9 +49,10 @@ public class OrbitalMoonAbilityEnhancement : Enhancement
     {
         bool available = true;
         if (Player.instance.equippedPassiveAbilities.Count == 3) available = false;
-        else if(Player.instance.equippedPassiveAbilities.Find(x => x.getID() == "rabi.orbitalmoon") != null)
+        if(Player.instance.equippedPassiveAbilities.Find(x => x.getID() == "rabi.orbitalmoon") != null)
         {
-            if (Player.instance.abilityValues["ability.orbitalmoon.level"] >= 4) available = false;
+            if (Player.instance.abilityValues["ability.orbitalmoon.level"] < 7) available = true;
+            else available = false;
         }
 
 
@@ -88,7 +83,7 @@ public class OrbitalMoonAbilityEnhancement : Enhancement
         {
             Player.instance.abilityValues["ability.orbitalmoon.level"] += 1;
             int level = (int)Player.instance.abilityValues["ability.orbitalmoon.level"];
-            UIManager.Instance.PlayerUI.SetPassiveLevel(level, level >= 4, Player.instance.getPassiveAbilityIndex(typeof(OrbitalMoonAbility)));
+            UIManager.Instance.PlayerUI.SetPassiveLevel(level, level >= 7, Player.instance.getPassiveAbilityIndex(typeof(OrbitalMoonAbility)));
         }
         Player.instance.CalculateStats();
     }

@@ -9,6 +9,8 @@ public class RabiAttack : PlayerAttack
 {
     [SerializeField] AudioClip attackSound;
     [SerializeField] Animator animator;
+    int pierce;
+    bool hasExploded;
 
     public override void Start()
     {
@@ -17,6 +19,9 @@ public class RabiAttack : PlayerAttack
 
     public override void Attack(Vector2 direction)
     {
+        int level = (int)Player.instance.abilityValues["attack.moonlightdaggers.level"];
+        pierce = (int)Player.instance.abilityValues["Attack_Pierce"];
+        hasExploded = false;
         StartCoroutine(AttackCoroutine(direction));
     }
 
@@ -30,6 +35,9 @@ public class RabiAttack : PlayerAttack
         Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
         Vector2 difference = (crosshairPos - (Vector2)Player.instance.transform.position).normalized;
         Vector2 animDir;
+        float spread = Player.instance.abilityValues["Attack_Spread"];
+        spread = Random.Range(-spread, spread);
+        difference = rotate(difference, spread);
 
         animDir = new Vector2(difference.y, -difference.x);
         direction = difference;
@@ -45,19 +53,31 @@ public class RabiAttack : PlayerAttack
 
         AudioController.PlaySound(attackSound);
 
-        float velocity = 12f * Player.instance.abilityValues["Attack_Velocity"];
+        float velocity = 10f * Player.instance.abilityValues["Attack_Velocity"];
+        
         dir = direction;
 
         float abilityDuration = Player.instance.abilityValues["Attack_Time"];
-        while (time <= BeatManager.GetActionDuration() * abilityDuration)
+        while (time <= abilityDuration)
         {
             time += Time.deltaTime;
             transform.position += ((Vector3)dir * velocity * Time.deltaTime);
             yield return new WaitForEndOfFrame();
         }
         Player.instance.isPerformingAction = false;
+
+        
+
         PoolManager.Return(gameObject, GetType());
         yield break;
+    }
+
+    public Vector2 rotate(Vector2 v, float delta)
+    {
+        return new Vector2(
+            v.x * Mathf.Cos(delta) - v.y * Mathf.Sin(delta),
+            v.x * Mathf.Sin(delta) + v.y * Mathf.Cos(delta)
+        );
     }
 
     public float getAngleFromVector(Vector2 direction)
@@ -99,6 +119,13 @@ public class RabiAttack : PlayerAttack
 
     public override void OnTriggerEnter2D(Collider2D collision)
     {
+        if (pierce <= 0)
+        {
+            Player.instance.isPerformingAction = false;
+            PoolManager.Return(gameObject, GetType());
+            return;
+        }
+        
         if (collision.CompareTag("Enemy"))
         {
             Enemy enemy = collision.GetComponent<Enemy>();
@@ -107,12 +134,19 @@ public class RabiAttack : PlayerAttack
             bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
             if (isCritical) damage *= Player.instance.currentStats.CritDmg;
             enemy.TakeDamage((int)damage, isCritical);
+            pierce--;
+            if (!hasExploded && Player.instance.abilityValues["Attack_Explode"] == 1)
+            {
+                MoonlightShockwave shockwave = PoolManager.Get<MoonlightShockwave>();
+                shockwave.transform.position = transform.position;
+            }
         }
 
         if (collision.CompareTag("FairyCage"))
         {
             FairyCage cage = collision.GetComponent<FairyCage>();
             cage.OnHit();
+            pierce--;
         }
     }
 }

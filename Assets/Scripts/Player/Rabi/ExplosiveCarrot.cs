@@ -10,12 +10,16 @@ public class ExplosiveCarrot : MonoBehaviour
     [SerializeField] SpriteRenderer carrotSpr;
     [SerializeField] AudioSource spinSource;
 
+    public float dmg;
+
     public void Init(Vector2 dir)
     {
         height = 0.3f;
         force = 15f;
         direction = dir;
         carrotSpr.transform.localEulerAngles = Vector3.zero;
+        int level = (int)Player.instance.abilityValues["ability.carrotbarrage.level"];
+        dmg = 30;
         StartCoroutine(Throw());
     }
 
@@ -61,6 +65,7 @@ public class ExplosiveCarrot : MonoBehaviour
 
         CarrotExplosion carrotExplosion = PoolManager.Get<CarrotExplosion>();
         carrotExplosion.transform.position = transform.position;
+        carrotExplosion.dmg = dmg;
         
         PoolManager.Return(gameObject, GetType());
         yield return null;

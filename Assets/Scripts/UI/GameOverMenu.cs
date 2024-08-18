@@ -33,7 +33,7 @@ public class GameOverMenu : MonoBehaviour
 
         Player.instance.Despawn();
         GameManager.LoadPlayer(GameManager.runData.characterPrefab);
-        GameManager.LoadMap("SampleScene");
+        GameManager.LoadMap("Stage1a");
     }
 
     public void Open()
