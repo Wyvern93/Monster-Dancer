@@ -216,7 +216,7 @@ public class Stage1a : Map
             new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 590),
             new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 595),*/
 
-            new SpawnBossEvent(EnemyType.Usarin, 6), // 600
+            new SpawnBossEvent(EnemyType.Usarin, 600), // 600
 
         };
     }

@@ -330,7 +330,7 @@ public class Player : MonoBehaviour
             if (activeAbility != null)
             {
                 BeatTrigger result = BeatManager.GetBeatSuccess();
-                if (result != BeatTrigger.FAIL && !waitForNextBeat && activeAbility.CanCast())
+                if (result != BeatTrigger.FAIL && activeAbility.CanCast())
                 {
                     OnActiveAbilityUse();
                 }
@@ -393,12 +393,9 @@ public class Player : MonoBehaviour
                     {
                         if (BeatManager.GetBeatSuccess() == BeatTrigger.SUCCESS || score == BeatTrigger.PERFECT)
                         {
-                            if (BeatManager.isBeatAfter() || BeatManager.isBeat)
-                            {
-                                BeatManager.TriggerBeatScore(score);
-                                PerformAction(action);
-                                waitForNextBeat = true;
-                            }
+                            BeatManager.TriggerBeatScore(score);
+                            PerformAction(action);
+                            waitForNextBeat = true;
                         }
                     }
                 }

@@ -55,7 +55,7 @@ public class BunnyHopAbility : PlayerAbility
         {
             maxCooldown = 12;
         }
-        maxCooldown = 6;
+        maxCooldown = 2; // 6
         currentCooldown = maxCooldown;
 
         PlayerRabi rabi = (PlayerRabi)Player.instance;

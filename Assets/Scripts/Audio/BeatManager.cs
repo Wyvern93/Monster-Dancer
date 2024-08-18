@@ -137,8 +137,9 @@ public class BeatManager : MonoBehaviour
             menuGameBeat = true;
             return;
         }
-        
-        if (compassless) return;
+
+        //if (compassless) return;
+        return;
         instance.canCastGameBeat = false;
         isGameBeat = true;
         lastBeatTime = Time.time;
@@ -183,7 +184,7 @@ public class BeatManager : MonoBehaviour
             JumpToLoop();
         }
 
-        if (compassless) CheckForGameBeat();
+        CheckForGameBeat();
         if (music.time >= nextBeat)
         {
             beats++;
@@ -193,7 +194,7 @@ public class BeatManager : MonoBehaviour
         }
         
         UpdateUI();
-        if (!compassless) CheckForGameBeat();
+        //if (!compassless) CheckForGameBeat();
     }
 
     private void CalculateNextBeat(float time)
@@ -208,6 +209,7 @@ public class BeatManager : MonoBehaviour
         currentFrameState = GetBeatSuccess();
         isGameBeat = false;
         menuGameBeat = false;
+        /*
         if (!compassless)
         {
             if (lastFrameState == BeatTrigger.FAIL && currentFrameState != BeatTrigger.FAIL) // First Frame of Input
@@ -229,6 +231,8 @@ public class BeatManager : MonoBehaviour
         {
             canCastGameBeat = true;
         }
+        */
+        canCastGameBeat = true;
         lastFrameState = currentFrameState;
     }
 
@@ -250,9 +254,10 @@ public class BeatManager : MonoBehaviour
         //beatPulseAnimator.speed = 1 / secondsPerBeat;
         if (compassless)
         {
-            isGameBeat = true;
-            menuGameBeat = true;
+            
         }
+        isGameBeat = true;
+        menuGameBeat = true;
         isBeat = true;
         beatTest.Play();
     }

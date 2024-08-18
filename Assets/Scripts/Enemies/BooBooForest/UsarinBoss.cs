@@ -569,10 +569,7 @@ public class UsarinBoss : Boss
         } 
         else
         {
-            PoolManager.RemovePool(typeof(BigUsarinCarrotBullet));
-            PoolManager.RemovePool(typeof(UsarinCarrotBullet));
-            PoolManager.RemovePool(typeof(BlueUsarinCarrotBullet));
-            PoolManager.RemovePool(typeof(BigUsarinBullet));
+            PoolManager.RemovePool(typeof(BulletBase));
             usarinState = UsarinBossState.Defeat;
             State = BossState.Defeat;
         }
@@ -633,6 +630,12 @@ public class UsarinBoss : Boss
         if (usarinState == UsarinBossState.Dance1 && CurrentHP < hpThreshold1) EndAttack();
         else if (usarinState == UsarinBossState.Dance2 && CurrentHP < hpThreshold2) EndAttack();
         else if (usarinState == UsarinBossState.Dance3 && CurrentHP <= 0) EndAttack();
+    }
+
+    public override void Die()
+    {
+        PoolManager.RemovePool(typeof(BulletBase));
+        base.Die();
     }
 
     public override string GetName()
