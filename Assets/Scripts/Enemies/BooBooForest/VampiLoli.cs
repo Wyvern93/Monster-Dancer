@@ -55,12 +55,15 @@ public class VampiLoli : Enemy
         BulletSpawnEffect bulletSpawnEffect = PoolManager.Get<BulletSpawnEffect>();
         bulletSpawnEffect.transform.position = transform.position;
         bulletSpawnEffect.transform.parent = transform;
+        bulletSpawnEffect.source = this;
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
 
         SpawnBullet(new Vector2(1, 1));
         SpawnBullet(new Vector2(1, -1));
         SpawnBullet(new Vector2(-1, 1));
         SpawnBullet(new Vector2(-1, -1));
+        bulletSpawnEffect.Despawn();
     }
 
     private void SpawnBullet(Vector2 dir)
@@ -123,6 +126,7 @@ public class VampiLoli : Enemy
         animator.Play("vampiloli_move");
         while (time <= BeatManager.GetBeatDuration() / 2f)
         {
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
             velocity = direction * speed * 6;
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();

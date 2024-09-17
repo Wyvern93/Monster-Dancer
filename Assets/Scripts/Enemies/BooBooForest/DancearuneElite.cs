@@ -38,8 +38,10 @@ public class DancearuneElite : Enemy
     {
         animator.Play("dancearune_preattack");
         BulletSpawnEffect bulletSpawnEffect = PoolManager.Get<BulletSpawnEffect>();
+        bulletSpawnEffect.source = this;
         bulletSpawnEffect.transform.position = transform.position;
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
 
         Vector2 dir = Player.instance.GetClosestPlayer(transform.position) - transform.position;
         dir.Normalize();
@@ -59,7 +61,7 @@ public class DancearuneElite : Enemy
             SpawnBullet(new Vector2(1, 0));
         }
         diagonal = !diagonal;
-
+        bulletSpawnEffect.Despawn();
         animator.Play("dancearune_normal");
         isAttacking = false;
         yield break;
@@ -120,6 +122,7 @@ public class DancearuneElite : Enemy
         animator.Play("dancearune_move");
         while (time <= BeatManager.GetBeatDuration() / 2f)
         {
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
             velocity = dir * speed * 6;
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();

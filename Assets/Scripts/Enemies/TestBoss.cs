@@ -139,6 +139,7 @@ public class TestBoss : Boss
         while (!BeatManager.isGameBeat) yield return new WaitForEndOfFrame();
 
         BulletSpawnEffect spawnEffect = PoolManager.Get<BulletSpawnEffect>();
+        spawnEffect.source = this;
         spawnEffect.transform.position = new Vector3(transform.position.x + direction.x, transform.position.y + direction.y);
         yield return new WaitForEndOfFrame();
 

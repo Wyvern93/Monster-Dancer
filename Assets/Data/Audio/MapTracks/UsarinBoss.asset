@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: UsarinBoss
   m_EditorClassIdentifier: 
   music: {fileID: 8300000, guid: 81f7f991f5647ad4f92e74b618e02062, type: 3}
-  tempo: 150
-  offset: 0.67
+  tempo: 145
+  offset: 0.423
   loopStart: 26.26
-  loopEnd: 255.12
+  loopEnd: 125.17

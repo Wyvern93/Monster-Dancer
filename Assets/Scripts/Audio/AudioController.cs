@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -27,7 +28,6 @@ public class AudioController : MonoBehaviour
     }
     void Start()
     {
-        
     }
 
     public void SetMaxVolume()
@@ -38,7 +38,7 @@ public class AudioController : MonoBehaviour
 
         audioMixer.SetFloat("MainVol", Mathf.Log10(mainVolume + 0.0001f) * 20f);
         audioMixer.SetFloat("MusicVol", Mathf.Log10(musicVolume + 0.0001f) * 20f);
-        audioMixer.SetFloat("SFXVol", Mathf.Log10(sfxVolume + 0.0001f) * 20f);
+        audioMixer.SetFloat("SfxVol", Mathf.Log10(sfxVolume + 0.0001f) * 20f);
     }
 
     // Update is called once per frame
@@ -51,8 +51,21 @@ public class AudioController : MonoBehaviour
     {
         if (instance.clipsPlaying.Contains(sound)) return;
         instance.clipsPlaying.Add(sound);
-        instance.sfx.pitch = pitch;
-        instance.sfx.PlayOneShot(sound);
+
+        if (pitch == 1)
+        {
+            instance.sfx.pitch = pitch;
+            instance.sfx.PlayOneShot(sound);
+        }
+        else
+        {
+            GameObject sfxObj = new GameObject(sound.name);
+            AudioSource currentSfx = sfxObj.AddComponent<AudioSource>();
+            currentSfx.pitch = pitch;
+            currentSfx.outputAudioMixerGroup = instance.sfxMixerGroup;
+            currentSfx.PlayOneShot(sound);
+            Destroy(sfxObj, 3f);
+        }
     }
     public static void PlayMusic(AudioClip music, bool loop = true)
     {

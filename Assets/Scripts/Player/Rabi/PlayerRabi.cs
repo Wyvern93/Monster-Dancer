@@ -25,6 +25,7 @@ public class PlayerRabi : Player
     [SerializeField] GameObject truckPrefab;
     [SerializeField] GameObject carrotBulletPrefab;
     [SerializeField] GameObject moonlightShockwavePrefab;
+    [SerializeField] GameObject rabiEclipsePrefab;
 
     [SerializeField] SpriteTrail spriteTrail;
     [SerializeField] CircleCollider2D dashHitBox;
@@ -60,6 +61,7 @@ public class PlayerRabi : Player
         PoolManager.CreatePool(typeof(CarrotDeliveryTruck), truckPrefab, 20);
         PoolManager.CreatePool(typeof(CarrotBullet), carrotBulletPrefab, 150);
         PoolManager.CreatePool(typeof(MoonlightShockwave), moonlightShockwavePrefab, 30);
+        PoolManager.CreatePool(typeof(RabiEclipse), rabiEclipsePrefab, 1);
 
         GameManager.runData.possibleSkillEnhancements = new List<Enhancement>()
         { 
@@ -67,15 +69,14 @@ public class PlayerRabi : Player
             new MoonlightDaggersMasterfulEnhancement(),
             new MoonlightDaggersPowerfulEnhancement(),
             new CarrotBarrageAbilityEnhancement(),
-            new BunnyHopAbilityEnhancement(),
             new MoonBeamAbilityEnhancement(),
             new OrbitalMoonAbilityEnhancement(),
             new CarrotJuiceAbilityEnhancement(),
             new LunarPulseAbilityEnhancement(),
             new RabbitReflexesAbilityEnhancement(),
             new LunarRainAbilityEnhancement(),
-            new IllusionDashAbilityEnhancement(),
-            new CarrotDeliveryAbilityEnhancement()
+            new CarrotDeliveryAbilityEnhancement(),
+            new EclipseAbilityEnhancement()
         };
         
         BunnyHopAbility hop = new BunnyHopAbility();
@@ -117,6 +118,7 @@ public class PlayerRabi : Player
         PoolManager.RemovePool(typeof(LunarRainRay));
         PoolManager.RemovePool(typeof(CarrotDeliveryTruck));
         PoolManager.RemovePool(typeof(CarrotBullet));
+        PoolManager.RemovePool(typeof(RabiEclipse));
 
         Destroy(gameObject);
     }
@@ -163,29 +165,32 @@ public class PlayerRabi : Player
         {
             direction = (oldDir * currentStats.Speed);
         }
+
         Vector2 dir = Vector2.zero;
-        if (InputManager.playerDevice == InputManager.InputDeviceType.Keyboard)
-        {
-            dir.x = Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed ? -1 : Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed ? 1 : 0;
-            dir.y = Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed ? -1 : Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed ? 1 : 0;
-        }
-        else
-        {
-            Vector2 leftStick = InputManager.GetLeftStick();
-            dir = leftStick;
-        }
-        if (dir == Vector2.zero)
-        {
-            dir.x = facingRight ? 1 : -1;
-        }
-        dir.Normalize();
 
         animator.Play("Rabi_Move");
-        //animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration());
         animator.speed = 1f / BeatManager.GetBeatDuration() / 0.8f;
 
         while (time <= BeatManager.GetBeatDuration() * 0.8f)
         {
+            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            if (time <= 0.05f)
+            {
+                Vector2 tempDir;
+                if (InputManager.playerDevice == InputManager.InputDeviceType.Keyboard)
+                {
+                    tempDir.x = Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed ? -1 : Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed ? 1 : 0;
+                    tempDir.y = Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed ? -1 : Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed ? 1 : 0;
+                }
+                else
+                {
+                    Vector2 leftStick = InputManager.GetLeftStick();
+                    tempDir = leftStick;
+                }
+                if (tempDir != Vector2.zero) dir = tempDir;
+                dir.Normalize();
+
+            }
             bool isCrouching = Keyboard.current.leftShiftKey.isPressed;
             if (isCastingBunnyHop)
             {
@@ -199,7 +204,6 @@ public class PlayerRabi : Player
         }
         rb.velocity = Vector2.zero;
         animator.speed = 1f / BeatManager.GetBeatDuration();
-        //animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration());
         animator.Play("Rabi_Idle");
         yield return new WaitForEndOfFrame();
         Sprite.transform.localPosition = Vector3.zero;
@@ -330,6 +334,7 @@ public class PlayerRabi : Player
 
     public void DoBunnyHop()
     {
+        StopCoroutine(MoveCoroutine(direction));
         Vector2 dir = Vector2.zero;
         if (InputManager.playerDevice == InputManager.InputDeviceType.Keyboard)
         {
@@ -378,6 +383,7 @@ public class PlayerRabi : Player
         AudioController.PlaySound(dashSound);
         while (time <= BeatManager.GetBeatDuration())
         {
+            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
             if (Map.isWallAt(targetPos)) targetPos = originPos;
             // BeatDuration is 1
             // time is x
@@ -432,6 +438,7 @@ public class PlayerRabi : Player
         float remainingAttacks = numAttacks;
         while (remainingAttacks > 0)
         {
+            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
             PlayerAttack atkEntity = PoolManager.Get<RabiAttack>();
             atkEntity.Attack(direction);
             atkEntity.transform.localScale = Vector3.one * abilityValues["Attack_Size"];
@@ -470,6 +477,12 @@ public class PlayerRabi : Player
         if (isCastingBunnyHop) return;
         if (isInvulnerable) return;
         if (isDead) return;
+
+        if (invulTime > 0) return;
+        else
+        {
+            invulTime = 0.2f;
+        }
 
         RabbitReflexesAbility reflexes = (RabbitReflexesAbility)equippedPassiveAbilities.FirstOrDefault(x=> x.GetType() == typeof(RabbitReflexesAbility));
         if (reflexes != null)

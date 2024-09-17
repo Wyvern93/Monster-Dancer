@@ -53,7 +53,7 @@ public class CarrotJuiceAbilityEnhancement : Enhancement
     public override bool isAvailable()
     {
         bool available = true;
-        if (Player.instance.equippedPassiveAbilities.Count == 3) available = false;
+        if (Player.instance.equippedPassiveAbilities.Count == 5) available = false;
         if(Player.instance.equippedPassiveAbilities.Find(x => x.getID() == "rabi.carrotjuice") != null)
         {
             if (Player.instance.abilityValues["ability.carrotjuice.level"] < 4) available = true;

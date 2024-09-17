@@ -24,7 +24,7 @@ public class Stage1b : Map
     public GameObject ojouGuaridanPrefab;
     public GameObject kappaPrefab;
 
-    public GameObject usarinBossPrefab;
+    public GameObject nebulionBossPrefab;
 
     [Header("Bullet Prefabs")]
     public GameObject directionalBulletPrefab;
@@ -56,7 +56,7 @@ public class Stage1b : Map
         PoolManager.CreatePool(typeof(VampiLoli), vampiLoliPrefab, 30);
         PoolManager.CreatePool(typeof(OjouGuardian), ojouGuaridanPrefab, 50);
         PoolManager.CreatePool(typeof(Kappa), kappaPrefab, 30);
-        PoolManager.CreatePool(typeof(UsarinBoss), usarinBossPrefab, 1);
+        PoolManager.CreatePool(typeof(NebulionBoss), nebulionBossPrefab, 1);
 
         PoolManager.CreatePool(typeof(DirectionalBullet), directionalBulletPrefab, 150);
         PoolManager.CreatePool(typeof(NomEliteBullet), nomSlimeEliteBullet, 60);
@@ -84,7 +84,7 @@ public class Stage1b : Map
         PoolManager.RemovePool(typeof(VampiLoli));
         PoolManager.RemovePool(typeof(OjouGuardian));
         PoolManager.RemovePool(typeof(Kappa));
-        PoolManager.RemovePool(typeof(UsarinBoss));
+        PoolManager.RemovePool(typeof(NebulionBoss));
 
         PoolManager.RemovePool(typeof(DirectionalBullet));
         PoolManager.RemovePool(typeof(NomEliteBullet));
@@ -118,10 +118,16 @@ public class Stage1b : Map
         Player.instance.Sprite.transform.localScale = Vector3.one;
         Camera.main.transform.position = new Vector3(Player.instance.transform.position.x, Player.instance.transform.position.y, Camera.main.transform.position.z);
         mapObjects.SetActive(false);
+        bossGrid.SetActive(false);
         bossArea.color = new Color(0, 0, 0, 0);
         bossArea.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
         bossArea.gameObject.SetActive(false);
 
+        yield return new WaitForSeconds(1f);
+
+        Dialogue dialogue = Player.instance is PlayerRabi ? rabiEndDialogue : rabiEndDialogue;
+        UIManager.Instance.dialogueMenu.Open(dialogue.entries);
+        while (!UIManager.Instance.dialogueMenu.hasFinished) yield return new WaitForEndOfFrame();
         yield return new WaitForSeconds(1f);
 
         UIManager.Instance.StageFinish.SetActive(true);
@@ -151,6 +157,7 @@ public class Stage1b : Map
         stageEvents = new List<StageTimeEvent>()
         {
             // Spawn Rates
+            /*
             new ChangeSpawnRateEvent(7, 0), // start
             new ChangeSpawnRateEvent(7, 30),
             new ChangeSpawnRateEvent(8, 60),
@@ -189,8 +196,8 @@ public class Stage1b : Map
             new AddEnemyEvent(EnemyType.StayinUndead, 3, 0, 300),
             new AddEnemyEvent(EnemyType.Purrfessor, 1, 0, 330),
             new AddEnemyEvent(EnemyType.ZippyBat, 8, 0, 400), // Needs custom spawn
-            //new AddEnemyEvent(EnemyType.VampiLoli, 1, 0, 400), // Needs to be an event
-            //new AddEnemyEvent(EnemyType.OjouGuardian, 3, 0, 450), // These needs a reference for the vampiLoli
+            new AddEnemyEvent(EnemyType.VampiLoli, 1, 0, 400), // Needs to be an event
+            new AddEnemyEvent(EnemyType.OjouGuardian, 3, 0, 450), // These needs a reference for the vampiLoli
             new AddEnemyEvent(EnemyType.Kappa, 1, 0, 530),
 
             new RemoveEnemyEvent(EnemyType.WiggleViper, 0, 180),
@@ -200,15 +207,14 @@ public class Stage1b : Map
             new RemoveEnemyEvent(EnemyType.StayinUndead, 0, 420),
             new RemoveEnemyEvent(EnemyType.Purrfessor, 0, 540),
             new RemoveEnemyEvent(EnemyType.ZippyBat, 0, 600),
-            //new RemoveEnemyEvent(EnemyType.VampiLoli, 0, 540),
-            //new RemoveEnemyEvent(EnemyType.OjouGuardian, 0, 570),
+            new RemoveEnemyEvent(EnemyType.VampiLoli, 0, 540),
+            new RemoveEnemyEvent(EnemyType.OjouGuardian, 0, 570),
             new RemoveEnemyEvent(EnemyType.Kappa, 0, 600),
 
             new SpawnEliteEvent(EnemyType.MuscleHareElite, 120),
             new SpawnEliteEvent(EnemyType.RhytmiaElite, 240),
             new SpawnEliteEvent(EnemyType.FungooElite, 240), // 360
             new SpawnEliteEvent(EnemyType.StayinUndeadElite, 480), // 480
-            new SpawnBossEvent(EnemyType.Usarin, 600),
 
             new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 400),
             new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 420),
@@ -221,6 +227,8 @@ public class Stage1b : Map
             new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 530),
             new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 535),
             new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 540),
+            */
+            new SpawnBossEvent(EnemyType.Nebulion, 6)
         };
     }
 }

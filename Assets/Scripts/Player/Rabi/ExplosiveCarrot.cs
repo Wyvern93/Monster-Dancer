@@ -31,6 +31,7 @@ public class ExplosiveCarrot : MonoBehaviour
         float angle = direction.x < 0 ? -800 : 800;
         while (height > 0.1f)
         {
+            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
             height += force * Time.deltaTime;
             force -= Time.deltaTime * 60f;
             carrotSpr.transform.localPosition = new Vector3(0, height, height * 2);
@@ -47,6 +48,7 @@ public class ExplosiveCarrot : MonoBehaviour
         float totaltimer = 0.2f;
         while (i > 0)
         {
+            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
             if (timer > 0)
             {
                 timer -= Time.deltaTime;

@@ -31,7 +31,10 @@ public class CarrotDeliveryAbility : PlayerAbility
     {
         return new List<Enhancement>() { new CarrotDeliveryAbilityEnhancement() };
     }
-
+    public override bool isUltimate()
+    {
+        return true;
+    }
     public override string getID()
     {
         return "rabi.carrotdelivery";
@@ -52,6 +55,8 @@ public class CarrotDeliveryAbility : PlayerAbility
         rabi.animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration());
         rabi.animator.Play("Rabi_Ultimate");
 
+        AudioController.PlaySound(AudioController.instance.sounds.playerSpecialUseSfx);
+        Player.TriggerCameraShake(3f, 1f);
         CarrotDeliveryTruck truck = PoolManager.Get<CarrotDeliveryTruck>();
 
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());

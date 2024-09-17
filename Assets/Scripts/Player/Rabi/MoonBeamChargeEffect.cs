@@ -8,10 +8,11 @@ public class MoonBeamChargeEffect : MonoBehaviour
     [SerializeField] AudioClip chargeSound;
     [SerializeField] ParticleSystem particles;
 
-    private int beamDuration = 12;
-    private int maxBeamDuration = 12;
+    private int beamDuration = 4;
+    private int maxBeamDuration = 4;
 
     private bool charged = false;
+    private bool hitThisBeat;
     public void OnBeamChargeFinish()
     {
         charged = true;
@@ -32,25 +33,19 @@ public class MoonBeamChargeEffect : MonoBehaviour
 
         int abilityLevel = (int)Player.instance.abilityValues["ability.moonbeam.level"];
 
-        if (abilityLevel == 1) maxBeamDuration = 12;
-        else if (abilityLevel >= 4) maxBeamDuration = 18;
+        if (abilityLevel >= 3) maxBeamDuration = 6;
+        else maxBeamDuration = 4;
+ 
 
-        maxBeamDuration = 
         beamDuration = maxBeamDuration;
         particles.Play();
     }
 
     public void Update()
     {
-        if (!charged)
+        if (BeatManager.isGameBeat && !GameManager.isPaused)
         {
-            Player.TriggerCameraShake(0.2f, 0.1f);
-            return;
-        }
-        Player.TriggerCameraShake(0.3f, 0.2f);
-
-        if (BeatManager.isGameBeat)
-        {
+            hitThisBeat = false;
             if (beamDuration > 0)
             {
                 beamDuration--;
@@ -68,6 +63,15 @@ public class MoonBeamChargeEffect : MonoBehaviour
             }
         }
         
+    }
+
+    public void OnBeamHit()
+    {
+        if (hitThisBeat) return;
+
+        MoonlightShockwave shockwave = PoolManager.Get<MoonlightShockwave>();
+        shockwave.dmg = 4;
+        shockwave.transform.position = transform.position;
     }
 
     private void StartBeam()

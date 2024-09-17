@@ -27,6 +27,7 @@ public class IconList
     public Sprite lunarRain;
     public Sprite illusionDash;
     public Sprite carrotDelivery;
+    public Sprite Eclipse;
 
     public static IconList instance;
 }

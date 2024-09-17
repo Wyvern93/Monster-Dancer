@@ -53,21 +53,27 @@ public class MuscleHareElite : Enemy
     {
         animator.Play("musclehare_normal");
         BulletSpawnEffect bulletSpawnEffect = PoolManager.Get<BulletSpawnEffect>();
+        bulletSpawnEffect.source = this;
         bulletSpawnEffect.transform.position = transform.position;
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
 
         Vector2 dir = Player.instance.GetClosestPlayer(transform.position) - transform.position;
         dir.Normalize();
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
 
         SpawnBullet(Vector2.left, 12f, 0f);
         SpawnBullet(Vector2.right, 12f, 0f);
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+
         SpawnBullet(Vector2.left, 12f, 0f);
         SpawnBullet(Vector2.right, 12f, 0f);
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+
         SpawnBullet(Vector2.left, 12f, 0f);
         SpawnBullet(Vector2.right, 12f, 0f);
-
+        bulletSpawnEffect.Despawn();
         isAttacking = false;
         yield break;
 
@@ -110,6 +116,7 @@ public class MuscleHareElite : Enemy
         animator.Play("musclehare_move");
         while (time <= BeatManager.GetBeatDuration() / 2f)
         {
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
             velocity = dir * speed * 6;
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();

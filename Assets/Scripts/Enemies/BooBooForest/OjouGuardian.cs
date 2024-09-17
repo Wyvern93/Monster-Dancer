@@ -65,6 +65,7 @@ public class OjouGuardian : Enemy
         facingRight = dir.x > 0;
         while (time <= BeatManager.GetBeatDuration() / 2)
         {
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
             velocity = dir * speed * 6;
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();

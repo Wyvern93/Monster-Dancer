@@ -40,11 +40,36 @@ public abstract class Enemy : MonoBehaviour
 
     public Vector3 eventMove;
     public int lifeTime;
+
+    public StunEffect stunStatus;
+    private float oldAnimSpeed;
     public bool CanMove()
     {
         if (isMoving) return false;
         if (GameManager.isPaused) return false;
         else return true;
+    }
+
+    public virtual bool CanBeStunned(bool isUltimate)
+    {
+        if (isUltimate) return true;
+        if (this is Boss) return false;
+        return true;
+    }
+
+    public void OnStun(int time)
+    {
+        if (!stunStatus.isStunned()) oldAnimSpeed = animator.speed;
+
+        stunStatus.duration = time;
+        animator.speed = 0;
+        Sprite.color = new Color(0.8f, 0.8f, 1f, 1f);
+    }
+
+    public void OnStunEnd()
+    {
+        animator.speed = oldAnimSpeed;
+        Sprite.color = Color.white;
     }
 
     public static Enemy GetEnemyOfType(EnemyType enemyType)
@@ -85,6 +110,7 @@ public abstract class Enemy : MonoBehaviour
             case EnemyType.WiggleViper: return PoolManager.Get<WiggleViper>();
 
             case EnemyType.Usarin: return PoolManager.Get<UsarinBoss>();
+            case EnemyType.Nebulion: return PoolManager.Get<NebulionBoss>();
         }
     }
 
@@ -99,6 +125,7 @@ public abstract class Enemy : MonoBehaviour
 
     private void Awake()
     {
+        stunStatus = new StunEffect();
         spriteRendererMat = Sprite.material;
         facingRight = true;
         animator = GetComponentInChildren<Animator>();
@@ -124,7 +151,7 @@ public abstract class Enemy : MonoBehaviour
         if (baseExperience == 0) baseExperience = experience;
         experience = baseExperience * (1 + GameManager.runData.stageMulti);
 
-        float baseSize = isElite || this is Boss ? 2 : 1;
+        float baseSize = isElite ? 2 : 1;
         float multi = 1 + (Map.StageTime / 600f);
         transform.localScale = Vector3.one * baseSize * multi;
     }
@@ -135,12 +162,27 @@ public abstract class Enemy : MonoBehaviour
     void Update()
     {
         if (GameManager.isPaused) return;
-        OnBehaviourUpdate();
-        if (BeatManager.isGameBeat) OnBeat();
+        if (Player.instance == null) return;
+        if (Player.instance.isDead) return;
+        if (!stunStatus.isStunned())
+        {
+            OnBehaviourUpdate();
+            if (BeatManager.isGameBeat)
+            {
+                OnBeat();
+            }
+        }
+        else if (BeatManager.isGameBeat && stunStatus.duration > 0)
+        {
+            if (stunStatus.duration == 1) OnStunEnd();
+            stunStatus.duration--;
+        }
 
+        
+        if (stunStatus.isStunned()) rb.velocity = Vector2.zero;
+        else rb.velocity = velocity + (knockback * 2);
         HandleSprite();
         HandleKnockback();
-        rb.velocity = velocity + (knockback * 2);
     }
     public virtual void OnSpawn()
     {
@@ -151,6 +193,7 @@ public abstract class Enemy : MonoBehaviour
 
     protected void HandleKnockback()
     {
+        if (stunStatus.isStunned()) return;
         knockback = Vector3.MoveTowards(knockback, Vector3.zero, Time.deltaTime * 12f);
     }
 
@@ -289,6 +332,7 @@ public abstract class Enemy : MonoBehaviour
     public void OnTriggerEnter2D(Collider2D collision)
     {
         if (!BeatManager.isPlaying) return;
+        if (stunStatus.isStunned()) return;
         if (collision.CompareTag("Player") && collision.name == "Player")
         {
             Player.instance.TakeDamage(atk);
@@ -299,6 +343,7 @@ public abstract class Enemy : MonoBehaviour
     {
         if (!BeatManager.isPlaying) return;
         if (!BeatManager.isGameBeat) return;
+        if (stunStatus.isStunned()) return;
 
         if (collision.CompareTag("Player") && collision.name == "Player")
         {

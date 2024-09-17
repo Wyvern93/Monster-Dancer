@@ -6,23 +6,17 @@ public class MoonBeamAbilityEnhancement : Enhancement
     public override string GetDescription()
     {
         int level = getLevel() + 1;
-        if (level == 1)
+        switch (level)
         {
-            return "Rabi calls the power of the moon and projects it as three beams of moonlight that destroy projectiles and damage enemies for <color=\"yellow\">12</color> beats";
+            default:
+            case 1: return "Shoot a moonlight ball of lasers that deal damage to enemies";
+            case 2: return "Increase damage by <color=\"green\">20%</color>";
+            case 3: return "Increase duration by <color=\"green\">50%</color>";
+            case 4: return "Increase damage by <color=\"green\">30%</color>";
+            case 5: return "Adds a <color=\"green\">second</color> moonlight ball";
+            case 6: return "Increase size by <color=\"green\">25%</color>";
+            case 7: return "Moonball casts moon echos when hitting enemies once per beat";
         }
-        if (level == 2)
-        {
-            return "Increases the damage of the beams by <color=\"yellow\">25%</color>";
-        }
-        if (level == 3)
-        {
-            return "Increases the speed of the beams by <color=\"yellow\">25%</color>";
-        }
-        if (level == 4)
-        {
-            return "Increases the duration of the Moon Beams from <color=\"yellow\">12->18</color> beats and Rabi recovers <color=\"yellow\">2%</color> HP with every hit";
-        }
-        return "";
     }
 
     public override int getLevel()
@@ -48,20 +42,19 @@ public class MoonBeamAbilityEnhancement : Enhancement
 
     public override int getWeight()
     {
-        return 3;
+        return 2;
     }
 
     public override bool isAvailable()
     {
-        bool available = false;
-        if (Player.instance.ultimateAbility == null) available = true;
-        else
+        bool available = true;
+        if (Player.instance.equippedPassiveAbilities.Count == 5) available = false;
+        if (Player.instance.equippedPassiveAbilities.Find(x => x.getID() == "rabi.moonbeam") != null)
         {
-            if (Player.instance.ultimateAbility.getID() == "rabi.moonbeam")
-            {
-                if (Player.instance.abilityValues["ability.moonbeam.level"] < 4) available = true;
-            }
+            if (Player.instance.abilityValues["ability.moonbeam.level"] < 7) available = true;
+            else available = false;
         }
+
 
         return available;
     }
@@ -83,15 +76,14 @@ public class MoonBeamAbilityEnhancement : Enhancement
         if (!Player.instance.abilityValues.ContainsKey("ability.moonbeam.level"))
         {
             Player.instance.abilityValues.Add("ability.moonbeam.level", 1);
-            Player.instance.ultimateAbility = new MoonBeamAbility();
-            UIManager.Instance.PlayerUI.ShowSPBar();
-            UIManager.Instance.PlayerUI.SetUltimateIcon(IconList.instance.moonBeam, 1, false);
+            Player.instance.equippedPassiveAbilities.Add(new MoonBeamAbility());
+            UIManager.Instance.PlayerUI.SetPassiveIcon(IconList.instance.moonBeam, 1, false, Player.instance.getPassiveAbilityIndex(typeof(MoonBeamAbility)));
         }
         else
         {
             Player.instance.abilityValues["ability.moonbeam.level"] += 1;
             int level = (int)Player.instance.abilityValues["ability.moonbeam.level"];
-            UIManager.Instance.PlayerUI.SetUltimateLevel(level, level >= 4);
+            UIManager.Instance.PlayerUI.SetPassiveLevel(level, level >= 4, Player.instance.getPassiveAbilityIndex(typeof(MoonBeamAbility)));
         }
         Player.instance.CalculateStats();
     }

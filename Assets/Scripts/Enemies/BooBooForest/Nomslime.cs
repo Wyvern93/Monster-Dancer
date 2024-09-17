@@ -78,6 +78,7 @@ public class NomSlime : Enemy
         animator.Play("nomslime_move");
         while (time <= BeatManager.GetBeatDuration() / 2f)
         {
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
             velocity = dir * speed * 6;
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();

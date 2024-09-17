@@ -45,8 +45,10 @@ public class GhostJrElite : Enemy
         animator.Play("boojr_preattack");
         animator.speed = 1f / BeatManager.GetBeatDuration();
         BulletSpawnEffect bulletSpawnEffect = PoolManager.Get<BulletSpawnEffect>();
+        bulletSpawnEffect.source = this;
         bulletSpawnEffect.transform.position = transform.position;
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
 
         Vector2 dir = Player.instance.GetClosestPlayer(transform.position) - transform.position;
         dir.Normalize();
@@ -56,6 +58,8 @@ public class GhostJrElite : Enemy
         float diff = 360 / 8;
         for (int i = 0; i < 8; i++)
         {
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+
             bullets.Add(SpawnBullet(i * diff, 16f, 1f));
             yield return new WaitForSeconds(BeatManager.GetBeatDuration() / 8f);
         }
@@ -63,7 +67,7 @@ public class GhostJrElite : Enemy
         {
             bullet.canMove = true;
         }
-
+        bulletSpawnEffect.Despawn();
         isAttacking = false;
         animator.speed = 1f / BeatManager.GetBeatDuration() * 2f;
         animator.Play("boojr_normal");
@@ -122,6 +126,7 @@ public class GhostJrElite : Enemy
         facingRight = dir.x > 0;
         while (time <= BeatManager.GetBeatDuration() / 2f)
         {
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
             velocity = dir * speed * 6;
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();

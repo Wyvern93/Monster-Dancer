@@ -84,8 +84,10 @@ public class CarrotDeliveryAbilityEnhancement : Enhancement
         {
             Player.instance.abilityValues.Add("ability.carrotdelivery.level", 1);
             Player.instance.ultimateAbility = new CarrotDeliveryAbility();
+            Player.AddSP(250);
             UIManager.Instance.PlayerUI.ShowSPBar();
             UIManager.Instance.PlayerUI.SetUltimateIcon(IconList.instance.carrotDelivery, 1, false);
+            UIManager.Instance.PlayerUI.UpdateSpecial();
         }
         else
         {

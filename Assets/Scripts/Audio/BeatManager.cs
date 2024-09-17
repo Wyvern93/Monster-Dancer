@@ -45,10 +45,11 @@ public class BeatManager : MonoBehaviour
     public static bool isPlaying;
 
     public static bool compassless;
+    private float targetBeatPulseAlpha;
 
     public static void UpdatePulseAnimator()
     {
-        instance.beatPulseAnimator.gameObject.SetActive(!compassless);
+        //instance.beatPulseAnimator.gameObject.SetActive(!compassless);
     }
 
     public static void SetTrack(MapTrack track)
@@ -73,6 +74,7 @@ public class BeatManager : MonoBehaviour
         instance.music.time = 0;
         instance.music.Stop();
         beats = 0;
+        instance.targetBeatPulseAlpha = 0;
     }
 
     public static void StartTrack()
@@ -80,6 +82,7 @@ public class BeatManager : MonoBehaviour
         instance.beatPulseSprite.color = Color.white;
         instance.music.volume = 1f;
         instance.music.Play();
+        instance.targetBeatPulseAlpha = 1;
 
         isPlaying = true;
     }
@@ -137,8 +140,9 @@ public class BeatManager : MonoBehaviour
             menuGameBeat = true;
             return;
         }
-        
-        if (compassless) return;
+
+        //if (compassless) return;
+        return;
         instance.canCastGameBeat = false;
         isGameBeat = true;
         lastBeatTime = Time.time;
@@ -164,6 +168,7 @@ public class BeatManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        beatPulseSprite.color = new Color(1, 1, 1, Mathf.MoveTowards(beatPulseSprite.color.a, targetBeatPulseAlpha, Time.deltaTime * 4f));
         if (!isBeat)
         {
             beatPulseAnimator.ResetTrigger("OnBeat");
@@ -183,7 +188,7 @@ public class BeatManager : MonoBehaviour
             JumpToLoop();
         }
 
-        if (compassless) CheckForGameBeat();
+        CheckForGameBeat();
         if (music.time >= nextBeat)
         {
             beats++;
@@ -193,7 +198,7 @@ public class BeatManager : MonoBehaviour
         }
         
         UpdateUI();
-        if (!compassless) CheckForGameBeat();
+        //if (!compassless) CheckForGameBeat();
     }
 
     private void CalculateNextBeat(float time)
@@ -208,6 +213,7 @@ public class BeatManager : MonoBehaviour
         currentFrameState = GetBeatSuccess();
         isGameBeat = false;
         menuGameBeat = false;
+        /*
         if (!compassless)
         {
             if (lastFrameState == BeatTrigger.FAIL && currentFrameState != BeatTrigger.FAIL) // First Frame of Input
@@ -229,6 +235,8 @@ public class BeatManager : MonoBehaviour
         {
             canCastGameBeat = true;
         }
+        */
+        canCastGameBeat = true;
         lastFrameState = currentFrameState;
     }
 
@@ -250,9 +258,10 @@ public class BeatManager : MonoBehaviour
         //beatPulseAnimator.speed = 1 / secondsPerBeat;
         if (compassless)
         {
-            isGameBeat = true;
-            menuGameBeat = true;
+            
         }
+        isGameBeat = true;
+        menuGameBeat = true;
         isBeat = true;
         beatTest.Play();
     }

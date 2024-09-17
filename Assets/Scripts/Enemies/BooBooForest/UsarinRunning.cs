@@ -95,6 +95,7 @@ public class UsarinRunning : Enemy
         animator.Play("vampiloli_move");
         while (time <= BeatManager.GetBeatDuration() / 2f)
         {
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
             velocity = direction * speed * 6;
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();

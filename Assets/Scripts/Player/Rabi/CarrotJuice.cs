@@ -40,6 +40,7 @@ public class CarrotJuice : MonoBehaviour
 
     public void Update()
     {
+        if (GameManager.isPaused) return;
         if (BeatManager.isGameBeat)
         {
             beats--;

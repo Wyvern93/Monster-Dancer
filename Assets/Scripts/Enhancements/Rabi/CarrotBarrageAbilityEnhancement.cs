@@ -54,7 +54,7 @@ public class CarrotBarrageAbilityEnhancement : Enhancement
     public override bool isAvailable()
     {
         bool available = true;
-        if (Player.instance.equippedPassiveAbilities.Count == 3) available = false;
+        if (Player.instance.equippedPassiveAbilities.Count == 5) available = false;
 
         if(Player.instance.equippedPassiveAbilities.Find(x => x.getID() == "rabi.carrotbarrage") != null)
         {

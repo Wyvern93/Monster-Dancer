@@ -11,16 +11,20 @@ public class MoonBeam : MonoBehaviour
     [SerializeField] SpriteRenderer spriteRenderer;
     [SerializeField] Animator animator;
     [SerializeField] AudioSource sound;
+    [SerializeField] MoonBeamChargeEffect charge;
 
     bool started = false;
 
     private float pitch = 1;
-    private float maxPitch = 1.5f;
+    private float maxPitch = 1.25f;
     private float size;
 
     private float abilityDamage = 10f;
-    private float beamSpeed = 100;
+    private float beamSpeed = 200;
     private bool stealHealth = false;
+
+    public Vector2 movDir;
+    private int level;
     public void OnBeamEnd()
     {
         started = false;
@@ -38,22 +42,22 @@ public class MoonBeam : MonoBehaviour
     public void OnInit()
     {
         int abilityLevel = (int)Player.instance.abilityValues["ability.moonbeam.level"];
+        level = abilityLevel;
 
-        if (abilityLevel >= 2) abilityDamage = 25f;
-        else abilityDamage = 20f;
+        abilityDamage = abilityLevel < 4 ? abilityLevel < 2 ? 10 : 12 : 16;
 
-        if (abilityLevel >= 3) beamSpeed = 125f;
-        else beamSpeed = 100f;
+        beamSpeed = 400f;
 
-        if (abilityLevel >= 4) stealHealth = true;
-        else stealHealth = false;
+        stealHealth = false;
 
         started = false;
         foreach (BoxCollider2D boxCollider in boxColliders) boxCollider.enabled = false;
         spriteRenderer.enabled = false;
         parts.SetActive(false);
         sound.volume = 0;
-        size = 5;
+        size = abilityLevel < 6 ? 1 : 1.25f;
+        transform.position = (Vector3)Player.instance.transform.position + new Vector3(0, 1.5f, 10f);
+        transform.localScale = Vector3.one * size;
     }
 
     public void OnBeamStart()
@@ -66,7 +70,6 @@ public class MoonBeam : MonoBehaviour
         Vector2 direction = difference;
 
         if (direction == Vector2.zero) direction = Vector2.right;
-        transform.position = (Vector3)Player.instance.transform.position + new Vector3(0, 1.5f, 10f);
 
         //transform.localEulerAngles = new Vector3(0, 0, Vector2.SignedAngle(Vector2.down, animDir));
         pitch = 1;
@@ -81,7 +84,8 @@ public class MoonBeam : MonoBehaviour
 
     public void Update()
     {
-
+        if (GameManager.isPaused) return;
+        transform.position += (Vector3)(movDir.normalized * 3f * Time.deltaTime);
         // Read direction
         Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
         Vector2 difference = (crosshairPos - (Vector2)transform.position).normalized;
@@ -91,16 +95,15 @@ public class MoonBeam : MonoBehaviour
         Vector2 direction = difference;
 
         if (direction == Vector2.zero) direction = Vector2.right;
-        transform.position = Player.instance.transform.position + new Vector3(0, 2f, 10f);
         float targetDir = Vector2.SignedAngle(Vector2.down, animDir);
         //transform.localEulerAngles = new Vector3(0, 0, Mathf.MoveTowardsAngle(transform.localEulerAngles.z, targetDir, Time.deltaTime * 160f));
-        transform.localEulerAngles = new Vector3(0, 0, transform.localEulerAngles.z + Time.deltaTime * 100f);
+        transform.localEulerAngles = new Vector3(0, 0, transform.localEulerAngles.z + Time.deltaTime * 200f);
         //transform.localEulerAngles = new Vector3(0, 0, Vector2.SignedAngle(Vector2.down, animDir));//getAngleFromVector(animDir));
 
         if (!started && sound.volume > 0) sound.volume = Mathf.MoveTowards(sound.volume, 0, Time.deltaTime * 2f);
         if (!started) return;
 
-        if (sound.pitch < maxPitch) sound.pitch = Mathf.MoveTowards(sound.pitch, maxPitch, Time.deltaTime / 5f);
+        if (sound.pitch < maxPitch) sound.pitch = Mathf.MoveTowards(sound.pitch, maxPitch, Time.deltaTime / 2f);
         if (dotCD > 0)
         { 
             dotCD -= Time.deltaTime;
@@ -115,27 +118,16 @@ public class MoonBeam : MonoBehaviour
 
     public void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Bullet"))
-        {
-            Bullet bullet = collision.GetComponent<Bullet>();
-            bullet.Despawn();
-        }
         if (collision.CompareTag("Enemy"))
         {
             Enemy enemy = collision.GetComponent<Enemy>();
+
+            if (level >= 7) charge.OnBeamHit();
 
             float damage = Player.instance.currentStats.Atk * abilityDamage;
             bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
             if (isCritical) damage *= Player.instance.currentStats.CritDmg;
             enemy.TakeDamage((int)damage, isCritical);
-
-            if (stealHealth)
-            {
-                float recovery = Mathf.Clamp(damage * 0.01f, 1f, 99999f);
-                Player.instance.CurrentHP = (int)Mathf.Clamp(Player.instance.CurrentHP + recovery, 0, Player.instance.currentStats.MaxHP);
-                UIManager.Instance.PlayerUI.SpawnDamageText(transform.position, (int)recovery, DamageTextType.Heal);
-                UIManager.Instance.PlayerUI.UpdateHealth();
-            }
         }
 
         if (collision.CompareTag("FairyCage"))

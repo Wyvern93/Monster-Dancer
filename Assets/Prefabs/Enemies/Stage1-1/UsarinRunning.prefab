@@ -157,7 +157,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: -1518054358, guid: 77e37ef4c8858ec45896572a960ae4d4, type: 3}
+  m_Sprite: {fileID: 1947674365, guid: 61826bc2f4b155a4aa2c22444a54fed3, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -340,8 +340,8 @@ MonoBehaviour:
   Sprite: {fileID: 7292069710259428833}
   rb: {fileID: 3636511805454691390}
   SpriteSize: 1
-  MaxHP: 10000
-  CurrentHP: 10000
+  MaxHP: 6000
+  CurrentHP: 6000
   SpawnIndex: 0
   AItype: 0
   experience: 15
@@ -360,7 +360,7 @@ Animator:
   m_GameObject: {fileID: 7454657059184023214}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: db66c7fcb58f5254c8d4b4161d24b79d, type: 2}
+  m_Controller: {fileID: 9100000, guid: 8fa75eadffaf49a4d8e0286930e975aa, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

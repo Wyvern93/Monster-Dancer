@@ -40,6 +40,7 @@ public class CarrotDeliveryTruck : MonoBehaviour
 
     public void Update()
     {
+        if (GameManager.isPaused) return;
         if (transform.position.x > Player.instance.transform.position.x + 12 && facingRight)
         {
             facingRight = false;

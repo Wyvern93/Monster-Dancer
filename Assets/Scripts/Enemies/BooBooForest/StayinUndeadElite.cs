@@ -39,22 +39,33 @@ public class StayinUndeadElite : Enemy
         isAttacking = true;
         animator.Play("stayinundead_normal");
         BulletSpawnEffect bulletSpawnEffect = PoolManager.Get<BulletSpawnEffect>();
+        bulletSpawnEffect.source = this;
         bulletSpawnEffect.transform.position = transform.position;
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+
         if (AItype == 0)
         {
             SpawnDirectionalBullet(new Vector2(-1f, -1f));
             yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+
             SpawnDirectionalBullet(new Vector2(-1f, 0f));
             yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+
             SpawnDirectionalBullet(new Vector2(-1f, 1f));
         }
         else if (AItype == 1)
         {
             SpawnDirectionalBullet(new Vector2(1f, -1f));
             yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+
             SpawnDirectionalBullet(new Vector2(1f, 0f));
             yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+
             SpawnDirectionalBullet(new Vector2(1f, 1f));
         }
         else
@@ -63,6 +74,7 @@ public class StayinUndeadElite : Enemy
             SpawnSpiralBullet(120);
             SpawnSpiralBullet(240);
         }
+        bulletSpawnEffect.Despawn();
         if (AItype >= 2) AItype = 0;
         else AItype++;
         //animator.Play("dancearune_normal");
@@ -135,6 +147,7 @@ public class StayinUndeadElite : Enemy
         animator.Play("stayinundead_move");
         while (time <= BeatManager.GetBeatDuration() / 2f)
         {
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
             velocity = dir * speed * 6;
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();

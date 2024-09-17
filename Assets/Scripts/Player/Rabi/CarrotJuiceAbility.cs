@@ -36,7 +36,10 @@ public class CarrotJuiceAbility : PlayerAbility
     {
         return "rabi.carrotjuice";
     }
-
+    public override bool isUltimate()
+    {
+        return false;
+    }
     public override void OnCast()
     {
         int level = (int)Player.instance.abilityValues["ability.carrotjuice.level"];

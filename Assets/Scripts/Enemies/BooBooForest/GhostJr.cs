@@ -44,14 +44,16 @@ public class GhostJr : Enemy
         animator.Play("boojr_preattack");
         animator.speed = 1f / BeatManager.GetBeatDuration();
         BulletSpawnEffect bulletSpawnEffect = PoolManager.Get<BulletSpawnEffect>();
+        bulletSpawnEffect.source = this;
         bulletSpawnEffect.transform.position = transform.position;
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
 
         Vector2 dir = Player.instance.GetClosestPlayer(transform.position) - transform.position;
         dir.Normalize();
 
         SpawnBullet(dir, 16f, 0f);
-
+        bulletSpawnEffect.Despawn();
         isAttacking = false;
         animator.speed = 1f / BeatManager.GetBeatDuration() * 2f;
         animator.Play("boojr_normal");
@@ -108,6 +110,7 @@ public class GhostJr : Enemy
         animator.Play("boojr_move");
         while (time <= BeatManager.GetBeatDuration() / 2f)
         {
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
             velocity = dir * speed * 6;
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();

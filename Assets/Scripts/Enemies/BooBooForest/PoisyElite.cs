@@ -1,5 +1,7 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.UI.Image;
 
 public class PoisyElite : Enemy
 {
@@ -26,40 +28,52 @@ public class PoisyElite : Enemy
             ShootBullets();
             beatCD = 4;
         }
-        else if (CanMove())
+        if (CanMove() && beatCD < 3)
         {
-            beatCD--;
             MoveTowardsPlayer();
         }
+        beatCD--;
     }
     private IEnumerator ShootBulletsCoroutine()
     {
+        AudioController.PlaySound(AudioController.instance.sounds.chargeBulletSound);
         BulletSpawnEffect bulletSpawnEffect = PoolManager.Get<BulletSpawnEffect>();
         bulletSpawnEffect.transform.position = transform.position;
+        bulletSpawnEffect.source = this;
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
 
         Vector2 dir = Player.instance.GetClosestPlayer(transform.position) - transform.position;
         dir.Normalize();
 
-        SpawnBullet(new Vector2(-1f, -1f));
-        SpawnBullet(new Vector2(1f, -1f));
-        SpawnBullet(new Vector2(-1f, 1f));
-        SpawnBullet(new Vector2(1f, 1f));
+        SpawnBullet();
+        bulletSpawnEffect.Despawn();
         isAttacking = false;
         yield break;
     }
 
-    private void SpawnBullet(Vector2 dir)
+    private void SpawnBullet()
     {
-        PoisonBullet bullet = PoolManager.Get<PoisonBullet>();
-        bullet.transform.position = transform.position + (Vector3)(dir * 0.2f) + (Vector3.one * 0.3f);
+        BulletBase bullet = PoolManager.Get<BulletBase>();
+        Vector3 playerPos = Player.instance.transform.position;
+        Vector2 dir = (playerPos - transform.position).normalized;
+
+        bullet.transform.position = transform.position + (-Vector3.up * 0.4f);
         bullet.direction = dir;
-        bullet.origSpeed = 10f;
-        bullet.speed = 10f;
-        bullet.enemySource = this;
-        bullet.atk = Mathf.Clamp(atk / 8, 1, 1000);
-        bullet.lifetime = 12;
+        bullet.speed = 10;
+        bullet.atk = 5;
+        bullet.lifetime = 8;
+        bullet.transform.localScale = Vector3.one;
+        bullet.startOnBeat = true;
+        bullet.behaviours = new List<BulletBehaviour>
+            {
+                new SpriteLookAngleBehaviour() { start = 0, end = -1 },
+                new PoisonBehaviour(3) { start = 0, end = -1},
+                new HomingToPlayerBehaviour(Player.instance.gameObject, 0.02f) {start = 0, end = -1 }
+            };
+        bullet.animator.Play("bigpoisonbullet");
         bullet.OnSpawn();
+        AudioController.PlaySound(AudioController.instance.sounds.bulletwaveShootSound);
     }
 
     public void ShootBullets()
@@ -100,6 +114,7 @@ public class PoisyElite : Enemy
         facingRight = dir.x > 0;
         while (time <= BeatManager.GetBeatDuration() / 2f)
         {
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
             velocity = dir * speed * 6;
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();

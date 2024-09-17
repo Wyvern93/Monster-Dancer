@@ -48,7 +48,7 @@ public class OrbitalMoonAbilityEnhancement : Enhancement
     public override bool isAvailable()
     {
         bool available = true;
-        if (Player.instance.equippedPassiveAbilities.Count == 3) available = false;
+        if (Player.instance.equippedPassiveAbilities.Count == 5) available = false;
         if(Player.instance.equippedPassiveAbilities.Find(x => x.getID() == "rabi.orbitalmoon") != null)
         {
             if (Player.instance.abilityValues["ability.orbitalmoon.level"] < 7) available = true;

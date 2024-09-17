@@ -31,5 +31,6 @@ public enum EnemyType
     VampiLoli,
     OjouGuardian,
     Kappa,
-    UsarinRunning
+    UsarinRunning,
+    Nebulion
 }

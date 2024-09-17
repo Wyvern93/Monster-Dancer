@@ -32,7 +32,7 @@ public class BunnyHopAbility : PlayerAbility
 
     public override List<Enhancement> getEnhancementList()
     {
-        return new List<Enhancement>() { new BunnyHopAbilityEnhancement() };
+        return new List<Enhancement>() { };
     }
 
     public override string getID()
@@ -40,6 +40,10 @@ public class BunnyHopAbility : PlayerAbility
         return "rabi.bunnyhop";
     }
 
+    public override bool isUltimate()
+    {
+        return false;
+    }
     public override void OnCast()
     {
         level = (int)Player.instance.abilityValues["ability.bunnyhop.level"];
@@ -55,7 +59,7 @@ public class BunnyHopAbility : PlayerAbility
         {
             maxCooldown = 12;
         }
-        maxCooldown = 6;
+        maxCooldown = 6; // 6
         currentCooldown = maxCooldown;
 
         PlayerRabi rabi = (PlayerRabi)Player.instance;

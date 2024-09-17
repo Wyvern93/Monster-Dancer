@@ -11,7 +11,7 @@ public class ZombieThief : Enemy
         isMoving = false;
         Sprite.transform.localPosition = Vector3.zero;
         animator.Play("zombiethief_normal");
-        animator.speed = 1f / BeatManager.GetBeatDuration() * 2f;
+        animator.speed = 1f / BeatManager.GetBeatDuration();
     }
     protected override void OnBeat()
     {
@@ -56,12 +56,13 @@ public class ZombieThief : Enemy
         animator.speed = 1f / BeatManager.GetBeatDuration() * 2f;
         while (time <= BeatManager.GetBeatDuration() / 2f)
         {
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
             velocity = dir * speed * 6;
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
         animator.Play("zombiethief_normal");
-        animator.speed = 1f / BeatManager.GetBeatDuration() * 2f;
+        animator.speed = 1f / BeatManager.GetBeatDuration();
         velocity = Vector2.zero;
         Sprite.transform.localPosition = Vector3.zero;
 

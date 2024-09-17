@@ -55,6 +55,7 @@ public class Tronco : Enemy
         animator.Play("tronco_move");
         while (time <= BeatManager.GetBeatDuration() / 3f)
         {
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
             velocity = dir * speed * 8;
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();

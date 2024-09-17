@@ -13,6 +13,7 @@ public abstract class PlayerAbility
         currentCooldown = 0;
     }
 
+    public abstract bool isUltimate();
     public abstract Sprite GetIcon();
     public abstract void OnUpdate();
     public abstract void OnEquip();

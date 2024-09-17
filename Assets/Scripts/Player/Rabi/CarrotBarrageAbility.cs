@@ -31,7 +31,10 @@ public class CarrotBarrageAbility : PlayerAbility
     {
         return IconList.instance.carrotBarrage;
     }
-
+    public override bool isUltimate()
+    {
+        return false;
+    }
     public override string getID()
     {
         return "rabi.carrotbarrage";
