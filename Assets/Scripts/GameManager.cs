@@ -168,7 +168,7 @@ public class GameManager : MonoBehaviour
         Player.ResetPosition();
         Player.instance.transform.position = Map.Instance.startPosition.position;
         Player.instance.SetCameraPos(Map.Instance.startPosition.position);
-        
+        Player.instance.isMoving = false;
         if (Player.instance is PlayerRabi) Player.instance.animator.Play("Rabi_Idle");
         yield break;
     }

@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58bc704ff83d12c45a2f687cd32cb9c8, type: 3}
+  m_Name: RabiUsarinDialogue
+  m_EditorClassIdentifier: 
+  entries:
+  - name: Usarin
+    leftSide: 0
+    text: Ah... I have finally left all those idiots behind... Being an idol is such
+      a pain, they don't understand!
+    leftPortrait: RabiSurprised
+    rightPortrait: UsarinFunny
+  - name: Usarin
+    leftSide: 0
+    text: Oh, it's you Rabi, guess there was one more idiot left, have you learned
+      to dance already?
+    leftPortrait: RabiSurprised
+    rightPortrait: UsarinSmile
+  - name: Rabi
+    leftSide: 1
+    text: I-I'm not an idiot! What are you doing here anyway!? Don't tell me you
+      are the one behind this dancing thing!
+    leftPortrait: RabiFlustered
+    rightPortrait: UsarinSmile
+  - name: Usarin
+    leftSide: 0
+    text: Hahaha, but isn't dancing fun? Now everyone can dance as much as they want
+      to.
+    leftPortrait: RabiSurprised
+    rightPortrait: UsarinLaugh
+  - name: Usarin
+    leftSide: 0
+    text: (Not that they are any good at it...)
+    leftPortrait: RabiSurprised
+    rightPortrait: UsarinFunny
+  - name: Rabi
+    leftSide: 1
+    text: I knew this had to be your doing, you're always so arrogant.
+    leftPortrait: RabiFlustered
+    rightPortrait: UsarinFunny
+  - name: Usarin
+    leftSide: 0
+    text: Oh my, are you challenging an idol such as me to a dancing battle? You
+      must be more of a fool than I thought.
+    leftPortrait: RabiFlustered
+    rightPortrait: UsarinSmile
+  - name: Rabi
+    leftSide: 1
+    text: I will show you what this rabbit can do!
+    leftPortrait: RabiSmirk
+    rightPortrait: UsarinSmile
+  - name: Usarin
+    leftSide: 0
+    text: I warned you, let's see if you can keep the rhythm!
+    leftPortrait: RabiSmirk
+    rightPortrait: UsarinSerious

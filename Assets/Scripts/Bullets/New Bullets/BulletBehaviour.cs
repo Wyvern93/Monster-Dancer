@@ -21,4 +21,6 @@ public class BulletBehaviour
     public virtual void UpdateBehaviour(BulletBase bullet, float beatTime)
     { }
 
+    public virtual void OnPlayerHit(BulletBase bullet) { }
+
 }

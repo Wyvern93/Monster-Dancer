@@ -16,6 +16,7 @@ public class MoonlightShockwave : MonoBehaviour
 
     public void Update()
     {
+        if (GameManager.isPaused) return;
         if (alpha > 0)
         {
             alpha = Mathf.MoveTowards(alpha, 0f, Time.deltaTime);

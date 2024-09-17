@@ -45,10 +45,11 @@ public class BeatManager : MonoBehaviour
     public static bool isPlaying;
 
     public static bool compassless;
+    private float targetBeatPulseAlpha;
 
     public static void UpdatePulseAnimator()
     {
-        instance.beatPulseAnimator.gameObject.SetActive(!compassless);
+        //instance.beatPulseAnimator.gameObject.SetActive(!compassless);
     }
 
     public static void SetTrack(MapTrack track)
@@ -73,6 +74,7 @@ public class BeatManager : MonoBehaviour
         instance.music.time = 0;
         instance.music.Stop();
         beats = 0;
+        instance.targetBeatPulseAlpha = 0;
     }
 
     public static void StartTrack()
@@ -80,6 +82,7 @@ public class BeatManager : MonoBehaviour
         instance.beatPulseSprite.color = Color.white;
         instance.music.volume = 1f;
         instance.music.Play();
+        instance.targetBeatPulseAlpha = 1;
 
         isPlaying = true;
     }
@@ -165,6 +168,7 @@ public class BeatManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        beatPulseSprite.color = new Color(1, 1, 1, Mathf.MoveTowards(beatPulseSprite.color.a, targetBeatPulseAlpha, Time.deltaTime * 4f));
         if (!isBeat)
         {
             beatPulseAnimator.ResetTrigger("OnBeat");

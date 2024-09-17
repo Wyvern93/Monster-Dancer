@@ -23,6 +23,7 @@ public class LunarPulse : MonoBehaviour
 
     public void Update()
     {
+        if (GameManager.isPaused) return;
         if (transform.localScale.magnitude < size)
         {
             transform.localScale = Vector3.MoveTowards(transform.localScale, Vector3.one * size, size * Time.deltaTime);

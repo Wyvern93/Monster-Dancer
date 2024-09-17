@@ -9,9 +9,6 @@ public class UsarinBoss : Boss
 {
     public List<Bullet> allBullets;
     public List<Enemy> allEnemies;
-
-    [SerializeField] GameObject baseBulletPrefab;
-
     private enum UsarinBossState
     {
         Dance1, Dance2, Dance3, Defeat
@@ -32,6 +29,8 @@ public class UsarinBoss : Boss
     private float starOrbitAngle;
 
     List<BulletBase> sideBullets;
+
+    [SerializeField] Dialogue rabiDialogue;
 
     public override void OnSpawn()
     {
@@ -56,14 +55,31 @@ public class UsarinBoss : Boss
         orbitRight = true;
         sideBullets = new List<BulletBase>();
 
-        PoolManager.CreatePool(typeof(BulletBase), baseBulletPrefab, 500);
-        animator.Play("usarin_intro");
+        if (transform.position.x < Player.instance.transform.position.x)
+        {
+            facingRight = true;
+            animator.Play("usarin_intro");
+            animator.speed = 1;
+        }
+        else
+        {
+            facingRight = false;
+            animator.Play("usarin_intro2");
+            animator.speed = 1;
+        }
+        
+        animator.speed = 1f;
+        transform.localScale = Vector3.one * 2f;
     }
 
     public override void OnIntroductionFinish()
     {
         base.OnIntroductionFinish();
         animator.Play("usarin_normal");
+        animator.speed = 1f / BeatManager.GetBeatDuration();
+        State = BossState.Dialogue;
+        Dialogue dialogue = Player.instance is PlayerRabi ? rabiDialogue : rabiDialogue;
+        UIManager.Instance.dialogueMenu.Open(dialogue.entries);
     }
 
     private void FindTargetPositionAroundPlayer()
@@ -89,6 +105,10 @@ public class UsarinBoss : Boss
 
     protected override void OnBeat()
     {
+        while (GameManager.isPaused) return;
+        if (State == BossState.Introduction) return;
+        if (Player.instance.transform.position.x < transform.position.x) facingRight = false;
+        else facingRight = true;
         if (State == BossState.Phase1)
         {
             if (usarinState == UsarinBossState.Dance1) OnPattern1();
@@ -99,12 +119,15 @@ public class UsarinBoss : Boss
     
     protected override void OnBehaviourUpdate()
     {
+        while (GameManager.isPaused) return;
         switch (State)
         {
             case BossState.Dialogue:
-                State = BossState.Phase1;
-                usarinState = UsarinBossState.Dance1;
-                OnBattleStart();
+                if (UIManager.Instance.dialogueMenu.hasFinished)
+                {
+                    State = BossState.Phase4;
+                    StartCoroutine(OnBattleStart());
+                }
                 break;
             case BossState.Phase1:
                 if (usarinState == UsarinBossState.Dance1) UpdatePhase1();
@@ -136,11 +159,19 @@ public class UsarinBoss : Boss
 
     private IEnumerator ChargeAttack1Coroutine(bool reset = true)
     {
-        yield return new WaitForSeconds(BeatManager.GetBeatDuration() * 2f);
+        magicCircle.transform.localScale = Vector3.one * 1.5f;
+        float time = BeatManager.GetBeatDuration() * (reset ? 3f : 2f);
+        while (time > 0)
+        {
+            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            time -= Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
         while (!BeatManager.isGameBeat) yield return new WaitForEndOfFrame();
 
         isPreparingAttack = false;
         if (reset) attackBeat = 0;
+        animator.Play("usarin_dance");
         yield break;
     }
 
@@ -198,10 +229,13 @@ public class UsarinBoss : Boss
 
         if (attackBeat >= 2 && attackBeat <= 6) // Carrot Bullets
         {
+            animator.Play("usarin_dance");
+
             StartCoroutine(ShootBulletsPhase1());
         }
         if (attackBeat == 0) // Bunnies
         {
+            animator.Play("usarin_dance");
             StartCoroutine(ShootSecondCarrots());
         }
 
@@ -243,6 +277,7 @@ public class UsarinBoss : Boss
             bullet.atk = 3;
             bullet.lifetime = 8;
             bullet.transform.localScale = Vector3.one;
+            bullet.startOnBeat = false;
             bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteLookAngleBehaviour() { start = 0, end = -1 },
@@ -258,7 +293,13 @@ public class UsarinBoss : Boss
             yield return new WaitForSeconds(BeatManager.GetBeatDuration() / 8f);
         }
 
-        yield return new WaitForSeconds(BeatManager.GetBeatDuration() * 3);
+        float time = BeatManager.GetBeatDuration() * 3f;
+        while (time > 0)
+        {
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            time -= Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
 
         foreach (Bullet b in bullets) b.lifetime = 8;
 
@@ -297,6 +338,7 @@ public class UsarinBoss : Boss
             bullet.atk = 10;
             bullet.lifetime = 10;
             bullet.transform.localScale = Vector3.one;
+            bullet.startOnBeat = true;
             bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpeedOverTimeBehaviour() { speedPerBeat = 1, start = 0, end = 3, targetSpeed = 6 },
@@ -308,7 +350,7 @@ public class UsarinBoss : Boss
             allBullets.Add(bullet);
         }
 
-        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
+        AudioController.PlaySound(AudioController.instance.sounds.bulletwaveShootSound);
         yield break;
     }
 
@@ -356,6 +398,7 @@ public class UsarinBoss : Boss
             bullet.atk = 10;
             bullet.lifetime = 10;
             bullet.transform.localScale = Vector3.one;
+            bullet.startOnBeat = true;
             bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteWaveBehaviour() { start = 0, end = -1 }
@@ -387,6 +430,7 @@ public class UsarinBoss : Boss
                 bullet.atk = 10;
                 bullet.lifetime = 10;
                 bullet.transform.localScale = Vector3.one;
+                bullet.startOnBeat = true;
                 bullet.behaviours = new List<BulletBehaviour>
                 {
                     new SpriteSpinBehaviour() { start = 0, end = -1 },
@@ -401,13 +445,12 @@ public class UsarinBoss : Boss
         }
         starOrbitRight = !starOrbitRight;
         starOrbitAngle += 36;
-        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
+        AudioController.PlaySound(AudioController.instance.sounds.bulletwaveShootSound);
         yield break;
     }
 
     void OnPattern3()
     {
-
         // Charge attack for 2 seconds
         if (attackBeat == 0 && isPreparingAttack)
         {
@@ -422,7 +465,7 @@ public class UsarinBoss : Boss
         if (isPreparingAttack) return; // Wait until the attack is charged;
 
         if (attackBeat == 0) orbitRight = false;
-        if ((attackBeat - 2) % 24 == 0)
+        if ((attackBeat - 2) % 24 == 0 && attackBeat > 2)
         {
             AudioController.PlaySound(AudioController.instance.sounds.bossChargeAttack);
             magicCircle.color = new Color(1, 1, 1, 0);
@@ -437,13 +480,18 @@ public class UsarinBoss : Boss
         }
         if (attackBeat % 10 == 0) // Carrot Bullets
         {
+            animator.Play("usarin_dance");
             StartCoroutine(ShootSpinningCarrots());
         }
 
         if (attackBeat % 10 == 0) FindTargetPositionAroundPlayer();
-        if (attackBeat % 10 != 0)
+        if (attackBeat % 10 != 0 && attackBeat % 10 > 1 && attackBeat % 10 < 4)
         {
             Move();
+        }
+        else
+        {
+            animator.Play("usarin_dance");
         }
 
         attackBeat++;
@@ -464,6 +512,7 @@ public class UsarinBoss : Boss
             bullet.atk = 10;
             bullet.lifetime = 30;
             bullet.transform.localScale = Vector3.one;
+            bullet.startOnBeat = true;
             bullet.behaviours = new List<BulletBehaviour>
                 {
                     new SpriteSpinBehaviour() { start = 0, end = 4 },
@@ -475,9 +524,15 @@ public class UsarinBoss : Boss
             bullets.Add(bullet);
         }
 
-        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
+        AudioController.PlaySound(AudioController.instance.sounds.bulletwaveShootSound);
 
-        yield return new WaitForSeconds(BeatManager.GetBeatDuration() * 4);
+        float time = BeatManager.GetBeatDuration() * 4f;
+        while (time > 0)
+        {
+            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            time -= Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
         Vector2 arenaPos = Map.Instance.bossArea.transform.position;
         for (int i = 0; i < 21; i++)
         {
@@ -525,6 +580,7 @@ public class UsarinBoss : Boss
             bullet.atk = 10;
             bullet.lifetime = 50;
             bullet.transform.localScale = Vector3.one;
+            bullet.startOnBeat = true;
             bullet.behaviours = new List<BulletBehaviour>
             {
                     new SpriteLookAngleBehaviour() { start = 0, end = -1 },
@@ -541,12 +597,19 @@ public class UsarinBoss : Boss
 
     private void EndAttack()
     {
+        animator.Play("usarin_normal");
         StopAllCoroutines();
         rb.velocity = Vector2.zero;
         velocity = Vector2.zero;
-        Player.TriggerCameraShake(0.4f, 0.3f);
+        Player.TriggerCameraShake(1f, 1f);
+
+        AudioController.PlaySound(AudioController.instance.sounds.bossPhaseEnd);
         foreach (Bullet b in allBullets)
         {
+            if (!b.gameObject.activeSelf) continue;
+            Coin coin = PoolManager.Get<Coin>();
+            coin.transform.position = b.transform.position;
+            coin.followPlayer = true;
             if (b.gameObject.activeSelf) b.ForceDespawn();
         }
         allBullets.Clear();
@@ -569,7 +632,6 @@ public class UsarinBoss : Boss
         } 
         else
         {
-            PoolManager.RemovePool(typeof(BulletBase));
             usarinState = UsarinBossState.Defeat;
             State = BossState.Defeat;
         }
@@ -603,12 +665,16 @@ public class UsarinBoss : Boss
         Vector3 playerPos = targetPos;
         Vector2 dir = (playerPos - transform.position).normalized;
         facingRight = dir.x > 0;
-        while (time <= BeatManager.GetBeatDuration() / 3f)
+        animator.Play("usarin_move");
+        while (time <= BeatManager.GetBeatDuration() / 2)
         {
-            velocity = dir * speed * 8;
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            
+            velocity = dir * speed * 6;
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
+        animator.Play("usarin_normal");
         AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
         Player.TriggerCameraShake(0.5f, 0.2f);
         velocity = Vector2.zero;
@@ -634,6 +700,11 @@ public class UsarinBoss : Boss
 
     public override void Die()
     {
+        foreach (Bullet b in allBullets)
+        {
+            b.ForceDespawn();
+        }
+        Player.TriggerCameraShake(2f, 0.45f);
         PoolManager.RemovePool(typeof(BulletBase));
         base.Die();
     }
@@ -641,5 +712,31 @@ public class UsarinBoss : Boss
     public override string GetName()
     {
         return "Usarin";
+    }
+    public override  IEnumerator OnBattleStart()
+    {
+        // Fade off music
+
+        BeatManager.FadeOut(1);
+        Vector3 target = (new Vector3(Player.instance.transform.position.x, Player.instance.transform.position.y, Camera.main.transform.position.z) + transform.position) / 2f;
+        target.z = -60;
+        float time = 2f;
+        while (time > 0)
+        {
+            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            Camera.main.transform.position = Vector3.MoveTowards(Camera.main.transform.position, target, Time.deltaTime * 2f);
+            time -= Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
+        Player.instance.SetCameraPos(target);
+        UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
+        UIManager.Instance.PlayerUI.SetBossBarName(GetName());
+        UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stageboss")}");
+        BeatManager.SetTrack(bossTrack);
+        BeatManager.StartTrack();
+        Map.isBossWave = true;
+        Player.instance.canDoAnything = true;
+        State = BossState.Phase1;
+        usarinState = UsarinBossState.Dance1;
     }
 }

@@ -82,6 +82,19 @@ public class Player : MonoBehaviour
 
     public float invulTime;
 
+    public GameObject Exclamation;
+    public int poisonStatus;
+
+    public bool isPoisoned()
+    {
+        return poisonStatus > 0;
+    }
+
+    public int GetPoisonDamage()
+    {
+        return poisonStatus;
+    }
+
     public Vector3 GetClosestPlayer(Vector2 pos)
     {
         if (playerClones.Count == 0) return transform.position;
@@ -142,6 +155,7 @@ public class Player : MonoBehaviour
         equippedPassiveAbilities = new List<PlayerAbility>();
         playerItems = new List<PlayerItem>();
         spriteRendererMat = Sprite.material;
+        Exclamation.SetActive(false);
         Level = 1;
         MaxExp = CalculateExpCurve(Level);
 
@@ -206,14 +220,22 @@ public class Player : MonoBehaviour
             UIManager.Instance.PlayerUI.activeCDImage.fillAmount = 0;
             activeAbility.currentCooldown = 0;
             UIManager.Instance.PlayerUI.activeCDImage.transform.position = Sprite.transform.position + new Vector3(0.7f, 0.9f, 1f);
+            HandleSprite();
             return;
         }
+        
         invulTime = Mathf.MoveTowards(invulTime, 0, Time.deltaTime);
 
         if (!isDead)
         {
             HandleInput();
         }
+        /*
+        if (Keyboard.current.f12Key.wasPressedThisFrame)
+        {
+            Player.AddSP(250);
+            UIManager.Instance.PlayerUI.UpdateSpecial();
+        }*/
         
         HandleSprite();
         HandleCamera();
@@ -226,9 +248,13 @@ public class Player : MonoBehaviour
 
         if (BeatManager.isGameBeat)
         {
-            AddSP(1);
+            if (ultimateAbility != null) AddSP(1);
+
             UIManager.Instance.PlayerUI.UpdateSpecial();
             animator.updateMode = AnimatorUpdateMode.Normal;
+            if (poisonStatus > 5) poisonStatus = 5;
+            if (poisonStatus > 0) poisonStatus--;
+            if (poisonStatus > 0) TakeDamage(GetPoisonDamage());
         }
 
         foreach (PlayerAbility ability in equippedPassiveAbilities)

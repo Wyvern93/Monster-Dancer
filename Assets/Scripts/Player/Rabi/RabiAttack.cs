@@ -60,6 +60,7 @@ public class RabiAttack : PlayerAttack
         float abilityDuration = Player.instance.abilityValues["Attack_Time"];
         while (time <= abilityDuration)
         {
+            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
             time += Time.deltaTime;
             transform.position += ((Vector3)dir * velocity * Time.deltaTime);
             yield return new WaitForEndOfFrame();

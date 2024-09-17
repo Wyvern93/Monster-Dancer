@@ -92,8 +92,10 @@ MonoBehaviour:
   enemySource: {fileID: 0}
   atk: 1
   beat: 0
+  forcedDespawn: 0
   animator: {fileID: 220885958002423677}
   angle: 0
+  startOnBeat: 0
 --- !u!95 &220885958002423677
 Animator:
   serializedVersion: 5
@@ -187,7 +189,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 3
   m_Sprite: {fileID: -1840245981, guid: 52c339b1e97119748b1c712c14e97c4e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

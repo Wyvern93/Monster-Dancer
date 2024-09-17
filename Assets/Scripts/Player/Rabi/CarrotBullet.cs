@@ -23,6 +23,7 @@ public class CarrotBullet : MonoBehaviour
 
     public void Update()
     {
+        if (GameManager.isPaused) return;
         transform.position += (Vector3)dir * 30 * Time.deltaTime;
         lifeTime -= Time.deltaTime;
         if (dir == Vector2.zero || lifeTime < 0) PoolManager.Return(gameObject, GetType());

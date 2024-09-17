@@ -34,7 +34,10 @@ public class IllusionDashAbility : PlayerAbility
     {
         return new List<Enhancement>() { new IllusionDashAbilityEnhancement() };
     }
-
+    public override bool isUltimate()
+    {
+        return false;
+    }
     public override string getID()
     {
         return "rabi.illusiondash";

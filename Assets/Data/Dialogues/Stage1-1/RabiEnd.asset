@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58bc704ff83d12c45a2f687cd32cb9c8, type: 3}
+  m_Name: RabiEnd
+  m_EditorClassIdentifier: 
+  entries:
+  - name: Rabi
+    leftSide: 1
+    text: That was so much fun! Let's do it again!
+    leftPortrait: RabiSmile
+    rightPortrait: NoPortrait
+  - name: Rabi
+    leftSide: 1
+    text: Usarin?
+    leftPortrait: RabiSurprised
+    rightPortrait: NoPortrait
+  - name: Rabi
+    leftSide: 1
+    text: She's gone...
+    leftPortrait: RabiSurprised
+    rightPortrait: NoPortrait
+  - name: Rabi
+    leftSide: 1
+    text: This seems to be more complicated than I thought.
+    leftPortrait: RabiFlustered
+    rightPortrait: NoPortrait
+  - name: Rabi
+    leftSide: 1
+    text: I guess I will have to keep dancing until I find the culprit!
+    leftPortrait: RabiSmile
+    rightPortrait: NoPortrait

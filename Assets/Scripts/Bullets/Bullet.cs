@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Bullet : MonoBehaviour
 {
@@ -20,15 +21,28 @@ public class Bullet : MonoBehaviour
     private float emission = 0;
     protected float beatScale = 1;
     public int beat;
-
+    public StunEffect stunStatus;
+    public bool forcedDespawn;
     private void Awake()
     {
+        stunStatus = new StunEffect();
         spriteRendererMat = spriteRenderer.material;
     }
     // Start is called before the first frame update
     void Start()
     {
         
+    }
+
+    public void OnStun(int time)
+    {
+        stunStatus.duration = time;
+        spriteRenderer.color = new Color(0.8f, 0.8f, 1f, 1f);
+    }
+
+    public void OnStunEnd()
+    {
+        spriteRenderer.color = Color.white;
     }
 
     public void SetSuperGrazed()
@@ -61,10 +75,18 @@ public class Bullet : MonoBehaviour
     void Update()
     {
         if (!BeatManager.isPlaying) return;
+        if (GameManager.isPaused) return;
         if (BeatManager.isGameBeat)
         {
-            OnBeat();
+            if (!stunStatus.isStunned()) OnBeat();
+
             beatScale = 1.25f;
+        }
+
+        if (BeatManager.isGameBeat && stunStatus.duration > 0)
+        {
+            if (stunStatus.duration == 1) OnStunEnd();
+            stunStatus.duration--;
         }
 
         emission -= Time.deltaTime * 3f;
@@ -72,20 +94,25 @@ public class Bullet : MonoBehaviour
         beatScale = Mathf.MoveTowards(beatScale, 1, Time.deltaTime * 2f);
         spriteRenderer.transform.localScale = Vector3.one * beatScale;
         spriteRendererMat.SetColor("_EmissionColor", new Color(1, 1, 1, emission));
-        OnBulletUpdate();
+
+        if (!stunStatus.isStunned()) OnBulletUpdate();
 
         if (!superGrazed) return;
     }
 
     public virtual void OnBulletUpdate() { }
 
+    public void OnEnable()
+    {
+        if (Map.Instance != null) SceneManager.MoveGameObjectToScene(gameObject, Map.Instance.gameObject.scene);
+    }
     public virtual void OnSpawn()
     {
         if (Map.Instance != null) Map.Instance.bulletsSpawned.Add(this);
 
         beat = 0;
         beatScale = 1;
-        circleCollider.enabled = false;
+        circleCollider.enabled = true;
         spriteRenderer.color = Color.clear;
         StartCoroutine(BulletSpawnCoroutine());
         if (BeatManager.isGameBeat) OnBeat();
@@ -111,6 +138,7 @@ public class Bullet : MonoBehaviour
 
     public virtual void Despawn()
     {
+        forcedDespawn = true;
         if (lifetime > 0)
         {
             lifetime = 0;
@@ -228,6 +256,7 @@ public class Bullet : MonoBehaviour
 
     public virtual void OnTriggerEnter2D(Collider2D collision)
     {
+        if (GameManager.isPaused) return;
         if (!BeatManager.isPlaying) return;
         if (collision.CompareTag("Player") && collision.name == "Player")
         {
@@ -238,6 +267,7 @@ public class Bullet : MonoBehaviour
     public virtual void OnTriggerStay2D(Collider2D collision)
     {
         if (!BeatManager.isPlaying) return;
+        if (GameManager.isPaused) return;
         if (!BeatManager.isGameBeat) return;
 
         if (collision.CompareTag("Player") && collision.name == "Player")

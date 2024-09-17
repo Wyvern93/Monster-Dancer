@@ -10,16 +10,20 @@ public class BulletBase : Bullet
     public float angle;
     protected float beatTime;
     public List<BulletBehaviour> behaviours;
+    public bool startOnBeat;
     public override void OnSpawn()
     {
+        forcedDespawn = false;
+        animator.speed = 1f / BeatManager.GetBeatDuration();
         if (Map.Instance != null) Map.Instance.bulletsSpawned.Add(this);
 
         angle = Vector2.SignedAngle(Vector2.down, direction) - 90;
         beat = 0;
         beatScale = 1;
-        circleCollider.enabled = false;
+        circleCollider.enabled = true;
         spriteRenderer.color = Color.clear;
         StartCoroutine(BulletSpawnCoroutine());
+        if (BeatManager.isGameBeat && startOnBeat) OnBeat();
     }
 
     public override void OnBeat()
@@ -40,15 +44,17 @@ public class BulletBase : Bullet
         float beatDuration = BeatManager.GetBeatDuration();
         beatTime = 1;
 
-        
         foreach (BulletBehaviour behaviour in behaviours)
         {
             behaviour.OnTrigger(this);
         }
-
         float time = 0;
         while (time <= beatDuration)
         {
+            while (GameManager.isPaused || stunStatus.isStunned())
+            {
+                yield return new WaitForEndOfFrame();
+            }
             float beatProgress = time / beatDuration;
             beatTime = Mathf.Lerp(1, 0f, beatProgress);
 
@@ -64,5 +70,36 @@ public class BulletBase : Bullet
         }
 
         yield break;
+    }
+
+    public override void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (GameManager.isPaused) return;
+        if (!BeatManager.isPlaying) return;
+        if (collision.CompareTag("Player") && collision.name == "Player")
+        {
+            foreach (BulletBehaviour b in behaviours)
+            {
+                b.OnPlayerHit(this);
+            }
+            if (atk > 0) Player.instance.TakeDamage(atk);
+
+        }
+    }
+
+    public override void OnTriggerStay2D(Collider2D collision)
+    {
+        if (!BeatManager.isPlaying) return;
+        if (GameManager.isPaused) return;
+        if (!BeatManager.isGameBeat) return;
+
+        if (collision.CompareTag("Player") && collision.name == "Player")
+        {
+            foreach (BulletBehaviour b in behaviours)
+            {
+                b.OnPlayerHit(this);
+            }
+            if (atk > 0) Player.instance.TakeDamage(atk);
+        }
     }
 }

@@ -67,6 +67,7 @@ public class OrbitalMoon : MonoBehaviour
 
     public void Update()
     {
+        if (GameManager.isPaused) return;
         angle += Time.deltaTime * 360f * speedmulti;
         Vector3 origin = Player.instance.transform.position;
         transform.position = new Vector3(origin.x + (2.5f * Mathf.Cos(angle * Mathf.Deg2Rad)), origin.y + (2.5f * Mathf.Sin(angle * Mathf.Deg2Rad)), origin.z + 2f);

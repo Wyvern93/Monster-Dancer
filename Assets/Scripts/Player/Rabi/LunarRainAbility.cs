@@ -35,7 +35,10 @@ public class LunarRainAbility : PlayerAbility
     {
         return "rabi.lunarrain";
     }
-
+    public override bool isUltimate()
+    {
+        return false;
+    }
     public override void OnCast()
     {
         int level = (int)Player.instance.abilityValues["ability.lunarrain.level"];
@@ -62,6 +65,6 @@ public class LunarRainAbility : PlayerAbility
 
     public override void OnUpdate()
     {
-        if (BeatManager.isGameBeat && currentCooldown > 0) currentCooldown--;
+        if (BeatManager.isGameBeat && !GameManager.isPaused && currentCooldown > 0) currentCooldown--;
     }
 }

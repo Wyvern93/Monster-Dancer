@@ -3,6 +3,7 @@ using UnityEngine;
 public class Drop : MonoBehaviour
 {
     public Animator animator;
+    public bool followPlayer;
 
     private void Awake()
     {
@@ -11,6 +12,7 @@ public class Drop : MonoBehaviour
     public void OnEnable()
     {
         Map.Instance.dropsSpawned.Add(this);
+        followPlayer = false;
     }
     public virtual void ForceDespawn()
     {

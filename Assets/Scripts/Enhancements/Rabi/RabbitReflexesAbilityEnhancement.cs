@@ -54,7 +54,7 @@ public class RabbitReflexesAbilityEnhancement : Enhancement
     public override bool isAvailable()
     {
         bool available = true;
-        if (Player.instance.equippedPassiveAbilities.Count == 3) available = false;
+        if (Player.instance.equippedPassiveAbilities.Count == 5) available = false;
         if (Player.instance.equippedPassiveAbilities.Find(x => x.getID() == "rabi.rabbitreflexes") != null)
         {
             if (Player.instance.abilityValues["ability.rabbitreflexes.level"] < 4) available = true;

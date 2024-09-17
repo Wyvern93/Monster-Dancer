@@ -34,7 +34,10 @@ public class LunarPulseAbility : PlayerAbility
     {
         return new List<Enhancement>() { new LunarPulseAbilityEnhancement() };
     }
-
+    public override bool isUltimate()
+    {
+        return false;
+    }
     public override string getID()
     {
         return "rabi.lunarpulse";

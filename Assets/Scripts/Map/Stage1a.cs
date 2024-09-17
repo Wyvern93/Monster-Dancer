@@ -117,10 +117,16 @@ public class Stage1a : Map
         Player.instance.Sprite.transform.localScale = Vector3.one;
         Camera.main.transform.position = new Vector3(Player.instance.transform.position.x, Player.instance.transform.position.y, Camera.main.transform.position.z);
         mapObjects.SetActive(false);
+        bossGrid.SetActive(false);
         bossArea.color = new Color(0, 0, 0, 0);
         bossArea.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
         bossArea.gameObject.SetActive(false);
 
+        yield return new WaitForSeconds(1f);
+
+        Dialogue dialogue = Player.instance is PlayerRabi ? rabiEndDialogue : rabiEndDialogue;
+        UIManager.Instance.dialogueMenu.Open(dialogue.entries);
+        while (!UIManager.Instance.dialogueMenu.hasFinished) yield return new WaitForEndOfFrame();
         yield return new WaitForSeconds(1f);
 
         UIManager.Instance.StageFinish.SetActive(true);
@@ -150,7 +156,7 @@ public class Stage1a : Map
         stageEvents = new List<StageTimeEvent>()
         {
             // Spawn Rates
-            /*
+            
             new ChangeSpawnRateEvent(5, 0), // start
             new ChangeSpawnRateEvent(7, 30),
             new ChangeSpawnRateEvent(9, 60),
@@ -214,7 +220,7 @@ public class Stage1a : Map
             new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 580),
             new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 585),
             new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 590),
-            new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 595),*/
+            new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 595),
 
             new SpawnBossEvent(EnemyType.Usarin, 600), // 600
 

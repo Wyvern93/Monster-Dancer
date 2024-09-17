@@ -15,7 +15,7 @@ public class SlimeDancer : Enemy
         Sprite.transform.localPosition = Vector3.zero;
         beatCD = Random.Range(1,10);
         animator.Play("slimedancer_normal");
-        animator.speed = 1f / BeatManager.GetBeatDuration() * 2;
+        animator.speed = 1f / BeatManager.GetBeatDuration();
         isAttacking = false;
     }
     protected override void OnBeat()
@@ -54,18 +54,22 @@ public class SlimeDancer : Enemy
     {
         animator.Play("slimedancer_preattack");
         BulletSpawnEffect bulletSpawnEffect = PoolManager.Get<BulletSpawnEffect>();
+        bulletSpawnEffect.source = this;
         bulletSpawnEffect.transform.position = transform.position;
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
 
         Vector2 dir = Player.instance.GetClosestPlayer(transform.position) - transform.position;
         dir.Normalize();
 
         SpawnBullet(dir, 10f, 0f);
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
         SpawnBullet(dir, 10f, 0f);
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
         SpawnBullet(dir, 10f, 0f);
-
+        bulletSpawnEffect.Despawn();
         isAttacking = false;
         animator.Play("slimedancer_normal");
         yield break;
@@ -108,6 +112,7 @@ public class SlimeDancer : Enemy
         facingRight = dir.x > 0;
         while (time <= BeatManager.GetBeatDuration() / 3f)
         {
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
             velocity = dir * speed * 8;
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();

@@ -66,6 +66,7 @@ public class CarrotFan : Enemy
         animator.Play("carrotfan_move");
         while (time <= BeatManager.GetBeatDuration() / 2)
         {
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
             velocity = dir * speed * 6;
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();

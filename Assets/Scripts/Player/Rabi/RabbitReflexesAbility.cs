@@ -35,7 +35,10 @@ public class RabbitReflexesAbility : PlayerAbility
     {
         return new List<Enhancement>() { new RabbitReflexesAbilityEnhancement() };
     }
-
+    public override bool isUltimate()
+    {
+        return false;
+    }
     public override string getID()
     {
         return "rabi.rabbitreflexes";

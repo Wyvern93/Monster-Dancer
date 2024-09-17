@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
+using UnityEngine.UIElements;
 
 public class MoonBeamAbility : PlayerAbility
 {
     public int minCooldown = 1;
     int level;
-    public MoonBeamAbility() : base(0)
+    public MoonBeamAbility() : base(14)
     {
     }
 
     public override bool CanCast()
     {
-        Debug.Log(Player.instance.CurrentSP >= Player.instance.MaxSP);
-        return Player.instance.CurrentSP >= Player.instance.MaxSP;
+        return currentCooldown == 0;
     }
 
     public override string getAbilityDescription()
@@ -37,34 +37,29 @@ public class MoonBeamAbility : PlayerAbility
     {
         return "rabi.moonbeam";
     }
-
+    public override bool isUltimate()
+    {
+        return false;
+    }
     public override void OnCast()
     {
         level = (int)Player.instance.abilityValues["ability.moonbeam.level"];
-        Player.instance.CurrentSP = 0;
-        UIManager.Instance.PlayerUI.UpdateSpecial();
-        Player.instance.StartCoroutine(UltimateCast());
-    }
+        maxCooldown = 14; //level < 4 ? level < 3 ? level < 2 ? 4 : 3 : 2 : 1;
 
-    public IEnumerator UltimateCast()
-    {
-        Camera cam = Camera.main;
+        currentCooldown = maxCooldown;
+
         PlayerRabi rabi = (PlayerRabi)Player.instance;
-        rabi.isCastingMoonBeam = true;
-        rabi.animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration());
-        rabi.animator.Play("Rabi_Ultimate");
-        rabi.isMoving = true;
-        MoonBeam moonBeam = PoolManager.Get<MoonBeam>();
-        moonBeam.transform.position = new Vector3(rabi.transform.position.x, rabi.transform.position.y + 1.5f, 10f);
-        moonBeam.transform.localEulerAngles = new Vector3(0, 0, 45f);
+        int beams = level < 5 ? 1 : 2;
+        for (int i = 0; i < beams; i++)
+        {
+            MoonBeam moonBeam = PoolManager.Get<MoonBeam>();
+            moonBeam.transform.position = new Vector3(rabi.transform.position.x, rabi.transform.position.y + 1.5f, 10f);
+            moonBeam.transform.localEulerAngles = new Vector3(0, 0, 45f);
 
-        while (moonBeam.isActiveAndEnabled) yield return new WaitForEndOfFrame();
-
-        rabi.isMoving = false;
-        rabi.animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration());
-        rabi.animator.Play("Rabi_Idle");
-        rabi.isCastingMoonBeam = false;
-        yield break;
+            Enemy e = Map.GetRandomClosebyEnemy();
+            if (e == null) moonBeam.movDir = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f));
+            else moonBeam.movDir = (e.transform.position - rabi.transform.position);
+        }
     }
 
     public override Sprite GetIcon()

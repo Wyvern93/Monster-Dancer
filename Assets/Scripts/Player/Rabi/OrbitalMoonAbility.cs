@@ -32,7 +32,10 @@ public class OrbitalMoonAbility : PlayerAbility
     {
         return IconList.instance.orbitalMoon;
     }
-
+    public override bool isUltimate()
+    {
+        return false;
+    }
     public override string getID()
     {
         return "rabi.orbitalmoon";

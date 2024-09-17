@@ -17,6 +17,7 @@ public class Boss : Enemy
         isMoving = false;
         Sprite.transform.localPosition = Vector3.zero;
         State = BossState.Introduction;// FALTA LA ANIMACION DE INTRODUCCION DEL JEFE
+        Player.instance.facingRight = transform.position.x > Player.instance.transform.position.x;
     }
 
     protected override void OnBeat()
@@ -72,7 +73,6 @@ public class Boss : Enemy
         o.SetActive(true);
 
         AudioController.PlaySound(AudioController.instance.sounds.bossDeath);
-        Player.instance.canDoAnything = false;
         Map.Instance.OnBossDeath(this);
     }
 
@@ -81,8 +81,11 @@ public class Boss : Enemy
         return "Unnamed Boss";
     }
 
-    public virtual void OnBattleStart()
+    public virtual IEnumerator OnBattleStart()
     {
+        // Fade off music
+        BeatManager.FadeOut(1);
+        yield return new WaitForSeconds(1f);
         UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
         UIManager.Instance.PlayerUI.SetBossBarName(GetName());
         UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stageboss")}");
@@ -90,5 +93,7 @@ public class Boss : Enemy
         BeatManager.StartTrack();
         Map.isBossWave = true;
         Player.instance.canDoAnything = true;
+        State = BossState.Phase1;
+        //usarinState = UsarinBossState.Dance1;
     }
 }
