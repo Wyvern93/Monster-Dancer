@@ -1,7 +1,7 @@
 using System;
 
 [Serializable]
-public abstract class CutsceneEvent
+public class CutsceneEvent
 {
 
 }

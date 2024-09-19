@@ -16,4 +16,6 @@ public class DialogueEntry : CutsceneEvent
         this.leftPortrait = leftportrait;
         this.rightPortrait = rightPortrait;
     }
+
+    public DialogueEntry() { }
 }

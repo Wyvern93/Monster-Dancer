@@ -13,7 +13,7 @@ public class CutsceneManager : MonoBehaviour
     [SerializeField] Animator leftPortrait, rightPortrait;
     [SerializeField] Image leftPortraitSpr, rightPortraitSpr;
 
-    public List<DialogueEntry> entries;
+    public List<CutsceneEvent> entries;
     private int index = 0;
 
     public bool isOpen;
@@ -25,8 +25,8 @@ public class CutsceneManager : MonoBehaviour
         group.alpha = 0;
     }
 
-    public void Open(List<DialogueEntry> dialogue)
-    {
+    public void Open(List<CutsceneEvent> dialogue)
+    {/*
         hasFinished = false;
         entries = dialogue;
         index = 0;
@@ -56,7 +56,7 @@ public class CutsceneManager : MonoBehaviour
             rightPortrait.Play(dialogue[0].rightPortrait);
         }
 
-        StartCoroutine(DialogueOpen());
+        StartCoroutine(DialogueOpen());*/
     }
 
     public void Close()
@@ -91,7 +91,7 @@ public class CutsceneManager : MonoBehaviour
     }
 
     IEnumerator DisplayDialogue(int entry)
-    {
+    {/*
         isWriting = true;
         string dialogue = entries[entry].text;
         string currentDialogue = "";
@@ -134,7 +134,8 @@ public class CutsceneManager : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         dialogueText.maxVisibleCharacters = dialogue.Length;
-        isWriting = false;
+        isWriting = false;*/
+        yield break;
     }
 
     public void Update()
@@ -146,8 +147,8 @@ public class CutsceneManager : MonoBehaviour
             {
                 StopAllCoroutines();
                 isWriting = false;
-                dialogueText.text = entries[index].text;
-                dialogueText.maxVisibleCharacters = entries[index].text.Length;
+                //dialogueText.text = entries[index].text;
+                //dialogueText.maxVisibleCharacters = entries[index].text.Length;
             }
         }
         else
