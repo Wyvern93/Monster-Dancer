@@ -461,6 +461,12 @@ public class UsarinBoss : Boss
             magicCircleVisible = true;
 
             StartCoroutine(ChargeAttack1Coroutine());
+            targetPos = Map.Instance.bossArea.transform.position + (Vector3.up * 6f);
+        }
+
+        if (transform.position != targetPos)
+        {
+            StartCoroutine(MoveToTarget());
         }
         if (isPreparingAttack) return; // Wait until the attack is charged;
 
@@ -483,7 +489,7 @@ public class UsarinBoss : Boss
             animator.Play("usarin_dance");
             StartCoroutine(ShootSpinningCarrots());
         }
-
+        /*
         if (attackBeat % 10 == 0) FindTargetPositionAroundPlayer();
         if (attackBeat % 10 != 0 && attackBeat % 10 > 1 && attackBeat % 10 < 4)
         {
@@ -492,7 +498,7 @@ public class UsarinBoss : Boss
         else
         {
             animator.Play("usarin_dance");
-        }
+        }*/
 
         attackBeat++;
     }
@@ -653,6 +659,35 @@ public class UsarinBoss : Boss
     public void Move()
     {
         StartCoroutine(MoveCoroutine());
+    }
+    IEnumerator MoveToTarget()
+    {
+        isMoving = true;
+
+        float time = 0;
+        GameObject posObj = new GameObject("objpos");
+        posObj.transform.position = targetPos;
+        Vector3 playerPos = targetPos;
+        Vector2 dir = (playerPos - transform.position).normalized;
+        facingRight = dir.x > 0;
+        animator.Play("usarin_move");
+        while (time <= BeatManager.GetBeatDuration() / 2)
+        {
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+
+            velocity = Vector2.zero;
+            transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * speed * 6);
+            time += Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
+        if (transform.position == targetPos) animator.Play("usarin_dance");
+        else animator.Play("usarin_move");
+
+        velocity = Vector2.zero;
+        Sprite.transform.localPosition = Vector3.zero;
+
+        isMoving = false;
+        yield break;
     }
 
     IEnumerator MoveCoroutine()

@@ -157,7 +157,7 @@ public class Stage1b : Map
         stageEvents = new List<StageTimeEvent>()
         {
             // Spawn Rates
-            /*
+            
             new ChangeSpawnRateEvent(7, 0), // start
             new ChangeSpawnRateEvent(7, 30),
             new ChangeSpawnRateEvent(8, 60),
@@ -227,8 +227,8 @@ public class Stage1b : Map
             new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 530),
             new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 535),
             new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 540),
-            */
-            new SpawnBossEvent(EnemyType.Nebulion, 6)
+            
+            new SpawnBossEvent(EnemyType.Nebulion, 600)
         };
     }
 }

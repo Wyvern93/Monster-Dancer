@@ -156,7 +156,7 @@ public class Stage1a : Map
         stageEvents = new List<StageTimeEvent>()
         {
             // Spawn Rates
-            
+            /*
             new ChangeSpawnRateEvent(5, 0), // start
             new ChangeSpawnRateEvent(7, 30),
             new ChangeSpawnRateEvent(9, 60),
@@ -221,8 +221,8 @@ public class Stage1a : Map
             new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 585),
             new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 590),
             new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 595),
-
-            new SpawnBossEvent(EnemyType.Usarin, 600), // 600
+            */
+            new SpawnBossEvent(EnemyType.Usarin, 6), // 600
 
         };
     }
