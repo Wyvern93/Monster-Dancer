@@ -1,7 +1,7 @@
 using System;
 
 [Serializable]
-public class DialogueEntry
+public class DialogueEntry : CutsceneEvent
 {
     public string name;
     public bool leftSide;

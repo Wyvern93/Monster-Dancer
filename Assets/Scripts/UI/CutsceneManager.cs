@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-public class DialogueMenu : MonoBehaviour
+public class CutsceneManager : MonoBehaviour
 {
     [SerializeField] CanvasGroup group;
     [SerializeField] GameObject leftNameObj, rightNameObj;
