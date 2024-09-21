@@ -64,6 +64,7 @@ public class Map : MonoBehaviour
     public SpriteRenderer bossArea;
 
     [SerializeField]protected Dialogue rabiEndDialogue;
+    [SerializeField] public Animator CutsceneAnimator;
 
     public static void ForceDespawnEnemies()
     {
@@ -150,6 +151,8 @@ public class Map : MonoBehaviour
 
         // Player can't move
         Player.instance.canDoAnything = false;
+        Player.instance.ForceDespawnAbilities(false);
+        Player.instance.ResetAbilities();
 
         Player.instance.Exclamation.SetActive(true);
         AudioController.PlaySound(AudioController.instance.sounds.surpriseSfx);
@@ -162,17 +165,6 @@ public class Map : MonoBehaviour
         Player.instance.transform.position = PlayerPositionOnBoss.position;
         Camera.main.transform.position = new Vector3(PlayerPositionOnBoss.position.x, PlayerPositionOnBoss.position.y, Camera.main.transform.position.z);
 
-        /*
-        // Move camera target to where boss is going to spawn
-        float angle, x, y;
-        while (true)
-        {
-            angle = Random.Range(0, 360f);
-            x = Player.instance.transform.position.x + (4 * Mathf.Cos(angle));
-            y = Player.instance.transform.position.y + (4 * Mathf.Sin(angle));
-            if (!isWallAt(new Vector2(Mathf.RoundToInt(x), Mathf.RoundToInt(y)))) break;
-        }
-        */
         Vector3 spawnPos = BossPosition.position; //new Vector3(Mathf.RoundToInt(x), Mathf.RoundToInt(y));
 
         UIManager.Fade(true);
@@ -274,13 +266,9 @@ public class Map : MonoBehaviour
         PoolManager.CreatePool(typeof(Gem), gemPrefab, 30);
         PoolManager.CreatePool(typeof(BulletGem), bulletgemPrefab, 100);
         PoolManager.CreatePool(typeof(Coin), coinPrefab, 50);
-        PoolManager.CreatePool(typeof(TestEnemy), enemyPrefab, 10);
-        //PoolManager.CreatePool(typeof(TestBoss), bossAPrefab, 1);
         PoolManager.CreatePool(typeof(KillEffect), killEffectPrefab, 10);
         PoolManager.CreatePool(typeof(SpawnEffect), enemySpawnPrefab, 10);
         PoolManager.CreatePool(typeof(BulletBase), bulletBasePrefab, 500);
-
-        //PoolManager.CreatePool(typeof(Bullet), bulletPrefab, 100);
         PoolManager.CreatePool(typeof(BulletSpawnEffect), bulletSpawnPrefab, 100);
     }
 
@@ -421,12 +409,9 @@ public class Map : MonoBehaviour
         PoolManager.RemovePool(typeof(Gem));
         PoolManager.RemovePool(typeof(BulletGem));
         PoolManager.RemovePool(typeof(Coin));
-        //PoolManager.RemovePool(typeof(TestEnemy));
-        //PoolManager.RemovePool(typeof(TestBoss));
         PoolManager.RemovePool(typeof(KillEffect));
         PoolManager.RemovePool(typeof(SpawnEffect));
-
-        //PoolManager.RemovePool(typeof(Bullet));
+        PoolManager.RemovePool(typeof(BulletBase));
         PoolManager.RemovePool(typeof(BulletSpawnEffect));
     }
 
@@ -653,7 +638,7 @@ public class Map : MonoBehaviour
         }
         bossGrid.SetActive(false);
         Dialogue dialogue = Player.instance is PlayerRabi ? rabiEndDialogue : rabiEndDialogue;
-        UIManager.Instance.dialogueMenu.Open(dialogue.entries);
+        UIManager.Instance.dialogueMenu.StartCutscene(dialogue.entries);
         while (!UIManager.Instance.dialogueMenu.hasFinished) yield return new WaitForEndOfFrame();
         yield return new WaitForSeconds(1f);
 

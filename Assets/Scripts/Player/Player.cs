@@ -84,6 +84,7 @@ public class Player : MonoBehaviour
 
     public GameObject Exclamation;
     public int poisonStatus;
+    public List<IDespawneable> despawneables;
 
     public bool isPoisoned()
     {
@@ -93,6 +94,30 @@ public class Player : MonoBehaviour
     public int GetPoisonDamage()
     {
         return poisonStatus;
+    }
+
+    public void ForceDespawnAbilities(bool instant)
+    {
+        foreach (IDespawneable despawneable in despawneables)
+        {
+            despawneable.ForceDespawn(instant);
+        }
+        despawneables.Clear();
+    }
+
+    public void ResetAbilities()
+    {
+        foreach (PlayerAbility ability in equippedPassiveAbilities)
+        {
+            ability.currentCooldown = 1;
+        }
+    }
+
+    public void UpdateAbilityTrack()
+    {
+        foreach (IDespawneable i in despawneables)
+        {
+        }
     }
 
     public Vector3 GetClosestPlayer(Vector2 pos)
@@ -152,6 +177,7 @@ public class Player : MonoBehaviour
     {
         instance = this;
         abilityValues = new Dictionary<string, float>();
+        despawneables = new List<IDespawneable>();
         equippedPassiveAbilities = new List<PlayerAbility>();
         playerItems = new List<PlayerItem>();
         spriteRendererMat = Sprite.material;
@@ -245,6 +271,10 @@ public class Player : MonoBehaviour
         {
             OnLevelUp();
         }
+        if (Keyboard.current.numpad2Key.wasPressedThisFrame)
+        {
+            ForceDespawnAbilities(true);
+        }
 
         if (BeatManager.isGameBeat)
         {
@@ -296,6 +326,7 @@ public class Player : MonoBehaviour
         }
         PlayerAttack atkEntity = PoolManager.Get<PlayerAttack>();
         atkEntity.Attack(direction);
+        despawneables.Add(atkEntity);
         if (direction.x < 0) facingRight = false;
         else facingRight = true;
     }

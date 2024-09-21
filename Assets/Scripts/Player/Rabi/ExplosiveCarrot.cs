@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class ExplosiveCarrot : MonoBehaviour
+public class ExplosiveCarrot : MonoBehaviour, IDespawneable
 {
     public Vector2 direction;
     public float height;
@@ -68,8 +68,14 @@ public class ExplosiveCarrot : MonoBehaviour
         CarrotExplosion carrotExplosion = PoolManager.Get<CarrotExplosion>();
         carrotExplosion.transform.position = transform.position;
         carrotExplosion.dmg = dmg;
-        
+        Player.instance.despawneables.Remove(this);
         PoolManager.Return(gameObject, GetType());
         yield return null;
+    }
+
+    public void ForceDespawn(bool instant = false)
+    {
+        StopAllCoroutines();
+        PoolManager.Return(gameObject, GetType());
     }
 }

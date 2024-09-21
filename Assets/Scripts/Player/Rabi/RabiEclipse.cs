@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class RabiEclipse : MonoBehaviour
+public class RabiEclipse : MonoBehaviour, IDespawneable
 {
     [SerializeField] AudioClip pulseSfx;
     [SerializeField] Animator animator;
@@ -36,6 +36,7 @@ public class RabiEclipse : MonoBehaviour
 
     public void OnAnimationFinish()
     {
+        Player.instance.despawneables.Remove(this);
         PoolManager.Return(gameObject, typeof(RabiEclipse));
     }
 
@@ -79,5 +80,11 @@ public class RabiEclipse : MonoBehaviour
             sfxSource.volume = Mathf.MoveTowards(sfxSource.volume, 0, (Time.deltaTime / BeatManager.GetBeatDuration()) * 4f);
         }
         time += Time.deltaTime;
+    }
+
+    public void ForceDespawn(bool instant = false)
+    {
+        StopAllCoroutines();
+        PoolManager.Return(gameObject, GetType());
     }
 }

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.U2D;
 
-public class CarrotDeliveryTruck : MonoBehaviour
+public class CarrotDeliveryTruck : MonoBehaviour, IDespawneable
 {
     public int numbeats;
     public int lap, maxlaps;
@@ -12,6 +12,8 @@ public class CarrotDeliveryTruck : MonoBehaviour
     public float cd, maxcd;
 
     [SerializeField] AudioClip shootSound;
+
+    public CarrotDeliveryAbility ability;
 
     private bool facingRight = true;
     List<float> offsets = new List<float>()
@@ -47,6 +49,7 @@ public class CarrotDeliveryTruck : MonoBehaviour
             lap++;
             if (lap >= maxlaps)
             {
+                Player.instance.despawneables.Remove(this);
                 PoolManager.Return(gameObject, GetType());
             }
             else transform.position = new Vector3(Player.instance.transform.position.x + 12, Player.instance.transform.position.y + offsets[lap], 0);
@@ -78,6 +81,8 @@ public class CarrotDeliveryTruck : MonoBehaviour
     {
         CarrotBullet carrot = PoolManager.Get<CarrotBullet>();
         carrot.transform.position = transform.position;
+        carrot.ability = ability;
+        Player.instance.despawneables.Add(carrot.GetComponent<IDespawneable>());
 
         Enemy e = Map.GetRandomEnemy();
         int attempts = 5;
@@ -118,5 +123,10 @@ public class CarrotDeliveryTruck : MonoBehaviour
             Bullet bullet = collision.GetComponent<Bullet>();
             bullet.Despawn();
         }
+    }
+
+    public void ForceDespawn(bool instant = false)
+    {
+        PoolManager.Return(gameObject, GetType());
     }
 }

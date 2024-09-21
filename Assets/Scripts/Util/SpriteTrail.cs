@@ -91,4 +91,12 @@ public class SpriteTrail : MonoBehaviour
         PoolManager.Return(sprites[0].gameObject, typeof(SpriteRenderer));
         sprites.RemoveAt(0);
     }
+
+    public void ForceDespawn()
+    {
+        foreach(SpriteRenderer s in sprites)
+        {
+            PoolManager.Return(s.gameObject, typeof(SpriteRenderer));
+        }
+    }
 }

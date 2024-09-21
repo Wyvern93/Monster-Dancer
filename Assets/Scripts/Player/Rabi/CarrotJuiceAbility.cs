@@ -55,6 +55,7 @@ public class CarrotJuiceAbility : PlayerAbility
         CarrotJuiceBottle bottle = PoolManager.Get<CarrotJuiceBottle>();
         bottle.transform.position = Player.instance.transform.position;
         bottle.Init(direction);
+        Player.instance.despawneables.Add(bottle);
     }
 
     public override void OnEquip()

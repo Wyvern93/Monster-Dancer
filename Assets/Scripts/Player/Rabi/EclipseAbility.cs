@@ -59,6 +59,7 @@ public class EclipseAbility : PlayerAbility
 
 
         RabiEclipse eclipse = PoolManager.Get<RabiEclipse>();
+        Player.instance.despawneables.Add(eclipse);
 
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
 

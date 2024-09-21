@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class MoonBeam : MonoBehaviour
+public class MoonBeam : MonoBehaviour, IDespawneable
 {
     float dotCD = 0.01f;
 
@@ -135,6 +135,14 @@ public class MoonBeam : MonoBehaviour
             FairyCage cage = collision.GetComponent<FairyCage>();
             cage.OnHit();
         }
+
+    }
+
+    public void ForceDespawn(bool instant = false)
+    {
+        StopAllCoroutines();
+        if (instant) PoolManager.Return(gameObject, GetType());
+        else OnBeamEnd();
 
     }
 }

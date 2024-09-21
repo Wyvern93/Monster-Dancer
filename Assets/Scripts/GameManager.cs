@@ -154,19 +154,11 @@ public class GameManager : MonoBehaviour
         BeatManager.StartTrack();
         UIManager.Instance.PlayerUI.ShowUI();
         isLoading = false;
-        Player.instance.transform.position = Map.Instance.startPosition.position + Vector3.left * 12f;
-        Camera.main.transform.position = new Vector3(Map.Instance.startPosition.position.x, Map.Instance.startPosition.position.y, Camera.main.transform.position.z);
-        
-        float goalPos = Map.Instance.startPosition.position.x;
-        if (Player.instance is PlayerRabi) Player.instance.animator.Play("Rabi_Move");
-        while (Player.instance.transform.position.x < goalPos)
-        {
-            Player.instance.transform.position += (Vector3.right * 4f * Time.deltaTime);
-            yield return new WaitForEndOfFrame();
-        }
-        Player.instance.canDoAnything = true;
         Player.ResetPosition();
         Player.instance.transform.position = Map.Instance.startPosition.position;
+        Camera.main.transform.position = new Vector3(Map.Instance.startPosition.position.x, Map.Instance.startPosition.position.y, Camera.main.transform.position.z);
+        Player.instance.canDoAnything = true;
+
         Player.instance.SetCameraPos(Map.Instance.startPosition.position);
         Player.instance.isMoving = false;
         if (Player.instance is PlayerRabi) Player.instance.animator.Play("Rabi_Idle");

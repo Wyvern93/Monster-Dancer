@@ -17,31 +17,45 @@ public class CutsceneManager : MonoBehaviour
     private int index = 0;
 
     public bool isOpen;
+    private bool isOpening;
     public bool hasFinished;
     private bool isWriting;
+    private bool moveToNext;
 
     public void Awake()
     {
         group.alpha = 0;
     }
 
-    public void Open(List<CutsceneEvent> dialogue)
-    {/*
+    public void StartCutscene(List<CutsceneEvent> entries)
+    {
+        moveToNext = false;
+        index = 0;
+        this.entries = entries;
         hasFinished = false;
-        entries = dialogue;
+        
+        isOpening = false;
+        isOpen = false;
+        index = 0;
+        
+    }
+
+    public void StartDialogue(DialogueEntry entry)
+    {
+        hasFinished = false;
         index = 0;
         dialogueText.text = string.Empty;
-        if (dialogue[0].leftSide)
+        if (entry.leftSide)
         {
             leftNameObj.SetActive(true);
             rightNameObj.SetActive(false);
             
             leftPortraitSpr.color = Color.white;
             
-            if (entries[0].rightPortrait == "NoPortrait") rightPortraitSpr.color = Color.clear;
+            if (entry.rightPortrait == "NoPortrait") rightPortraitSpr.color = Color.clear;
             else rightPortraitSpr.color = new Color(0.5f, 0.5f, 0.5f, 1f);
-            leftPortrait.Play(dialogue[0].leftPortrait);
-            rightPortrait.Play(dialogue[0].rightPortrait);
+            leftPortrait.Play(entry.leftPortrait);
+            rightPortrait.Play(entry.rightPortrait);
         }
         else
         {
@@ -50,13 +64,13 @@ public class CutsceneManager : MonoBehaviour
    
             leftPortraitSpr.color = new Color(0.5f, 0.5f, 0.5f, 1f);
             
-            if (entries[0].leftPortrait == "NoPortrait") leftPortraitSpr.color = Color.clear;
+            if (entry.leftPortrait == "NoPortrait") leftPortraitSpr.color = Color.clear;
             else rightPortraitSpr.color = Color.white;
-            leftPortrait.Play(dialogue[0].leftPortrait);
-            rightPortrait.Play(dialogue[0].rightPortrait);
+            leftPortrait.Play(entry.leftPortrait);
+            rightPortrait.Play(entry.rightPortrait);
         }
 
-        StartCoroutine(DialogueOpen());*/
+        StartCoroutine(DialogueOpen(entry));
     }
 
     public void Close()
@@ -64,9 +78,9 @@ public class CutsceneManager : MonoBehaviour
         StartCoroutine(DialogueClose());
     }
 
-    IEnumerator DialogueOpen()
+    IEnumerator DialogueOpen(DialogueEntry entry)
     {
-        StartCoroutine(DisplayDialogue(index));
+        StartCoroutine(DisplayDialogue(entry));
         yield return new WaitForEndOfFrame();
         while (group.alpha < 1)
         {
@@ -74,7 +88,8 @@ public class CutsceneManager : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         isOpen = true;
-        
+        isOpening = false;
+
         yield break;
     }
 
@@ -90,36 +105,35 @@ public class CutsceneManager : MonoBehaviour
         yield break;
     }
 
-    IEnumerator DisplayDialogue(int entry)
-    {/*
+    IEnumerator DisplayDialogue(DialogueEntry entry)
+    {
         isWriting = true;
-        string dialogue = entries[entry].text;
-        string currentDialogue = "";
+        string dialogue = entry.text;
 
-        if (entries[entry].leftSide)
+        if (entry.leftSide)
         {
             leftNameObj.SetActive(true);
             rightNameObj.SetActive(false);
-            leftNameText.text = entries[entry].name;
+            leftNameText.text = entry.name;
             rightNameText.text = string.Empty;
-            leftPortrait.Play(entries[index].leftPortrait);
+            leftPortrait.Play(entry.leftPortrait);
            
-            rightPortrait.Play(entries[index].rightPortrait);
+            rightPortrait.Play(entry.rightPortrait);
             leftPortraitSpr.color = Color.white;
             rightPortraitSpr.color = new Color(0.5f, 0.5f, 0.5f, 1f);
-            if (entries[index].rightPortrait == "NoPortrait") rightPortraitSpr.color = Color.clear;
+            if (entry.rightPortrait == "NoPortrait") rightPortraitSpr.color = Color.clear;
         }
         else
         {
             leftNameObj.SetActive(false);
             rightNameObj.SetActive(true);
             leftNameText.text = string.Empty;
-            rightNameText.text = entries[entry].name;
-            leftPortrait.Play(entries[index].leftPortrait);
-            rightPortrait.Play(entries[index].rightPortrait);
+            rightNameText.text = entry.name;
+            leftPortrait.Play(entry.leftPortrait);
+            rightPortrait.Play(entry.rightPortrait);
             leftPortraitSpr.color = new Color(0.5f, 0.5f, 0.5f, 1f);
             rightPortraitSpr.color = Color.white;
-            if (entries[index].leftPortrait == "NoPortrait") leftPortraitSpr.color = Color.clear;
+            if (entry.leftPortrait == "NoPortrait") leftPortraitSpr.color = Color.clear;
         }
 
         string[] words = dialogue.Split(' ');
@@ -134,32 +148,52 @@ public class CutsceneManager : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         dialogueText.maxVisibleCharacters = dialogue.Length;
-        isWriting = false;*/
+        isWriting = false;
         yield break;
     }
 
     public void Update()
     {
-        if (!isOpen) return;
-        if (isWriting)
+        if (index >= entries.Count) return;
+
+        // Read events
+        if (entries[index].GetType() == typeof(PlayAnimationEvent))
         {
-            if (Keyboard.current.spaceKey.wasPressedThisFrame || Mouse.current.leftButton.wasPressedThisFrame)
-            {
-                StopAllCoroutines();
-                isWriting = false;
-                //dialogueText.text = entries[index].text;
-                //dialogueText.maxVisibleCharacters = entries[index].text.Length;
-            }
+            Map.Instance.CutsceneAnimator.Play((entries[index] as PlayAnimationEvent).animation);
+            index++;
         }
-        else
+        else if (entries[index].GetType() == typeof(DialogueEntry))
         {
-            if (Keyboard.current.spaceKey.wasPressedThisFrame || Mouse.current.leftButton.wasPressedThisFrame)
+            if (!isOpen && !isOpening)
             {
-                index++;
-                if (index >= entries.Count) Close();
-                else
+                isOpening = true;
+                StartDialogue(entries[index] as DialogueEntry);
+                return;
+            }
+            if (moveToNext)
+            {
+                moveToNext = false;
+                StartCoroutine(DisplayDialogue(entries[index] as DialogueEntry));
+            }
+            DialogueEntry currentDialogue = entries[index] as DialogueEntry;
+            if (isWriting)
+            {
+                if (Keyboard.current.spaceKey.wasPressedThisFrame || Mouse.current.leftButton.wasPressedThisFrame)
                 {
-                    StartCoroutine(DisplayDialogue(index));
+                    group.alpha = 1;
+                    StopAllCoroutines();
+                    isWriting = false;
+                    dialogueText.text = currentDialogue.text;
+                    dialogueText.maxVisibleCharacters = currentDialogue.text.Length;
+                }
+            }
+            else
+            {
+                if (Keyboard.current.spaceKey.wasPressedThisFrame || Mouse.current.leftButton.wasPressedThisFrame)
+                {
+                    index++;
+                    if (index >= entries.Count) Close();
+                    else moveToNext = true;
                 }
             }
         }

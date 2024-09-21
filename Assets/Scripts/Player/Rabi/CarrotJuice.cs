@@ -3,7 +3,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class CarrotJuice : MonoBehaviour
+public class CarrotJuice : MonoBehaviour, IDespawneable
 {
     private int beats = 16;
     [SerializeField] Animator animator;
@@ -30,6 +30,7 @@ public class CarrotJuice : MonoBehaviour
     }
     public void OnAnimationEnd()
     {
+        Player.instance.despawneables.Remove(this);
         PoolManager.Return(gameObject, GetType());
     }
 
@@ -89,5 +90,13 @@ public class CarrotJuice : MonoBehaviour
                 enemies.Remove(collision.GetComponent<Enemy>());
             }
         }
+    }
+
+    public void ForceDespawn(bool instant = false)
+    {
+        StopAllCoroutines();
+        if (instant) PoolManager.Return(gameObject, GetType());
+        else OnDespawn();
+
     }
 }

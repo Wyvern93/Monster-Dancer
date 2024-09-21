@@ -13,62 +13,110 @@ MonoBehaviour:
   m_Name: RabiNebulionDialogue
   m_EditorClassIdentifier: 
   entries:
-  - name: Nebulion
-    leftSide: 0
-    text: Stop right there, rabbit.
-    leftPortrait: RabiSurprised
-    rightPortrait: NebulionNormal
-  - name: Rabi
-    leftSide: 1
-    text: Huh? Who are you? And where did you come from?
-    leftPortrait: RabiSurprised
-    rightPortrait: NebulionNormal
-  - name: Nebulion
-    leftSide: 0
-    text: It seems you are different from that other Rabbit.
-    leftPortrait: RabiSurprised
-    rightPortrait: NebulionNormal
-  - name: Nebulion
-    leftSide: 0
-    text: Very well, I shall introduce myself.
-    leftPortrait: RabiSurprised
-    rightPortrait: NebulionDisappointed
-  - name: Nebulion
-    leftSide: 0
-    text: My name is Nebulion, wielder of the Cosmos, I'm on my way to stop this
-      dancing spell!
-    leftPortrait: RabiSurprised
-    rightPortrait: NebulionSmug
-  - name: Rabi
-    leftSide: 1
-    text: What a weird name, I never heard of you.
-    leftPortrait: RabiSmug
-    rightPortrait: NebulionAngry
-  - name: Nebulion
-    leftSide: 0
-    text: Hahaha, a small existance like you who never left the forest wouldn't know
-      of someone like me.
-    leftPortrait: RabiSurprised
-    rightPortrait: NebulionSmug
-  - name: Nebulion
-    leftSide: 0
-    text: I'm as powerful as a god! If it wasn't because of this dancing...! I can't
-      properly use my magic!
-    leftPortrait: RabiSurprised
-    rightPortrait: NebulionAngry
-  - name: Rabi
-    leftSide: 1
-    text: I don't know what you are talking about, a god? What are you, a kiddo?
-      Hahaha.
-    leftPortrait: RabiSmirk
-    rightPortrait: NebulionNormal
-  - name: Nebulion
-    leftSide: 0
-    text: I shall teach you the difference between me and your miserable existence!
-    leftPortrait: RabiSmirk
-    rightPortrait: NebulionAngry
-  - name: Rabi
-    leftSide: 1
-    text: Bring it on! I will make you spit what you know of this endless dancing!
-    leftPortrait: RabiSmirk
-    rightPortrait: NebulionAngry
+  - rid: 4183682867992723522
+  - rid: 4183682867992723524
+  - rid: 4183682867992723526
+  - rid: 4183682867992723528
+  - rid: 4183682867992723530
+  - rid: 4183682867992723532
+  - rid: 4183682867992723534
+  - rid: 4183682867992723536
+  - rid: 4183682867992723538
+  - rid: 4183682867992723540
+  - rid: 4183682867992723542
+  references:
+    version: 2
+    RefIds:
+    - rid: 4183682867992723522
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Nebulion
+        leftSide: 0
+        text: Stop right there, rabbit!
+        leftPortrait: RabiSurprised
+        rightPortrait: NebulionNormal
+    - rid: 4183682867992723524
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Rabi
+        leftSide: 1
+        text: Whoah, where did you come from?
+        leftPortrait: RabiSurprised
+        rightPortrait: NebulionNormal
+    - rid: 4183682867992723526
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Hmm, it seems you are different from that other Rabbit
+        leftSide: 0
+        text: Very well, I shall introduce myself.
+        leftPortrait: RabiSurprised
+        rightPortrait: NebulionDisappointed
+    - rid: 4183682867992723528
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Nebulion
+        leftSide: 0
+        text: My name is Nebulion, wielder of the Cosmos, I'm on my way to stop this
+          dancing spell.
+        leftPortrait: RabiSurprised
+        rightPortrait: NebulionSmug
+    - rid: 4183682867992723530
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Rabi
+        leftSide: 1
+        text: What a weird name, I never heard of you
+        leftPortrait: RabiSmug
+        rightPortrait: NebulionAngry
+    - rid: 4183682867992723532
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Nebulion
+        leftSide: 0
+        text: Hahaha, not a surprise coming from a forest resident.
+        leftPortrait: RabiSurprised
+        rightPortrait: NebulionSmug
+    - rid: 4183682867992723534
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Nebulion
+        leftSide: 0
+        text: I'm as powerful as a god! If it wasn't because of this dancing...!
+          I can't properly use my magic!
+        leftPortrait: RabiSurprised
+        rightPortrait: NebulionAngry
+    - rid: 4183682867992723536
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Rabi
+        leftSide: 1
+        text: Huh? A god? What are you talking about? Hahaha
+        leftPortrait: RabiSmirk
+        rightPortrait: NebulionNormal
+    - rid: 4183682867992723538
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Nebulion
+        leftSide: 0
+        text: Tsk, it seems I should teach you the difference between you and someone
+          like me.
+        leftPortrait: RabiSmirk
+        rightPortrait: NebulionAngry
+    - rid: 4183682867992723540
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Nebulion
+        leftSide: 0
+        text: Even if I can't properly use my magic now, I'm more than powerful enough
+          to deal with someone like you.
+        leftPortrait: RabiSmile
+        rightPortrait: NebulionAngry
+    - rid: 4183682867992723542
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Rabi
+        leftSide: 1
+        text: Bring it on! I will make you spit what you know about this endless
+          dancing!
+        leftPortrait: RabiSmirk
+        rightPortrait: NebulionAngry

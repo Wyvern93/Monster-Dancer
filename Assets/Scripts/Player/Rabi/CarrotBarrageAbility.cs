@@ -103,6 +103,7 @@ public class CarrotBarrageAbility : PlayerAbility
         ExplosiveCarrot carrot = PoolManager.Get<ExplosiveCarrot>();
         carrot.transform.position = Player.instance.transform.position;
         carrot.Init(direction);
+        Player.instance.despawneables.Add(carrot.GetComponent<IDespawneable>());
     }
 
     public override void OnEquip()

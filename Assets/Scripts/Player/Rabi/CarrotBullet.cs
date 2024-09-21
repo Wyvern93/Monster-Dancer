@@ -1,7 +1,8 @@
 using UnityEngine;
 
-public class CarrotBullet : MonoBehaviour
+public class CarrotBullet : MonoBehaviour, IDespawneable
 {
+    public CarrotDeliveryAbility ability;
     int level, dmg;
 
     Vector2 dir;
@@ -26,7 +27,12 @@ public class CarrotBullet : MonoBehaviour
         if (GameManager.isPaused) return;
         transform.position += (Vector3)dir * 30 * Time.deltaTime;
         lifeTime -= Time.deltaTime;
-        if (dir == Vector2.zero || lifeTime < 0) PoolManager.Return(gameObject, GetType());
+        if (dir == Vector2.zero || lifeTime < 0)
+        {
+            Player.instance.despawneables.Remove(this);
+            PoolManager.Return(gameObject, GetType());
+        }
+        
     }
 
     public void OnTriggerEnter2D(Collider2D collision)
@@ -40,7 +46,13 @@ public class CarrotBullet : MonoBehaviour
             if (isCritical) damage *= Player.instance.currentStats.CritDmg;
 
             enemy.TakeDamage((int)damage, isCritical);
+            Player.instance.despawneables.Remove(this);
             PoolManager.Return(gameObject, GetType());
         }
+    }
+
+    public void ForceDespawn(bool instant = false)
+    {
+        PoolManager.Return(gameObject, GetType());
     }
 }

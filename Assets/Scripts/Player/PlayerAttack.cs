@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
-public class PlayerAttack : MonoBehaviour
+public class PlayerAttack : MonoBehaviour, IDespawneable
 {
     [SerializeField] protected SpriteRenderer spr_renderer;
     [SerializeField] protected BoxCollider2D boxCollider;
@@ -36,5 +36,10 @@ public class PlayerAttack : MonoBehaviour
 
             enemy.TakeDamage((int)damage, isCritical);
         }
+    }
+
+    public void ForceDespawn(bool instant = false)
+    {
+        PoolManager.Return(gameObject, GetType());
     }
 }

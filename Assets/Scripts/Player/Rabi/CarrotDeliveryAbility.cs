@@ -58,6 +58,8 @@ public class CarrotDeliveryAbility : PlayerAbility
         AudioController.PlaySound(AudioController.instance.sounds.playerSpecialUseSfx);
         Player.TriggerCameraShake(3f, 1f);
         CarrotDeliveryTruck truck = PoolManager.Get<CarrotDeliveryTruck>();
+        truck.ability = this;
+        Player.instance.despawneables.Add(truck);
 
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
 

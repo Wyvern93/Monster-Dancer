@@ -55,6 +55,7 @@ public class MoonBeamAbility : PlayerAbility
             MoonBeam moonBeam = PoolManager.Get<MoonBeam>();
             moonBeam.transform.position = new Vector3(rabi.transform.position.x, rabi.transform.position.y + 1.5f, 10f);
             moonBeam.transform.localEulerAngles = new Vector3(0, 0, 45f);
+            Player.instance.despawneables.Add(moonBeam);
 
             Enemy e = Map.GetRandomClosebyEnemy();
             if (e == null) moonBeam.movDir = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f));

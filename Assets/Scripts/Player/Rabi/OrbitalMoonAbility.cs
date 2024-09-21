@@ -42,16 +42,7 @@ public class OrbitalMoonAbility : PlayerAbility
     }
 
     public override void OnCast()
-    {/*
-        case 1: return "<color=\"green\">2</color> moons orbit Rabi that deal damage and have a chance to block projectiles";
-        case 2: return "Increase damage by <color=\"green\">20%</color>";
-        case 3: return "Spins <color=\"green\">25%</color> faster and orbits for<color=\"green\">2s->5s</color>";
-        case 4: return "Increase damage by <color=\"green\">30%</color>";
-        case 5: return "Adds a <color=\"green\">third</color> moon";
-        case 6: return "Moons have a <color=\"green\">10->25%</color> chance to destroy projectiles";
-        case 7:
-            return "Add small knockback on hit";
-        */
+    {
 
         int level = (int)Player.instance.abilityValues["ability.orbitalmoon.level"];
         if (level >= 7)
@@ -76,6 +67,7 @@ public class OrbitalMoonAbility : PlayerAbility
     public void SpawnMoon(float angle)
     {
         OrbitalMoon moon = PoolManager.Get<OrbitalMoon>();
+        Player.instance.despawneables.Add(moon);
         moon.angle = angle;
     }
 

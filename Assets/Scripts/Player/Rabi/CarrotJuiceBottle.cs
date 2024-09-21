@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class CarrotJuiceBottle : MonoBehaviour
+public class CarrotJuiceBottle : MonoBehaviour, IDespawneable
 {
     public Vector2 direction;
     public float height;
@@ -9,6 +9,8 @@ public class CarrotJuiceBottle : MonoBehaviour
 
     [SerializeField] SpriteRenderer bottleSpr;
     [SerializeField] AudioSource spinSource;
+
+    public CarrotJuiceAbility ability;
 
     public void Init(Vector2 dir)
     {
@@ -43,8 +45,16 @@ public class CarrotJuiceBottle : MonoBehaviour
 
         CarrotJuice carrotJuice = PoolManager.Get<CarrotJuice>();
         carrotJuice.transform.position = transform.position;
-        
+        Player.instance.despawneables.Add(carrotJuice.GetComponent<IDespawneable>());
+
+        Player.instance.despawneables.Remove(this);
         PoolManager.Return(gameObject, GetType());
         yield return null;
+    }
+
+    public void ForceDespawn(bool instant = false)
+    {
+        StopAllCoroutines();
+        PoolManager.Return(gameObject, GetType());
     }
 }

@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class OrbitalMoon : MonoBehaviour
+public class OrbitalMoon : MonoBehaviour, IDespawneable
 {
     [SerializeField] SpriteTrail trail;
     [SerializeField] SpriteRenderer sprite;
@@ -101,7 +101,15 @@ public class OrbitalMoon : MonoBehaviour
             sprite.color = Color.Lerp(sprite.color, new Color(1, 1, 1, 0), Time.deltaTime * 2f);
             yield return new WaitForEndOfFrame();
         }
+        Player.instance.despawneables.Remove(this);
         PoolManager.Return(gameObject, GetType());
     }
 
+    public void ForceDespawn(bool instant = false)
+    {
+        trail.Stop();
+        trail.ForceDespawn();
+        StopAllCoroutines();
+        PoolManager.Return(gameObject, GetType());
+    }
 }

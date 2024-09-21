@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
-public class RabiAttack : PlayerAttack
+public class RabiAttack : PlayerAttack, IDespawneable
 {
     [SerializeField] AudioClip attackSound;
     [SerializeField] Animator animator;
@@ -120,13 +120,6 @@ public class RabiAttack : PlayerAttack
 
     public override void OnTriggerEnter2D(Collider2D collision)
     {
-        if (pierce <= 0)
-        {
-            Player.instance.isPerformingAction = false;
-            PoolManager.Return(gameObject, GetType());
-            return;
-        }
-        
         if (collision.CompareTag("Enemy"))
         {
             Enemy enemy = collision.GetComponent<Enemy>();
@@ -149,5 +142,19 @@ public class RabiAttack : PlayerAttack
             cage.OnHit();
             pierce--;
         }
+
+        if (pierce <= 0)
+        {
+            Player.instance.isPerformingAction = false;
+            Player.instance.despawneables.Remove(this);
+            PoolManager.Return(gameObject, GetType());
+            return;
+        }
+    }
+
+    public void ForceDespawn()
+    {
+        StopAllCoroutines();
+        PoolManager.Return(gameObject, GetType());
     }
 }

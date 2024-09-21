@@ -17,9 +17,8 @@ public class CutsceneEventInspector : Editor
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
-
+        EditorGUI.BeginChangeCheck();
         EditorGUILayout.LabelField("Cutscene Events", EditorStyles.boldLabel);
-
         // Iterate over each event in the list
         for (int i = 0; i < cutsceneEvents.arraySize; i++)
         {
@@ -27,20 +26,28 @@ public class CutsceneEventInspector : Editor
             CutsceneEvent cutsceneEvent = dialogue.entries[i];
 
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-
+            
             // Display the type of the event and handle specific types
             if (cutsceneEvent is DialogueEntry dialogueEntry)
             {
-                dialogueEntry.name = EditorGUILayout.TextField("Speaker Name", dialogueEntry.name);
-                dialogueEntry.leftPortrait = EditorGUILayout.TextField("Left Portrait", dialogueEntry.leftPortrait);
-                dialogueEntry.rightPortrait = EditorGUILayout.TextField("Right Portrait", dialogueEntry.rightPortrait);
+                EditorGUILayout.PropertyField(eventProperty, true);
+                /*
+                dialogueEntry.name = EditorGUILayout.TextField("Name", dialogueEntry.name);
+                dialogueEntry.leftSide = EditorGUILayout.Toggle("LeftSide", dialogueEntry.leftSide);
+                
                 dialogueEntry.text = EditorGUILayout.TextField("Dialogue Text", dialogueEntry.text);
+                dialogueEntry.leftPortrait = EditorGUILayout.TextField("Left Portrait", dialogueEntry.leftPortrait);
+                dialogueEntry.rightPortrait = EditorGUILayout.TextField("Right Portrait", dialogueEntry.rightPortrait);*/
             }
             else if (cutsceneEvent is PlayAnimationEvent playAnimation)
             {
-                playAnimation.animation = EditorGUILayout.TextField("Animation Name", playAnimation.animation);
+                //playAnimation.animation = EditorGUILayout.TextField("Animation Name", playAnimation.animation);
+                EditorGUILayout.PropertyField(eventProperty, true);
             }
-
+            if (GUILayout.Button("Add New Event"))
+            {
+                ShowAddEventMenuHere(i);
+            }
             // Remove button
             if (GUILayout.Button("Remove Event"))
             {
@@ -48,6 +55,7 @@ public class CutsceneEventInspector : Editor
             }
 
             EditorGUILayout.EndVertical();
+            eventProperty.serializedObject.ApplyModifiedProperties();
         }
 
         // Add new event
@@ -55,7 +63,6 @@ public class CutsceneEventInspector : Editor
         {
             ShowAddEventMenu();
         }
-
         serializedObject.ApplyModifiedProperties();
     }
 
@@ -64,6 +71,14 @@ public class CutsceneEventInspector : Editor
         GenericMenu menu = new GenericMenu();
         menu.AddItem(new GUIContent("Dialogue Entry"), false, () => AddNewEvent(typeof(DialogueEntry)));
         menu.AddItem(new GUIContent("Play Animation"), false, () => AddNewEvent(typeof(PlayAnimationEvent)));
+        menu.ShowAsContext();
+    }
+
+    void ShowAddEventMenuHere(int index)
+    {
+        GenericMenu menu = new GenericMenu();
+        menu.AddItem(new GUIContent("Dialogue Entry"), false, () => AddNewEventHere(index, typeof(DialogueEntry)));
+        menu.AddItem(new GUIContent("Play Animation"), false, () => AddNewEventHere(index, typeof(PlayAnimationEvent)));
         menu.ShowAsContext();
     }
 
@@ -79,6 +94,20 @@ public class CutsceneEventInspector : Editor
         SerializedProperty newEventProperty = cutsceneEvents.GetArrayElementAtIndex(cutsceneEvents.arraySize - 1);
         //fieldInfo.SetValue(currentProperty.serializedObject.targetObject, new List<QuestStep>() { new KillStep() });
         newEventProperty.managedReferenceValue = System.Activator.CreateInstance(dialogue.entries[dialogue.entries.Count - 1].GetType());
+        serializedObject.ApplyModifiedProperties();
+    }
+    void AddNewEventHere(int index, System.Type eventType)
+    {
+        CutsceneEvent ev;
+        if (eventType == typeof(DialogueEntry)) ev = new DialogueEntry();
+        else if (eventType == typeof(PlayAnimationEvent)) ev = new PlayAnimationEvent();
+        else ev = new DialogueEntry();
+
+        dialogue.entries.Add(ev);
+        cutsceneEvents.InsertArrayElementAtIndex(index);
+        SerializedProperty newEventProperty = cutsceneEvents.GetArrayElementAtIndex(index - 1);
+        //fieldInfo.SetValue(currentProperty.serializedObject.targetObject, new List<QuestStep>() { new KillStep() });
+        newEventProperty.managedReferenceValue = System.Activator.CreateInstance(dialogue.entries[index - 1].GetType());
         serializedObject.ApplyModifiedProperties();
     }
 }

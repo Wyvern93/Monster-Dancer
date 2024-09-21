@@ -12,7 +12,6 @@ public abstract class PlayerAbility
         maxCooldown = maxCD;
         currentCooldown = 0;
     }
-
     public abstract bool isUltimate();
     public abstract Sprite GetIcon();
     public abstract void OnUpdate();

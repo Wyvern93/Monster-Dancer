@@ -442,6 +442,7 @@ public class PlayerRabi : Player
             PlayerAttack atkEntity = PoolManager.Get<RabiAttack>();
             atkEntity.Attack(direction);
             atkEntity.transform.localScale = Vector3.one * abilityValues["Attack_Size"];
+            despawneables.Add(atkEntity);
             remainingAttacks--;
             yield return new WaitForSeconds(attackduration);
         }

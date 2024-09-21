@@ -70,6 +70,7 @@ public class UsarinBoss : Boss
         
         animator.speed = 1f;
         transform.localScale = Vector3.one * 2f;
+        CurrentHP = 10;
     }
 
     public override void OnIntroductionFinish()
@@ -77,9 +78,11 @@ public class UsarinBoss : Boss
         base.OnIntroductionFinish();
         animator.Play("usarin_normal");
         animator.speed = 1f / BeatManager.GetBeatDuration();
-        State = BossState.Dialogue;
+        
         Dialogue dialogue = Player.instance is PlayerRabi ? rabiDialogue : rabiDialogue;
-        UIManager.Instance.dialogueMenu.Open(dialogue.entries);
+        UIManager.Instance.dialogueMenu.StartCutscene(dialogue.entries);
+
+        State = BossState.Dialogue;
     }
 
     private void FindTargetPositionAroundPlayer()
@@ -127,6 +130,7 @@ public class UsarinBoss : Boss
                 {
                     State = BossState.Phase4;
                     StartCoroutine(OnBattleStart());
+                    UIManager.Instance.dialogueMenu.hasFinished = false;
                 }
                 break;
             case BossState.Phase1:
@@ -740,7 +744,6 @@ public class UsarinBoss : Boss
             b.ForceDespawn();
         }
         Player.TriggerCameraShake(2f, 0.45f);
-        PoolManager.RemovePool(typeof(BulletBase));
         base.Die();
     }
 
