@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: RabiNebulionDialogue
   m_EditorClassIdentifier: 
   entries:
-  - rid: 4183682867992723522
+  - rid: 4183682912879116378
   - rid: 4183682867992723524
   - rid: 4183682867992723526
+  - rid: 4183682912879116296
   - rid: 4183682867992723528
   - rid: 4183682867992723530
   - rid: 4183682867992723532
@@ -27,14 +28,6 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 4183682867992723522
-      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
-      data:
-        name: Nebulion
-        leftSide: 0
-        text: Stop right there, rabbit!
-        leftPortrait: RabiSurprised
-        rightPortrait: NebulionNormal
     - rid: 4183682867992723524
       type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
       data:
@@ -46,9 +39,9 @@ MonoBehaviour:
     - rid: 4183682867992723526
       type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
       data:
-        name: Hmm, it seems you are different from that other Rabbit
+        name: Nebulion
         leftSide: 0
-        text: Very well, I shall introduce myself.
+        text: Hmm, it seems you are different from that other Rabbit
         leftPortrait: RabiSurprised
         rightPortrait: NebulionDisappointed
     - rid: 4183682867992723528
@@ -65,8 +58,8 @@ MonoBehaviour:
       data:
         name: Rabi
         leftSide: 1
-        text: What a weird name, I never heard of you
-        leftPortrait: RabiSmug
+        text: What a weird name, I never heard of you.
+        leftPortrait: RabiSmirk
         rightPortrait: NebulionAngry
     - rid: 4183682867992723532
       type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
@@ -120,3 +113,19 @@ MonoBehaviour:
           dancing!
         leftPortrait: RabiSmirk
         rightPortrait: NebulionAngry
+    - rid: 4183682912879116296
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Nebulion
+        leftSide: 0
+        text: Very well, I shall introduce myself.
+        leftPortrait: RabiSurprised
+        rightPortrait: NebulionNormal
+    - rid: 4183682912879116378
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Nebulion
+        leftSide: 0
+        text: Stop right there, rabbit!
+        leftPortrait: RabiSurprised
+        rightPortrait: NebulionNormal

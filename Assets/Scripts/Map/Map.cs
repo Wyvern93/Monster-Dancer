@@ -186,7 +186,7 @@ public class Map : MonoBehaviour
         enemy.SpawnIndex = 0;
         enemy.transform.position = spawnPos;
         enemy.OnSpawn();
-
+        Player.instance.Exclamation.SetActive(false);
         // 2 seconds
         bossArea.gameObject.SetActive(true);
         bossArea.color = new Color(1, 1, 1, 0);
@@ -460,7 +460,6 @@ public class Map : MonoBehaviour
         yield return new WaitForSeconds(BeatManager.GetBeatDuration() * 2);
         AudioController.PlaySound(AudioController.instance.sounds.warningWaveSound);
         yield return new WaitForSeconds(BeatManager.GetBeatDuration() * 2);
-        PoolManager.Return(spawnEffect.gameObject, typeof(SpawnEffect));
 
         Enemy enemy = Enemy.GetEnemyOfType(spawnData.enemyType);
         enemy.AItype = spawnData.AItype;

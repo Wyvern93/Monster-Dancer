@@ -52,6 +52,7 @@ public class AudioController : MonoBehaviour
         if (instance.clipsPlaying.Contains(sound)) return;
         instance.clipsPlaying.Add(sound);
 
+        //if (sound.name == instance.sounds.enemyHurtSound.name || sound.name == "rabi_attack") return;
         if (pitch == 1)
         {
             instance.sfx.pitch = pitch;

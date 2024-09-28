@@ -45,6 +45,7 @@ public class NomSlimeElite : Enemy
             bullet.lifetime = 6;
             bullet.transform.localScale = Vector3.one;
             bullet.startOnBeat = true;
+            bullet.enemySource = this;
             bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteLookAngleBehaviour() { start = 0, end = -1 }

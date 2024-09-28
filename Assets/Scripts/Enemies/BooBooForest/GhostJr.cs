@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GhostJr : Enemy
@@ -22,8 +23,12 @@ public class GhostJr : Enemy
         if (isAttacking) return;
         if (beatCD == 0)
         {
-            isAttacking = true;
-            ShootBullets();
+            if (isCloseEnoughToShoot())
+            {
+                isAttacking = true;
+                ShootBullets();
+                AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
+            }
             beatCD = 10;
         }
         else if (CanMove())
@@ -63,16 +68,22 @@ public class GhostJr : Enemy
 
     private void SpawnBullet(Vector2 dir, float speed, float dist)
     {
-        GhostBullet bullet = PoolManager.Get<GhostBullet>();
-        bullet.transform.position = transform.position + (Vector3)(dir * dist) + (Vector3.one * 0.5f);
+        BulletBase bullet = PoolManager.Get<BulletBase>();
+
+        bullet.transform.position = transform.position + (Vector3.up * 0.3f);
         bullet.direction = dir;
-        bullet.origSpeed = speed;
-        bullet.speed = speed;
-        bullet.enemySource = this;
-        bullet.atk = atk / 4;
+        bullet.speed = 8;
+        bullet.atk = 5;
         bullet.lifetime = 10;
-        bullet.canMove = true;
         bullet.transform.localScale = Vector3.one;
+        bullet.startOnBeat = true;
+        bullet.enemySource = this;
+        bullet.behaviours = new List<BulletBehaviour>
+            {
+                new SpriteLookAngleBehaviour() { start = 0, end = -1 },
+                new ZigZagBehaviour() { start = 0, end= -1, triggerOnce = false }
+            };
+        bullet.animator.Play("ghostbullet");
         bullet.OnSpawn();
     }
 

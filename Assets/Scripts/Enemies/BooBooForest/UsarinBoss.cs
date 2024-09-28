@@ -70,7 +70,6 @@ public class UsarinBoss : Boss
         
         animator.speed = 1f;
         transform.localScale = Vector3.one * 2f;
-        CurrentHP = 10;
     }
 
     public override void OnIntroductionFinish()
@@ -179,43 +178,6 @@ public class UsarinBoss : Boss
         yield break;
     }
 
-    public void SpawnBunnies(Vector3 position)
-    {
-        List<NomSlime> wave = new List<NomSlime>();
-        // Spawn Bunnies
-        for (int i = 0; i < 5; i++)
-        {
-            float angle = (360 / 5) * i;
-
-            Vector3 pos = position + new Vector3(1.5f * (Mathf.Cos(angle * Mathf.Deg2Rad)), 1.5f * (Mathf.Sin(angle * Mathf.Deg2Rad)));
-            NomSlime nomSlime = (NomSlime)GetEnemyOfType(EnemyType.NomSlime);
-            nomSlime.OnSpawn();
-            nomSlime.AItype = 1;
-
-            nomSlime.MaxHP = 2000;
-            nomSlime.CurrentHP = 2000;
-            nomSlime.transform.position = pos;
-
-
-            wave.Add(nomSlime);
-            allEnemies.Add(nomSlime);
-
-            SmokeExplosion smokeExplosion = PoolManager.Get<SmokeExplosion>();
-            smokeExplosion.transform.position = pos;
-        }
-        Vector3 playerPos = Player.instance.GetClosestPlayer(position);
-        // Send them
-        foreach (Enemy enemy in wave)
-        {
-            Vector2 dir = (playerPos - enemy.transform.position).normalized;
-            enemy.AItype = 2;
-            enemy.lifeTime = 10;
-            enemy.eventMove = dir;
-        }
-
-        
-    }
-
     void OnPattern1()
     {
         // Charge attack for 2 seconds
@@ -282,6 +244,7 @@ public class UsarinBoss : Boss
             bullet.lifetime = 8;
             bullet.transform.localScale = Vector3.one;
             bullet.startOnBeat = false;
+            bullet.enemySource = this;
             bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteLookAngleBehaviour() { start = 0, end = -1 },
@@ -343,6 +306,7 @@ public class UsarinBoss : Boss
             bullet.lifetime = 10;
             bullet.transform.localScale = Vector3.one;
             bullet.startOnBeat = true;
+            bullet.enemySource = this;
             bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpeedOverTimeBehaviour() { speedPerBeat = 1, start = 0, end = 3, targetSpeed = 6 },
@@ -403,6 +367,7 @@ public class UsarinBoss : Boss
             bullet.lifetime = 10;
             bullet.transform.localScale = Vector3.one;
             bullet.startOnBeat = true;
+            bullet.enemySource = this;
             bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteWaveBehaviour() { start = 0, end = -1 }
@@ -435,6 +400,7 @@ public class UsarinBoss : Boss
                 bullet.lifetime = 10;
                 bullet.transform.localScale = Vector3.one;
                 bullet.startOnBeat = true;
+                bullet.enemySource = this;
                 bullet.behaviours = new List<BulletBehaviour>
                 {
                     new SpriteSpinBehaviour() { start = 0, end = -1 },
@@ -523,6 +489,7 @@ public class UsarinBoss : Boss
             bullet.lifetime = 30;
             bullet.transform.localScale = Vector3.one;
             bullet.startOnBeat = true;
+            bullet.enemySource = this;
             bullet.behaviours = new List<BulletBehaviour>
                 {
                     new SpriteSpinBehaviour() { start = 0, end = 4 },
@@ -591,6 +558,7 @@ public class UsarinBoss : Boss
             bullet.lifetime = 50;
             bullet.transform.localScale = Vector3.one;
             bullet.startOnBeat = true;
+            bullet.enemySource = this;
             bullet.behaviours = new List<BulletBehaviour>
             {
                     new SpriteLookAngleBehaviour() { start = 0, end = -1 },

@@ -12,6 +12,8 @@ public class Player : MonoBehaviour
     public static Player instance;
     public bool isPerformingAction;
 
+    public Sprite icon;
+    public string charactername = "SHIKAMI RABI";
     public Animator animator;
 
     protected Vector2 direction, oldDir;
@@ -176,6 +178,7 @@ public class Player : MonoBehaviour
     protected virtual void Awake()
     {
         instance = this;
+        UIManager.Instance.PlayerUI.SetPlayerCharacter(icon, charactername);
         abilityValues = new Dictionary<string, float>();
         despawneables = new List<IDespawneable>();
         equippedPassiveAbilities = new List<PlayerAbility>();

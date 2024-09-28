@@ -97,7 +97,6 @@ public class NebulionBoss : Boss
         animator.Play("nebulion_intro");
         animator.speed = 1;
         transform.localScale = Vector3.one * 2f;
-        CurrentHP = 10;
     }
 
     public override void OnIntroductionFinish()
@@ -346,6 +345,7 @@ public class NebulionBoss : Boss
         bullet.lifetime = 12;
         bullet.transform.localScale = Vector3.one;
         bullet.startOnBeat = true;
+        bullet.enemySource = this;
         bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteLookAngleBehaviour() { start = 0, end = -1 },
@@ -371,6 +371,7 @@ public class NebulionBoss : Boss
         bullet.lifetime = 6;
         bullet.transform.localScale = Vector3.one;
         bullet.startOnBeat = true;
+        bullet.enemySource = this;
         bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteSpinBehaviour() { start = 0, end = -1 },
@@ -396,6 +397,7 @@ public class NebulionBoss : Boss
             bullet.speed = 2f;
             bullet.atk = 1;
             bullet.lifetime = 20;
+            bullet.enemySource = this;
             bullet.transform.localScale = Vector3.one;
             bullet.startOnBeat = true;
             bullet.behaviours = new List<BulletBehaviour>
@@ -427,6 +429,7 @@ public class NebulionBoss : Boss
             bullet.lifetime = 20;
             bullet.transform.localScale = Vector3.one;
             bullet.startOnBeat = true;
+            bullet.enemySource = this;
             bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteSpinBehaviour() { start = 0, end = -1 },
@@ -518,6 +521,7 @@ public class NebulionBoss : Boss
         bullet.lifetime = 10;
         bullet.transform.localScale = Vector3.one;
         bullet.startOnBeat = true;
+        bullet.enemySource = this;
         bullet.behaviours = new List<BulletBehaviour>
             {
                 new HomingToPlayerBehaviour(Player.instance.gameObject) { start = 0, end = -1},
@@ -671,6 +675,7 @@ public class NebulionBoss : Boss
         bullet.lifetime = 12;
         bullet.transform.localScale = Vector3.one;
         bullet.startOnBeat = true;
+        bullet.enemySource = this;
         bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteLookAngleBehaviour() { start = 0, end = -1 },
@@ -788,6 +793,7 @@ public class NebulionBoss : Boss
         bullet.lifetime = 10;
         bullet.transform.localScale = Vector3.one;
         bullet.startOnBeat = false;
+        bullet.enemySource = this;
         bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpeedOverTimeBehaviour() {start = 0, end = -1, speedPerBeat = 0.25f, targetSpeed = 1f },

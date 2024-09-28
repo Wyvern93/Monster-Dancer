@@ -3,9 +3,10 @@ using UnityEngine;
 public class BulletBehaviour
 {
     public int start, end;
+    public bool triggerOnce = true;
     public void OnTrigger(BulletBase bullet)
     {
-        if (bullet.beat != start) return;
+        if (bullet.beat != start && triggerOnce) return;
         TriggerBehaviour(bullet);
     }
 

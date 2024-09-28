@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class WiggleViper : Enemy
@@ -24,8 +25,11 @@ public class WiggleViper : Enemy
         float distance = Vector2.Distance(transform.position, Player.instance.GetClosestPlayer(transform.position));
         if (beatCD <= 0 && distance < 3)
         {
-            isAttacking = true;
-            ShootBullets();
+            if (isCloseEnoughToShoot())
+            {
+                isAttacking = true;
+                ShootBullets();
+            }
             beatCD = 2;
         }
         else if (CanMove())
@@ -52,15 +56,25 @@ public class WiggleViper : Enemy
 
     private void SpawnBullet(Vector2 dir)
     {
-        PoisonBullet bullet = PoolManager.Get<PoisonBullet>();
-        bullet.transform.position = transform.position + (Vector3)(dir * 0.2f) + (Vector3.one * 0.3f);
+        BulletBase bullet = PoolManager.Get<BulletBase>();
+
+        bullet.transform.position = transform.position;
         bullet.direction = dir;
-        bullet.origSpeed = 8f;
-        bullet.speed = 8f;
-        bullet.enemySource = this;
-        bullet.atk = Mathf.Clamp(atk / 8, 1, 1000);
+        bullet.speed = 8;
+        bullet.atk = 2;
         bullet.lifetime = 8;
+        bullet.transform.localScale = Vector3.one;
+        bullet.startOnBeat = true;
+        bullet.enemySource = this;
+        bullet.behaviours = new List<BulletBehaviour>
+            {
+                new SpriteLookAngleBehaviour() { start = 0, end = -1 },
+                new SpeedOverTimeBehaviour() { start = 0, end = -1, speedPerBeat = 0.5f, targetSpeed = 7 },
+                new PoisonBehaviour(3) { start = 0, end = -1},
+            };
+        bullet.animator.Play("poisonbullet");
         bullet.OnSpawn();
+        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
     }
 
     public void ShootBullets()

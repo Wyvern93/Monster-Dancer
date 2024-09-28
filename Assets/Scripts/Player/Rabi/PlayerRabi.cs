@@ -7,8 +7,6 @@ using UnityEngine.InputSystem;
 
 public class PlayerRabi : Player
 {
-    
-
     [Header("Ability Prefabs")]
     [SerializeField] GameObject explosiveCarrot;
     [SerializeField] GameObject carrotExplosionPrefab;
@@ -26,11 +24,13 @@ public class PlayerRabi : Player
     [SerializeField] GameObject carrotBulletPrefab;
     [SerializeField] GameObject moonlightShockwavePrefab;
     [SerializeField] GameObject rabiEclipsePrefab;
+    [SerializeField] GameObject piercingShotPrefab;
+    [SerializeField] GameObject boxofCarrotsPrefab;
 
     [SerializeField] SpriteTrail spriteTrail;
     [SerializeField] CircleCollider2D dashHitBox;
     [SerializeField] AudioClip dashSound;
-
+    [SerializeField] public AudioClip piercingShotChargeSound;
 
     public bool isCastingBunnyHop;
     public bool isCastingMoonBeam;
@@ -62,6 +62,8 @@ public class PlayerRabi : Player
         PoolManager.CreatePool(typeof(CarrotBullet), carrotBulletPrefab, 150);
         PoolManager.CreatePool(typeof(MoonlightShockwave), moonlightShockwavePrefab, 30);
         PoolManager.CreatePool(typeof(RabiEclipse), rabiEclipsePrefab, 1);
+        PoolManager.CreatePool(typeof(PiercingShot), piercingShotPrefab, 10);
+        PoolManager.CreatePool(typeof(BoxOfCarrots), boxofCarrotsPrefab, 15);
 
         GameManager.runData.possibleSkillEnhancements = new List<Enhancement>()
         { 
@@ -73,10 +75,11 @@ public class PlayerRabi : Player
             new OrbitalMoonAbilityEnhancement(),
             new CarrotJuiceAbilityEnhancement(),
             new LunarPulseAbilityEnhancement(),
-            new RabbitReflexesAbilityEnhancement(),
+            new PiercingShotAbilityEnhancement(),
             new LunarRainAbilityEnhancement(),
             new CarrotDeliveryAbilityEnhancement(),
-            new EclipseAbilityEnhancement()
+            new EclipseAbilityEnhancement(),
+            new BoxOfCarrotsAbilityEnhancement()
         };
         
         BunnyHopAbility hop = new BunnyHopAbility();
@@ -119,6 +122,8 @@ public class PlayerRabi : Player
         PoolManager.RemovePool(typeof(CarrotDeliveryTruck));
         PoolManager.RemovePool(typeof(CarrotBullet));
         PoolManager.RemovePool(typeof(RabiEclipse));
+        PoolManager.RemovePool(typeof(PiercingShot));
+        PoolManager.RemovePool(typeof(BoxOfCarrots));
 
         Destroy(gameObject);
     }

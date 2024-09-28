@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Rhythmia : Enemy
@@ -11,7 +12,7 @@ public class Rhythmia : Enemy
         CurrentHP = MaxHP;
         emissionColor = new Color(1, 1, 1, 0);
         isMoving = false;
-        beatCD = Random.Range(1,6);
+        beatCD = Random.Range(1,4);
         Sprite.transform.localPosition = Vector3.zero;
         isAttacking = false;
         animator.Play("rhythmia_normal");
@@ -22,9 +23,13 @@ public class Rhythmia : Enemy
         if (isAttacking) return;
         if (beatCD == 0)
         {
-            isAttacking = true;
-            ShootBullets();
-            beatCD = 6;
+
+            if (isCloseEnoughToShoot())
+            {
+                isAttacking = true;
+                ShootBullets();
+            }
+            beatCD = 4;
         }
         else if (CanMove())
         {
@@ -48,6 +53,7 @@ public class Rhythmia : Enemy
         SpawnBullet(0);
         SpawnBullet(120);
         SpawnBullet(240);
+        AudioController.PlaySound(AudioController.instance.sounds.bulletwaveShootSound);
         bulletSpawnEffect.Despawn();
         animator.Play("rhythmia_normal");
         isAttacking = false;
@@ -56,19 +62,23 @@ public class Rhythmia : Enemy
 
     private void SpawnBullet(float angle)
     {
-        Vector2 dir = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad)).normalized;
-        SpiralBullet bullet = PoolManager.Get<SpiralBullet>();
+        BulletBase bullet = PoolManager.Get<BulletBase>();
+
+        Vector2 dir = BulletBase.angleToVector(angle);
         bullet.transform.position = transform.position + (Vector3)(dir * 0.2f) + (Vector3.one * 0.3f);
         bullet.direction = dir;
-        bullet.origSpeed = 2.5f;
-        bullet.speed = 2.5f;
-        bullet.enemySource = this;
-        bullet.atk = atk / 4;
+        bullet.speed = 8f;
+        bullet.atk = 5;
         bullet.lifetime = 3;
-        bullet.orbitAngle = angle;
-        bullet.transform.localScale = Vector3.one * 2f;
-        bullet.orbitSpeed = 2f;
-        bullet.directionalVelocity = Vector3.zero;
+        bullet.transform.localScale = Vector3.one;
+        bullet.startOnBeat = true;
+        bullet.enemySource = this;
+        bullet.behaviours = new List<BulletBehaviour>
+            {
+                new SpriteWaveBehaviour() { start = 0, end = -1 },
+                new RotateOverBeatBehaviour() { start = 0, end = -1, rotateAmount = 460f}
+            };
+        bullet.animator.Play("notebullet");
         bullet.OnSpawn();
     }
 

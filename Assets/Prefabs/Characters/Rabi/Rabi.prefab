@@ -269,6 +269,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: 7232690413544996010}
   isPerformingAction: 0
+  icon: {fileID: 21300000, guid: 5b7cc8dea66ed0345a42d408705bf000, type: 3}
+  charactername: SHIKAMI RABI
   animator: {fileID: 4284550755660226288}
   isMoving: 0
   canDoAnything: 0
@@ -356,6 +358,7 @@ MonoBehaviour:
     m_Bits: 4096
   invulTime: 0
   Exclamation: {fileID: 1219958621631604314}
+  poisonStatus: 0
   explosiveCarrot: {fileID: 6176280003804827367, guid: 3022bd6a79b7630479f72639d2475f67, type: 3}
   carrotExplosionPrefab: {fileID: 2605593471026702462, guid: 941e5a73124b6514cacc803978b84e0a, type: 3}
   rabiClonePrefab: {fileID: 2259806814164270096, guid: 62879664afbba8f4a813d773bdc57f27, type: 3}
@@ -370,9 +373,12 @@ MonoBehaviour:
   carrotBulletPrefab: {fileID: 5213826588971438917, guid: 9ea086bc5d89b384699a26f5d17bd759, type: 3}
   moonlightShockwavePrefab: {fileID: 4163177863434745036, guid: def8eb86107984148ad0e97d62c8ef22, type: 3}
   rabiEclipsePrefab: {fileID: 7892215351694188037, guid: 841e205ca6af3d344b4ab7d4839173ca, type: 3}
+  piercingShotPrefab: {fileID: 4352397607850131520, guid: 79471f49fb66d1442a18767207966990, type: 3}
+  boxofCarrotsPrefab: {fileID: 2268989308770497195, guid: 31e889eb307f3054c807216e612bc1b1, type: 3}
   spriteTrail: {fileID: 4465351908415658744}
   dashHitBox: {fileID: 7102733586936279029}
   dashSound: {fileID: 8300000, guid: 7903361135f538e44bab3cd4f2380af2, type: 3}
+  piercingShotChargeSound: {fileID: 8300000, guid: e5fca25ee446ef2419cf2fe15cbed7d9, type: 3}
   isCastingBunnyHop: 0
   isCastingMoonBeam: 0
   references:

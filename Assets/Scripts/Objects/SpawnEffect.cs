@@ -4,6 +4,14 @@ using UnityEngine;
 
 public class SpawnEffect : MonoBehaviour
 {
+    void OnEnable()
+    {
+        GetComponent<Animator>().speed = 1f / BeatManager.GetBeatDuration();
+    }
+    public void AnimationFinish()
+    {
+        PoolManager.Return(gameObject, typeof(SpawnEffect));
+    }
     // Start is called before the first frame update
     void Start()
     {

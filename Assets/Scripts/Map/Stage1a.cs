@@ -26,13 +26,6 @@ public class Stage1a : Map
 
     public GameObject usarinBossPrefab;
 
-    [Header("Bullet Prefabs")]
-    public GameObject directionalBulletPrefab;
-    public GameObject nomSlimeEliteBullet;
-    public GameObject ghostBullet;
-    public GameObject poisonBullet;
-    public GameObject petalBullet;
-
     public override void Start()
     {
         fireflies.transform.parent = Camera.main.transform;
@@ -57,12 +50,6 @@ public class Stage1a : Map
         PoolManager.CreatePool(typeof(CarrotFan), carrotfanPrefab, 30);
         PoolManager.CreatePool(typeof(UsarinRunning), usarinRunningPrefab, 5);
         PoolManager.CreatePool(typeof(UsarinBoss), usarinBossPrefab, 1);
-
-        PoolManager.CreatePool(typeof(DirectionalBullet), directionalBulletPrefab, 60);
-        PoolManager.CreatePool(typeof(NomEliteBullet), nomSlimeEliteBullet, 60);
-        PoolManager.CreatePool(typeof(GhostBullet), ghostBullet, 60);
-        PoolManager.CreatePool(typeof(PoisonBullet), poisonBullet, 60);
-        PoolManager.CreatePool(typeof(PetalBullet), petalBullet, 60);
     }
 
     public override void RemoveAllPools()
@@ -85,12 +72,6 @@ public class Stage1a : Map
         PoolManager.RemovePool(typeof(CarrotFan));
         PoolManager.RemovePool(typeof(UsarinRunning));
         PoolManager.RemovePool(typeof(UsarinBoss));
-
-        PoolManager.RemovePool(typeof(DirectionalBullet));
-        PoolManager.RemovePool(typeof(NomEliteBullet));
-        PoolManager.RemovePool(typeof(GhostBullet));
-        PoolManager.RemovePool(typeof(PoisonBullet));
-        PoolManager.RemovePool(typeof(PetalBullet));
     }
 
     public override void OnStopMap()
@@ -111,12 +92,12 @@ public class Stage1a : Map
         Player.instance.rb.velocity = Vector2.zero;
         if (Player.instance is PlayerRabi) Player.instance.animator.Play("Rabi_Idle");
         yield return new WaitForSeconds(0.45f); // This is when the white screen is pure white
+        BeatManager.FadeOut(1);
         currentBoss = null;
-
-        PoolManager.Return(boss.gameObject, boss.GetType());
+        
         Player.instance.facingRight = true;
         Player.instance.Sprite.transform.localScale = Vector3.one;
-        Camera.main.transform.position = new Vector3(CutsceneAnimator.transform.position.x, CutsceneAnimator.transform.position.y, -60);
+        
         mapObjects.SetActive(false);
         bossGrid.SetActive(false);
         bossArea.color = new Color(0, 0, 0, 0);
@@ -127,6 +108,9 @@ public class Stage1a : Map
 
         Dialogue dialogue = Player.instance is PlayerRabi ? rabiEndDialogue : rabiEndDialogue;
         UIManager.Instance.dialogueMenu.StartCutscene(dialogue.entries);
+        yield return new WaitForEndOfFrame();
+        Camera.main.transform.position = new Vector3(CutsceneAnimator.transform.position.x, CutsceneAnimator.transform.position.y, -60);
+        PoolManager.Return(boss.gameObject, boss.GetType());
         while (!UIManager.Instance.dialogueMenu.hasFinished) yield return new WaitForEndOfFrame();
         yield return new WaitForSeconds(1f);
         UIManager.Instance.dialogueMenu.hasFinished = false;
@@ -138,6 +122,7 @@ public class Stage1a : Map
 
         OnStopMap();
         UIManager.Fade(false);
+        UIManager.Instance.StageFinish.SetActive(false);
         yield return new WaitForSeconds(1f);
         GameManager.runData.stageMulti++;
         Player.instance.isMoving = false;
@@ -150,7 +135,7 @@ public class Stage1a : Map
         stageEvents = new List<StageTimeEvent>()
         {
             // Spawn Rates
-            /*
+            
             new ChangeSpawnRateEvent(5, 0), // start
             new ChangeSpawnRateEvent(7, 30),
             new ChangeSpawnRateEvent(9, 60),
@@ -201,12 +186,13 @@ public class Stage1a : Map
             new RemoveEnemyEvent(EnemyType.Dancearune, 0, 520),
             new RemoveEnemyEvent(EnemyType.Skeleko, 0, 540),
             new RemoveEnemyEvent(EnemyType.ZombieBride, 0, 540),
-
+            
             new SpawnEliteEvent(EnemyType.NomSlimeElite, 120),
-            new SpawnEliteEvent(EnemyType.BooJrElite, 240),
+            
+            new SpawnEliteEvent(EnemyType.BooJrElite, 240), // 240
             new SpawnEliteEvent(EnemyType.PoisyElite, 360), // 360
             new SpawnEliteEvent(EnemyType.DancearuneElite, 480), // 480
-
+            
             new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 520),
             new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 540),
             new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 560),
@@ -215,8 +201,8 @@ public class Stage1a : Map
             new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 585),
             new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 590),
             new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 595),
-            */
-            new SpawnBossEvent(EnemyType.Usarin, 30), // 600
+            
+            new SpawnBossEvent(EnemyType.Usarin, 600), // 600
 
         };
     }

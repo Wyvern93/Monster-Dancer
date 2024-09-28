@@ -6,6 +6,7 @@ public class CarrotExplosion : MonoBehaviour
     public float dmg;
     public void OnEnable()
     {
+        transform.localScale = Vector3.one;
         Player.TriggerCameraShake(0.3f, 0.2f);
         AudioController.PlaySound(explosionSound);
     }

@@ -37,9 +37,9 @@ public class SpriteTrail : MonoBehaviour
 
     private void ClearSprites()
     {
-        foreach (SpriteRenderer sprite in sprites)
+        foreach (SpriteRenderer s in sprites)
         {
-            GameObject.Destroy(sprite.gameObject);
+            PoolManager.Return(s.gameObject, typeof(SpriteRenderer));
         }
         sprites.Clear();
     }
@@ -48,6 +48,7 @@ public class SpriteTrail : MonoBehaviour
     {
         if (GameManager.isPaused) return;
         if (spriteReference == null) return;
+        if (!spriteReference.gameObject.activeSelf) return;
 
         if (currentOffset <= 0)
         {
@@ -83,6 +84,7 @@ public class SpriteTrail : MonoBehaviour
         spr.color = new Color(1, 1, 1, 0.3f);
         spr.material.SetColor("_EmissionColor", spriteColor);
         spr.transform.localScale = targetObj.transform.localScale * size;
+        spr.transform.eulerAngles = targetObj.eulerAngles;
         sprites.Add(spr);
     }
 

@@ -57,6 +57,11 @@ public abstract class Enemy : MonoBehaviour
         return true;
     }
 
+    public bool isCloseEnoughToShoot()
+    {
+        return (Vector2.Distance(transform.position, Player.instance.GetClosestPlayer(transform.position)) < 10);
+    }
+
     public void OnStun(int time)
     {
         if (!stunStatus.isStunned()) oldAnimSpeed = animator.speed;

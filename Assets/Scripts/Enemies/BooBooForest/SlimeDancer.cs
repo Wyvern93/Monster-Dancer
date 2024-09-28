@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
@@ -23,8 +24,11 @@ public class SlimeDancer : Enemy
         if (isAttacking) return;
         if (beatCD == 0)
         {
-            isAttacking = true;
-            ShootBullets();
+            if (isCloseEnoughToShoot())
+            {
+                isAttacking = true;
+                ShootBullets();
+            }
             beatCD = 10;
         }
         else if(CanMove())
@@ -63,12 +67,17 @@ public class SlimeDancer : Enemy
         dir.Normalize();
 
         SpawnBullet(dir, 10f, 0f);
+        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
         while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+
         SpawnBullet(dir, 10f, 0f);
+        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
         while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+
         SpawnBullet(dir, 10f, 0f);
+        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
         bulletSpawnEffect.Despawn();
         isAttacking = false;
         animator.Play("slimedancer_normal");
@@ -78,14 +87,21 @@ public class SlimeDancer : Enemy
 
     private void SpawnBullet(Vector2 dir, float speed, float dist)
     {
-        DirectionalBullet bullet = PoolManager.Get<DirectionalBullet>();
+        BulletBase bullet = PoolManager.Get<BulletBase>();
+
         bullet.transform.position = transform.position + (Vector3)(dir * dist) + (Vector3.one * 0.5f);
         bullet.direction = dir;
-        bullet.origSpeed = speed;
-        bullet.speed = speed;
-        bullet.enemySource = this;
-        bullet.atk = atk / 4;
+        bullet.speed = 7;
+        bullet.atk = 3;
         bullet.lifetime = 10;
+        bullet.transform.localScale = Vector3.one;
+        bullet.startOnBeat = true;
+        bullet.enemySource = this;
+        bullet.behaviours = new List<BulletBehaviour>
+            {
+                new SpriteLookAngleBehaviour() { start = 0, end = -1 }
+            };
+        bullet.animator.Play("redbullet");
         bullet.OnSpawn();
     }
 

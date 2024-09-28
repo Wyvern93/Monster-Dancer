@@ -28,6 +28,10 @@ public class IconList
     public Sprite illusionDash;
     public Sprite carrotDelivery;
     public Sprite Eclipse;
+    public Sprite piercingShot;
+    public Sprite boxofCarrots;
+    public Sprite Riccochet;
+    public Sprite NightSlash;
 
     public static IconList instance;
 }

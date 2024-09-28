@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Purrfessor : Enemy
@@ -24,8 +25,11 @@ public class Purrfessor : Enemy
         if (isAttacking) return;
         if (beatCD == 0)
         {
-            isAttacking = true;
-            ShootBullets();
+            if (isCloseEnoughToShoot())
+            {
+                isAttacking = true;
+                ShootBullets();
+            }
             beatCD = 10;
         }
         else if (CanMove())
@@ -69,21 +73,25 @@ public class Purrfessor : Enemy
         {
             SpawnBullet(new Vector2(1, 0));
             SpawnBullet(new Vector2(-1, 0));
+            AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
             yield return new WaitForSeconds(BeatManager.GetBeatDuration());
             while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
 
             SpawnBullet(new Vector2(1, 0));
             SpawnBullet(new Vector2(-1, 0));
+            AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
         }
         else
         {
             SpawnBullet(new Vector2(0, 1));
             SpawnBullet(new Vector2(0, -1));
+            AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
             yield return new WaitForSeconds(BeatManager.GetBeatDuration());
             while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
 
             SpawnBullet(new Vector2(0, 1));
             SpawnBullet(new Vector2(0, -1));
+            AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
         }
         bulletSpawnEffect.Despawn();
         horizontal = !horizontal;
@@ -95,15 +103,21 @@ public class Purrfessor : Enemy
 
     private void SpawnBullet(Vector2 dir)
     {
-        StarBullet bullet = PoolManager.Get<StarBullet>();
-        bullet.transform.position = transform.position + (Vector3.one * 0.3f);
+        BulletBase bullet = PoolManager.Get<BulletBase>();
+
+        bullet.transform.position = transform.position + (Vector3.up * 0.3f);
         bullet.direction = dir;
-        bullet.origSpeed = 10f;
-        bullet.speed = 10f;
-        bullet.enemySource = this;
-        bullet.atk = atk / 4;
+        bullet.speed = 10;
+        bullet.atk = 5;
         bullet.lifetime = 10;
         bullet.transform.localScale = Vector3.one;
+        bullet.startOnBeat = true;
+        bullet.enemySource = this;
+        bullet.behaviours = new List<BulletBehaviour>
+            {
+                new SpriteSpinBehaviour() { start = 0, end = -1 }
+            };
+        bullet.animator.Play("starbullet");
         bullet.OnSpawn();
     }
 

@@ -42,6 +42,9 @@ public class PlayerUI : MonoBehaviour
 
     [SerializeField] Image ultimateIcon;
     [SerializeField] TextMeshProUGUI ultimateLevelText;
+
+    [SerializeField] Image playerIcon;
+    [SerializeField] TextMeshProUGUI playerName;
     // Start is called before the first frame update
     void Awake()
     {
@@ -58,6 +61,12 @@ public class PlayerUI : MonoBehaviour
         {
             icon.Display(null, 0, false);
         }
+    }
+
+    public void SetPlayerCharacter(Sprite icon, string name)
+    {
+        playerIcon.sprite = icon;
+        playerName.text = name;
     }
 
     public void CreatePools()
