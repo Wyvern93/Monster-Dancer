@@ -7,9 +7,6 @@ public class RabbitReflexesAbility : PlayerAbility
     int level;
 
     public int charges;
-    public RabbitReflexesAbility() : base(0)
-    {
-    }
 
     public override bool CanCast()
     {
@@ -26,11 +23,6 @@ public class RabbitReflexesAbility : PlayerAbility
         return Localization.GetLocalizedString("ability.rabi.rabbitreflexes.name");
     }
 
-    public override Sprite GetIcon()
-    {
-        return IconList.instance.rabbitReflexes;
-    }
-
     public override List<Enhancement> getEnhancementList()
     {
         return new List<Enhancement>() { new RabbitReflexesAbilityEnhancement() };
@@ -39,9 +31,9 @@ public class RabbitReflexesAbility : PlayerAbility
     {
         return false;
     }
-    public override string getID()
+    public override string getId()
     {
-        return "rabi.rabbitreflexes";
+        return "rabbitreflexes";
     }
 
     public override void OnCast()

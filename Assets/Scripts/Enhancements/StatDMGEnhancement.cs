@@ -38,19 +38,13 @@ public class StatDMGEnhancement : Enhancement
         return "Attack Damage";
     }
 
-    public override string getType()
+    public override string getDescriptionType()
     {
         return "Stat Up";
     }
 
-    public override bool isUnique()
-    {
-        return false;
-    }
-
     public override void OnEquip()
     {
-        if (isUnique()) GameManager.runData.RemoveStatEnhancement(this);
         Player.instance.enhancements.Add(new StatDMGEnhancement());
         Player.instance.CalculateStats();
     }
@@ -58,5 +52,10 @@ public class StatDMGEnhancement : Enhancement
     public override void OnStatCalculate(ref PlayerStats flatBonus, ref PlayerStats percentBonus)
     {
         percentBonus.Atk += 0.1f;
+    }
+
+    public override EnhancementType GetEnhancementType()
+    {
+        return EnhancementType.Stat;
     }
 }

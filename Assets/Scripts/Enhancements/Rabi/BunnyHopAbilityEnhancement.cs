@@ -12,28 +12,22 @@ public class BunnyHopAbilityEnhancement : Enhancement
         }
         if (level == 2)
         {
-            return "Reduces the cooldown from <color=\"yellow\">20->16</color> beats.";
+            return "Reduces the cooldown from <color=\"yellow\">20 -> 16</color> beats.";
         }
         if (level == 3)
         {
-            return "Reduces the cooldown from <color=\"yellow\">16->12</color> beats.";
+            return "Reduces the cooldown from <color=\"yellow\">16 -> 12</color> beats.";
         }
         if (level == 4)
         {
-            return "Rabi's perfectly identical clone lasts <color=\"yellow\">12->20</color> beats.";
+            return "Rabi's perfectly identical clone lasts <color=\"yellow\">12 -> 20</color> beats.";
         }
         return "";
     }
 
     public override string getId()
     {
-        return "rabi.bunnyhop";
-    }
-
-    public override int getLevel()
-    {
-        if (!Player.instance.abilityValues.ContainsKey("ability.bunnyhop.level")) return 0;
-        else return (int)Player.instance.abilityValues["ability.bunnyhop.level"];
+        return "bunnyhop";
     }
 
     public override string getName()
@@ -41,7 +35,7 @@ public class BunnyHopAbilityEnhancement : Enhancement
         return "Bunny Hop";
     }
 
-    public override string getType()
+    public override string getDescriptionType()
     {
         return "Active";
     }
@@ -50,54 +44,13 @@ public class BunnyHopAbilityEnhancement : Enhancement
     {
         return 3;
     }
-
-    public override bool isAvailable()
+    public override PlayerAbility getAbility()
     {
-        bool available = false;
-        if (Player.instance.activeAbility == null) available = true;
-        else
-        {
-            if (Player.instance.activeAbility.getID() == "rabi.bunnyhop")
-            {
-                if (Player.instance.abilityValues["ability.bunnyhop.level"] < 4) available = true;
-            }
-        }
-
-        return available;
+        return new BunnyHopAbility();
     }
 
-    public override bool isUnique()
+    public override EnhancementType GetEnhancementType()
     {
-        return false;
-    }
-
-    public override Sprite getIcon()
-    {
-        return IconList.instance.bunnyhop;
-    }
-
-    public override void OnEquip()
-    {
-        if (isUnique()) GameManager.runData.RemoveSkillEnhancement(this);
-        Player.instance.enhancements.Add(new BunnyHopAbilityEnhancement());
-        if (!Player.instance.abilityValues.ContainsKey("ability.bunnyhop.level"))
-        {
-            Player.instance.abilityValues.Add("ability.bunnyhop.level", 1);
-            Player.instance.activeAbility = new BunnyHopAbility();
-            UIManager.Instance.PlayerUI.SetActiveIcon(IconList.instance.bunnyhop, 1, false);
-        }
-        else
-        {
-            Player.instance.abilityValues["ability.bunnyhop.level"] += 1;
-            int level = (int)Player.instance.abilityValues["ability.bunnyhop.level"];
-            UIManager.Instance.PlayerUI.SetActiveLevel(level, level >= 4);
-        }
-        
-        Player.instance.CalculateStats();
-    }
-
-    public override void OnStatCalculate(ref PlayerStats flatBonus, ref PlayerStats percentBonus)
-    {
-
+        return EnhancementType.Ability;
     }
 }

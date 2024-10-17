@@ -147,10 +147,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isSmall: 0
   dir: {x: 0, y: 0}
-  piercingShotSound: {fileID: 8300000, guid: 2ba4cbd0e4fe238419f6550ed9a25dbe, type: 3}
+  piercingShotSound: {fileID: 8300000, guid: dacfe51c706f2344eafa9253dcfa31e6, type: 3}
   animator: {fileID: 2873983152065283135}
   trail: {fileID: 2056843554461180312}
   sprite: {fileID: 4140295875403626119}
+  enemiesHit: []
 --- !u!95 &2873983152065283135
 Animator:
   serializedVersion: 5

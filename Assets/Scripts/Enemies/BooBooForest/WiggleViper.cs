@@ -60,9 +60,9 @@ public class WiggleViper : Enemy
 
         bullet.transform.position = transform.position;
         bullet.direction = dir;
-        bullet.speed = 8;
+        bullet.speed = 6;
         bullet.atk = 2;
-        bullet.lifetime = 8;
+        bullet.lifetime = 4;
         bullet.transform.localScale = Vector3.one;
         bullet.startOnBeat = true;
         bullet.enemySource = this;

@@ -269,6 +269,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: 7232690413544996010}
   isPerformingAction: 0
+  cam: {fileID: 0}
   icon: {fileID: 21300000, guid: 5b7cc8dea66ed0345a42d408705bf000, type: 3}
   charactername: SHIKAMI RABI
   animator: {fileID: 4284550755660226288}
@@ -375,12 +376,24 @@ MonoBehaviour:
   rabiEclipsePrefab: {fileID: 7892215351694188037, guid: 841e205ca6af3d344b4ab7d4839173ca, type: 3}
   piercingShotPrefab: {fileID: 4352397607850131520, guid: 79471f49fb66d1442a18767207966990, type: 3}
   boxofCarrotsPrefab: {fileID: 2268989308770497195, guid: 31e889eb307f3054c807216e612bc1b1, type: 3}
+  carrotcopterPrefab: {fileID: 3425642355969134211, guid: d00d1c6e96ff75d40bb8a7cac7e20e4e, type: 3}
+  moonlightFlowerPrefab: {fileID: 191912119710237282, guid: a014cdfc807c77d4e88a6e18a4c5aa49, type: 3}
+  lunarAuraPrefab: {fileID: 6512445447011835760, guid: 21dd3efcf3de78746bb9adb505000609, type: 3}
+  sanctuaryPrefab: {fileID: 447770707882610931, guid: b14fe2d6085ea8a45991c24842d5533e, type: 3}
+  sanctuaryPulsePrefab: {fileID: 6582179206276219419, guid: 1d571eb514d006d42bc666602f4b2e22, type: 3}
+  holyOrbPrefab: {fileID: 1447474559152972855, guid: e1b36be15436ff0428fefbb73ff633c9, type: 3}
+  flamingDrillPrefab: {fileID: 7314761454927757109, guid: 125d2c2ea2ca2e742b9fe4f9199c39cd, type: 3}
+  flamingDrillBlastPrefab: {fileID: 617246096743505240, guid: 69eb70be527186942a47bbccc5e6990f, type: 3}
+  groundFirePrefab: {fileID: 4907338861854158483, guid: acc362ba6b996454bad02ec62a22c7a9, type: 3}
+  fireworkPrefab: {fileID: 775206094103201475, guid: 138f7d2e39717cf4f990335769dd3483, type: 3}
+  fireworkExplosionPrefab: {fileID: 6664872255475693508, guid: 492362b2b12a15d4589314b885a3824e, type: 3}
   spriteTrail: {fileID: 4465351908415658744}
   dashHitBox: {fileID: 7102733586936279029}
   dashSound: {fileID: 8300000, guid: 7903361135f538e44bab3cd4f2380af2, type: 3}
   piercingShotChargeSound: {fileID: 8300000, guid: e5fca25ee446ef2419cf2fe15cbed7d9, type: 3}
+  flamingDrillChargeSound: {fileID: 8300000, guid: 1e03a7b6b5a52e844b92a439fcbe186f, type: 3}
+  fireworkSound: {fileID: 8300000, guid: 29f71132360851045bb4d5a49e8f7984, type: 3}
   isCastingBunnyHop: 0
-  isCastingMoonBeam: 0
   references:
     version: 2
     RefIds: []

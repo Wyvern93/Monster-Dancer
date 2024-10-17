@@ -8,7 +8,7 @@ public class FairyCage : MonoBehaviour
     [SerializeField] AudioClip breakSound, hitSound;
     [SerializeField] Fairy fairy;
 
-    private int hits = 12;
+    private int hits = 4;
 
     Vector2 position;
 
@@ -16,7 +16,7 @@ public class FairyCage : MonoBehaviour
     {
         boxCollider.enabled = true;
         animator.Play("FairyCage_Idle");
-        hits = 12;
+        hits = 4;
         position = transform.position;
     }
 

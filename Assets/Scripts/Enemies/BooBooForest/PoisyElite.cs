@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
-using static UnityEngine.UI.Image;
 
 public class PoisyElite : Enemy
 {
@@ -45,7 +43,7 @@ public class PoisyElite : Enemy
         while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
 
         
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 3; i++)
         {
             Vector2 playerdir = Player.instance.GetClosestPlayer(transform.position + (-Vector3.up * 0.4f)) - transform.position;
             playerdir.Normalize();
@@ -79,7 +77,7 @@ public class PoisyElite : Enemy
 
         bullet.transform.position = transform.position;
         bullet.direction = dir;
-        bullet.speed = 10;
+        bullet.speed = 9;
         bullet.atk = 5;
         bullet.lifetime = 8;
         bullet.transform.localScale = Vector3.one;

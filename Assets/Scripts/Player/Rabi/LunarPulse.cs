@@ -6,7 +6,6 @@ public class LunarPulse : MonoBehaviour
     public float cooldown;
     public float size;
     public float dmg;
-    int level;
 
     [SerializeField] SpriteRenderer spriteRenderer;
     float alpha;
@@ -15,10 +14,7 @@ public class LunarPulse : MonoBehaviour
         alpha = 0.5f;
         spriteRenderer.color = new Color(1,1,1, alpha);
         transform.localScale = Vector3.one * 0.5f;
-        level = (int)Player.instance.abilityValues["ability.lunarpulse.level"];
-
-        dmg = level < 4 ? 10f : 20f;
-        size = level < 2 ? 2f : 2.5f;
+        size =  6f;
     }
 
     public void Update()
@@ -26,10 +22,10 @@ public class LunarPulse : MonoBehaviour
         if (GameManager.isPaused) return;
         if (transform.localScale.magnitude < size)
         {
-            transform.localScale = Vector3.MoveTowards(transform.localScale, Vector3.one * size, size * Time.deltaTime);
+            transform.localScale = Vector3.MoveTowards(transform.localScale, Vector3.one * size, size * Time.deltaTime * 2f);
             if (transform.localScale.magnitude > size - 0.5f)
             {
-                alpha = Mathf.MoveTowards(alpha, 0f, Time.deltaTime * 2f);
+                alpha = Mathf.MoveTowards(alpha, 0f, Time.deltaTime);
             }
             
         }
@@ -54,11 +50,8 @@ public class LunarPulse : MonoBehaviour
 
             enemy.TakeDamage((int)damage, isCritical);
 
-            if (level >= 3)
-            {
-                Vector2 dir = enemy.transform.position - Player.instance.transform.position;
-                enemy.PushEnemy(dir, 2f);
-            }
+            Vector2 dir = enemy.transform.position - Player.instance.transform.position;
+            enemy.PushEnemy(dir, 2f);
         }
 
         if (collision.CompareTag("FairyCage"))

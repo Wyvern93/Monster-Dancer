@@ -24,13 +24,11 @@ public class RabiEclipse : MonoBehaviour, IDespawneable
 
     public void PlayPulse()
     {
-        Player.TriggerCameraShake(0.3f, 0.3f);
+        PlayerCamera.TriggerCameraShake(0.3f, 0.3f);
         level = (int)Player.instance.abilityValues["ability.eclipse.level"];
         healing = level < 6 ? level < 4 ? 0.06f : 0.08f : 0.1f;
         int healnumber = (int)(Player.instance.currentStats.MaxHP * healing);
-        Player.instance.CurrentHP = (int)Mathf.Clamp(Player.instance.CurrentHP + healnumber, 0, Player.instance.currentStats.MaxHP);
-        UIManager.Instance.PlayerUI.UpdateHealth();
-        UIManager.Instance.PlayerUI.SpawnDamageText(Player.instance.transform.position, healnumber, DamageTextType.Heal);
+        Player.instance.Heal(healnumber);
         AudioController.PlaySound(pulseSfx);
     }
 

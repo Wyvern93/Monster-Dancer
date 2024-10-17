@@ -10,12 +10,7 @@ public class MoonlightDaggersPowerfulEnhancement : Enhancement
 
     public override string getId()
     {
-        return "rabi.moonlightdaggers.powerful";
-    }
-
-    public override int getLevel()
-    {
-        return 6;
+        return "moonlightdaggers";
     }
 
     public override string getName()
@@ -23,7 +18,7 @@ public class MoonlightDaggersPowerfulEnhancement : Enhancement
         return "Moonlight Daggers Powerful";
     }
 
-    public override string getType()
+    public override string getDescriptionType()
     {
         return "Attack";
     }
@@ -32,21 +27,15 @@ public class MoonlightDaggersPowerfulEnhancement : Enhancement
     {
         return 4;
     }
-
+    public override int getLevel()
+    {
+        if (!Player.instance.abilityValues.ContainsKey($"attack.{getId()}.level")) return 0;
+        else return (int)Player.instance.abilityValues[$"attack.{getId()}.level"];
+    }
     public override bool isAvailable()
     {
         if (!Player.instance.abilityValues.ContainsKey("attack.moonlightdaggers.level")) return false;
         return Player.instance.abilityValues["attack.moonlightdaggers.level"] == 6;
-    }
-
-    public override bool isUnique()
-    {
-        return true;
-    }
-
-    public override Sprite getIcon()
-    {
-        return IconList.instance.moonlightDaggers;
     }
 
     public override void OnEquip()
@@ -67,7 +56,7 @@ public class MoonlightDaggersPowerfulEnhancement : Enhancement
             Player.instance.abilityValues["Attack_Number"] = 2f;
             Player.instance.abilityValues["Attack_Size"] = 1.2f;
             Player.instance.abilityValues["Attack_Time"] = 0.75f;
-            Player.instance.abilityValues["Attack_Damage"] = 17f;
+            Player.instance.abilityValues["Attack_Damage"] = 20f;
             Player.instance.abilityValues["Attack_Cooldown"] = 1;
             Player.instance.abilityValues["Attack_Explode"] = 1;
         }
@@ -78,5 +67,10 @@ public class MoonlightDaggersPowerfulEnhancement : Enhancement
     public override void OnStatCalculate(ref PlayerStats flatBonus, ref PlayerStats percentBonus)
     {
 
+    }
+
+    public override EnhancementType GetEnhancementType()
+    {
+        return EnhancementType.Ability;
     }
 }

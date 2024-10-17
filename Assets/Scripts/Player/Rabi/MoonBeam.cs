@@ -44,9 +44,10 @@ public class MoonBeam : MonoBehaviour, IDespawneable
         int abilityLevel = (int)Player.instance.abilityValues["ability.moonbeam.level"];
         level = abilityLevel;
 
-        abilityDamage = abilityLevel < 4 ? abilityLevel < 2 ? 10 : 12 : 16;
+        abilityDamage = abilityLevel < 4 ? abilityLevel < 2 ? 10 : 14 : 20;
+        abilityDamage *= Player.instance.itemValues["orbitalDamage"];
 
-        beamSpeed = 400f;
+        beamSpeed = 300f * Player.instance.itemValues["orbitalSpeed"];
 
         stealHealth = false;
 
@@ -104,16 +105,6 @@ public class MoonBeam : MonoBehaviour, IDespawneable
         if (!started) return;
 
         if (sound.pitch < maxPitch) sound.pitch = Mathf.MoveTowards(sound.pitch, maxPitch, Time.deltaTime / 2f);
-        if (dotCD > 0)
-        { 
-            dotCD -= Time.deltaTime;
-            //boxCollider.enabled = false;
-        }
-        else
-        {
-            //boxCollider.enabled = true;
-            dotCD = 0f;
-        }
     }
 
     public void OnTriggerEnter2D(Collider2D collision)
@@ -128,6 +119,10 @@ public class MoonBeam : MonoBehaviour, IDespawneable
             bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
             if (isCritical) damage *= Player.instance.currentStats.CritDmg;
             enemy.TakeDamage((int)damage, isCritical);
+            foreach (PlayerItem item in Player.instance.equippedItems)
+            {
+                item.OnHit(Player.instance.equippedPassiveAbilities.Find(x => x.GetType() == typeof(MoonBeamAbility)), damage, enemy);
+            }
         }
 
         if (collision.CompareTag("FairyCage"))

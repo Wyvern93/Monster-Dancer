@@ -2,9 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PiercingShotAbility : PlayerAbility
+public class PiercingShotAbility : PlayerAbility, IPlayerProjectile
 {
-    public PiercingShotAbility(): base(10) { }
     public override bool CanCast()
     {
         return currentCooldown == 0;
@@ -24,18 +23,13 @@ public class PiercingShotAbility : PlayerAbility
     {
         return new List<Enhancement>() { new PiercingShotAbilityEnhancement() }; // Used for the menu
     }
-
-    public override Sprite GetIcon()
-    {
-        return IconList.instance.piercingShot;
-    }
     public override bool isUltimate()
     {
         return false;
     }
-    public override string getID()
+    public override string getId()
     {
-        return "rabi.piercingshot";
+        return "piercingshot";
     }
 
     public override void OnCast()
@@ -83,5 +77,15 @@ public class PiercingShotAbility : PlayerAbility
     public override void OnUpdate()
     {
         if (BeatManager.isGameBeat && currentCooldown > 0) currentCooldown--;
+    }
+
+    public override System.Type getEvolutionItemType()
+    {
+        return typeof(HotSauceBottleItem);
+    }
+
+    public override Enhancement getEvolutionEnhancement()
+    {
+        return new FlamingDrillAbilityEnhancement();
     }
 }

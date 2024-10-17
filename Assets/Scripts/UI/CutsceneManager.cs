@@ -144,7 +144,7 @@ public class CutsceneManager : MonoBehaviour
         for (int i = 0; i < dialogue.Length; i++)
         {
             dialogueText.maxVisibleCharacters++;
-            if (i % 3 == 0) AudioController.PlaySound(AudioController.instance.sounds.ui_dialogue_char, Random.Range(0.8f, 1.2f));
+            if (i % 3 == 0) AudioController.PlaySoundWithoutCooldown(AudioController.instance.sounds.ui_dialogue_char, Random.Range(0.8f, 1.2f));
             yield return new WaitForEndOfFrame();
         }
         dialogueText.maxVisibleCharacters = dialogue.Length;

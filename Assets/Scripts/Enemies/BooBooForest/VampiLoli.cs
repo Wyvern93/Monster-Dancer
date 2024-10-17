@@ -79,7 +79,7 @@ public class VampiLoli : Enemy
         bullet.direction = dir;
         bullet.speed = 8;
         bullet.atk = 3;
-        bullet.lifetime = 6;
+        bullet.lifetime = 3;
         bullet.transform.localScale = Vector3.one;
         bullet.startOnBeat = true;
         bullet.enemySource = this;

@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Coin : Drop
 {
-    private float speed;
     public Vector2 dir;
     // Start is called before the first frame update
     void Start()

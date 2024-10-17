@@ -2,16 +2,16 @@ using UnityEngine;
 
 public class CarrotBullet : MonoBehaviour, IDespawneable
 {
-    public CarrotDeliveryAbility ability;
-    int level, dmg;
+    public float dmg;
 
     Vector2 dir;
+    public bool isPiercing;
+
+    public PlayerAbility abilitySource;
 
     float lifeTime;
     public void OnEnable()
     {
-        level = (int)Player.instance.abilityValues["ability.carrotdelivery.level"];
-        dmg = level < 3 ? 20 : 30;
         lifeTime = 3f;
     }
 
@@ -46,8 +46,19 @@ public class CarrotBullet : MonoBehaviour, IDespawneable
             if (isCritical) damage *= Player.instance.currentStats.CritDmg;
 
             enemy.TakeDamage((int)damage, isCritical);
-            Player.instance.despawneables.Remove(this);
-            PoolManager.Return(gameObject, GetType());
+            foreach (PlayerItem item in Player.instance.equippedItems)
+            {
+                item.OnHit(abilitySource, damage, enemy);
+            }
+            foreach (PlayerItem item in Player.instance.evolvedItems)
+            {
+                item.OnHit(abilitySource, damage, enemy);
+            }
+            if (!isPiercing)
+            {
+                Player.instance.despawneables.Remove(this);
+                PoolManager.Return(gameObject, GetType());
+            }
         }
     }
 

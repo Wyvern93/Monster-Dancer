@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
-public class RabiAttack : PlayerAttack, IDespawneable
+public class RabiAttack : PlayerAttack, IDespawneable, IPlayerProjectile
 {
     [SerializeField] AudioClip attackSound;
     [SerializeField] Animator animator;
@@ -129,6 +129,15 @@ public class RabiAttack : PlayerAttack, IDespawneable
             if (isCritical) damage *= Player.instance.currentStats.CritDmg;
             enemy.TakeDamage((int)damage, isCritical);
             pierce--;
+
+            foreach (PlayerItem item in Player.instance.equippedItems)
+            {
+                item.OnAttackHit(this, damage, enemy);
+            }
+            foreach (PlayerItem item in Player.instance.evolvedItems)
+            {
+                item.OnAttackHit(this, damage, enemy);
+            }
             if (!hasExploded && Player.instance.abilityValues["Attack_Explode"] == 1)
             {
                 MoonlightShockwave shockwave = PoolManager.Get<MoonlightShockwave>();
@@ -150,6 +159,11 @@ public class RabiAttack : PlayerAttack, IDespawneable
             PoolManager.Return(gameObject, GetType());
             return;
         }
+    }
+
+    public override Sprite GetIcon()
+    {
+        return IconList.instance.getAbilityIcon("moonlightdaggers");
     }
 
     public void ForceDespawn()

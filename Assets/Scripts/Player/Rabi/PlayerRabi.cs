@@ -26,14 +26,29 @@ public class PlayerRabi : Player
     [SerializeField] GameObject rabiEclipsePrefab;
     [SerializeField] GameObject piercingShotPrefab;
     [SerializeField] GameObject boxofCarrotsPrefab;
+    [SerializeField] GameObject carrotcopterPrefab;
+    [SerializeField] GameObject moonlightFlowerPrefab;
+    [SerializeField] GameObject lunarAuraPrefab;
+
+    [SerializeField] GameObject sanctuaryPrefab;
+    [SerializeField] GameObject sanctuaryPulsePrefab;
+    [SerializeField] GameObject holyOrbPrefab;
+
+    [SerializeField] GameObject flamingDrillPrefab;
+    [SerializeField] GameObject flamingDrillBlastPrefab;
+    [SerializeField] GameObject groundFirePrefab;
+
+    [SerializeField] GameObject fireworkPrefab;
+    [SerializeField] GameObject fireworkExplosionPrefab;
 
     [SerializeField] SpriteTrail spriteTrail;
     [SerializeField] CircleCollider2D dashHitBox;
     [SerializeField] AudioClip dashSound;
     [SerializeField] public AudioClip piercingShotChargeSound;
+    [SerializeField] public AudioClip flamingDrillChargeSound;
+    [SerializeField] public AudioClip fireworkSound;
 
     public bool isCastingBunnyHop;
-    public bool isCastingMoonBeam;
 
     protected override void Awake()
     {
@@ -64,6 +79,19 @@ public class PlayerRabi : Player
         PoolManager.CreatePool(typeof(RabiEclipse), rabiEclipsePrefab, 1);
         PoolManager.CreatePool(typeof(PiercingShot), piercingShotPrefab, 10);
         PoolManager.CreatePool(typeof(BoxOfCarrots), boxofCarrotsPrefab, 15);
+        PoolManager.CreatePool(typeof(CarrotCopter), carrotcopterPrefab, 8);
+        PoolManager.CreatePool(typeof(MoonlightFlower), moonlightFlowerPrefab, 8);
+        PoolManager.CreatePool(typeof(LunarAura), lunarAuraPrefab, 1);
+
+        PoolManager.CreatePool(typeof(SanctuaryAura), sanctuaryPrefab, 1);
+        PoolManager.CreatePool(typeof(SanctuaryPulse), sanctuaryPulsePrefab, 1);
+        PoolManager.CreatePool(typeof(HolyOrb), holyOrbPrefab, 50);
+        PoolManager.CreatePool(typeof(FlamingDrill), flamingDrillPrefab, 10);
+        PoolManager.CreatePool(typeof(FlamingDrillFlames), flamingDrillBlastPrefab, 10);
+        PoolManager.CreatePool(typeof(GroundFire), groundFirePrefab, 100);
+
+        PoolManager.CreatePool(typeof(Firework), fireworkPrefab, 10);
+        PoolManager.CreatePool(typeof(FireworkExplosion), fireworkExplosionPrefab, 30);
 
         GameManager.runData.possibleSkillEnhancements = new List<Enhancement>()
         { 
@@ -74,12 +102,14 @@ public class PlayerRabi : Player
             new MoonBeamAbilityEnhancement(),
             new OrbitalMoonAbilityEnhancement(),
             new CarrotJuiceAbilityEnhancement(),
-            new LunarPulseAbilityEnhancement(),
+            new LunarAuraAbilityEnhancement(),
             new PiercingShotAbilityEnhancement(),
             new LunarRainAbilityEnhancement(),
             new CarrotDeliveryAbilityEnhancement(),
             new EclipseAbilityEnhancement(),
-            new BoxOfCarrotsAbilityEnhancement()
+            new BoxOfCarrotsAbilityEnhancement(),
+            new CarrotcopterAbilityEnhancement(),
+            new MoonlightFlowerAbilityEnhancement()
         };
         
         BunnyHopAbility hop = new BunnyHopAbility();
@@ -87,7 +117,9 @@ public class PlayerRabi : Player
         activeAbility = hop;
         //equippedPassiveAbilities.Add(orbitalmoon);
         abilityValues.Add("ability.bunnyhop.level", 1);
-        
+        UIManager.Instance.PlayerUI.activeCDImage.fillAmount = 0;
+        activeAbility.currentCooldown = 0;
+
         //ultimateAbility = new CarrotDeliveryAbility();
         //ultimateAbility.OnEquip();
         //instance.abilityValues.Add("ability.carrotdelivery.level", 1);
@@ -124,8 +156,30 @@ public class PlayerRabi : Player
         PoolManager.RemovePool(typeof(RabiEclipse));
         PoolManager.RemovePool(typeof(PiercingShot));
         PoolManager.RemovePool(typeof(BoxOfCarrots));
+        PoolManager.RemovePool(typeof(CarrotCopter));
+        PoolManager.RemovePool(typeof(MoonlightFlower));
+        PoolManager.RemovePool(typeof(LunarAura));
 
+        PoolManager.RemovePool(typeof(SanctuaryAura));
+        PoolManager.RemovePool(typeof(SanctuaryPulse));
+        PoolManager.RemovePool(typeof(HolyOrb));
+
+        PoolManager.RemovePool(typeof(FlamingDrill));
+        PoolManager.RemovePool(typeof(FlamingDrillFlames));
+        PoolManager.RemovePool(typeof(GroundFire));
+
+        PoolManager.RemovePool(typeof(Firework));
+        PoolManager.RemovePool(typeof(FireworkExplosion));
+
+        spriteTrail.Stop();
+        spriteTrail.ForceDespawn();
         Destroy(gameObject);
+    }
+
+    public override void ResetAbilities()
+    {
+        isCastingBunnyHop = false;
+        spriteTrail.Stop();
     }
 
     public override List<Enhancement> GetAttackEnhancementList() 
@@ -323,7 +377,6 @@ public class PlayerRabi : Player
         {
             attackCD = (int)abilityValues["Attack_Cooldown"];
         }
-        if (isCastingMoonBeam) return;
         if (UIManager.Instance.PlayerUI.crosshair.transform.position.x > transform.position.x) facingRight = true;
         else facingRight = false;
         StartCoroutine(AttackCoroutine());
@@ -454,18 +507,12 @@ public class PlayerRabi : Player
         yield break;
     }
 
-    public override void OnPassiveAbility1Use()
+    public override void OnPassiveAbilityUse()
     {
-        if (equippedPassiveAbilities[0].CanCast()) equippedPassiveAbilities[0].OnCast();
-    }
-
-    public override void OnPassiveAbility2Use()
-    {
-        if (equippedPassiveAbilities[1].CanCast()) equippedPassiveAbilities[1].OnCast();
-    }
-    public override void OnPassiveAbility3Use()
-    {
-        if (equippedPassiveAbilities[2].CanCast()) equippedPassiveAbilities[2].OnCast();
+        foreach (PlayerAbility ability in equippedPassiveAbilities)
+        {
+            if (ability.CanCast()) ability.OnCast();
+        }
     }
 
     public override void OnActiveAbilityUse() 
@@ -496,12 +543,28 @@ public class PlayerRabi : Player
             reflexes.OnDamage();
         }
 
+        bool doDamage = true;
+        foreach (PlayerAbility ability in equippedPassiveAbilities)
+        {
+            if (ability.onPlayerPreHurt(damage) == false)
+            {
+                doDamage = false;
+                break;
+            }
+        }
+
+        if (!doDamage)
+        {
+            UIManager.Instance.PlayerUI.SpawnDamageText(transform.position, 0, DamageTextType.Dodge);
+            return;
+        }
+
         CurrentHP = Mathf.Clamp(CurrentHP - damage, 0, 9999);
         UIManager.Instance.PlayerUI.UpdateHealth();
         UIManager.Instance.PlayerUI.DoHurtEffect();
         if (hurtSfxCD <= 0)
         {
-            TriggerCameraShake(0.2f, 0.1f);
+            PlayerCamera.TriggerCameraShake(0.2f, 0.1f);
             AudioController.PlaySound(AudioController.instance.sounds.playerHurtSfx);
             hurtSfxCD = 0.6f;
         }

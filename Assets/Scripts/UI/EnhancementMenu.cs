@@ -183,8 +183,11 @@ public class EnhancementMenu : MonoBehaviour
         }
         if (finalList.Count == 0) return null;
 
-
         finalList.RemoveAll(x => !x.isAvailable());
+        foreach (Enhancement enhancement in chosenEnhancements)
+        {
+            finalList.RemoveAll(x => x.getId() == enhancement.getId());
+        }
         if (finalList.Count == 0) return null;
         Enhancement finalEnhancement = null;
         int attempts = 50;
@@ -192,7 +195,7 @@ public class EnhancementMenu : MonoBehaviour
         while (finalEnhancement == null)
         {
             int n = Random.Range(0, finalList.Count - 1);
-            if (chosenEnhancements.Any(x => x.GetType() == finalList[n].GetType()) == false)
+            if (chosenEnhancements.Any(x => x.getId() == finalList[n].getId()) == false)
             {
                 finalEnhancement = finalList[n];
                 chosenEnhancements.Add(finalEnhancement);
@@ -214,7 +217,7 @@ public class EnhancementMenu : MonoBehaviour
 
         List<Enhancement> finalList = new List<Enhancement>();
 
-        foreach (PlayerItem item in Player.instance.playerItems)
+        foreach (PlayerItem item in Player.instance.equippedItems)
         {
             owned.AddRange(item.getEnhancementList());
         }
@@ -253,12 +256,17 @@ public class EnhancementMenu : MonoBehaviour
         int attempts = 50;
 
         finalList.RemoveAll(x => !x.isAvailable());
+        foreach (Enhancement enhancement in chosenEnhancements)
+        {
+            finalList.RemoveAll(x => x.getId() == enhancement.getId());
+        }
         if (finalList.Count == 0) return null;
 
         while (finalEnhancement == null)
         {
             int n = Random.Range(0, finalList.Count - 1);
-            if(chosenEnhancements.Any(x => x.GetType() == finalList[n].GetType()) == false)
+
+            if(chosenEnhancements.Any(x => x.getId() == finalList[n].getId()) == false)
             {
                 finalEnhancement = finalList[n];
                 chosenEnhancements.Add(finalEnhancement);
@@ -345,7 +353,7 @@ public class EnhancementMenu : MonoBehaviour
         };
 
         DisplayEnhancements();
-        CurrentRerolls--;
+        if (!GameManager.isDebugMode) CurrentRerolls--;
         if (CurrentRerolls <= 0)
         {
             moneyIcon.SetActive(true);

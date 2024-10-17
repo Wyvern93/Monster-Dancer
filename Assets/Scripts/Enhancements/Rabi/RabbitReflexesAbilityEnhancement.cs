@@ -27,13 +27,7 @@ public class RabbitReflexesAbilityEnhancement : Enhancement
 
     public override string getId()
     {
-        return "rabi.rabbitreflexes";
-    }
-
-    public override int getLevel()
-    {
-        if (!Player.instance.abilityValues.ContainsKey("ability.rabbitreflexes.level")) return 0;
-        else return (int)Player.instance.abilityValues["ability.rabbitreflexes.level"];
+        return "rabbitreflexes";
     }
 
     public override string getName()
@@ -41,7 +35,7 @@ public class RabbitReflexesAbilityEnhancement : Enhancement
         return "Rabbit Reflexes";
     }
 
-    public override string getType()
+    public override string getDescriptionType()
     {
         return "Passive";
     }
@@ -51,54 +45,13 @@ public class RabbitReflexesAbilityEnhancement : Enhancement
         return 2;
     }
 
-    public override bool isAvailable()
+    public override PlayerAbility getAbility()
     {
-        bool available = true;
-        if (Player.instance.equippedPassiveAbilities.Count == 5) available = false;
-        if (Player.instance.equippedPassiveAbilities.Find(x => x.getID() == "rabi.rabbitreflexes") != null)
-        {
-            if (Player.instance.abilityValues["ability.rabbitreflexes.level"] < 4) available = true;
-            else available = false;
-        }
-
-
-        return available;
+        return new RabbitReflexesAbility();
     }
 
-    public override bool isUnique()
+    public override EnhancementType GetEnhancementType()
     {
-        return false;
-    }
-
-    public override Sprite getIcon()
-    {
-        return IconList.instance.rabbitReflexes;
-    }
-
-    public override void OnEquip()
-    {
-        if (isUnique()) GameManager.runData.RemoveSkillEnhancement(this);
-        Player.instance.enhancements.Add(new RabbitReflexesAbilityEnhancement());
-        if (!Player.instance.abilityValues.ContainsKey("ability.rabbitreflexes.level"))
-        {
-            Player.instance.abilityValues.Add("ability.rabbitreflexes.level", 1);
-            Player.instance.equippedPassiveAbilities.Add(new RabbitReflexesAbility());
-            UIManager.Instance.PlayerUI.SetPassiveIcon(IconList.instance.rabbitReflexes, 1, false, Player.instance.getPassiveAbilityIndex(typeof(RabbitReflexesAbility)));
-            Player.instance.grazeSprite.color = new Color(1, 1, 1, 0.25f);
-        }
-        else
-        {
-            Player.instance.abilityValues["ability.rabbitreflexes.level"] += 1;
-            int level = (int)Player.instance.abilityValues["ability.rabbitreflexes.level"];
-            UIManager.Instance.PlayerUI.SetPassiveLevel(level, level >= 4, Player.instance.getPassiveAbilityIndex(typeof(RabbitReflexesAbility)));
-            if (level == 2) Player.instance.grazeSprite.transform.localScale = Vector3.one * 1.5f;
-        }
-
-        Player.instance.CalculateStats();
-    }
-
-    public override void OnStatCalculate(ref PlayerStats flatBonus, ref PlayerStats percentBonus)
-    {
-
+        return EnhancementType.Ability;
     }
 }

@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements.Experimental;
 
@@ -15,7 +16,7 @@ public class BoxOfCarrots : MonoBehaviour, IDespawneable
     public void OnEnable()
     {
         level = (int)Player.instance.abilityValues["ability.boxofcarrots.level"];
-        dmg = level < 6 ? level < 3 ? 30 : 42 : 59;
+        dmg = level < 6 ? level < 4 ? level < 2 ? 30 : 42 : 59 : 78;
         heal = level < 5 ? 0.05f : 0.10f;
     }
 
@@ -44,6 +45,21 @@ public class BoxOfCarrots : MonoBehaviour, IDespawneable
             carrotExplosion.transform.position = transform.position;
             carrotExplosion.dmg = dmg;
             carrotExplosion.transform.localScale = Vector3.one * 2f;
+            carrotExplosion.transform.localScale = Vector3.one * Player.instance.itemValues["explosionSize"];
+
+            if (Player.instance.enhancements.Any(x => x.GetType() == typeof(FireworksKitItemEnhancement))) // This is never removed even with evolutions
+            {
+                bool doExplosion = Random.Range(0, 20) <= 0;
+                if (doExplosion)
+                {
+                    Vector2 explosionPos = transform.position + (Random.insideUnitSphere.normalized * 2f);
+
+                    CarrotExplosion carrotExplosion2 = PoolManager.Get<CarrotExplosion>();
+                    carrotExplosion2.transform.position = explosionPos;
+                    carrotExplosion2.dmg = dmg * 0.5f;
+                    carrotExplosion2.transform.localScale = Vector3.one * Player.instance.itemValues["explosionSize"];
+                }
+            }
 
             Player.instance.despawneables.Remove(this);
             PoolManager.Return(gameObject, GetType());
@@ -52,11 +68,8 @@ public class BoxOfCarrots : MonoBehaviour, IDespawneable
         if (collision.CompareTag("Player") && collision.name == "Player")
         {
             int healnumber = (int)(Player.instance.currentStats.MaxHP * heal);
-            Player.instance.CurrentHP = (int)Mathf.Clamp(Player.instance.CurrentHP + healnumber, 0, Player.instance.currentStats.MaxHP);
-            UIManager.Instance.PlayerUI.UpdateHealth();
-            UIManager.Instance.PlayerUI.SpawnDamageText(Player.instance.transform.position, healnumber, DamageTextType.Heal);
+            Player.instance.Heal(healnumber);
             Player.instance.despawneables.Remove(this);
-            AudioController.PlaySound(AudioController.instance.sounds.superGrazeSound);
             PoolManager.Return(gameObject, GetType());
         }
     }

@@ -24,6 +24,8 @@ public class PlayerAttack : MonoBehaviour, IDespawneable
         
     }
 
+    public virtual Sprite GetIcon() { return null; }
+
     public virtual void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Enemy"))

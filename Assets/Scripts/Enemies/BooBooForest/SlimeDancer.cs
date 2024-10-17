@@ -91,9 +91,9 @@ public class SlimeDancer : Enemy
 
         bullet.transform.position = transform.position + (Vector3)(dir * dist) + (Vector3.one * 0.5f);
         bullet.direction = dir;
-        bullet.speed = 7;
+        bullet.speed = 6;
         bullet.atk = 3;
-        bullet.lifetime = 10;
+        bullet.lifetime = 6;
         bullet.transform.localScale = Vector3.one;
         bullet.startOnBeat = true;
         bullet.enemySource = this;

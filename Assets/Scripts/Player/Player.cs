@@ -5,12 +5,14 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using static UnityEngine.GraphicsBuffer;
 
 public class Player : MonoBehaviour
 {
     [SerializeField] public Rigidbody2D rb;
     public static Player instance;
     public bool isPerformingAction;
+    public PlayerCamera cam;
 
     public Sprite icon;
     public string charactername = "SHIKAMI RABI";
@@ -29,12 +31,6 @@ public class Player : MonoBehaviour
     public bool onbeat;
     public bool waitForNextBeat;
 
-    protected float ScreenShakeStrength;
-    protected float ScreenShakeTime;
-
-    private Vector3 targetCameraPos;
-    protected Vector2 ScreenShakeDir;
-    protected Vector3 CameraOffset;
     protected PlayerAction action;
 
     public int CurrentHP;
@@ -59,6 +55,7 @@ public class Player : MonoBehaviour
     public PlayerStats flatBonusStats;
     public PlayerStats percentBonusStats;
     public Dictionary<string, float> abilityValues;
+    public Dictionary<string, float> itemValues;
 
     public AudioClip music_theme;
 
@@ -70,7 +67,8 @@ public class Player : MonoBehaviour
     public PlayerAbility ultimateAbility;
 
     [Header("Items")]
-    public List<PlayerItem> playerItems;
+    public List<PlayerItem> equippedItems;
+    public List<PlayerItem> evolvedItems;
 
     [Header("Prefabs")]
     public GameObject attackPrefab;
@@ -98,6 +96,24 @@ public class Player : MonoBehaviour
         return poisonStatus;
     }
 
+    public void SetMaxSP(int n)
+    {
+        bool playSound = false;
+        if (CurrentSP < MaxSP) playSound = true;
+        MaxSP = n;
+        if (CurrentSP > MaxSP)
+        {
+            CurrentSP = MaxSP;
+        }
+        if (CurrentSP == MaxSP && playSound)
+        {
+             AudioController.PlaySound(AudioController.instance.sounds.playerSpecialAvailableSfx);
+        }
+        instance.CurrentSP = Mathf.Clamp(instance.CurrentSP + n, 0, MaxSP);
+        UIManager.Instance.PlayerUI.UpdateSpecial();
+
+    }
+
     public void ForceDespawnAbilities(bool instant)
     {
         foreach (IDespawneable despawneable in despawneables)
@@ -107,18 +123,11 @@ public class Player : MonoBehaviour
         despawneables.Clear();
     }
 
-    public void ResetAbilities()
+    public virtual void ResetAbilities()
     {
         foreach (PlayerAbility ability in equippedPassiveAbilities)
         {
             ability.currentCooldown = 1;
-        }
-    }
-
-    public void UpdateAbilityTrack()
-    {
-        foreach (IDespawneable i in despawneables)
-        {
         }
     }
 
@@ -161,6 +170,19 @@ public class Player : MonoBehaviour
         }
     }
 
+    public int getItemIndex(System.Type itemType)
+    {
+        PlayerItem searchAbility = equippedItems.FirstOrDefault<PlayerItem>(x => x.GetType() == itemType);
+        if (searchAbility != null)
+        {
+            return equippedItems.IndexOf(searchAbility);
+        }
+        else
+        {
+            return equippedItems.Count();
+        }
+    }
+
     public virtual void Despawn()
     {
 
@@ -169,8 +191,7 @@ public class Player : MonoBehaviour
     public static void ResetPosition()
     {
         instance.transform.position = Vector3.zero;
-        instance.targetCameraPos = new Vector3(instance.transform.position.x, instance.transform.position.y, -60);
-        Camera.main.transform.position = instance.targetCameraPos;
+        instance.cam.SetOnPlayer();
         instance.animator.speed = 1 / BeatManager.GetBeatDuration();
         instance.animator.updateMode = AnimatorUpdateMode.Normal;
         instance.Sprite.sortingLayerID = 0;
@@ -178,11 +199,14 @@ public class Player : MonoBehaviour
     protected virtual void Awake()
     {
         instance = this;
+        cam = PlayerCamera.instance;
         UIManager.Instance.PlayerUI.SetPlayerCharacter(icon, charactername);
         abilityValues = new Dictionary<string, float>();
+        itemValues = new Dictionary<string, float>();
         despawneables = new List<IDespawneable>();
         equippedPassiveAbilities = new List<PlayerAbility>();
-        playerItems = new List<PlayerItem>();
+        equippedItems = new List<PlayerItem>();
+        evolvedItems = new List<PlayerItem>();
         spriteRendererMat = Sprite.material;
         Exclamation.SetActive(false);
         Level = 1;
@@ -198,6 +222,13 @@ public class Player : MonoBehaviour
         UIManager.Instance.PlayerUI.UpdateExp();
         UIManager.Instance.PlayerUI.UpdateSpecial();
         UIManager.Instance.PlayerUI.coinText.text = "0";
+
+        itemValues.Add("orbitalSpeed", 1.0f);
+        itemValues.Add("orbitalDamage", 1.0f);
+        itemValues.Add("explosionDamage", 1.0f);
+        itemValues.Add("explosionSize", 1.0f);
+        itemValues.Add("burnDamage", 1.0f);
+        itemValues.Add("burnDuration", 3);
     }
 
     public int CalculateExpCurve(int lv)
@@ -216,6 +247,23 @@ public class Player : MonoBehaviour
         //return (nextLevel - lastLevel) + 50;
     }
 
+    public bool hasEvolvableAbility()
+    {
+        foreach (PlayerAbility ability in equippedPassiveAbilities)
+        {
+            if (ability.isEvolved()) continue;
+            if (ability.GetLevel() >= 7)
+            {
+                PlayerItem item = equippedItems.FirstOrDefault(x => x.GetType() == ability.getEvolutionItemType());
+                
+                if (item == null) continue;
+
+                if (item.GetLevel() >= 1) return true;
+            }
+        }
+        return false;
+    }
+    
     public void CalculateStats()
     {
         currentStats = baseStats.Copy();
@@ -239,6 +287,37 @@ public class Player : MonoBehaviour
         Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -60f);
         facingRight = true;
         canDoAnything = true;
+        cam.SetOnPlayer();
+        cam.followPlayer = true;
+    }
+
+    public void Heal(float amount)
+    {
+        float baseamount = amount;
+        foreach (PlayerItem item in equippedItems)
+        {
+            amount += item.OnPreHeal(baseamount) - baseamount;
+        }
+        foreach (PlayerItem item in evolvedItems)
+        {
+            amount += item.OnPreHeal(baseamount) - baseamount;
+        }
+        if (amount == 0) return;
+
+        bool canCrit = false;
+        if (itemValues.ContainsKey("item.blessedfigure.level")) canCrit = true;
+        bool isCritical = false;
+        if (canCrit)
+        {
+           isCritical = currentStats.CritChance > Random.Range(0f, 100f);
+            if (isCritical) amount *= currentStats.CritDmg;
+        }
+        
+        amount = Mathf.RoundToInt(amount);
+        CurrentHP = (int)Mathf.Clamp(CurrentHP + amount, 0, currentStats.MaxHP);
+        UIManager.Instance.PlayerUI.UpdateHealth();
+        UIManager.Instance.PlayerUI.SpawnDamageText(transform.position, (int)amount, isCritical ? DamageTextType.CriticalHeal : DamageTextType.Heal);
+        AudioController.PlaySound(AudioController.instance.sounds.healSound);
     }
 
     // Update is called once per frame
@@ -267,7 +346,6 @@ public class Player : MonoBehaviour
         }*/
         
         HandleSprite();
-        HandleCamera();
         if (hurtSfxCD > 0) hurtSfxCD -= Time.deltaTime;
 
         if (Keyboard.current.numpad1Key.wasPressedThisFrame)
@@ -294,6 +372,14 @@ public class Player : MonoBehaviour
         {
             if (ability != null) ability.OnUpdate();
         }
+        foreach (PlayerItem item in equippedItems)
+        {
+            if (item != null) item.OnUpdate();
+        }
+        foreach (PlayerItem item in evolvedItems)
+        {
+            if (item != null) item.OnUpdate();
+        }
 
         if (activeAbility != null) { activeAbility.OnUpdate(); }
         if (ultimateAbility != null) { ultimateAbility.OnUpdate(); }
@@ -304,7 +390,9 @@ public class Player : MonoBehaviour
             float currentCD = activeAbility.currentCooldown;
             float maxCD = activeAbility.maxCooldown;
 
-            UIManager.Instance.PlayerUI.activeCDImage.fillAmount = (currentCD / maxCD);
+            if (currentCD == 0) UIManager.Instance.PlayerUI.activeCDImage.fillAmount = 0;
+            else UIManager.Instance.PlayerUI.activeCDImage.fillAmount = (currentCD / maxCD);
+
         }
         UIManager.Instance.PlayerUI.activeCDImage.transform.position = Sprite.transform.position + new Vector3(0.7f, 0.9f, 1f);
 
@@ -334,11 +422,7 @@ public class Player : MonoBehaviour
         else facingRight = true;
     }
 
-    public virtual void OnPassiveAbility1Use() { }
-
-    public virtual void OnPassiveAbility2Use() { }
-
-    public virtual void OnPassiveAbility3Use() { }
+    public virtual void OnPassiveAbilityUse() { }
 
     public virtual void OnActiveAbilityUse() { }
 
@@ -396,7 +480,7 @@ public class Player : MonoBehaviour
                 }
                 else
                 {
-                    TriggerCameraShake(0.04f, 0.2f);
+                    PlayerCamera.TriggerCameraShake(0.04f, 0.2f);
                     BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
                     
                     //waitForNextBeat = true;
@@ -416,7 +500,7 @@ public class Player : MonoBehaviour
                 }
                 else
                 {
-                    TriggerCameraShake(0.04f, 0.2f);
+                    PlayerCamera.TriggerCameraShake(0.04f, 0.2f);
                     BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
                     //waitForNextBeat = true;
                 }
@@ -438,13 +522,13 @@ public class Player : MonoBehaviour
                     // Too late to the beat = fail
                     if (!BeatManager.closestIsNextBeat() && score == BeatTrigger.FAIL)
                     {
-                        TriggerCameraShake(0.04f, 0.2f);
+                        PlayerCamera.TriggerCameraShake(0.04f, 0.2f);
                         BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
                         action = PlayerAction.None;
                     }
                     else if (BeatManager.closestIsNextBeat() && score == BeatTrigger.FAIL)
                     {
-                        TriggerCameraShake(0.04f, 0.2f);
+                        PlayerCamera.TriggerCameraShake(0.04f, 0.2f);
                         BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
                         waitForNextBeat = true;
                         action = PlayerAction.None;
@@ -547,9 +631,7 @@ public class Player : MonoBehaviour
     public void PerformAutomatedAction()
     {
         OnAttack();
-        if (equippedPassiveAbilities.Count > 0) OnPassiveAbility1Use();
-        if (equippedPassiveAbilities.Count > 1) OnPassiveAbility2Use();
-        if (equippedPassiveAbilities.Count > 2) OnPassiveAbility3Use();
+        OnPassiveAbilityUse();
     }
 
     private void PerformAction(PlayerAction Playeraction)
@@ -564,7 +646,7 @@ public class Player : MonoBehaviour
                 Move((Vector2)transform.position + direction);
                 break;
         }
-        if (!BeatManager.compassless) PerformAutomatedAction();
+        //if (!BeatManager.compassless) PerformAutomatedAction();
 
         BeatManager.OnPlayerAction();
     }
@@ -632,11 +714,7 @@ public class Player : MonoBehaviour
         yield break;
     }
 
-    public static void TriggerCameraShake(float strength, float time)
-    {
-        if (strength > instance.ScreenShakeStrength) instance.ScreenShakeStrength = strength;
-        if (time > instance.ScreenShakeTime) instance.ScreenShakeTime = time;
-    }
+    
 
 
     protected void HandleSprite()
@@ -649,37 +727,7 @@ public class Player : MonoBehaviour
         spriteRendererMat.SetColor("_EmissionColor", emissionColor);
     }
 
-    public void SetCameraPos(Vector3 pos)
-    {
-        Camera.main.transform.position = new Vector3(pos.x, pos.y, -60);
-        Player.instance.targetCameraPos = new Vector3(pos.x, pos.y, -60);
-    }
-
-    protected void HandleCamera()
-    {
-        if (Map.Instance.currentBoss != null)
-        {
-            Vector3 target = (new Vector3(transform.position.x, transform.position.y, -60) + Map.Instance.currentBoss.transform.position) / 2f;
-            target.z = -60;
-            targetCameraPos = Vector3.Lerp(targetCameraPos, target, Time.deltaTime * 8f);
-        }
-        else
-        {
-            targetCameraPos = Vector3.Lerp(targetCameraPos, new Vector3(transform.position.x, transform.position.y, -60), Time.deltaTime * 8f);
-        }
-        
-
-        // Camera ScreenShake
-        if (ScreenShakeTime > 0)
-        {
-            ScreenShakeTime = Mathf.MoveTowards(ScreenShakeTime, 0, Time.deltaTime);
-            float currentShakeStrength = ScreenShakeStrength * ScreenShakeTime;
-            ScreenShakeDir = Random.insideUnitCircle * currentShakeStrength;
-        }
-        CameraOffset = Vector3.MoveTowards(CameraOffset, ScreenShakeDir, Time.deltaTime * 24f);
-
-        Camera.main.transform.position = targetCameraPos + CameraOffset;
-    }
+   
 
     public virtual void TakeDamage(int damage)
     {
@@ -691,13 +739,30 @@ public class Player : MonoBehaviour
         {
             invulTime = 0.2f;
         }
+
+        bool doDamage = true;
+        foreach (PlayerAbility ability in equippedPassiveAbilities)
+        {
+            if (ability.onPlayerPreHurt(damage) == false)
+            {
+                doDamage = false;
+                break;
+            }
+        }
+
+        if (!doDamage)
+        {
+            UIManager.Instance.PlayerUI.SpawnDamageText(transform.position, 0, DamageTextType.Dodge);
+            return;
+        }
+
         CurrentHP = Mathf.Clamp(CurrentHP - damage, 0, 9999);
         
         UIManager.Instance.PlayerUI.UpdateHealth();
         UIManager.Instance.PlayerUI.DoHurtEffect();
         if (hurtSfxCD <= 0)
         {
-            TriggerCameraShake(0.2f, 0.1f);
+            PlayerCamera.TriggerCameraShake(0.2f, 0.1f);
             AudioController.PlaySound(AudioController.instance.sounds.playerHurtSfx);
             hurtSfxCD = 0.6f;
         }
@@ -729,7 +794,7 @@ public class Player : MonoBehaviour
     {
         if (instance.isDead) return;
         if (instance.CurrentSP < instance.MaxSP && instance.CurrentSP + n >= instance.MaxSP) AudioController.PlaySound(AudioController.instance.sounds.playerSpecialAvailableSfx);
-        instance.CurrentSP = Mathf.Clamp(instance.CurrentSP + n, 0, 250);
+        instance.CurrentSP = Mathf.Clamp(instance.CurrentSP + n, 0, instance.MaxSP);
         UIManager.Instance.PlayerUI.UpdateSpecial();
     }
 
@@ -748,12 +813,23 @@ public class Player : MonoBehaviour
         EnhancementMenu.instance.Open();
     }
 
+    public void OpenEvolutionMenu()
+    {
+        StartCoroutine(OpenEvolutionMenuCoroutine());
+    }
+    protected IEnumerator OpenEvolutionMenuCoroutine()
+    {
+        while (!BeatManager.isGameBeat) yield return new WaitForEndOfFrame();
+        BeatManager.isGameBeat = false;
+        EvolutionUI.instance.Open();
+    }
+
     public void Die()
     {
         isDead = true;
         StopAllCoroutines();
-        CameraOffset = Vector3.zero;
-        Camera.main.transform.position = new Vector3(transform.position.x, transform.position.y, -60);
+        cam.ResetOffset();
+        cam.SetOnPlayer();
         emissionColor = Color.clear;
         spriteRendererMat.SetColor("_EmissionColor", emissionColor);
 

@@ -17,15 +17,14 @@ public class CarrotJuice : MonoBehaviour, IDespawneable
     public void OnEnable()
     {
         int level = (int)Player.instance.abilityValues["ability.carrotjuice.level"];
-        if (level >= 3) transform.localScale = Vector3.one * 2f;
-        else transform.localScale = Vector3.one;
+        transform.localScale = Vector3.one * (level < 5 ? 1f : 1.5f);
 
-        dmg = level < 4 ? level < 2 ? 4f : 6f : 9f;
+        dmg = level < 6 ? level < 4 ? level < 2 ? 4f : 6f : 8f : 12f;
 
         animator.Play("CarrotJuice_Spawn");
         enemies = new List<Enemy>();
         cd = 0;
-        beats = 16;
+        beats = 12;
         AudioController.PlaySound(breakSound, Random.Range(0.8f, 1.2f));
     }
     public void OnAnimationEnd()
@@ -55,7 +54,7 @@ public class CarrotJuice : MonoBehaviour, IDespawneable
 
         if (cd <= 0)
         {
-            cd = 0.1f;
+            cd = BeatManager.GetBeatDuration() / 4f;
             for (int i = 0; i < enemies.Count; i++)
             {
                 float damage = Player.instance.currentStats.Atk * dmg;

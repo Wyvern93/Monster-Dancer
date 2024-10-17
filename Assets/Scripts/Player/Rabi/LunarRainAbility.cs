@@ -3,9 +3,6 @@ using UnityEngine;
 
 public class LunarRainAbility : PlayerAbility
 {
-    public LunarRainAbility(): base(4)
-    {
-    }
     public override bool CanCast()
     {
         return currentCooldown == 0;
@@ -26,14 +23,9 @@ public class LunarRainAbility : PlayerAbility
         return new List<Enhancement>() { new LunarRainAbilityEnhancement() };
     }
 
-    public override Sprite GetIcon()
+    public override string getId()
     {
-        return IconList.instance.lunarRain;
-    }
-
-    public override string getID()
-    {
-        return "rabi.lunarrain";
+        return "lunarrain";
     }
     public override bool isUltimate()
     {
@@ -42,7 +34,7 @@ public class LunarRainAbility : PlayerAbility
     public override void OnCast()
     {
         int level = (int)Player.instance.abilityValues["ability.lunarrain.level"];
-        maxCooldown = level < 5 ? level < 5 ? 4 : 2 : 1;
+        maxCooldown = level < 5 ? level < 3 ? 4 : 2 : 1;
         currentCooldown = maxCooldown;
 
         CastRay();

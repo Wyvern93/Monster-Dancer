@@ -4,13 +4,10 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
 
-public class CarrotDeliveryAbility : PlayerAbility
+public class CarrotDeliveryAbility : PlayerAbility, IPlayerProjectile
 {
     public int minCooldown = 1;
     int level;
-    public CarrotDeliveryAbility() : base(0)
-    {
-    }
 
     public override bool CanCast()
     {
@@ -35,9 +32,9 @@ public class CarrotDeliveryAbility : PlayerAbility
     {
         return true;
     }
-    public override string getID()
+    public override string getId()
     {
-        return "rabi.carrotdelivery";
+        return "carrotdelivery";
     }
 
     public override void OnCast()
@@ -56,7 +53,7 @@ public class CarrotDeliveryAbility : PlayerAbility
         rabi.animator.Play("Rabi_Ultimate");
 
         AudioController.PlaySound(AudioController.instance.sounds.playerSpecialUseSfx);
-        Player.TriggerCameraShake(3f, 1f);
+        PlayerCamera.TriggerCameraShake(3f, 1f);
         CarrotDeliveryTruck truck = PoolManager.Get<CarrotDeliveryTruck>();
         truck.ability = this;
         Player.instance.despawneables.Add(truck);
@@ -67,12 +64,6 @@ public class CarrotDeliveryAbility : PlayerAbility
         rabi.animator.Play("Rabi_Idle");
         yield break;
     }
-
-    public override Sprite GetIcon()
-    {
-        return IconList.instance.carrotDelivery;
-    }
-
     public override void OnEquip()
     {
         

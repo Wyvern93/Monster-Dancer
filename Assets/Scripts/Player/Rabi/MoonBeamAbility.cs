@@ -9,9 +9,6 @@ public class MoonBeamAbility : PlayerAbility
 {
     public int minCooldown = 1;
     int level;
-    public MoonBeamAbility() : base(14)
-    {
-    }
 
     public override bool CanCast()
     {
@@ -33,9 +30,9 @@ public class MoonBeamAbility : PlayerAbility
         return new List<Enhancement>() { new MoonBeamAbilityEnhancement() };
     }
 
-    public override string getID()
+    public override string getId()
     {
-        return "rabi.moonbeam";
+        return "moonbeam";
     }
     public override bool isUltimate()
     {
@@ -61,11 +58,6 @@ public class MoonBeamAbility : PlayerAbility
             if (e == null) moonBeam.movDir = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f));
             else moonBeam.movDir = (e.transform.position - rabi.transform.position);
         }
-    }
-
-    public override Sprite GetIcon()
-    {
-        return IconList.instance.moonBeam;
     }
 
     public override void OnEquip()

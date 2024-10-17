@@ -26,7 +26,7 @@ public class Fairy : MonoBehaviour
     {
         if (collision.CompareTag("Player") && collision.gameObject.name == "Player")
         {
-            // Do Fairy Menu
+            Player.instance.OpenEvolutionMenu();
         }
     }
 

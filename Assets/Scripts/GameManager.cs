@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using static UnityEngine.GraphicsBuffer;
 
 public class GameManager : MonoBehaviour
 {
@@ -19,11 +20,14 @@ public class GameManager : MonoBehaviour
     public static bool compassless;
     public IconList iconList;
     public GameObject spriteTrailPrefab;
+    public static bool isDebugMode = true;
 
     private void Awake()
     {
         instance = this;
         DontDestroyOnLoad(gameObject);
+        iconList.abilityAtlas = Resources.LoadAll<Sprite>("UI/AbilityList");
+        iconList.itemAtlas = Resources.LoadAll<Sprite>("UI/ItemList");
         UIManager.Instance.PlayerUI.HideUI();
         UIManager.Instance.SetGameOverBG(false);
 
@@ -106,6 +110,15 @@ public class GameManager : MonoBehaviour
     {
         runData.possibleStatEnhancements = new List<Enhancement>()
         { new StatDMGEnhancement(), new StatHPEnhancement(), new StatEXPPercentEnhancement(), new StatCritChanceEnhancement(), new MovSpeedEnhancement() };
+        runData.possibleItemEnhancements = new List<Enhancement>()
+        {
+            new BlessedFigureItemEnhancement(),
+            new SpindiscItemEnhancement(),
+            new FireworksKitItemEnhancement(),
+            new DetonationCatalystItemEnhancement(),
+            new HotSauceBottleItemEnhancement(),
+            new CursedNecklaceItemEnhancement()
+        };
     }
 
     private IEnumerator LoadMapCoroutine(string map)
@@ -159,7 +172,8 @@ public class GameManager : MonoBehaviour
         Camera.main.transform.position = new Vector3(Map.Instance.startPosition.position.x, Map.Instance.startPosition.position.y, Camera.main.transform.position.z);
         Player.instance.canDoAnything = true;
 
-        Player.instance.SetCameraPos(Map.Instance.startPosition.position);
+        PlayerCamera.instance.SetOnPlayer();
+        PlayerCamera.instance.followPlayer = true;
         Player.instance.isMoving = false;
         if (Player.instance is PlayerRabi) Player.instance.animator.Play("Rabi_Idle");
         yield break;

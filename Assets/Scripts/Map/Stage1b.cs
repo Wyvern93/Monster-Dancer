@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using static UnityEngine.GraphicsBuffer;
 
 public class Stage1b : Map
 {
@@ -84,6 +85,7 @@ public class Stage1b : Map
         // This is supposed to be an animation
         ForceDespawnBullets();
         Player.instance.canDoAnything = false;
+        PlayerCamera.instance.followPlayer = false;
         Player.instance.ForceDespawnAbilities(false);
         Player.instance.ResetAbilities();
         Player.instance.StopAllCoroutines();
@@ -107,7 +109,7 @@ public class Stage1b : Map
         Dialogue dialogue = Player.instance is PlayerRabi ? rabiEndDialogue : rabiEndDialogue;
         UIManager.Instance.dialogueMenu.StartCutscene(dialogue.entries);
         yield return new WaitForEndOfFrame();
-        Camera.main.transform.position = new Vector3(CutsceneAnimator.transform.position.x, CutsceneAnimator.transform.position.y, -60);
+        PlayerCamera.instance.SetCameraPos(CutsceneAnimator.transform.position);
         PoolManager.Return(boss.gameObject, boss.GetType());
         while (!UIManager.Instance.dialogueMenu.hasFinished) yield return new WaitForEndOfFrame();
         yield return new WaitForSeconds(1f);
@@ -161,9 +163,9 @@ public class Stage1b : Map
             new ChangeSpawnCooldownEvent(11, 120),
             new ChangeSpawnCooldownEvent(10, 180),
             new ChangeSpawnCooldownEvent(12, 240),
-            new ChangeSpawnCooldownEvent(9, 360),
-            new ChangeSpawnCooldownEvent(8, 480),
-            new ChangeSpawnCooldownEvent(8, 540),
+            new ChangeSpawnCooldownEvent(11, 360),
+            new ChangeSpawnCooldownEvent(12, 480),
+            new ChangeSpawnCooldownEvent(10, 540),
             
             new AddEnemyEvent(EnemyType.WiggleViper, 5, 0, 0), // wiggleviper
             new AddEnemyEvent(EnemyType.MuscleHare, 1, 0, 30),
@@ -179,11 +181,11 @@ public class Stage1b : Map
             new RemoveEnemyEvent(EnemyType.Rhytmia, 0, 300),
             new RemoveEnemyEvent(EnemyType.Fungoo, 0, 360),
             new RemoveEnemyEvent(EnemyType.StayinUndead, 0, 420),
-            new RemoveEnemyEvent(EnemyType.Purrfessor, 0, 540),
-            new RemoveEnemyEvent(EnemyType.ZippyBat, 0, 600),
-            new RemoveEnemyEvent(EnemyType.VampiLoli, 0, 540),
-            new RemoveEnemyEvent(EnemyType.OjouGuardian, 0, 570),
-            new RemoveEnemyEvent(EnemyType.Kappa, 0, 600),
+            new RemoveEnemyEvent(EnemyType.Purrfessor, 0, 480),
+            new RemoveEnemyEvent(EnemyType.ZippyBat, 0, 595),
+            //new RemoveEnemyEvent(EnemyType.VampiLoli, 0, 540),
+            //new RemoveEnemyEvent(EnemyType.OjouGuardian, 0, 570),
+            new RemoveEnemyEvent(EnemyType.Kappa, 0, 595),
             
             new SpawnEliteEvent(EnemyType.MuscleHareElite, 120), // 120
             new SpawnEliteEvent(EnemyType.RhytmiaElite, 240), // 240

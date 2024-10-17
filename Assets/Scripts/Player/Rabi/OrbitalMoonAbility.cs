@@ -4,10 +4,6 @@ using UnityEngine;
 
 public class OrbitalMoonAbility : PlayerAbility
 {
-
-    public OrbitalMoonAbility() : base(20)
-    {
-    }
     public override bool CanCast()
     {
         return currentCooldown == 0;
@@ -27,18 +23,13 @@ public class OrbitalMoonAbility : PlayerAbility
     {
         return new List<Enhancement>() { new OrbitalMoonAbilityEnhancement() };
     }
-
-    public override Sprite GetIcon()
-    {
-        return IconList.instance.orbitalMoon;
-    }
     public override bool isUltimate()
     {
         return false;
     }
-    public override string getID()
+    public override string getId()
     {
-        return "rabi.orbitalmoon";
+        return "orbitalmoon";
     }
 
     public override void OnCast()
@@ -79,5 +70,10 @@ public class OrbitalMoonAbility : PlayerAbility
     public override void OnUpdate()
     {
         if (BeatManager.isGameBeat && currentCooldown > 0) currentCooldown--;
+    }
+
+    public override System.Type getEvolutionItemType()
+    {
+        return typeof(HotSauceBottleItem);
     }
 }

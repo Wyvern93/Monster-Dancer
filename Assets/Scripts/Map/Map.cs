@@ -11,7 +11,7 @@ public class Map : MonoBehaviour
     public List<MapTrack> tracks;
     public LayerMask nonPassableMask;
     public GameObject enemyPrefab;
-    protected float SpawnRadius = 15f;
+    protected float SpawnRadius = 8f;
 
     public Transform startPosition;
 
@@ -23,6 +23,8 @@ public class Map : MonoBehaviour
     public GameObject bulletSpawnPrefab;
     public GameObject coinPrefab;
     public GameObject bulletBasePrefab;
+    public GameObject foodPrefab;
+    public GameObject burningPrefab;
 
     //public GameObject bossAPrefab;
     public static float StageTime;
@@ -63,8 +65,11 @@ public class Map : MonoBehaviour
     public Boss currentBoss;
     public SpriteRenderer bossArea;
 
+    private float spawnAngle;
     [SerializeField]protected Dialogue rabiEndDialogue;
     [SerializeField] public Animator CutsceneAnimator;
+
+    public Fairy fairyCage;
 
     public static void ForceDespawnEnemies()
     {
@@ -151,6 +156,7 @@ public class Map : MonoBehaviour
 
         // Player can't move
         Player.instance.canDoAnything = false;
+        PlayerCamera.instance.followPlayer = false;
         Player.instance.ForceDespawnAbilities(false);
         Player.instance.ResetAbilities();
 
@@ -163,7 +169,7 @@ public class Map : MonoBehaviour
         mapObjects.SetActive(false);
         bossGrid.SetActive(true);
         Player.instance.transform.position = PlayerPositionOnBoss.position;
-        Camera.main.transform.position = new Vector3(PlayerPositionOnBoss.position.x, PlayerPositionOnBoss.position.y, Camera.main.transform.position.z);
+        PlayerCamera.instance.SetCameraPos(PlayerPositionOnBoss.position);
 
         Vector3 spawnPos = BossPosition.position; //new Vector3(Mathf.RoundToInt(x), Mathf.RoundToInt(y));
 
@@ -171,9 +177,11 @@ public class Map : MonoBehaviour
         yield return new WaitForSeconds(1f);
 
         float time = 2;
+        Vector3 c = PlayerCamera.instance.transform.position;
         while (time > 0)
         {
-            Camera.main.transform.position = Vector3.MoveTowards(Camera.main.transform.position, new Vector3(spawnPos.x, spawnPos.y, Camera.main.transform.position.z), Time.deltaTime * 2f);
+            c = Vector3.MoveTowards(c, new Vector3(spawnPos.x, spawnPos.y, -60), Time.deltaTime * 2f);
+            PlayerCamera.instance.SetCameraPos(c);
             time -= Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
@@ -270,20 +278,21 @@ public class Map : MonoBehaviour
         PoolManager.CreatePool(typeof(SpawnEffect), enemySpawnPrefab, 10);
         PoolManager.CreatePool(typeof(BulletBase), bulletBasePrefab, 500);
         PoolManager.CreatePool(typeof(BulletSpawnEffect), bulletSpawnPrefab, 100);
+        PoolManager.CreatePool(typeof(Food), foodPrefab, 50);
+        PoolManager.CreatePool(typeof(BurningVisualEffect), burningPrefab, 50);
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (!GameManager.isPaused) spawnAngle += Time.deltaTime * 30;
+
+
         if (Keyboard.current.f6Key.wasPressedThisFrame)
         {
             foreach (Enemy enemy in Instance.enemiesAlive)
             {
-                if (enemy.CanBeStunned(true)) enemy.OnStun(4);
-            }
-            foreach (Bullet bullet in Instance.bulletsSpawned)
-            {
-                bullet.OnStun(4);
+                enemy.OnBurn();
             }
         }
         HandleStageLoop();
@@ -413,18 +422,21 @@ public class Map : MonoBehaviour
         PoolManager.RemovePool(typeof(SpawnEffect));
         PoolManager.RemovePool(typeof(BulletBase));
         PoolManager.RemovePool(typeof(BulletSpawnEffect));
+        PoolManager.RemovePool(typeof(Food));
+        PoolManager.RemovePool(typeof(BurningVisualEffect));
     }
 
     public static void SpawnEnemy(SpawnData spawnData)
     {
         if (spawnData == null) return;
 
-        float angle, x, y;
+
+        float x, y;
         while (true)
         {
-            angle = Random.Range(0, 360f);
-            x = Player.instance.transform.position.x + (Instance.SpawnRadius * Mathf.Cos(angle));
-            y = Player.instance.transform.position.y + (Instance.SpawnRadius * Mathf.Sin(angle));
+            Instance.spawnAngle += 1;
+            x = Player.instance.transform.position.x + (Instance.SpawnRadius * 1.7f * Mathf.Cos(Instance.spawnAngle));
+            y = Player.instance.transform.position.y + (Instance.SpawnRadius * Mathf.Sin(Instance.spawnAngle));
             if (!isWallAt(new Vector2(x, y))) break;
         }
         Vector3 spawnPos = new Vector3(x,y);
@@ -619,18 +631,20 @@ public class Map : MonoBehaviour
     {
         // This is supposed to be an animation
         ForceDespawnBullets();
-        Player.TriggerCameraShake(2f, 0.45f);
+        PlayerCamera.TriggerCameraShake(2f, 0.45f);
         Player.instance.isMoving = true;
         if (Player.instance is PlayerRabi) Player.instance.animator.Play("Rabi_Idle");
         yield return new WaitForSeconds(0.45f); // This is when the white screen is pure white
         Player.instance.canDoAnything = false;
+        PlayerCamera.instance.followPlayer = false;
         BeatManager.FadeOut(2f);
         currentBoss = null;
 
         PoolManager.Return(boss.gameObject, boss.GetType());
         Player.instance.facingRight = true;
         Player.instance.Sprite.transform.localScale = Vector3.one;
-        Camera.main.transform.position = new Vector3(Player.instance.transform.position.x, Player.instance.transform.position.y, Camera.main.transform.position.z);
+        PlayerCamera.instance.SetOnPlayer();
+
         foreach (GameObject g in stageGridObjects)
         {
             g.SetActive(false);

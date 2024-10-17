@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Drawing;
 using UnityEngine;
 
@@ -15,9 +16,11 @@ public class PiercingShot : MonoBehaviour, IDespawneable
 
     [SerializeField] SpriteTrail trail;
     [SerializeField] SpriteRenderer sprite;
+    public List<Enemy> enemiesHit;
 
     public void OnEnable()
     {
+        enemiesHit.Clear();
         level = (int)Player.instance.abilityValues["ability.piercingshot.level"];
         dmg = level < 4 ? level < 2 ? 20f : 26f : 34f;
         splitOnTouch = level >= 7;
@@ -52,12 +55,23 @@ public class PiercingShot : MonoBehaviour, IDespawneable
         if (collision.CompareTag("Enemy"))
         {
             Enemy enemy = collision.GetComponent<Enemy>();
+            if (enemiesHit.Contains(enemy)) return;
+
+            enemiesHit.Add(enemy);
 
             float damage = (int)(Player.instance.currentStats.Atk * dmg * (isSmall ? 0.75f : 1f));
             bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
             if (isCritical) damage *= Player.instance.currentStats.CritDmg;
 
             enemy.TakeDamage((int)damage, isCritical);
+            foreach (PlayerItem item in Player.instance.equippedItems)
+            {
+                item.OnHit(Player.instance.equippedPassiveAbilities.Find(x => x.GetType() == typeof(PiercingShotAbility)), damage, enemy);
+            }
+            foreach (PlayerItem item in Player.instance.evolvedItems)
+            {
+                item.OnHit(Player.instance.equippedPassiveAbilities.Find(x => x.GetType() == typeof(PiercingShotAbility)), damage, enemy);
+            }
             if (knockback)
             {
                 Vector2 dir = enemy.transform.position - Player.instance.transform.position;
@@ -76,6 +90,7 @@ public class PiercingShot : MonoBehaviour, IDespawneable
                 shot1.transform.position = transform.position;
                 shot1.isSmall = true;
                 shot1.PlayAnimation();
+                shot1.enemiesHit = enemiesHit;
                 Player.instance.despawneables.Add(shot1);
 
                 PiercingShot shot2 = PoolManager.Get<PiercingShot>();
@@ -83,6 +98,7 @@ public class PiercingShot : MonoBehaviour, IDespawneable
                 shot2.transform.position = transform.position;
                 shot2.isSmall = true;
                 shot2.PlayAnimation();
+                shot2.enemiesHit = enemiesHit;
                 Player.instance.despawneables.Add(shot2);
 
                 Player.instance.despawneables.Remove(this);

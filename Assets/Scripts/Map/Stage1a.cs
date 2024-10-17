@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static UnityEngine.GraphicsBuffer;
 
 public class Stage1a : Map
 {
@@ -86,6 +87,7 @@ public class Stage1a : Map
         // This is supposed to be an animation
         ForceDespawnBullets();
         Player.instance.canDoAnything = false;
+        PlayerCamera.instance.followPlayer = false;
         Player.instance.ForceDespawnAbilities(false);
         Player.instance.ResetAbilities();
         Player.instance.StopAllCoroutines();
@@ -109,7 +111,7 @@ public class Stage1a : Map
         Dialogue dialogue = Player.instance is PlayerRabi ? rabiEndDialogue : rabiEndDialogue;
         UIManager.Instance.dialogueMenu.StartCutscene(dialogue.entries);
         yield return new WaitForEndOfFrame();
-        Camera.main.transform.position = new Vector3(CutsceneAnimator.transform.position.x, CutsceneAnimator.transform.position.y, -60);
+        PlayerCamera.instance.SetCameraPos(CutsceneAnimator.transform.position);
         PoolManager.Return(boss.gameObject, boss.GetType());
         while (!UIManager.Instance.dialogueMenu.hasFinished) yield return new WaitForEndOfFrame();
         yield return new WaitForSeconds(1f);
@@ -158,14 +160,14 @@ public class Stage1a : Map
             new ChangeSpawnRateEvent(11, 570),
             new ChangeSpawnRateEvent(0, 595), // boss
 
-            new ChangeSpawnCooldownEvent(14, 0),
+            new ChangeSpawnCooldownEvent(12, 0),
             new ChangeSpawnCooldownEvent(10, 30),
             new ChangeSpawnCooldownEvent(12, 120),
-            new ChangeSpawnCooldownEvent(10, 180),
-            new ChangeSpawnCooldownEvent(8, 240),
-            new ChangeSpawnCooldownEvent(6, 360),
+            new ChangeSpawnCooldownEvent(11, 180),
+            new ChangeSpawnCooldownEvent(11, 240),
+            new ChangeSpawnCooldownEvent(9, 360),
             new ChangeSpawnCooldownEvent(12, 480),
-            new ChangeSpawnCooldownEvent(8, 540),
+            new ChangeSpawnCooldownEvent(9, 540),
 
             new AddEnemyEvent(EnemyType.NomSlime, 5, 0, 0), // nomslime
             new AddEnemyEvent(EnemyType.SlimeDancer, 1, 0, 30),
@@ -182,10 +184,10 @@ public class Stage1a : Map
             new RemoveEnemyEvent(EnemyType.ZombieThief, 0, 300),
             new RemoveEnemyEvent(EnemyType.BooJr, 0, 360),
             new RemoveEnemyEvent(EnemyType.Poisy, 0, 480),
-            new RemoveEnemyEvent(EnemyType.Tronco, 0, 510),
-            new RemoveEnemyEvent(EnemyType.Dancearune, 0, 520),
-            new RemoveEnemyEvent(EnemyType.Skeleko, 0, 540),
-            new RemoveEnemyEvent(EnemyType.ZombieBride, 0, 540),
+            new RemoveEnemyEvent(EnemyType.Tronco, 0, 520),
+            new RemoveEnemyEvent(EnemyType.Dancearune, 0, 580),
+            new RemoveEnemyEvent(EnemyType.Skeleko, 0, 590),
+            new RemoveEnemyEvent(EnemyType.ZombieBride, 0, 590),
             
             new SpawnEliteEvent(EnemyType.NomSlimeElite, 120),
             

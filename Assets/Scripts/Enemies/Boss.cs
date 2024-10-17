@@ -52,7 +52,7 @@ public class Boss : Enemy
         
     }
 
-    public override void TakeDamage(int damage, bool isCritical)
+    public override void TakeDamage(float damage, bool isCritical)
     {
         if (State == BossState.Introduction || State == BossState.Dialogue || State == BossState.Defeat) return;
         base.TakeDamage(damage, isCritical);
@@ -72,7 +72,7 @@ public class Boss : Enemy
         o.transform.position = transform.position;
         o.SetActive(true);
 
-        AudioController.PlaySound(AudioController.instance.sounds.bossDeath);
+        AudioController.PlaySound(AudioController.instance.sounds.bossDeath, side:true);
         Map.Instance.OnBossDeath(this);
     }
 

@@ -836,9 +836,9 @@ public class NebulionBoss : Boss
         StopAllCoroutines();
         rb.velocity = Vector2.zero;
         velocity = Vector2.zero;
-        Player.TriggerCameraShake(1f, 1f);
+        PlayerCamera.TriggerCameraShake(1f, 1f);
 
-        AudioController.PlaySound(AudioController.instance.sounds.bossPhaseEnd);
+        AudioController.PlaySound(AudioController.instance.sounds.bossPhaseEnd, side: true);
         foreach (Bullet b in allBullets)
         {
             if (!b.gameObject.activeSelf) continue;
@@ -951,7 +951,7 @@ public class NebulionBoss : Boss
         return true;
     }
 
-    public override void TakeDamage(int damage, bool isCritical)
+    public override void TakeDamage(float damage, bool isCritical)
     {
         base.TakeDamage(damage, isCritical);
 
@@ -967,7 +967,7 @@ public class NebulionBoss : Boss
         {
             b.ForceDespawn();
         }
-        Player.TriggerCameraShake(2f, 0.45f);
+        PlayerCamera.TriggerCameraShake(2f, 0.45f);
         base.Die();
     }
 
@@ -990,7 +990,8 @@ public class NebulionBoss : Boss
             time -= Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
-        Player.instance.SetCameraPos(target);
+        PlayerCamera.instance.SetCameraPos(target);
+        PlayerCamera.instance.followPlayer = true;
         UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
         UIManager.Instance.PlayerUI.SetBossBarName(GetName());
         UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stageboss")}");

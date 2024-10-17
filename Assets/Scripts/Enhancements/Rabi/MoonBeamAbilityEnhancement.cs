@@ -10,19 +10,13 @@ public class MoonBeamAbilityEnhancement : Enhancement
         {
             default:
             case 1: return "Shoot a moonlight ball of lasers that deal damage to enemies";
-            case 2: return "Increase damage by <color=\"green\">20%</color>";
-            case 3: return "Increase duration by <color=\"green\">50%</color>";
-            case 4: return "Increase damage by <color=\"green\">30%</color>";
-            case 5: return "Adds a <color=\"green\">second</color> moonlight ball";
+            case 2: return "Increase damage from <color=\"green\">10 -> 14</color>";
+            case 3: return "Increase duration from <color=\"green\">4 -> 6</color> beats";
+            case 4: return "Increase damage from <color=\"green\">14 -> 20</color>";
+            case 5: return "<color=\"green\">1 -> 2</color> moonlight balls spawn";
             case 6: return "Increase size by <color=\"green\">25%</color>";
-            case 7: return "Moonball casts moon echos when hitting enemies once per beat";
+            case 7: return "Moonballs casts moon echos when hitting enemies";
         }
-    }
-
-    public override int getLevel()
-    {
-        if (!Player.instance.abilityValues.ContainsKey("ability.moonbeam.level")) return 0;
-        else return (int)Player.instance.abilityValues["ability.moonbeam.level"];
     }
 
     public override string getName()
@@ -30,14 +24,14 @@ public class MoonBeamAbilityEnhancement : Enhancement
         return "Moon Beam";
     }
 
-    public override string getType()
+    public override string getDescriptionType()
     {
-        return "Special";
+        return "Passive";
     }
 
     public override string getId()
     {
-        return "rabi.moonbeam";
+        return "moonbeam";
     }
 
     public override int getWeight()
@@ -45,51 +39,12 @@ public class MoonBeamAbilityEnhancement : Enhancement
         return 2;
     }
 
-    public override bool isAvailable()
+    public override PlayerAbility getAbility()
     {
-        bool available = true;
-        if (Player.instance.equippedPassiveAbilities.Count == 5) available = false;
-        if (Player.instance.equippedPassiveAbilities.Find(x => x.getID() == "rabi.moonbeam") != null)
-        {
-            if (Player.instance.abilityValues["ability.moonbeam.level"] < 7) available = true;
-            else available = false;
-        }
-
-
-        return available;
+        return new MoonBeamAbility();
     }
-
-    public override bool isUnique()
+    public override EnhancementType GetEnhancementType()
     {
-        return false;
-    }
-
-    public override Sprite getIcon()
-    {
-        return IconList.instance.moonBeam;
-    }
-
-    public override void OnEquip()
-    {
-        if (isUnique()) GameManager.runData.RemoveSkillEnhancement(this);
-        Player.instance.enhancements.Add(new MoonBeamAbilityEnhancement());
-        if (!Player.instance.abilityValues.ContainsKey("ability.moonbeam.level"))
-        {
-            Player.instance.abilityValues.Add("ability.moonbeam.level", 1);
-            Player.instance.equippedPassiveAbilities.Add(new MoonBeamAbility());
-            UIManager.Instance.PlayerUI.SetPassiveIcon(IconList.instance.moonBeam, 1, false, Player.instance.getPassiveAbilityIndex(typeof(MoonBeamAbility)));
-        }
-        else
-        {
-            Player.instance.abilityValues["ability.moonbeam.level"] += 1;
-            int level = (int)Player.instance.abilityValues["ability.moonbeam.level"];
-            UIManager.Instance.PlayerUI.SetPassiveLevel(level, level >= 4, Player.instance.getPassiveAbilityIndex(typeof(MoonBeamAbility)));
-        }
-        Player.instance.CalculateStats();
-    }
-
-    public override void OnStatCalculate(ref PlayerStats flatBonus, ref PlayerStats percentBonus)
-    {
-
+        return EnhancementType.Ability;
     }
 }

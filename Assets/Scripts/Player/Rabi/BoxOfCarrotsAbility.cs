@@ -4,10 +4,6 @@ using UnityEngine;
 
 public class BoxOfCarrotsAbility : PlayerAbility
 {
-
-    public BoxOfCarrotsAbility() : base(20)
-    {
-    }
     public override bool CanCast()
     {
         return currentCooldown == 0;
@@ -27,18 +23,13 @@ public class BoxOfCarrotsAbility : PlayerAbility
     {
         return new List<Enhancement>() { new BoxOfCarrotsAbilityEnhancement() };
     }
-
-    public override Sprite GetIcon()
-    {
-        return IconList.instance.boxofCarrots;
-    }
     public override bool isUltimate()
     {
         return false;
     }
-    public override string getID()
+    public override string getId()
     {
-        return "rabi.boxofcarrots";
+        return "boxofcarrots";
     }
 
     public override void OnCast()
@@ -65,5 +56,10 @@ public class BoxOfCarrotsAbility : PlayerAbility
     public override void OnUpdate()
     {
         if (BeatManager.isGameBeat && currentCooldown > 0) currentCooldown--;
+    }
+
+    public override System.Type getEvolutionItemType()
+    {
+        return typeof(FireworksKitItem);
     }
 }

@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Tilemaps;
 using UnityEngine;
 
 public class DancearuneElite : Enemy
@@ -138,7 +137,7 @@ public class DancearuneElite : Enemy
         }
         animator.Play("dancearune_normal");
         AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
-        Player.TriggerCameraShake(0.5f, 0.2f);
+        PlayerCamera.TriggerCameraShake(0.5f, 0.2f);
         velocity = Vector2.zero;
         Sprite.transform.localPosition = Vector3.zero;
 

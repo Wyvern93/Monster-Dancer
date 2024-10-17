@@ -11,7 +11,7 @@ public class ZombieThief : Enemy
         isMoving = false;
         Sprite.transform.localPosition = Vector3.zero;
         animator.Play("zombiethief_normal");
-        animator.speed = 1f / BeatManager.GetBeatDuration();
+        animator.speed = 1f / BeatManager.GetBeatDuration() * 2;
     }
     protected override void OnBeat()
     {

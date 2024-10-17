@@ -6,29 +6,17 @@ public class CarrotJuiceAbilityEnhancement : Enhancement
     public override string GetDescription()
     {
         int level = getLevel() + 1;
-        if (level == 1)
+        switch (level)
         {
-            return "Rabi throws a carrot juice bottle that spills and deals <color=\"green\">25%</color> of your damage repeatedly on contact";
+            default:
+            case 1: return "Throw a Carrot Juice Bottle that spills and deals damage to enemies in contact";
+            case 2: return "Increases damage from <color=\"green\">4 -> 6</color>";
+            case 3: return "Reduces the cooldown from <color=\"green\">26 -> 12</color> beats";
+            case 4: return "Increases damage from <color=\"green\">6 -> 8</color>";
+            case 5: return "Increases juice size to <color=\"green\">150%</color>";
+            case 6: return "Increases damage from <color=\"green\">8 -> 12</color>";
+            case 7: return "Throw <color=\"green\">1 -> 2</color> juice bottles";
         }
-        if (level == 2)
-        {
-            return "Throws carrot bottles every <color=\"green\">20->12</color> beats and deals <color=\"green\">50%</color> more damage";
-        }
-        if (level == 3)
-        {
-            return "Carrot juice is <color=\"green\">200%</color> bigger";
-        }
-        if (level == 4)
-        {
-            return "Rabi throws <color=\"green\">1->2</color> carrot juice bottles, increases damage a <color=\"green\">50%</color>";
-        }
-        return "";
-    }
-
-    public override int getLevel()
-    {
-        if (!Player.instance.abilityValues.ContainsKey("ability.carrotjuice.level")) return 0;
-        else return (int)Player.instance.abilityValues["ability.carrotjuice.level"];
     }
 
     public override string getName()
@@ -38,10 +26,10 @@ public class CarrotJuiceAbilityEnhancement : Enhancement
 
     public override string getId()
     {
-        return "rabi.carrotjuice";
+        return "carrotjuice";
     }
 
-    public override string getType()
+    public override string getDescriptionType()
     {
         return "Passive";
     }
@@ -50,51 +38,13 @@ public class CarrotJuiceAbilityEnhancement : Enhancement
         return 4;
     }
 
-    public override bool isAvailable()
+    public override PlayerAbility getAbility()
     {
-        bool available = true;
-        if (Player.instance.equippedPassiveAbilities.Count == 5) available = false;
-        if(Player.instance.equippedPassiveAbilities.Find(x => x.getID() == "rabi.carrotjuice") != null)
-        {
-            if (Player.instance.abilityValues["ability.carrotjuice.level"] < 4) available = true;
-            else available = false;
-        }
-
-
-        return available;
+        return new CarrotJuiceAbility();
     }
 
-    public override bool isUnique()
+    public override EnhancementType GetEnhancementType()
     {
-        return false;
-    }
-
-    public override Sprite getIcon()
-    {
-        return IconList.instance.carrotJuice;
-    }
-
-    public override void OnEquip()
-    {
-        if (isUnique()) GameManager.runData.RemoveSkillEnhancement(this);
-        Player.instance.enhancements.Add(new CarrotJuiceAbilityEnhancement());
-        if (!Player.instance.abilityValues.ContainsKey("ability.carrotjuice.level"))
-        {
-            Player.instance.abilityValues.Add("ability.carrotjuice.level", 1);
-            Player.instance.equippedPassiveAbilities.Add(new CarrotJuiceAbility());
-            UIManager.Instance.PlayerUI.SetPassiveIcon(IconList.instance.carrotJuice, 1,false, Player.instance.getPassiveAbilityIndex(typeof(CarrotJuiceAbility)));
-        }
-        else
-        {
-            Player.instance.abilityValues["ability.carrotjuice.level"] += 1;
-            int level = (int)Player.instance.abilityValues["ability.carrotjuice.level"];
-            UIManager.Instance.PlayerUI.SetPassiveLevel(level, level >= 4, Player.instance.getPassiveAbilityIndex(typeof(CarrotJuiceAbility)));
-        }
-        Player.instance.CalculateStats();
-    }
-
-    public override void OnStatCalculate(ref PlayerStats flatBonus, ref PlayerStats percentBonus)
-    {
-        
+        return EnhancementType.Ability;
     }
 }

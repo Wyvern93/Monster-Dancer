@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 public class CarrotExplosion : MonoBehaviour
@@ -7,7 +8,6 @@ public class CarrotExplosion : MonoBehaviour
     public void OnEnable()
     {
         transform.localScale = Vector3.one;
-        Player.TriggerCameraShake(0.3f, 0.2f);
         AudioController.PlaySound(explosionSound);
     }
     public void OnAnimationEnd()
@@ -21,11 +21,13 @@ public class CarrotExplosion : MonoBehaviour
         {
             Enemy enemy = collision.GetComponent<Enemy>();
 
-            float damage = Player.instance.currentStats.Atk * dmg;
+            float damage = Player.instance.currentStats.Atk * dmg * Player.instance.itemValues["explosionDamage"];
+            if (Player.instance.enhancements.Any(x => x.GetType() == typeof(DetonationCatalystItemEnhancement))) damage *= (Player.instance.itemValues["explosionSize"] * 1.5f) - 0.5f;
+
             bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
             if (isCritical) damage *= Player.instance.currentStats.CritDmg;
 
-            enemy.TakeDamage((int)damage, isCritical);
+            enemy.TakeDamage(damage, isCritical);
         }
 
         if (collision.CompareTag("FairyCage"))

@@ -29,11 +29,6 @@ public class BonusCoinsEnhancement : Enhancement
         return IconList.instance.coins;
     }
 
-    public override bool isUnique()
-    {
-        return false;
-    }
-
     public override int getLevel()
     {
         return 0;
@@ -44,7 +39,7 @@ public class BonusCoinsEnhancement : Enhancement
         return "Monster Coins";
     }
 
-    public override string getType()
+    public override string getDescriptionType()
     {
         return "Bonus";
     }
@@ -62,5 +57,10 @@ public class BonusCoinsEnhancement : Enhancement
     public override void OnStatCalculate(ref PlayerStats flatBonus, ref PlayerStats percentBonus)
     {
         
+    }
+
+    public override EnhancementType GetEnhancementType()
+    {
+        return EnhancementType.Stat;
     }
 }
