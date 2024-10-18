@@ -3,10 +3,6 @@ using UnityEngine;
 
 public class CarrotJuiceAbility : PlayerAbility
 {
-    
-    public CarrotJuiceAbility(): base(20)
-    {
-    }
     public override bool CanCast()
     {
         return currentCooldown == 0;
@@ -27,14 +23,9 @@ public class CarrotJuiceAbility : PlayerAbility
         return new List<Enhancement>() { new CarrotJuiceAbilityEnhancement() };
     }
 
-    public override Sprite GetIcon()
+    public override string getId()
     {
-        return IconList.instance.carrotJuice;
-    }
-
-    public override string getID()
-    {
-        return "rabi.carrotjuice";
+        return "carrotjuice";
     }
     public override bool isUltimate()
     {
@@ -43,11 +34,11 @@ public class CarrotJuiceAbility : PlayerAbility
     public override void OnCast()
     {
         int level = (int)Player.instance.abilityValues["ability.carrotjuice.level"];
-        maxCooldown = level < 2 ? 20 : 12; 
+        maxCooldown = level < 3 ? 16 : 12; 
         currentCooldown = maxCooldown;
 
-        CastBottle(new Vector2(Random.Range(-5f, 5f), Random.Range(-5f, 5f)));
-        if (level >= 4) CastBottle(new Vector2(Random.Range(-5f, 5f), Random.Range(-5f, 5f)));
+        CastBottle(Random.insideUnitCircle * 6f);
+        if (level >= 7) CastBottle(Random.insideUnitCircle * 6f);
     }
 
     public void CastBottle(Vector2 direction)
@@ -55,6 +46,7 @@ public class CarrotJuiceAbility : PlayerAbility
         CarrotJuiceBottle bottle = PoolManager.Get<CarrotJuiceBottle>();
         bottle.transform.position = Player.instance.transform.position;
         bottle.Init(direction);
+        Player.instance.despawneables.Add(bottle);
     }
 
     public override void OnEquip()
@@ -65,5 +57,10 @@ public class CarrotJuiceAbility : PlayerAbility
     public override void OnUpdate()
     {
         if (BeatManager.isGameBeat && currentCooldown > 0) currentCooldown--;
+    }
+
+    public override System.Type getEvolutionItemType()
+    {
+        return typeof(BlessedFigureItem);
     }
 }

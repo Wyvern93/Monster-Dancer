@@ -1,16 +1,17 @@
 using UnityEngine;
 
-public class CarrotBullet : MonoBehaviour
+public class CarrotBullet : MonoBehaviour, IDespawneable
 {
-    int level, dmg;
+    public float dmg;
 
     Vector2 dir;
+    public bool isPiercing;
+
+    public PlayerAbility abilitySource;
 
     float lifeTime;
     public void OnEnable()
     {
-        level = (int)Player.instance.abilityValues["ability.carrotdelivery.level"];
-        dmg = level < 3 ? 20 : 30;
         lifeTime = 3f;
     }
 
@@ -26,7 +27,12 @@ public class CarrotBullet : MonoBehaviour
         if (GameManager.isPaused) return;
         transform.position += (Vector3)dir * 30 * Time.deltaTime;
         lifeTime -= Time.deltaTime;
-        if (dir == Vector2.zero || lifeTime < 0) PoolManager.Return(gameObject, GetType());
+        if (dir == Vector2.zero || lifeTime < 0)
+        {
+            Player.instance.despawneables.Remove(this);
+            PoolManager.Return(gameObject, GetType());
+        }
+        
     }
 
     public void OnTriggerEnter2D(Collider2D collision)
@@ -40,7 +46,24 @@ public class CarrotBullet : MonoBehaviour
             if (isCritical) damage *= Player.instance.currentStats.CritDmg;
 
             enemy.TakeDamage((int)damage, isCritical);
-            PoolManager.Return(gameObject, GetType());
+            foreach (PlayerItem item in Player.instance.equippedItems)
+            {
+                item.OnHit(abilitySource, damage, enemy);
+            }
+            foreach (PlayerItem item in Player.instance.evolvedItems)
+            {
+                item.OnHit(abilitySource, damage, enemy);
+            }
+            if (!isPiercing)
+            {
+                Player.instance.despawneables.Remove(this);
+                PoolManager.Return(gameObject, GetType());
+            }
         }
+    }
+
+    public void ForceDespawn(bool instant = false)
+    {
+        PoolManager.Return(gameObject, GetType());
     }
 }

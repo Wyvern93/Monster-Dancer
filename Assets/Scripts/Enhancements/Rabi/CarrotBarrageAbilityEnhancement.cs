@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CarrotBarrageAbilityEnhancement : Enhancement
@@ -6,29 +7,17 @@ public class CarrotBarrageAbilityEnhancement : Enhancement
     public override string GetDescription()
     {
         int level = getLevel() + 1;
-        if (level == 1)
+        switch (level)
         {
-            return "Rabi throws <color=\"green\">4</color> carrots that explode after a second";
+            default:
+            case 1: return "Throw explosive carrots around Rabi that deal damage in an area";
+            case 2: return "Increases damage from <color=\"green\">25 -> 40</color>";
+            case 3: return "Reduces the cooldown from <color=\"green\">10 -> 8</color> beats";
+            case 4: return "Increases damage from <color=\"green\">40 -> 65</color>";
+            case 5: return "Increase the number of carrots from <color=\"green\">3 -> 5</color>";
+            case 6: return "Reduces the cooldown from <color=\"green\">8 -> 6</color> beats";
+            case 7: return "Carrots explode into smaller explosive carrots that deal 50% damage";
         }
-        if (level == 2)
-        {
-            return "Rabi throws <color=\"green\">4->6</color> carrots";
-        }
-        if (level == 3)
-        {
-            return "Rabi throws <color=\"green\">6->8</color> carrots";
-        }
-        if (level == 4)
-        {
-            return "Rabi throws <color=\"green\">8->12</color> carrots";
-        }
-        return "";
-    }
-
-    public override int getLevel()
-    {
-        if (!Player.instance.abilityValues.ContainsKey("ability.carrotbarrage.level")) return 0;
-        else return (int)Player.instance.abilityValues["ability.carrotbarrage.level"];
     }
 
     public override string getName()
@@ -38,10 +27,10 @@ public class CarrotBarrageAbilityEnhancement : Enhancement
 
     public override string getId()
     {
-        return "rabi.carrotbarrage";
+        return "carrotbarrage";
     }
 
-    public override string getType()
+    public override string getDescriptionType()
     {
         return "Passive";
     }
@@ -50,53 +39,13 @@ public class CarrotBarrageAbilityEnhancement : Enhancement
     {
         return 4;
     }
-
-    public override bool isAvailable()
+    public override PlayerAbility getAbility()
     {
-        bool available = true;
-        if (Player.instance.equippedPassiveAbilities.Count == 5) available = false;
-
-        if(Player.instance.equippedPassiveAbilities.Find(x => x.getID() == "rabi.carrotbarrage") != null)
-        {
-            if (Player.instance.abilityValues["ability.carrotbarrage.level"] < 4) available = true;
-            else available = false;
-        }
-
-
-        return available;
+        return new CarrotBarrageAbility();
     }
 
-    public override bool isUnique()
+    public override EnhancementType GetEnhancementType()
     {
-        return false;
-    }
-
-    public override Sprite getIcon()
-    {
-        return IconList.instance.carrotBarrage;
-    }
-
-    public override void OnEquip()
-    {
-        if (isUnique()) GameManager.runData.RemoveSkillEnhancement(this);
-        Player.instance.enhancements.Add(new CarrotBarrageAbilityEnhancement());
-        if (!Player.instance.abilityValues.ContainsKey("ability.carrotbarrage.level"))
-        {
-            Player.instance.abilityValues.Add("ability.carrotbarrage.level", 1);
-            Player.instance.equippedPassiveAbilities.Add(new CarrotBarrageAbility());
-            UIManager.Instance.PlayerUI.SetPassiveIcon(IconList.instance.carrotBarrage, 1,false, Player.instance.getPassiveAbilityIndex(typeof(CarrotBarrageAbility)));
-        }
-        else
-        {
-            Player.instance.abilityValues["ability.carrotbarrage.level"] += 1;
-            int level = (int)Player.instance.abilityValues["ability.carrotbarrage.level"];
-            UIManager.Instance.PlayerUI.SetPassiveLevel(level, level >= 4, Player.instance.getPassiveAbilityIndex(typeof(CarrotBarrageAbility)));
-        }
-        Player.instance.CalculateStats();
-    }
-
-    public override void OnStatCalculate(ref PlayerStats flatBonus, ref PlayerStats percentBonus)
-    {
-        
+        return EnhancementType.Ability;
     }
 }

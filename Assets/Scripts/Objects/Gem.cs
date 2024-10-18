@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Gem : Drop
 {
-    private float speed;
     public Vector2 dir;
     public int exp;
 

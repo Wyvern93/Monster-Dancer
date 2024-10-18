@@ -42,30 +42,38 @@ public class GhostJrElite : Enemy
 
     private IEnumerator ShootBulletsCoroutine()
     {
+        AudioController.PlaySound(AudioController.instance.sounds.chargeBulletSound);
         animator.Play("boojr_preattack");
         animator.speed = 1f / BeatManager.GetBeatDuration();
         BulletSpawnEffect bulletSpawnEffect = PoolManager.Get<BulletSpawnEffect>();
         bulletSpawnEffect.source = this;
         bulletSpawnEffect.transform.position = transform.position;
+        bulletSpawnEffect.finalScale = 1f;
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
         while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
 
         Vector2 dir = Player.instance.GetClosestPlayer(transform.position) - transform.position;
         dir.Normalize();
 
-        List<GhostBullet> bullets = new List<GhostBullet>();
-
-        float diff = 360 / 8;
-        for (int i = 0; i < 8; i++)
+        List<BulletBase> tempbullets = new List<BulletBase>();
+        float diff = 360f / 12f;
+        for (int i = 0; i < 12; i++)
         {
             while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
 
-            bullets.Add(SpawnBullet(i * diff, 16f, 1f));
-            yield return new WaitForSeconds(BeatManager.GetBeatDuration() / 8f);
+            tempbullets.Add(SpawnBullet(i * diff, 10 + (i % 3), 1 + ((i % 3) / 2f)));
+            yield return new WaitForSeconds(BeatManager.GetBeatDuration() / 12f);
         }
-        foreach (GhostBullet bullet in bullets)
+        foreach (BulletBase bullet in tempbullets)
         {
-            bullet.canMove = true;
+            bullet.beat = 1;
+        }
+        float time = BeatManager.GetBeatDuration();
+        while (time > 0)
+        {
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            time -= Time.deltaTime;
+            yield return new WaitForEndOfFrame();
         }
         bulletSpawnEffect.Despawn();
         isAttacking = false;
@@ -75,21 +83,30 @@ public class GhostJrElite : Enemy
 
     }
 
-    private GhostBullet SpawnBullet(float angle, float speed, float dist)
+    private BulletBase SpawnBullet(float angle, float speed, float dist)
     {
+        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
         Vector2 dir = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
 
-        GhostBullet bullet = PoolManager.Get<GhostBullet>();
-        bullet.transform.position = transform.position + (Vector3)(dir * dist) + (Vector3.one * 0.5f);
+        BulletBase bullet = PoolManager.Get<BulletBase>();
+
+        bullet.transform.position = transform.position + ((Vector3)dir * -dist) + (Vector3.up * 0.5f);// + (Vector3)(dir * -dist) + (Vector3.one * 0.5f);
         bullet.direction = dir;
-        bullet.origSpeed = speed;
-        bullet.speed = speed;
-        bullet.enemySource = this;
-        bullet.atk = atk / 4;
+        bullet.speed = 0;
+        bullet.atk = 5;
         bullet.lifetime = 10;
-        bullet.canMove = false;
-        bullet.transform.localScale = Vector3.one * 2; 
+        bullet.transform.localScale = Vector3.one * 2f;
+        bullet.startOnBeat = false;
+        bullet.behaviours = new List<BulletBehaviour>
+            {
+                new SpriteLookAngleBehaviour() { start = 0, end = -1 },
+                new SpeedOverTimeBehaviour() { start = 2, end = -1, speedPerBeat = 3f, targetSpeed = speed},
+                new ZigZagBehaviour() { start = 0, end= -1, triggerOnce = false }
+            };
+        bullet.animator.Play("ghostbullet");
         bullet.OnSpawn();
+        bullet.beat = 0;
+        bullet.enemySource = this;
         return bullet;
     }
 

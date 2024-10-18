@@ -104,9 +104,11 @@ public class NebulionBoss : Boss
         base.OnIntroductionFinish();
         animator.Play("nebulion_normal");
         animator.speed = 1f / BeatManager.GetBeatDuration();
-        State = BossState.Dialogue;
+        
         Dialogue dialogue = Player.instance is PlayerRabi ? rabiDialogue : rabiDialogue;
-        UIManager.Instance.dialogueMenu.Open(dialogue.entries);
+        UIManager.Instance.dialogueMenu.StartCutscene(dialogue.entries);
+
+        State = BossState.Dialogue;
     }
 
     private void FindTargetPositionAroundPlayer()
@@ -155,8 +157,10 @@ public class NebulionBoss : Boss
             case BossState.Dialogue:
                 if (UIManager.Instance.dialogueMenu.hasFinished)
                 {
+                    Debug.Log("it was finished");
                     State = BossState.Phase4;
                     StartCoroutine(OnBattleStart());
+                    UIManager.Instance.dialogueMenu.hasFinished = false;
                 }
                 break;
         }
@@ -341,6 +345,7 @@ public class NebulionBoss : Boss
         bullet.lifetime = 12;
         bullet.transform.localScale = Vector3.one;
         bullet.startOnBeat = true;
+        bullet.enemySource = this;
         bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteLookAngleBehaviour() { start = 0, end = -1 },
@@ -366,6 +371,7 @@ public class NebulionBoss : Boss
         bullet.lifetime = 6;
         bullet.transform.localScale = Vector3.one;
         bullet.startOnBeat = true;
+        bullet.enemySource = this;
         bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteSpinBehaviour() { start = 0, end = -1 },
@@ -391,6 +397,7 @@ public class NebulionBoss : Boss
             bullet.speed = 2f;
             bullet.atk = 1;
             bullet.lifetime = 20;
+            bullet.enemySource = this;
             bullet.transform.localScale = Vector3.one;
             bullet.startOnBeat = true;
             bullet.behaviours = new List<BulletBehaviour>
@@ -422,6 +429,7 @@ public class NebulionBoss : Boss
             bullet.lifetime = 20;
             bullet.transform.localScale = Vector3.one;
             bullet.startOnBeat = true;
+            bullet.enemySource = this;
             bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteSpinBehaviour() { start = 0, end = -1 },
@@ -513,6 +521,7 @@ public class NebulionBoss : Boss
         bullet.lifetime = 10;
         bullet.transform.localScale = Vector3.one;
         bullet.startOnBeat = true;
+        bullet.enemySource = this;
         bullet.behaviours = new List<BulletBehaviour>
             {
                 new HomingToPlayerBehaviour(Player.instance.gameObject) { start = 0, end = -1},
@@ -666,6 +675,7 @@ public class NebulionBoss : Boss
         bullet.lifetime = 12;
         bullet.transform.localScale = Vector3.one;
         bullet.startOnBeat = true;
+        bullet.enemySource = this;
         bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteLookAngleBehaviour() { start = 0, end = -1 },
@@ -783,6 +793,7 @@ public class NebulionBoss : Boss
         bullet.lifetime = 10;
         bullet.transform.localScale = Vector3.one;
         bullet.startOnBeat = false;
+        bullet.enemySource = this;
         bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpeedOverTimeBehaviour() {start = 0, end = -1, speedPerBeat = 0.25f, targetSpeed = 1f },
@@ -825,9 +836,9 @@ public class NebulionBoss : Boss
         StopAllCoroutines();
         rb.velocity = Vector2.zero;
         velocity = Vector2.zero;
-        Player.TriggerCameraShake(1f, 1f);
+        PlayerCamera.TriggerCameraShake(1f, 1f);
 
-        AudioController.PlaySound(AudioController.instance.sounds.bossPhaseEnd);
+        AudioController.PlaySound(AudioController.instance.sounds.bossPhaseEnd, side: true);
         foreach (Bullet b in allBullets)
         {
             if (!b.gameObject.activeSelf) continue;
@@ -940,7 +951,7 @@ public class NebulionBoss : Boss
         return true;
     }
 
-    public override void TakeDamage(int damage, bool isCritical)
+    public override void TakeDamage(float damage, bool isCritical)
     {
         base.TakeDamage(damage, isCritical);
 
@@ -956,8 +967,7 @@ public class NebulionBoss : Boss
         {
             b.ForceDespawn();
         }
-        Player.TriggerCameraShake(2f, 0.45f);
-        PoolManager.RemovePool(typeof(BulletBase));
+        PlayerCamera.TriggerCameraShake(2f, 0.45f);
         base.Die();
     }
 
@@ -980,7 +990,8 @@ public class NebulionBoss : Boss
             time -= Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
-        Player.instance.SetCameraPos(target);
+        PlayerCamera.instance.SetCameraPos(target);
+        PlayerCamera.instance.followPlayer = true;
         UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
         UIManager.Instance.PlayerUI.SetBossBarName(GetName());
         UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stageboss")}");

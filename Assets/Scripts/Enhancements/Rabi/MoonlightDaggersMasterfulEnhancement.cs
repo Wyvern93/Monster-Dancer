@@ -10,12 +10,7 @@ public class MoonlightDaggersMasterfulEnhancement : Enhancement
 
     public override string getId()
     {
-        return "rabi.moonlightdaggers.masterful";
-    }
-
-    public override int getLevel()
-    {
-        return 6;
+        return "moonlightdaggers";
     }
 
     public override string getName()
@@ -23,7 +18,7 @@ public class MoonlightDaggersMasterfulEnhancement : Enhancement
         return "Moonlight Daggers Masterful";
     }
 
-    public override string getType()
+    public override string getDescriptionType()
     {
         return "Attack";
     }
@@ -38,17 +33,11 @@ public class MoonlightDaggersMasterfulEnhancement : Enhancement
         if (!Player.instance.abilityValues.ContainsKey("attack.moonlightdaggers.level")) return false;
         return Player.instance.abilityValues["attack.moonlightdaggers.level"] == 6;
     }
-
-    public override bool isUnique()
+    public override int getLevel()
     {
-        return true;
+        if (!Player.instance.abilityValues.ContainsKey($"attack.{getId()}.level")) return 0;
+        else return (int)Player.instance.abilityValues[$"attack.{getId()}.level"];
     }
-
-    public override Sprite getIcon()
-    {
-        return IconList.instance.moonlightDaggers;
-    }
-
     public override void OnEquip()
     {
         Player.instance.enhancements.Add(new MoonlightDaggersMasterfulEnhancement());
@@ -67,8 +56,8 @@ public class MoonlightDaggersMasterfulEnhancement : Enhancement
             Player.instance.abilityValues["Attack_Number"] = 4f;
             Player.instance.abilityValues["Attack_Velocity"] = 1.5f;
             Player.instance.abilityValues["Attack_Time"] = 1f;
-            Player.instance.abilityValues["Attack_Damage"] = 12f;
-            Player.instance.abilityValues["Attack_Cooldown"] = 0;
+            Player.instance.abilityValues["Attack_Damage"] = 20f;
+            Player.instance.abilityValues["Attack_Cooldown"] = 1;
             Player.instance.abilityValues["Attack_Spread"] = 25f * Mathf.Deg2Rad;
         }
         
@@ -78,5 +67,10 @@ public class MoonlightDaggersMasterfulEnhancement : Enhancement
     public override void OnStatCalculate(ref PlayerStats flatBonus, ref PlayerStats percentBonus)
     {
 
+    }
+
+    public override EnhancementType GetEnhancementType()
+    {
+        return EnhancementType.Ability;
     }
 }

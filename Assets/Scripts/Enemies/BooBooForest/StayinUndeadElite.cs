@@ -1,5 +1,7 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class StayinUndeadElite : Enemy
 {
@@ -16,7 +18,7 @@ public class StayinUndeadElite : Enemy
         AItype = 0;
         isAttacking = false;
         animator.Play("stayinundead_normal");
-        animator.speed = 1f / BeatManager.GetBeatDuration() * 2;
+        animator.speed = 1f / BeatManager.GetBeatDuration();
     }
     protected override void OnBeat()
     {
@@ -41,39 +43,59 @@ public class StayinUndeadElite : Enemy
         BulletSpawnEffect bulletSpawnEffect = PoolManager.Get<BulletSpawnEffect>();
         bulletSpawnEffect.source = this;
         bulletSpawnEffect.transform.position = transform.position;
+        bulletSpawnEffect.finalScale = 1f;
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
         while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
 
-        if (AItype == 0)
-        {
-            SpawnDirectionalBullet(new Vector2(-1f, -1f));
-            yield return new WaitForSeconds(BeatManager.GetBeatDuration());
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+        Vector2 baseDir = Vector2.left;
+        float shootAngle = BulletBase.VectorToAngle(baseDir);
+        
+        SpawnDirectionalBullet(shootAngle - 10);
+        SpawnDirectionalBullet(shootAngle);
+        SpawnDirectionalBullet(shootAngle + 10);
+        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
 
-            SpawnDirectionalBullet(new Vector2(-1f, 0f));
-            yield return new WaitForSeconds(BeatManager.GetBeatDuration());
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+        yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
 
-            SpawnDirectionalBullet(new Vector2(-1f, 1f));
-        }
-        else if (AItype == 1)
-        {
-            SpawnDirectionalBullet(new Vector2(1f, -1f));
-            yield return new WaitForSeconds(BeatManager.GetBeatDuration());
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+        baseDir = Vector2.right;
+        shootAngle = BulletBase.VectorToAngle(baseDir);
 
-            SpawnDirectionalBullet(new Vector2(1f, 0f));
-            yield return new WaitForSeconds(BeatManager.GetBeatDuration());
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+        SpawnDirectionalBullet(shootAngle - 10);
+        SpawnDirectionalBullet(shootAngle);
+        SpawnDirectionalBullet(shootAngle + 10);
+        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
 
-            SpawnDirectionalBullet(new Vector2(1f, 1f));
-        }
-        else
-        {
-            SpawnSpiralBullet(0);
-            SpawnSpiralBullet(120);
-            SpawnSpiralBullet(240);
-        }
+        yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+
+        baseDir = Vector2.up;
+        shootAngle = BulletBase.VectorToAngle(baseDir);
+
+        SpawnDirectionalBullet(shootAngle - 10);
+        SpawnDirectionalBullet(shootAngle);
+        SpawnDirectionalBullet(shootAngle + 10);
+        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
+
+        yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+
+        baseDir = Vector2.down;
+        shootAngle = BulletBase.VectorToAngle(baseDir);
+
+        SpawnDirectionalBullet(shootAngle - 10);
+        SpawnDirectionalBullet(shootAngle);
+        SpawnDirectionalBullet(shootAngle + 10);
+        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
+
+        yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+
+        ShootSpiral();
+
+        yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+
         bulletSpawnEffect.Despawn();
         if (AItype >= 2) AItype = 0;
         else AItype++;
@@ -81,18 +103,57 @@ public class StayinUndeadElite : Enemy
         isAttacking = false;
     }
 
-    private void SpawnDirectionalBullet(Vector2 dir)
+    private void SpawnDirectionalBullet(float angle)
     {
-        DirectionalBullet bullet = PoolManager.Get<DirectionalBullet>();
-        bullet.transform.position = transform.position + (Vector3.one * 0.3f);
+        BulletBase bullet = PoolManager.Get<BulletBase>();
+
+        Vector2 dir = BulletBase.angleToVector(angle);
+        bullet.transform.position = transform.position + (Vector3)(dir * 0.2f) + (Vector3.up * 0.5f);
         bullet.direction = dir;
-        bullet.origSpeed = 15f;
-        bullet.speed = 15f;
-        bullet.enemySource = this;
-        bullet.atk = atk / 4;
-        bullet.lifetime = 10;
+        bullet.speed = 9;
+        bullet.atk = 5;
+        bullet.lifetime = 8;
         bullet.transform.localScale = Vector3.one;
+        bullet.startOnBeat = true;
+        bullet.enemySource = this;
+        bullet.behaviours = new List<BulletBehaviour>
+            {
+                new SpriteSpinBehaviour() { start = 0, end = -1 }
+            };
+        bullet.animator.Play("starbullet");
         bullet.OnSpawn();
+    }
+
+    private void SpawnMusicBullet(float angle)
+    {
+        BulletBase bullet = PoolManager.Get<BulletBase>();
+
+        Vector2 dir = BulletBase.angleToVector(angle);
+        bullet.transform.position = transform.position + (Vector3)(dir * 0.2f) + (Vector3.up * 0.5f);
+        bullet.direction = dir;
+        bullet.speed = 7;
+        bullet.atk = 5;
+        bullet.lifetime = 7;
+        bullet.transform.localScale = Vector3.one;
+        bullet.startOnBeat = true;
+        bullet.enemySource = this;
+        bullet.behaviours = new List<BulletBehaviour>
+            {
+                new SpriteWaveBehaviour() { start = 0, end = -1 },
+                new RotateOverBeatBehaviour() { start = 0, end = -1, rotateAmount = 90 }
+            };
+        bullet.animator.Play("notebullet");
+        bullet.OnSpawn();
+    }
+
+    private void ShootSpiral()
+    {
+        float anglebase = 360f / 12f;
+        for (int i = 0; i < 12; i++)
+        {
+            SpawnMusicBullet(i * anglebase);
+        }
+        AudioController.PlaySound(AudioController.instance.sounds.bulletwaveShootSound);
     }
 
     private void SpawnSpiralBullet(float angle)

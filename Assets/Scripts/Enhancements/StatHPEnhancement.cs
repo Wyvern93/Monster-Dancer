@@ -29,11 +29,6 @@ public class StatHPEnhancement : Enhancement
         return IconList.instance.hpUp;
     }
 
-    public override bool isUnique()
-    {
-        return false;
-    }
-
     public override int getLevel()
     {
         return 0;
@@ -44,14 +39,13 @@ public class StatHPEnhancement : Enhancement
         return "Health";
     }
 
-    public override string getType()
+    public override string getDescriptionType()
     {
         return "Stat Up";
     }
 
     public override void OnEquip()
     {
-        if (isUnique()) GameManager.runData.RemoveStatEnhancement(this);
         Player.instance.enhancements.Add(new StatHPEnhancement());
         Player.instance.CalculateStats();
         Player.instance.CurrentHP += hpBonus;
@@ -61,5 +55,10 @@ public class StatHPEnhancement : Enhancement
     public override void OnStatCalculate(ref PlayerStats flatBonus, ref PlayerStats percentBonus)
     {
         flatBonus.MaxHP += hpBonus;
+    }
+
+    public override EnhancementType GetEnhancementType()
+    {
+        return EnhancementType.Stat;
     }
 }

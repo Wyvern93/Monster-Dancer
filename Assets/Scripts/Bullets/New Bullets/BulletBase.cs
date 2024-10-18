@@ -23,7 +23,17 @@ public class BulletBase : Bullet
         circleCollider.enabled = true;
         spriteRenderer.color = Color.clear;
         StartCoroutine(BulletSpawnCoroutine());
-        if (BeatManager.isGameBeat && startOnBeat) OnBeat();
+        if (startOnBeat) OnBeat();
+    }
+
+    public static Vector2 angleToVector(float degrees)
+    {
+        return new Vector2(Mathf.Cos(degrees * Mathf.Deg2Rad), Mathf.Sin(degrees * Mathf.Deg2Rad)).normalized;
+    }
+
+    public static float VectorToAngle(Vector2 vector)
+    {
+        return Vector2.SignedAngle(Vector2.down, vector) - 90;
     }
 
     public override void OnBeat()

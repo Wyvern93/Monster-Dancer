@@ -336,11 +336,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   beatContact: 0
+  isElite: 0
   Sprite: {fileID: 5338283674250872097}
   rb: {fileID: 4483918820315295808}
   SpriteSize: 1
-  MaxHP: 60
-  CurrentHP: 60
+  MaxHP: 50
+  CurrentHP: 50
   SpawnIndex: 0
   AItype: 0
   experience: 11

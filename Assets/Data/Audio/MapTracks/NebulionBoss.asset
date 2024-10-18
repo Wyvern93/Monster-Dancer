@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: NebulionBoss
   m_EditorClassIdentifier: 
   music: {fileID: 8300000, guid: 853bba78641e4434e80c4d784ef550c4, type: 3}
-  tempo: 150
+  tempo: 135
   offset: 0.4
   loopStart: 0.4
   loopEnd: 150

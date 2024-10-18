@@ -30,11 +30,11 @@ public class NomSlimeElite : Enemy
 
     private void SpawnBullets()
     {
-        for (int i = 0; i < 12; i++)
+        for (int i = 0; i < 10; i++)
         {
             BulletBase bullet = PoolManager.Get<BulletBase>();
 
-            float angle = (360f / 12f) * i * Mathf.Deg2Rad;
+            float angle = (360f / 10f) * i * Mathf.Deg2Rad;
             Vector2 localDir = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle));
 
             bullet.transform.position = transform.position + (-Vector3.up * 0.4f);
@@ -45,6 +45,7 @@ public class NomSlimeElite : Enemy
             bullet.lifetime = 6;
             bullet.transform.localScale = Vector3.one;
             bullet.startOnBeat = true;
+            bullet.enemySource = this;
             bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteLookAngleBehaviour() { start = 0, end = -1 }
@@ -92,7 +93,7 @@ public class NomSlimeElite : Enemy
             yield return new WaitForEndOfFrame();
         }
         AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
-        Player.TriggerCameraShake(1f, 0.3f);
+        PlayerCamera.TriggerCameraShake(1f, 0.3f);
         SpawnBullets();
         velocity = Vector2.zero;
         Sprite.transform.localPosition = Vector3.zero;

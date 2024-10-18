@@ -39,9 +39,13 @@ public class PlayerUI : MonoBehaviour
     public Image activeCDImage;
     public TextMeshProUGUI coinText;
     [SerializeField] List<PlayerUIIcon> abilityIcons;
+    [SerializeField] List<PlayerUIIcon> itemIcons;
 
     [SerializeField] Image ultimateIcon;
     [SerializeField] TextMeshProUGUI ultimateLevelText;
+
+    [SerializeField] Image playerIcon;
+    [SerializeField] TextMeshProUGUI playerName;
     // Start is called before the first frame update
     void Awake()
     {
@@ -56,8 +60,18 @@ public class PlayerUI : MonoBehaviour
 
         foreach (PlayerUIIcon icon in abilityIcons)
         {
-            icon.Display(null, 0, false);
+            icon.Display(null, 0, false, false);
         }
+        foreach (PlayerUIIcon icon in itemIcons)
+        {
+            icon.Display(null, 0, false, true);
+        }
+    }
+
+    public void SetPlayerCharacter(Sprite icon, string name)
+    {
+        playerIcon.sprite = icon;
+        playerName.text = name;
     }
 
     public void CreatePools()
@@ -112,12 +126,12 @@ public class PlayerUI : MonoBehaviour
 
     public void SetWeaponIcon(Sprite sprite, int level, bool maxed)
     {
-        abilityIcons[0].Display(sprite, level, maxed);
+        abilityIcons[0].Display(sprite, level, maxed, false);
     }
 
     public void SetWeaponLevel(int level, bool maxed)
     {
-        abilityIcons[0].SetLevel(level, maxed);
+        abilityIcons[0].SetLevel(level, maxed, false);
     }
 
     public void SetUltimateIcon(Sprite sprite, int level, bool maxed)
@@ -125,14 +139,12 @@ public class PlayerUI : MonoBehaviour
         ultimateIcon.sprite = sprite;
         ultimateLevelText.text = "Lv" + level;
         ultimateLevelText.color = maxed ? Color.yellow : Color.white;
-        //abilityIcons[1].Display(sprite, level, maxed);
     }
 
     public void SetUltimateLevel(int level, bool maxed)
     {
         ultimateLevelText.text = "Lv" + level;
         ultimateLevelText.color = maxed ? Color.yellow : Color.white;
-        //abilityIcons[1].SetLevel(level, maxed);
     }
 
     public void SetActiveIcon(Sprite sprite, int level, bool maxed)
@@ -147,12 +159,38 @@ public class PlayerUI : MonoBehaviour
 
     public void SetPassiveIcon(Sprite sprite, int level, bool maxed, int id)
     {
-        abilityIcons[id + 1].Display(sprite, level, maxed);
+        abilityIcons[id + 1].Display(sprite, level, maxed, false);
     }
 
     public void SetPassiveLevel(int level, bool maxed, int id)
     {
-        abilityIcons[id + 1].SetLevel(level, maxed);
+        abilityIcons[id + 1].SetLevel(level, maxed, false);
+    }
+
+    public void SetItemIcon(Sprite sprite, int level, bool maxed, int id)
+    {
+        itemIcons[id].Display(sprite, level, maxed, true);
+    }
+
+    public void SetItemLevel(int level, bool maxed, int id)
+    {
+        itemIcons[id].SetLevel(level, maxed, true);
+    }
+
+    public void UpdateItemIcons()
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            if (i < Player.instance.equippedItems.Count)
+            {
+                PlayerItem item = Player.instance.equippedItems[i];
+                itemIcons[i].Display(item.GetIcon(), item.GetLevel(), item.GetLevel() >= 4, true); ;
+            }
+            else
+            {
+                itemIcons[i].Display(null, 0, false, true);
+            }
+        }
     }
 
 

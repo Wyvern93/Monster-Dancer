@@ -22,10 +22,10 @@ public class EnhancementUIButton : MonoBehaviour
         title.text = enhancement.getName();
 
         int level = enhancement.getLevel() + 1;
-        if (level > 1) title.text += " Lv. " + level;
+        if (level > 1 && enhancement.GetEnhancementType() == EnhancementType.Ability) title.text += " Lv. " + level;
 
         description.text = enhancement.GetDescription();
-        type.text = enhancement.getType();
+        type.text = enhancement.getDescriptionType();
 
         enhancementIcon.sprite = enhancement.getIcon();
 

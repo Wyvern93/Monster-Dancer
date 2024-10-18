@@ -93,6 +93,10 @@ public class AudioCalibrationMenu : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Keyboard.current.bKey.wasPressedThisFrame)
+        {
+            AudioController.PlaySound(AudioController.instance.sounds.bossPhaseEnd, side: true);
+        }
         if (canvasGroup.alpha == 0) return;
         if (InputManager.playerDevice == InputManager.InputDeviceType.Keyboard)
         {

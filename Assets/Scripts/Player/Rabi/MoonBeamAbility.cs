@@ -9,9 +9,6 @@ public class MoonBeamAbility : PlayerAbility
 {
     public int minCooldown = 1;
     int level;
-    public MoonBeamAbility() : base(14)
-    {
-    }
 
     public override bool CanCast()
     {
@@ -33,9 +30,9 @@ public class MoonBeamAbility : PlayerAbility
         return new List<Enhancement>() { new MoonBeamAbilityEnhancement() };
     }
 
-    public override string getID()
+    public override string getId()
     {
-        return "rabi.moonbeam";
+        return "moonbeam";
     }
     public override bool isUltimate()
     {
@@ -55,16 +52,12 @@ public class MoonBeamAbility : PlayerAbility
             MoonBeam moonBeam = PoolManager.Get<MoonBeam>();
             moonBeam.transform.position = new Vector3(rabi.transform.position.x, rabi.transform.position.y + 1.5f, 10f);
             moonBeam.transform.localEulerAngles = new Vector3(0, 0, 45f);
+            Player.instance.despawneables.Add(moonBeam);
 
             Enemy e = Map.GetRandomClosebyEnemy();
             if (e == null) moonBeam.movDir = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f));
             else moonBeam.movDir = (e.transform.position - rabi.transform.position);
         }
-    }
-
-    public override Sprite GetIcon()
-    {
-        return IconList.instance.moonBeam;
     }
 
     public override void OnEquip()

@@ -77,9 +77,11 @@ public class UsarinBoss : Boss
         base.OnIntroductionFinish();
         animator.Play("usarin_normal");
         animator.speed = 1f / BeatManager.GetBeatDuration();
-        State = BossState.Dialogue;
+        
         Dialogue dialogue = Player.instance is PlayerRabi ? rabiDialogue : rabiDialogue;
-        UIManager.Instance.dialogueMenu.Open(dialogue.entries);
+        UIManager.Instance.dialogueMenu.StartCutscene(dialogue.entries);
+
+        State = BossState.Dialogue;
     }
 
     private void FindTargetPositionAroundPlayer()
@@ -127,6 +129,7 @@ public class UsarinBoss : Boss
                 {
                     State = BossState.Phase4;
                     StartCoroutine(OnBattleStart());
+                    UIManager.Instance.dialogueMenu.hasFinished = false;
                 }
                 break;
             case BossState.Phase1:
@@ -173,43 +176,6 @@ public class UsarinBoss : Boss
         if (reset) attackBeat = 0;
         animator.Play("usarin_dance");
         yield break;
-    }
-
-    public void SpawnBunnies(Vector3 position)
-    {
-        List<NomSlime> wave = new List<NomSlime>();
-        // Spawn Bunnies
-        for (int i = 0; i < 5; i++)
-        {
-            float angle = (360 / 5) * i;
-
-            Vector3 pos = position + new Vector3(1.5f * (Mathf.Cos(angle * Mathf.Deg2Rad)), 1.5f * (Mathf.Sin(angle * Mathf.Deg2Rad)));
-            NomSlime nomSlime = (NomSlime)GetEnemyOfType(EnemyType.NomSlime);
-            nomSlime.OnSpawn();
-            nomSlime.AItype = 1;
-
-            nomSlime.MaxHP = 2000;
-            nomSlime.CurrentHP = 2000;
-            nomSlime.transform.position = pos;
-
-
-            wave.Add(nomSlime);
-            allEnemies.Add(nomSlime);
-
-            SmokeExplosion smokeExplosion = PoolManager.Get<SmokeExplosion>();
-            smokeExplosion.transform.position = pos;
-        }
-        Vector3 playerPos = Player.instance.GetClosestPlayer(position);
-        // Send them
-        foreach (Enemy enemy in wave)
-        {
-            Vector2 dir = (playerPos - enemy.transform.position).normalized;
-            enemy.AItype = 2;
-            enemy.lifeTime = 10;
-            enemy.eventMove = dir;
-        }
-
-        
     }
 
     void OnPattern1()
@@ -278,6 +244,7 @@ public class UsarinBoss : Boss
             bullet.lifetime = 8;
             bullet.transform.localScale = Vector3.one;
             bullet.startOnBeat = false;
+            bullet.enemySource = this;
             bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteLookAngleBehaviour() { start = 0, end = -1 },
@@ -339,6 +306,7 @@ public class UsarinBoss : Boss
             bullet.lifetime = 10;
             bullet.transform.localScale = Vector3.one;
             bullet.startOnBeat = true;
+            bullet.enemySource = this;
             bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpeedOverTimeBehaviour() { speedPerBeat = 1, start = 0, end = 3, targetSpeed = 6 },
@@ -399,6 +367,7 @@ public class UsarinBoss : Boss
             bullet.lifetime = 10;
             bullet.transform.localScale = Vector3.one;
             bullet.startOnBeat = true;
+            bullet.enemySource = this;
             bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteWaveBehaviour() { start = 0, end = -1 }
@@ -431,6 +400,7 @@ public class UsarinBoss : Boss
                 bullet.lifetime = 10;
                 bullet.transform.localScale = Vector3.one;
                 bullet.startOnBeat = true;
+                bullet.enemySource = this;
                 bullet.behaviours = new List<BulletBehaviour>
                 {
                     new SpriteSpinBehaviour() { start = 0, end = -1 },
@@ -519,6 +489,7 @@ public class UsarinBoss : Boss
             bullet.lifetime = 30;
             bullet.transform.localScale = Vector3.one;
             bullet.startOnBeat = true;
+            bullet.enemySource = this;
             bullet.behaviours = new List<BulletBehaviour>
                 {
                     new SpriteSpinBehaviour() { start = 0, end = 4 },
@@ -587,6 +558,7 @@ public class UsarinBoss : Boss
             bullet.lifetime = 50;
             bullet.transform.localScale = Vector3.one;
             bullet.startOnBeat = true;
+            bullet.enemySource = this;
             bullet.behaviours = new List<BulletBehaviour>
             {
                     new SpriteLookAngleBehaviour() { start = 0, end = -1 },
@@ -607,9 +579,9 @@ public class UsarinBoss : Boss
         StopAllCoroutines();
         rb.velocity = Vector2.zero;
         velocity = Vector2.zero;
-        Player.TriggerCameraShake(1f, 1f);
+        PlayerCamera.TriggerCameraShake(1f, 1f);
 
-        AudioController.PlaySound(AudioController.instance.sounds.bossPhaseEnd);
+        AudioController.PlaySound(AudioController.instance.sounds.bossPhaseEnd, side:true);
         foreach (Bullet b in allBullets)
         {
             if (!b.gameObject.activeSelf) continue;
@@ -711,7 +683,7 @@ public class UsarinBoss : Boss
         }
         animator.Play("usarin_normal");
         AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
-        Player.TriggerCameraShake(0.5f, 0.2f);
+        PlayerCamera.TriggerCameraShake(0.5f, 0.2f);
         velocity = Vector2.zero;
         Sprite.transform.localPosition = Vector3.zero;
 
@@ -724,7 +696,7 @@ public class UsarinBoss : Boss
         return true;
     }
 
-    public override void TakeDamage(int damage, bool isCritical)
+    public override void TakeDamage(float damage, bool isCritical)
     {
         base.TakeDamage(damage, isCritical);
 
@@ -739,8 +711,7 @@ public class UsarinBoss : Boss
         {
             b.ForceDespawn();
         }
-        Player.TriggerCameraShake(2f, 0.45f);
-        PoolManager.RemovePool(typeof(BulletBase));
+        PlayerCamera.TriggerCameraShake(2f, 0.45f);
         base.Die();
     }
 
@@ -763,7 +734,8 @@ public class UsarinBoss : Boss
             time -= Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
-        Player.instance.SetCameraPos(target);
+        PlayerCamera.instance.SetCameraPos(target);
+        PlayerCamera.instance.followPlayer = true;
         UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
         UIManager.Instance.PlayerUI.SetBossBarName(GetName());
         UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stageboss")}");

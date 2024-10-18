@@ -6,5 +6,5 @@ using UnityEngine;
 [Serializable]
 public class Dialogue : ScriptableObject
 {
-    public List<DialogueEntry> entries;
+    [SerializeReference] public List<CutsceneEvent> entries;
 }

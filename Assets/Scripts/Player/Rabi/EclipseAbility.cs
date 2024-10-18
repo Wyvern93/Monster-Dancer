@@ -8,9 +8,6 @@ public class EclipseAbility : PlayerAbility
 {
     public int minCooldown = 1;
     int level;
-    public EclipseAbility() : base(0)
-    {
-    }
 
     public override bool CanCast()
     {
@@ -35,9 +32,9 @@ public class EclipseAbility : PlayerAbility
     {
         return true;
     }
-    public override string getID()
+    public override string getId()
     {
-        return "rabi.eclipse";
+        return "eclipse";
     }
 
     public override void OnCast()
@@ -59,17 +56,13 @@ public class EclipseAbility : PlayerAbility
 
 
         RabiEclipse eclipse = PoolManager.Get<RabiEclipse>();
+        Player.instance.despawneables.Add(eclipse);
 
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
 
         rabi.animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration());
         rabi.animator.Play("Rabi_Idle");
         yield break;
-    }
-
-    public override Sprite GetIcon()
-    {
-        return IconList.instance.Eclipse;
     }
 
     public override void OnEquip()

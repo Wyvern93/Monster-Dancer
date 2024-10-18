@@ -1,9 +1,12 @@
 using System;
+using System.Linq;
 using UnityEngine;
 
 [Serializable]
 public class IconList
 {
+    public Sprite[] abilityAtlas;
+    public Sprite[] itemAtlas;
     [Header("Stats")]
     public Sprite hpUp;
     public Sprite dmgUp;
@@ -28,6 +31,21 @@ public class IconList
     public Sprite illusionDash;
     public Sprite carrotDelivery;
     public Sprite Eclipse;
+    public Sprite piercingShot;
+    public Sprite boxofCarrots;
+    public Sprite Riccochet;
+    public Sprite NightSlash;
 
     public static IconList instance;
+
+
+    public Sprite getAbilityIcon(string id)
+    {
+        return abilityAtlas.Single(s => s.name == id);
+    }
+
+    public Sprite getItemIcon(string id)
+    {
+        return itemAtlas.Single(s => s.name == id);
+    }
 }

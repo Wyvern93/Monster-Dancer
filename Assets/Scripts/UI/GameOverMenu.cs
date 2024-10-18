@@ -31,6 +31,8 @@ public class GameOverMenu : MonoBehaviour
         UIManager.Instance.SetGameOverBG(false);
         UIManager.Instance.PlayerUI.HideBossBar();
 
+        Player.instance.ForceDespawnAbilities(false);
+        Player.instance.ResetAbilities();
         Player.instance.Despawn();
         GameManager.LoadPlayer(GameManager.runData.characterPrefab);
         GameManager.LoadMap("Stage1a");

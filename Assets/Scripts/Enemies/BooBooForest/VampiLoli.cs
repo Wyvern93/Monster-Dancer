@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class VampiLoli : Enemy
@@ -46,7 +47,10 @@ public class VampiLoli : Enemy
         {
             MoveTowardsPlayer();
         }
-        StartCoroutine(ShootBulletsCoroutine());
+        if (isCloseEnoughToShoot())
+        {
+            StartCoroutine(ShootBulletsCoroutine());
+        }
     }
 
     private IEnumerator ShootBulletsCoroutine()
@@ -63,20 +67,27 @@ public class VampiLoli : Enemy
         SpawnBullet(new Vector2(1, -1));
         SpawnBullet(new Vector2(-1, 1));
         SpawnBullet(new Vector2(-1, -1));
+        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
         bulletSpawnEffect.Despawn();
     }
 
     private void SpawnBullet(Vector2 dir)
     {
-        DirectionalBullet bullet = PoolManager.Get<DirectionalBullet>();
+        BulletBase bullet = PoolManager.Get<BulletBase>();
+
         bullet.transform.position = transform.position + (Vector3.one * 0.3f);
         bullet.direction = dir;
-        bullet.origSpeed = 8f;
-        bullet.speed = 8f;
-        bullet.enemySource = this;
-        bullet.atk = atk / 4;
-        bullet.lifetime = 6;
+        bullet.speed = 8;
+        bullet.atk = 3;
+        bullet.lifetime = 3;
         bullet.transform.localScale = Vector3.one;
+        bullet.startOnBeat = true;
+        bullet.enemySource = this;
+        bullet.behaviours = new List<BulletBehaviour>
+            {
+                new SpriteLookAngleBehaviour() { start = 0, end = -1 }
+            };
+        bullet.animator.Play("redbullet");
         bullet.OnSpawn();
     }
 

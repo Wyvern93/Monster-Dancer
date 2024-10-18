@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Dancearune : Enemy
@@ -24,9 +25,13 @@ public class Dancearune : Enemy
         if (isAttacking) return;
         if (beatCD == 0)
         {
-            isAttacking = true;
-            ShootBullets();
-            beatCD = 10;
+
+            if (isCloseEnoughToShoot())
+            {
+                isAttacking = true;
+                ShootBullets();
+            }
+            beatCD = 8;
         }
         else if (CanMove())
         {
@@ -60,6 +65,7 @@ public class Dancearune : Enemy
             SpawnBullet(new Vector2(-1, 0));
             SpawnBullet(new Vector2(1, 0));
         }
+        AudioController.PlaySound(AudioController.instance.sounds.bulletwaveShootSound);
         diagonal = !diagonal;
         bulletSpawnEffect.Despawn();
         animator.Play("dancearune_normal");
@@ -69,16 +75,21 @@ public class Dancearune : Enemy
 
     private void SpawnBullet(Vector2 dir)
     {
-        PetalBullet bullet = PoolManager.Get<PetalBullet>();
-        bullet.transform.position = transform.position + (Vector3.one * 0.3f);
+        BulletBase bullet = PoolManager.Get<BulletBase>();
+
+        bullet.transform.position = transform.position + (Vector3.up * 0.3f);
         bullet.direction = dir;
-        bullet.origSpeed = 4f;
-        bullet.speed = 4f;
-        bullet.enemySource = this;
-        bullet.atk = atk / 4;
-        bullet.lifetime = 10;
+        bullet.speed = 4;
+        bullet.atk = 5;
+        bullet.lifetime = 8;
         bullet.transform.localScale = Vector3.one;
-        bullet.follow = false;
+        bullet.startOnBeat = true;
+        bullet.enemySource = this;
+        bullet.behaviours = new List<BulletBehaviour>
+            {
+                new SpriteSpinBehaviour() { start = 0, end = -1 }
+            };
+        bullet.animator.Play("petalbullet");
         bullet.OnSpawn();
     }
 

@@ -1,10 +1,13 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class RhythmiaElite : Enemy
 {
     int beatCD;
     bool isAttacking;
+    bool clockwise = true;
     public override void OnSpawn()
     {
         base.OnSpawn();
@@ -14,6 +17,7 @@ public class RhythmiaElite : Enemy
         beatCD = Random.Range(1, 6);
         Sprite.transform.localPosition = Vector3.zero;
         isAttacking = false;
+        clockwise = true;
         animator.Play("rhythmia_normal");
         animator.speed = 1f / BeatManager.GetBeatDuration() * 2;
     }
@@ -38,40 +42,58 @@ public class RhythmiaElite : Enemy
         BulletSpawnEffect bulletSpawnEffect = PoolManager.Get<BulletSpawnEffect>();
         bulletSpawnEffect.source = this;
         bulletSpawnEffect.transform.position = transform.position;
+        bulletSpawnEffect.finalScale = 1f;
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
         while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
 
         Vector2 dir = Player.instance.GetClosestPlayer(transform.position) - transform.position;
         dir.Normalize();
 
-
         SpawnBullet(0);
         SpawnBullet(120);
         SpawnBullet(240);
+        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
+        yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+        SpawnBullet(0);
+        SpawnBullet(120);
+        SpawnBullet(240);
+        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
+        yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+        SpawnBullet(0);
+        SpawnBullet(120);
+        SpawnBullet(240);
+        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
+        yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+
         bulletSpawnEffect.Despawn();
         animator.Play("rhythmia_normal");
         isAttacking = false;
+        clockwise = !clockwise;
         yield break;
     }
 
     private void SpawnBullet(float angle)
     {
-        Vector2 dir = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad)).normalized;
+        Vector2 dir = BulletBase.angleToVector(angle);
+        BulletBase bullet = PoolManager.Get<BulletBase>();
 
-        Vector2 playerDir = Player.instance.GetClosestPlayer(transform.position) - transform.position;
-        playerDir.Normalize();
-        SpiralBullet bullet = PoolManager.Get<SpiralBullet>();
-        bullet.transform.position = transform.position + (Vector3)(dir * 0.2f) + (Vector3.one * 0.3f);
+        bullet.transform.position = transform.position + (Vector3)dir + (Vector3.up * 0.5f);
         bullet.direction = dir;
-        bullet.origSpeed = 5f;
-        bullet.speed = 5f;
+        bullet.speed = 9;
+        bullet.atk = 5;
+        bullet.lifetime = 7;
+        bullet.transform.localScale = Vector3.one;
+        bullet.startOnBeat = true;
         bullet.enemySource = this;
-        bullet.atk = atk / 4;
-        bullet.lifetime = 10;
-        bullet.orbitAngle = angle;
-        bullet.transform.localScale = Vector3.one * 2f;
-        bullet.orbitSpeed = 0.1f;
-        bullet.directionalVelocity = playerDir * bullet.speed;
+        bullet.behaviours = new List<BulletBehaviour>
+            {
+                new SpriteWaveBehaviour() { start = 0, end = -1 },
+                new RotateOverBeatBehaviour() { start = 0, end = -1, rotateAmount = clockwise ? 220 : -220 }
+            };
+        bullet.animator.Play("notebullet");
         bullet.OnSpawn();
     }
 

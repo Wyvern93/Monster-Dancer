@@ -13,53 +13,92 @@ MonoBehaviour:
   m_Name: RabiUsarinDialogue
   m_EditorClassIdentifier: 
   entries:
-  - name: Usarin
-    leftSide: 0
-    text: Ah... I have finally left all those idiots behind... Being an idol is such
-      a pain, they don't understand!
-    leftPortrait: RabiSurprised
-    rightPortrait: UsarinFunny
-  - name: Usarin
-    leftSide: 0
-    text: Oh, it's you Rabi, guess there was one more idiot left, have you learned
-      to dance already?
-    leftPortrait: RabiSurprised
-    rightPortrait: UsarinSmile
-  - name: Rabi
-    leftSide: 1
-    text: I-I'm not an idiot! What are you doing here anyway!? Don't tell me you
-      are the one behind this dancing thing!
-    leftPortrait: RabiFlustered
-    rightPortrait: UsarinSmile
-  - name: Usarin
-    leftSide: 0
-    text: Hahaha, but isn't dancing fun? Now everyone can dance as much as they want
-      to.
-    leftPortrait: RabiSurprised
-    rightPortrait: UsarinLaugh
-  - name: Usarin
-    leftSide: 0
-    text: (Not that they are any good at it...)
-    leftPortrait: RabiSurprised
-    rightPortrait: UsarinFunny
-  - name: Rabi
-    leftSide: 1
-    text: I knew this had to be your doing, you're always so arrogant.
-    leftPortrait: RabiFlustered
-    rightPortrait: UsarinFunny
-  - name: Usarin
-    leftSide: 0
-    text: Oh my, are you challenging an idol such as me to a dancing battle? You
-      must be more of a fool than I thought.
-    leftPortrait: RabiFlustered
-    rightPortrait: UsarinSmile
-  - name: Rabi
-    leftSide: 1
-    text: I will show you what this rabbit can do!
-    leftPortrait: RabiSmirk
-    rightPortrait: UsarinSmile
-  - name: Usarin
-    leftSide: 0
-    text: I warned you, let's see if you can keep the rhythm!
-    leftPortrait: RabiSmirk
-    rightPortrait: UsarinSerious
+  - rid: 4183682867992723504
+  - rid: 4183682867992723506
+  - rid: 4183682867992723508
+  - rid: 4183682867992723510
+  - rid: 4183682867992723512
+  - rid: 4183682867992723514
+  - rid: 4183682867992723516
+  - rid: 4183682867992723518
+  - rid: 4183682867992723520
+  references:
+    version: 2
+    RefIds:
+    - rid: 4183682867992723504
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Usarin
+        leftSide: 0
+        text: Ah... I have finally left all those idiots behind... Being an idol
+          is such a pain, they don't understand what is to be an Idol.
+        leftPortrait: RabiSurprised
+        rightPortrait: UsarinFunny
+    - rid: 4183682867992723506
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Usarin
+        leftSide: 0
+        text: Oh, it's you Rabi, guess there was one more idiot left, have you learned
+          to dance already?
+        leftPortrait: RabiSurprised
+        rightPortrait: UsarinSmile
+    - rid: 4183682867992723508
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Rabi
+        leftSide: 1
+        text: I-I'm not an idiot! What are you doing here anyway!? Don't tell me
+          you are the one behind this dancing thing!
+        leftPortrait: RabiFlustered
+        rightPortrait: UsarinSmile
+    - rid: 4183682867992723510
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Usarin
+        leftSide: 0
+        text: Hahaha, isn't dancing fun? Now everyone can dance as much as they want
+          to.
+        leftPortrait: RabiSurprised
+        rightPortrait: UsarinLaugh
+    - rid: 4183682867992723512
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Usarin
+        leftSide: 0
+        text: (Not that they are any good at it though...)
+        leftPortrait: RabiSurprised
+        rightPortrait: UsarinFunny
+    - rid: 4183682867992723514
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Rabi
+        leftSide: 1
+        text: I knew this had to be your doing, you're always so arrogant
+        leftPortrait: RabiFlustered
+        rightPortrait: UsarinFunny
+    - rid: 4183682867992723516
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Usarin
+        leftSide: 0
+        text: Oh my, what is this? Are you challenging an idol such as me to a dancing
+          battle? Guess you never learn, Rabi.
+        leftPortrait: RabiFlustered
+        rightPortrait: UsarinSmile
+    - rid: 4183682867992723518
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Rabi
+        leftSide: 1
+        text: Heh, I will show you how much this rabbit has improved!
+        leftPortrait: RabiSmirk
+        rightPortrait: UsarinSmile
+    - rid: 4183682867992723520
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Usarin
+        leftSide: 0
+        text: Let's see if you can keep my rhythm!
+        leftPortrait: RabiSmirk
+        rightPortrait: UsarinSmile

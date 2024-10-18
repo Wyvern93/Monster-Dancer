@@ -13,28 +13,56 @@ MonoBehaviour:
   m_Name: RabiEnd
   m_EditorClassIdentifier: 
   entries:
-  - name: Rabi
-    leftSide: 1
-    text: That was so much fun! Let's do it again!
-    leftPortrait: RabiSmile
-    rightPortrait: NoPortrait
-  - name: Rabi
-    leftSide: 1
-    text: Usarin?
-    leftPortrait: RabiSurprised
-    rightPortrait: NoPortrait
-  - name: Rabi
-    leftSide: 1
-    text: She's gone...
-    leftPortrait: RabiSurprised
-    rightPortrait: NoPortrait
-  - name: Rabi
-    leftSide: 1
-    text: This seems to be more complicated than I thought.
-    leftPortrait: RabiFlustered
-    rightPortrait: NoPortrait
-  - name: Rabi
-    leftSide: 1
-    text: I guess I will have to keep dancing until I find the culprit!
-    leftPortrait: RabiSmile
-    rightPortrait: NoPortrait
+  - rid: 4183682893614678016
+  - rid: 4183682893614678018
+  - rid: 4183682893614678020
+  - rid: 4183682893614678022
+  - rid: 4183682893614678024
+  - rid: 4183682893614678026
+  references:
+    version: 2
+    RefIds:
+    - rid: 4183682893614678016
+      type: {class: PlayAnimationEvent, ns: , asm: Assembly-CSharp}
+      data:
+        animation: Stage1-1End
+    - rid: 4183682893614678018
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Rabi
+        leftSide: 1
+        text: That was so much fun! Let's do it again!
+        leftPortrait: RabiSmile
+        rightPortrait: NoPortrait
+    - rid: 4183682893614678020
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Rabi
+        leftSide: 1
+        text: Usarin?
+        leftPortrait: RabiSurprised
+        rightPortrait: NoPortrait
+    - rid: 4183682893614678022
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Rabi
+        leftSide: 1
+        text: She's gone...
+        leftPortrait: RabiSurprised
+        rightPortrait: NoPortrait
+    - rid: 4183682893614678024
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Rabi
+        leftSide: 1
+        text: This seems to be more complicated than I thought.
+        leftPortrait: RabiFlustered
+        rightPortrait: NoPortrait
+    - rid: 4183682893614678026
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Rabi
+        leftSide: 1
+        text: I guess I will have to keep dancing until I find the culprit!
+        leftPortrait: RabiSmile
+        rightPortrait: NoPortrait

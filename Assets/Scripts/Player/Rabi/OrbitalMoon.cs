@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class OrbitalMoon : MonoBehaviour
+public class OrbitalMoon : MonoBehaviour, IDespawneable
 {
     [SerializeField] SpriteTrail trail;
     [SerializeField] SpriteRenderer sprite;
@@ -11,10 +11,10 @@ public class OrbitalMoon : MonoBehaviour
 
     public float angle;
     public int numBeats;
-    private float blockChance;
     private float speedmulti = 1;
     private float dmg = 1;
     private int level;
+    private float orbitRange;
 
     public void OnEnable()
     {
@@ -24,10 +24,12 @@ public class OrbitalMoon : MonoBehaviour
         numBeats = level < 3 ? 6 : 12;
         sprite.color = new Color(1, 1, 1, 0);
         
-        blockChance = level < 6 ? 10 : 25;
         speedmulti = level < 3 ? 1 : 1.25f;
-        dmg = level < 4 ? level < 2 ? 20f : 24f : 31;
-        transform.localScale = Vector3.one * (level < 6 ? 1f : 1.5f);
+        speedmulti *= Player.instance.itemValues["orbitalSpeed"];
+        dmg = level < 4 ? level < 2 ? 15f : 30f : 40f;
+        dmg *= Player.instance.itemValues["orbitalDamage"];
+        transform.localScale = Vector3.one;
+        orbitRange = level < 6 ? 2.5f : 3.125f;
     }
 
     public void OnTriggerEnter2D(Collider2D collision)
@@ -39,13 +41,13 @@ public class OrbitalMoon : MonoBehaviour
             float damage = (int)(Player.instance.currentStats.Atk * dmg);
             bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
             if (isCritical) damage *= Player.instance.currentStats.CritDmg;
-
-            enemy.TakeDamage((int)damage, isCritical);
             if (level >= 7)
             {
                 Vector2 dir = enemy.transform.position - Player.instance.transform.position;
                 enemy.PushEnemy(dir, 2f);
             }
+            enemy.TakeDamage((int)damage, isCritical);
+            
         }
 
         if (collision.CompareTag("FairyCage"))
@@ -53,24 +55,16 @@ public class OrbitalMoon : MonoBehaviour
             FairyCage cage = collision.GetComponent<FairyCage>();
             cage.OnHit();
         }
-
-        if (collision.CompareTag("Bullet"))
-        {
-            bool destroyBullet = Random.Range(0f, 100f) <= blockChance;
-            if (destroyBullet)
-            {
-                Bullet bullet = collision.GetComponent<Bullet>();
-                bullet.Despawn();
-            }
-        }
     }
 
     public void Update()
     {
         if (GameManager.isPaused) return;
+        speedmulti = level < 3 ? 1 : 1.25f;
+        speedmulti *= Player.instance.itemValues["orbitalSpeed"];
         angle += Time.deltaTime * 360f * speedmulti;
         Vector3 origin = Player.instance.transform.position;
-        transform.position = new Vector3(origin.x + (2.5f * Mathf.Cos(angle * Mathf.Deg2Rad)), origin.y + (2.5f * Mathf.Sin(angle * Mathf.Deg2Rad)), origin.z + 2f);
+        transform.position = new Vector3(origin.x + (orbitRange * Mathf.Cos(angle * Mathf.Deg2Rad)), origin.y + (orbitRange * Mathf.Sin(angle * Mathf.Deg2Rad)), origin.z + 2f);
         if (angle > 360) angle -= 360;
 
         if (numBeats > 1 && sprite.color.a < 1)
@@ -101,7 +95,15 @@ public class OrbitalMoon : MonoBehaviour
             sprite.color = Color.Lerp(sprite.color, new Color(1, 1, 1, 0), Time.deltaTime * 2f);
             yield return new WaitForEndOfFrame();
         }
+        Player.instance.despawneables.Remove(this);
         PoolManager.Return(gameObject, GetType());
     }
 
+    public void ForceDespawn(bool instant = false)
+    {
+        trail.Stop();
+        trail.ForceDespawn();
+        StopAllCoroutines();
+        PoolManager.Return(gameObject, GetType());
+    }
 }

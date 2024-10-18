@@ -13,85 +13,157 @@ MonoBehaviour:
   m_Name: RabiEnd
   m_EditorClassIdentifier: 
   entries:
-  - name: Nebulion
-    leftSide: 0
-    text: How...? You are just a rabbit!
-    leftPortrait: RabiSmile
-    rightPortrait: NebulionAngry
-  - name: Rabi
-    leftSide: 1
-    text: Now, tell me what you know about this!
-    leftPortrait: RabiSmirk
-    rightPortrait: NebulionAngry
-  - name: Nebulion
-    leftSide: 0
-    text: Tsk... Very well, I acknowledge you.
-    leftPortrait: RabiSmirk
-    rightPortrait: NebulionDisappointed
-  - name: Nebulion
-    leftSide: 0
-    text: I don't want to keep dancing forever anyway.
-    leftPortrait: RabiSmile
-    rightPortrait: NebulionNormal
-  - name: Nebulion
-    leftSide: 0
-    text: It seems whoever casted this spell is not a normal person.
-    leftPortrait: RabiSmile
-    rightPortrait: NebulionNormal
-  - name: Nebulion
-    leftSide: 0
-    text: In fact, it could actually be one of the whims of the goddesses.
-    leftPortrait: RabiSurprised
-    rightPortrait: NebulionNormal
-  - name: Rabi
-    leftSide: 1
-    text: A goddess? So they exist after all?
-    leftPortrait: RabiSurprised
-    rightPortrait: NebulionNormal
-  - name: Nebulion
-    leftSide: 0
-    text: You really don't know anything beyond the forest, huh...?
-    leftPortrait: RabiSurprised
-    rightPortrait: NebulionDisappointed
-  - name: Rabi
-    leftSide: 1
-    text: This is my home, I never had a reason to leave.
-    leftPortrait: RabiSmile
-    rightPortrait: NebulionNormal
-  - name: Nebulion
-    leftSide: 0
-    text: Then you must be prepared.
-    leftPortrait: RabiSurprised
-    rightPortrait: NebulionNormal
-  - name: Nebulion
-    leftSide: 0
-    text: Beyond the forest, through the Crystal Whirlsea, there is a mountain that
-      reaches beyond the sky.
-    leftPortrait: RabiSmile
-    rightPortrait: NebulionNormal
-  - name: Nebulion
-    leftSide: 0
-    text: The only one capable of this is the Goddess of Dance. She must be behind
-      this!
-    leftPortrait: RabiSmile
-    rightPortrait: NebulionNormal
-  - name: Rabi
-    leftSide: 1
-    text: Beyond the sky... That sounds like fun!
-    leftPortrait: RabiSmirk
-    rightPortrait: NebulionNormal
-  - name: Nebulion
-    leftSide: 0
-    text: Fun, huh...? That's all I know, now leave.
-    leftPortrait: RabiSmile
-    rightPortrait: NebulionNormal
-  - name: Rabi
-    leftSide: 1
-    text: Thanks, Nebulion, I will beat her to a pulp!
-    leftPortrait: RabiSmirk
-    rightPortrait: NebulionDisappointed
-  - name: Nebulion
-    leftSide: 0
-    text: Yeah, sure... like you could do that to a Goddess...
-    leftPortrait: RabiSmirk
-    rightPortrait: NebulionDisappointed
+  - rid: 4183682867992723468
+  - rid: 4183682867992723470
+  - rid: 4183682867992723472
+  - rid: 4183682867992723474
+  - rid: 4183682867992723476
+  - rid: 4183682867992723478
+  - rid: 4183682867992723480
+  - rid: 4183682867992723482
+  - rid: 4183682867992723484
+  - rid: 4183682867992723486
+  - rid: 4183682867992723488
+  - rid: 4183682867992723490
+  - rid: 4183682867992723492
+  - rid: 4183682867992723494
+  - rid: 4183682867992723496
+  - rid: 4183682867992723498
+  - rid: 4183682867992723500
+  references:
+    version: 2
+    RefIds:
+    - rid: 4183682867992723468
+      type: {class: PlayAnimationEvent, ns: , asm: Assembly-CSharp}
+      data:
+        animation: Stage1-2End
+    - rid: 4183682867992723470
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Nebulion
+        leftSide: 0
+        text: How...!? You are just a rabbit...!
+        leftPortrait: RabiSmile
+        rightPortrait: NebulionAngry
+    - rid: 4183682867992723472
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Rabi
+        leftSide: 1
+        text: Now, tell me what you know!
+        leftPortrait: RabiSmirk
+        rightPortrait: NebulionAngry
+    - rid: 4183682867992723474
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Nebulion
+        leftSide: 0
+        text: Tsk... Very well, I acknowledge you.
+        leftPortrait: RabiSmirk
+        rightPortrait: NebulionDisappointed
+    - rid: 4183682867992723476
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Nebulion
+        leftSide: 0
+        text: I don't want to keep dancing forever anyway.
+        leftPortrait: RabiSmile
+        rightPortrait: NebulionNormal
+    - rid: 4183682867992723478
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Nebulion
+        leftSide: 0
+        text: It seems whoever casted this spell is not a normal person.
+        leftPortrait: RabiSmile
+        rightPortrait: NebulionNormal
+    - rid: 4183682867992723480
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Nebulion
+        leftSide: 0
+        text: In fact, it could actually be one of the whims of the goddesses.
+        leftPortrait: RabiSurprised
+        rightPortrait: NebulionNormal
+    - rid: 4183682867992723482
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Rabi
+        leftSide: 1
+        text: A goddess? So they exist after all?
+        leftPortrait: RabiSurprised
+        rightPortrait: NebulionNormal
+    - rid: 4183682867992723484
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Nebulion
+        leftSide: 0
+        text: You really don't know anything beyond the forest, huh...?
+        leftPortrait: RabiSurprised
+        rightPortrait: NebulionDisappointed
+    - rid: 4183682867992723486
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Rabi
+        leftSide: 1
+        text: This is my home, I never had a reason to leave.
+        leftPortrait: RabiSmile
+        rightPortrait: NebulionNormal
+    - rid: 4183682867992723488
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Nebulion
+        leftSide: 0
+        text: Then you must be prepared.
+        leftPortrait: RabiSurprised
+        rightPortrait: NebulionNormal
+    - rid: 4183682867992723490
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Nebulion
+        leftSide: 0
+        text: Beyond the forest, through the Crystal Whirlsea, there is a mountain
+          that reaches beyond the sky.
+        leftPortrait: RabiSmile
+        rightPortrait: NebulionNormal
+    - rid: 4183682867992723492
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Nebulion
+        leftSide: 0
+        text: The only one capable of this is the Goddess of Dance. She must be behind
+          this!
+        leftPortrait: RabiSmile
+        rightPortrait: NebulionNormal
+    - rid: 4183682867992723494
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Rabi
+        leftSide: 1
+        text: Beyond the sky... That sounds like fun!
+        leftPortrait: RabiSmirk
+        rightPortrait: NebulionNormal
+    - rid: 4183682867992723496
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Nebulion
+        leftSide: 0
+        text: Fun, huh...? That's all I know, now leage.
+        leftPortrait: RabiSmile
+        rightPortrait: NebulionNormal
+    - rid: 4183682867992723498
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Rabi
+        leftSide: 1
+        text: Thanks, Nebulion, I will beat her to a pulp!
+        leftPortrait: RabiSmirk
+        rightPortrait: NebulionDisappointed
+    - rid: 4183682867992723500
+      type: {class: DialogueEntry, ns: , asm: Assembly-CSharp}
+      data:
+        name: Nebulion
+        leftSide: 0
+        text: Yeah, sure... like you could do that to a Goddess...
+        leftPortrait: RabiSmirk
+        rightPortrait: NebulionDisappointed

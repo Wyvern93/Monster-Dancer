@@ -27,11 +27,6 @@ public class BonusHealEnhancement : Enhancement
         return IconList.instance.heal;
     }
 
-    public override bool isUnique()
-    {
-        return false;
-    }
-
     public override int getLevel()
     {
         return 0;
@@ -42,7 +37,7 @@ public class BonusHealEnhancement : Enhancement
         return "Heal";
     }
 
-    public override string getType()
+    public override string getDescriptionType()
     {
         return "Bonus";
     }
@@ -61,5 +56,10 @@ public class BonusHealEnhancement : Enhancement
     public override void OnStatCalculate(ref PlayerStats flatBonus, ref PlayerStats percentBonus)
     {
 
+    }
+
+    public override EnhancementType GetEnhancementType()
+    {
+        return EnhancementType.Stat;
     }
 }

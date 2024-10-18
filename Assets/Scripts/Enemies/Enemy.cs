@@ -14,7 +14,7 @@ public abstract class Enemy : MonoBehaviour
     protected Vector2 direction;
     public bool facingRight { get; protected set; }
 
-    [SerializeField] protected SpriteRenderer Sprite;
+    [SerializeField] public SpriteRenderer Sprite;
     [SerializeField] protected Rigidbody2D rb;
     public float SpriteSize = 1f;
     protected float SpriteX = 1f;
@@ -42,7 +42,9 @@ public abstract class Enemy : MonoBehaviour
     public int lifeTime;
 
     public StunEffect stunStatus;
+    public BurningEffect burnStatus;
     private float oldAnimSpeed;
+    private Vector2 deathDir;
     public bool CanMove()
     {
         if (isMoving) return false;
@@ -57,6 +59,11 @@ public abstract class Enemy : MonoBehaviour
         return true;
     }
 
+    public bool isCloseEnoughToShoot()
+    {
+        return (Vector2.Distance(transform.position, Player.instance.GetClosestPlayer(transform.position)) < 9);
+    }
+
     public void OnStun(int time)
     {
         if (!stunStatus.isStunned()) oldAnimSpeed = animator.speed;
@@ -64,6 +71,17 @@ public abstract class Enemy : MonoBehaviour
         stunStatus.duration = time;
         animator.speed = 0;
         Sprite.color = new Color(0.8f, 0.8f, 1f, 1f);
+    }
+
+    public void OnBurn()
+    {
+        int time = (int)Player.instance.itemValues["burnDuration"];
+        if (!burnStatus.isBurning())
+        {
+            BurningVisualEffect eff = PoolManager.Get<BurningVisualEffect>();
+            eff.source = this;
+        }
+        if (burnStatus.duration < time) burnStatus.duration = time;
     }
 
     public void OnStunEnd()
@@ -126,6 +144,7 @@ public abstract class Enemy : MonoBehaviour
     private void Awake()
     {
         stunStatus = new StunEffect();
+        burnStatus = new BurningEffect();
         spriteRendererMat = Sprite.material;
         facingRight = true;
         animator = GetComponentInChildren<Animator>();
@@ -135,13 +154,14 @@ public abstract class Enemy : MonoBehaviour
     private void OnEnable()
     {
         isDead = false;
+        Sprite.color = Color.white;
     }
 
     public virtual void CalculateHealth()
     {
         if (GameManager.runData == null) return;
         if (origHealth == 0) origHealth = MaxHP;
-        float minutes = (Map.StageTime / 100f) + (6 * GameManager.runData.stageMulti);
+        float minutes = (Map.StageTime / 120f) + (6 * GameManager.runData.stageMulti);
         float scale = 1 + Mathf.Clamp(minutes - 1, 0, 10000);
         // Minute 0 -> 1x
         // Minute 10 -> 10x
@@ -152,8 +172,13 @@ public abstract class Enemy : MonoBehaviour
         experience = baseExperience * (1 + GameManager.runData.stageMulti);
 
         float baseSize = isElite ? 2 : 1;
-        float multi = 1 + (Map.StageTime / 600f);
+        float multi = 1 + (Map.StageTime / 800f);
         transform.localScale = Vector3.one * baseSize * multi;
+    }
+
+    private Color ColorMoveTowards(Color a, Color b, float time)
+    {
+        return new Color(Mathf.MoveTowards(a.r, b.r, time), Mathf.MoveTowards(a.g, b.g, time), Mathf.MoveTowards(a.b, b.b, time), Mathf.MoveTowards(a.a, b.a, time));
     }
 
     protected abstract void OnInitialize();
@@ -163,13 +188,35 @@ public abstract class Enemy : MonoBehaviour
     {
         if (GameManager.isPaused) return;
         if (Player.instance == null) return;
-        if (Player.instance.isDead) return;
+        if (isDead)
+        {
+            transform.position += (Vector3)(deathDir * 4 * Time.deltaTime);
+            Sprite.color = ColorMoveTowards(Sprite.color, new Color(1, 0, 0, 0), Time.deltaTime * 4f);
+            if (Sprite.color.a <= 0f)
+            {
+                Map.Instance.enemiesAlive.Remove(this);
+                PoolManager.Return(gameObject, GetType());
+            }
+            return;
+        }
         if (!stunStatus.isStunned())
         {
             OnBehaviourUpdate();
             if (BeatManager.isGameBeat)
             {
                 OnBeat();
+            }
+        }
+
+        if (burnStatus.isBurning())
+        {
+            if (BeatManager.isQuarterBeat)
+            {
+                TakeDamage(2f * Player.instance.itemValues["burnDamage"], false);
+            }
+            if (BeatManager.isGameBeat)
+            {
+                burnStatus.duration--;
             }
         }
         else if (BeatManager.isGameBeat && stunStatus.duration > 0)
@@ -199,6 +246,7 @@ public abstract class Enemy : MonoBehaviour
 
     public void PushEnemy(Vector2 pushDir, float force)
     {
+        if (this is Boss) return;
         knockback = pushDir.normalized * force;
     }
 
@@ -218,23 +266,23 @@ public abstract class Enemy : MonoBehaviour
         spriteRendererMat.SetColor("_EmissionColor", emissionColor);
     }
 
-    public virtual void TakeDamage(int damage, bool isCritical)
+    public virtual void TakeDamage(float damage, bool isCritical)
     {
+        if (isDead) return;
         if (!CanTakeDamage())
         {
             UIManager.Instance.PlayerUI.SpawnDamageText(transform.position, 0, DamageTextType.Dodge);
             return;
         }
 
-        CurrentHP = Mathf.Clamp(CurrentHP - damage, 0, MaxHP);
+        CurrentHP = Mathf.Clamp(CurrentHP - Mathf.RoundToInt(damage), 0, MaxHP);
         //Player.TriggerCameraShake(0.4f, 0.2f);
-        AudioController.PlaySound(AudioController.instance.sounds.enemyHurtSound);
+        AudioController.PlaySound(AudioController.instance.sounds.enemyHurtSound, Random.Range(0.95f, 1.05f));
         emissionColor = new Color(1, 1, 1, 1);
-        UIManager.Instance.PlayerUI.SpawnDamageText(transform.position, damage, isCritical ? DamageTextType.Critical : DamageTextType.Normal);
+        UIManager.Instance.PlayerUI.SpawnDamageText(transform.position, Mathf.RoundToInt(damage), isCritical ? DamageTextType.Critical : DamageTextType.Normal);
 
         if (CurrentHP <= 0 && !isDead)
         {
-            isDead = true;
             Die();
         }
     }
@@ -243,24 +291,31 @@ public abstract class Enemy : MonoBehaviour
     {
         if (sound)
         {
-            AudioController.PlaySound(AudioController.instance.sounds.enemyDeathSound);
-            KillEffect deathFx = PoolManager.Get<KillEffect>();
-            deathFx.transform.position = transform.position;
+            //AudioController.PlaySound(AudioController.instance.sounds.enemyDeathSound);
+            //KillEffect deathFx = PoolManager.Get<KillEffect>();
+            //deathFx.transform.position = transform.position;
         }
-        
-        PoolManager.Return(gameObject, GetType());
+        isDead = true;
+        deathDir = (transform.position - Player.instance.transform.position).normalized;
     }
 
     public virtual void Die()
     {
-        AudioController.PlaySound(AudioController.instance.sounds.enemyDeathSound);
-
-        if (!Map.isBossWave) SpawnDrops();
-
-        KillEffect deathFx = PoolManager.Get<KillEffect>();
-        deathFx.transform.position = transform.position;
-        Map.Instance.enemiesAlive.Remove(this);
-        PoolManager.Return(gameObject, GetType());
+        if (this is not Boss) SpawnDrops();
+        if (isElite)
+        {
+            PlayerCamera.TriggerCameraShake(0.5f, 1f);
+            AudioController.PlaySound(AudioController.instance.sounds.bossPhaseEnd, side:true);
+            // Should also spawn a chest
+        }
+        isDead = true;
+        deathDir = (transform.position - Player.instance.transform.position).normalized;
+        stunStatus.duration = 0;
+        burnStatus.duration = 0;
+        //KillEffect deathFx = PoolManager.Get<KillEffect>();
+        //deathFx.transform.position = transform.position;
+        //Map.Instance.enemiesAlive.Remove(this);
+        //PoolManager.Return(gameObject, GetType());
     }
 
     public void SpawnDrops()
@@ -277,9 +332,6 @@ public abstract class Enemy : MonoBehaviour
                 if (Random.Range(0, 40) <= 1) numCoins++;
             }
         }
-        
-        
-        
 
         int expToUse = experience;
         while (expToUse > 0)
@@ -319,7 +371,6 @@ public abstract class Enemy : MonoBehaviour
                 }
             }
         }
-        
 
         for (int coins = 0; coins < numCoins; coins++)
         {
@@ -327,12 +378,32 @@ public abstract class Enemy : MonoBehaviour
             coin.dir = Random.insideUnitCircle * 2.4f;
             coin.transform.position = transform.position;
         }
+
+        int foodChance = Random.Range(0, 60);
+        if (foodChance < 1)
+        {
+            Food food = PoolManager.Get<Food>();
+            food.dir = Random.insideUnitCircle * 2.4f;
+            food.transform.position = transform.position;
+        }
+
+        if (!isElite && Player.instance.hasEvolvableAbility())
+        {
+            if (Map.isWallAt(new Vector2(transform.position.x, transform.position.y))) return;
+            int fairyChance = Random.Range(0, 10);
+            if (fairyChance < 1 && !Map.Instance.fairyCage.gameObject.activeSelf)
+            {
+                Map.Instance.fairyCage.transform.position = transform.position;
+                Map.Instance.fairyCage.gameObject.SetActive(true);
+            }
+        }
     }
 
     public void OnTriggerEnter2D(Collider2D collision)
     {
         if (!BeatManager.isPlaying) return;
         if (stunStatus.isStunned()) return;
+        if (isDead) return;
         if (collision.CompareTag("Player") && collision.name == "Player")
         {
             Player.instance.TakeDamage(atk);
@@ -343,6 +414,7 @@ public abstract class Enemy : MonoBehaviour
     {
         if (!BeatManager.isPlaying) return;
         if (!BeatManager.isGameBeat) return;
+        if (isDead) return;
         if (stunStatus.isStunned()) return;
 
         if (collision.CompareTag("Player") && collision.name == "Player")

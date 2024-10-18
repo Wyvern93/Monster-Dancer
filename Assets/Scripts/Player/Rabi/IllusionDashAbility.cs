@@ -5,9 +5,6 @@ public class IllusionDashAbility : PlayerAbility
 {
     public int minCooldown = 1;
     int level;
-    public IllusionDashAbility() : base(24)
-    {
-    }
 
     public override bool CanCast()
     {
@@ -25,11 +22,6 @@ public class IllusionDashAbility : PlayerAbility
         return Localization.GetLocalizedString("ability.rabi.illusiondash.name");
     }
 
-    public override Sprite GetIcon()
-    {
-        return IconList.instance.illusionDash;
-    }
-
     public override List<Enhancement> getEnhancementList()
     {
         return new List<Enhancement>() { new IllusionDashAbilityEnhancement() };
@@ -38,9 +30,9 @@ public class IllusionDashAbility : PlayerAbility
     {
         return false;
     }
-    public override string getID()
+    public override string getId()
     {
-        return "rabi.illusiondash";
+        return "illusiondash";
     }
 
     public override void OnCast()

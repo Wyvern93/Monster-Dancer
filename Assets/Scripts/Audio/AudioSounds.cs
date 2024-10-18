@@ -8,6 +8,7 @@ public class AudioSounds
     public AudioClip ui_hover;
     public AudioClip ui_select;
     public AudioClip ui_dialogue_char;
+    public AudioClip ui_evolve;
 
     [Header("Player Sounds")]
     public AudioClip playerHurtSfx;
@@ -30,7 +31,7 @@ public class AudioSounds
     [Header("Object Sounds")]
     public AudioClip gemSound;
     public AudioClip coinSound;
-    public AudioClip foodSound;
+    public AudioClip healSound;
 
     [Header("Bullet Sounds")]
     public AudioClip grazeSound;

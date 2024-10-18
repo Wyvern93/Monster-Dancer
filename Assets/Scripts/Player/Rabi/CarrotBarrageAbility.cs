@@ -3,10 +3,7 @@ using UnityEngine;
 
 public class CarrotBarrageAbility : PlayerAbility
 {
-    
-    public CarrotBarrageAbility(): base(8)
-    {
-    }
+    private List<ExplosiveCarrot> carrots = new List<ExplosiveCarrot>();
     public override bool CanCast()
     {
         return currentCooldown == 0;
@@ -26,83 +23,44 @@ public class CarrotBarrageAbility : PlayerAbility
     {
         return new List<Enhancement>() { new CarrotBarrageAbilityEnhancement() };
     }
-
-    public override Sprite GetIcon()
-    {
-        return IconList.instance.carrotBarrage;
-    }
     public override bool isUltimate()
     {
         return false;
     }
-    public override string getID()
+    public override string getId()
     {
-        return "rabi.carrotbarrage";
+        return "carrotbarrage";
     }
 
     public override void OnCast()
     {
+        int level = (int)Player.instance.abilityValues["ability.carrotbarrage.level"];
+        carrots.Clear();
+        maxCooldown = level < 6 ? level < 3 ? 10 : 8 : 6;
         currentCooldown = maxCooldown;
 
-        int level = (int)Player.instance.abilityValues["ability.carrotbarrage.level"];
-        int numberOfCarrots = 4 + ((level - 1) * 2);
+        float dmg = level < 4 ? level < 2 ? 25 : 40 : 65;
+        int numberOfCarrots = level < 5 ? 3 : 5;
 
+        float angleDiff = 360f / numberOfCarrots;
         for (int i = 0; i < numberOfCarrots; i++) 
         {
-            Vector2 dir = Vector2.zero;
-            if (level == 1)
-            {
-                if (i == 0) CastCarrot(new Vector2(1,1));
-                if (i == 1) CastCarrot(new Vector2(1, -1));
-                if (i == 2) CastCarrot(new Vector2(-1, 1));
-                if (i == 3) CastCarrot(new Vector2(-1, -1));
-            }
-
-            if (level == 2)
-            {
-                if (i == 0) CastCarrot(new Vector2(1, 1));
-                if (i == 1) CastCarrot(new Vector2(1, -1));
-                if (i == 2) CastCarrot(new Vector2(-1, 1));
-                if (i == 3) CastCarrot(new Vector2(-1, -1));
-                if (i == 4) CastCarrot(new Vector2(0, 1));
-                if (i == 5) CastCarrot(new Vector2(0, -1));
-            }
-
-            if (level == 3)
-            {
-                if (i == 0) CastCarrot(new Vector2(1, 1));
-                if (i == 1) CastCarrot(new Vector2(1, -1));
-                if (i == 2) CastCarrot(new Vector2(-1, 1));
-                if (i == 3) CastCarrot(new Vector2(-1, -1));
-                if (i == 4) CastCarrot(new Vector2(0, 1));
-                if (i == 5) CastCarrot(new Vector2(0, -1));
-                if (i == 6) CastCarrot(new Vector2(1, 0));
-                if (i == 7) CastCarrot(new Vector2(-1, 0));
-            }
-
-            if (level == 4)
-            {
-                if (i == 0) CastCarrot(new Vector2(1, 1));
-                if (i == 1) CastCarrot(new Vector2(1, -1));
-                if (i == 2) CastCarrot(new Vector2(-1, 1));
-                if (i == 3) CastCarrot(new Vector2(-1, -1));
-                if (i == 4) CastCarrot(new Vector2(0, 1));
-                if (i == 5) CastCarrot(new Vector2(0, -1));
-                if (i == 6) CastCarrot(new Vector2(1, 0));
-                if (i == 7) CastCarrot(new Vector2(-1, 0));
-
-                if (i == 8) CastCarrot(new Vector2(2, 2));
-                if (i == 9) CastCarrot(new Vector2(2, -2));
-            }
+            Vector2 dir = BulletBase.angleToVector((angleDiff * i) + 45f);
+            CastCarrot(dir, dmg, i == 0);
         }
 
     }
 
-    public void CastCarrot(Vector2 direction)
+    public void CastCarrot(Vector2 direction, float damage, bool playSound)
     {
         ExplosiveCarrot carrot = PoolManager.Get<ExplosiveCarrot>();
         carrot.transform.position = Player.instance.transform.position;
+        carrot.isSmall = false;
         carrot.Init(direction);
+        carrot.dmg = damage;
+        
+        if (playSound) carrot.PlaySpin();
+        Player.instance.despawneables.Add(carrot.GetComponent<IDespawneable>());
     }
 
     public override void OnEquip()
@@ -113,5 +71,15 @@ public class CarrotBarrageAbility : PlayerAbility
     public override void OnUpdate()
     {
         if (BeatManager.isGameBeat && currentCooldown > 0) currentCooldown--;
+    }
+
+    public override System.Type getEvolutionItemType()
+    {
+        return typeof(FireworksKitItem);
+    }
+
+    public override Enhancement getEvolutionEnhancement()
+    {
+        return new ExplosiveFestivalAbilityEnhancement();
     }
 }

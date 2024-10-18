@@ -29,11 +29,6 @@ public class StatEXPPercentEnhancement : Enhancement
         return true;
     }
 
-    public override bool isUnique()
-    {
-        return false;
-    }
-
     public override int getLevel()
     {
         return 0;
@@ -44,14 +39,13 @@ public class StatEXPPercentEnhancement : Enhancement
         return "Exp. Multi";
     }
 
-    public override string getType()
+    public override string getDescriptionType()
     {
         return "Stat Up";
     }
 
     public override void OnEquip()
     {
-        if (isUnique()) GameManager.runData.RemoveStatEnhancement(this);
         Player.instance.enhancements.Add(new StatEXPPercentEnhancement());
         Player.instance.CalculateStats();
     }
@@ -59,5 +53,10 @@ public class StatEXPPercentEnhancement : Enhancement
     public override void OnStatCalculate(ref PlayerStats flatBonus, ref PlayerStats percentBonus)
     {
         percentBonus.ExpMulti += expPercent;
+    }
+
+    public override EnhancementType GetEnhancementType()
+    {
+        return EnhancementType.Stat;
     }
 }

@@ -21,6 +21,7 @@ public class MoonBeamChargeEffect : MonoBehaviour
     
     public void OnAnimationEnd()
     {
+        Player.instance.despawneables.Remove(beam);
         PoolManager.Return(beam.gameObject, beam.GetType());
     }
 

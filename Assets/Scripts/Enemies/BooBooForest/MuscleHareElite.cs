@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class MuscleHareElite : Enemy
@@ -15,7 +16,7 @@ public class MuscleHareElite : Enemy
         isAttacking = false;
         beatCD = Random.Range(1, 6);
         animator.Play("musclehare_normal");
-        animator.speed = 1f / BeatManager.GetBeatDuration() * 2f;
+        animator.speed = 1f / BeatManager.GetBeatDuration();
     }
     protected override void OnBeat()
     {
@@ -55,40 +56,55 @@ public class MuscleHareElite : Enemy
         BulletSpawnEffect bulletSpawnEffect = PoolManager.Get<BulletSpawnEffect>();
         bulletSpawnEffect.source = this;
         bulletSpawnEffect.transform.position = transform.position;
+        bulletSpawnEffect.finalScale = 1f;
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
 
-        Vector2 dir = Player.instance.GetClosestPlayer(transform.position) - transform.position;
-        dir.Normalize();
+        float playery = Player.instance.GetClosestPlayer(transform.position).y;
         while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
 
-        SpawnBullet(Vector2.left, 12f, 0f);
-        SpawnBullet(Vector2.right, 12f, 0f);
-        yield return new WaitForSeconds(BeatManager.GetBeatDuration());
-        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+        Vector2 attackDir = transform.position.y > playery ? Vector2.down : Vector2.up;
 
-        SpawnBullet(Vector2.left, 12f, 0f);
-        SpawnBullet(Vector2.right, 12f, 0f);
+        SpawnBullet(Vector2.left, attackDir);
+        SpawnBullet(Vector2.right, attackDir);
+        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
         while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
 
-        SpawnBullet(Vector2.left, 12f, 0f);
-        SpawnBullet(Vector2.right, 12f, 0f);
+        SpawnBullet(Vector2.left, attackDir);
+        SpawnBullet(Vector2.right, attackDir);
+        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
+        yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+
+        SpawnBullet(Vector2.left, attackDir);
+        SpawnBullet(Vector2.right, attackDir);
+        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
         bulletSpawnEffect.Despawn();
         isAttacking = false;
         yield break;
 
     }
 
-    private void SpawnBullet(Vector2 dir, float speed, float dist)
+    private void SpawnBullet(Vector2 position, Vector2 attackDir)
     {
-        DirectionalBullet bullet = PoolManager.Get<DirectionalBullet>();
-        bullet.transform.position = transform.position + (Vector3)(dir * dist) + (Vector3.one * 0.5f);
-        bullet.direction = dir;
-        bullet.origSpeed = speed;
-        bullet.speed = speed;
-        bullet.enemySource = this;
-        bullet.atk = atk / 4;
+        BulletBase bullet = PoolManager.Get<BulletBase>();
+
+        float angleChange = position == Vector2.left ? 120 : -120;
+
+        bullet.transform.position = transform.position + (Vector3)position + (Vector3.up * 0.5f);
+        bullet.direction = attackDir;
+        bullet.speed = 10;
+        bullet.atk = 5;
         bullet.lifetime = 10;
+        bullet.transform.localScale = Vector3.one;
+        bullet.startOnBeat = true;
+        bullet.behaviours = new List<BulletBehaviour>
+            {
+                new SpriteLookAngleBehaviour() { start = 0, end = -1 },
+                new RotateOverBeatBehaviour() { start = 0, end = -1, rotateAmount = angleChange}
+            };
+        bullet.animator.Play("punchbullet");
+        bullet.enemySource = this;
         bullet.OnSpawn();
     }
 

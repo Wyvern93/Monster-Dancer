@@ -11,7 +11,7 @@ public class Map : MonoBehaviour
     public List<MapTrack> tracks;
     public LayerMask nonPassableMask;
     public GameObject enemyPrefab;
-    protected float SpawnRadius = 15f;
+    protected float SpawnRadius = 8f;
 
     public Transform startPosition;
 
@@ -23,6 +23,8 @@ public class Map : MonoBehaviour
     public GameObject bulletSpawnPrefab;
     public GameObject coinPrefab;
     public GameObject bulletBasePrefab;
+    public GameObject foodPrefab;
+    public GameObject burningPrefab;
 
     //public GameObject bossAPrefab;
     public static float StageTime;
@@ -63,7 +65,12 @@ public class Map : MonoBehaviour
     public Boss currentBoss;
     public SpriteRenderer bossArea;
 
+    private float spawnAngle;
     [SerializeField]protected Dialogue rabiEndDialogue;
+    [SerializeField] public Animator CutsceneAnimator;
+
+    public Fairy fairyCage;
+    public static int global_enemy_spawn_modifier = 4;
 
     public static void ForceDespawnEnemies()
     {
@@ -150,6 +157,9 @@ public class Map : MonoBehaviour
 
         // Player can't move
         Player.instance.canDoAnything = false;
+        PlayerCamera.instance.followPlayer = false;
+        Player.instance.ForceDespawnAbilities(false);
+        Player.instance.ResetAbilities();
 
         Player.instance.Exclamation.SetActive(true);
         AudioController.PlaySound(AudioController.instance.sounds.surpriseSfx);
@@ -160,28 +170,19 @@ public class Map : MonoBehaviour
         mapObjects.SetActive(false);
         bossGrid.SetActive(true);
         Player.instance.transform.position = PlayerPositionOnBoss.position;
-        Camera.main.transform.position = new Vector3(PlayerPositionOnBoss.position.x, PlayerPositionOnBoss.position.y, Camera.main.transform.position.z);
+        PlayerCamera.instance.SetCameraPos(PlayerPositionOnBoss.position);
 
-        /*
-        // Move camera target to where boss is going to spawn
-        float angle, x, y;
-        while (true)
-        {
-            angle = Random.Range(0, 360f);
-            x = Player.instance.transform.position.x + (4 * Mathf.Cos(angle));
-            y = Player.instance.transform.position.y + (4 * Mathf.Sin(angle));
-            if (!isWallAt(new Vector2(Mathf.RoundToInt(x), Mathf.RoundToInt(y)))) break;
-        }
-        */
         Vector3 spawnPos = BossPosition.position; //new Vector3(Mathf.RoundToInt(x), Mathf.RoundToInt(y));
 
         UIManager.Fade(true);
         yield return new WaitForSeconds(1f);
 
         float time = 2;
+        Vector3 c = PlayerCamera.instance.transform.position;
         while (time > 0)
         {
-            Camera.main.transform.position = Vector3.MoveTowards(Camera.main.transform.position, new Vector3(spawnPos.x, spawnPos.y, Camera.main.transform.position.z), Time.deltaTime * 2f);
+            c = Vector3.MoveTowards(c, new Vector3(spawnPos.x, spawnPos.y, -60), Time.deltaTime * 2f);
+            PlayerCamera.instance.SetCameraPos(c);
             time -= Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
@@ -194,7 +195,7 @@ public class Map : MonoBehaviour
         enemy.SpawnIndex = 0;
         enemy.transform.position = spawnPos;
         enemy.OnSpawn();
-
+        Player.instance.Exclamation.SetActive(false);
         // 2 seconds
         bossArea.gameObject.SetActive(true);
         bossArea.color = new Color(1, 1, 1, 0);
@@ -232,20 +233,6 @@ public class Map : MonoBehaviour
         return weightedList[randomIndex];
     }
 
-    private List<Wave> ShuffleWaves(List<Wave> list)
-    {
-        var count = list.Count;
-        var last = count - 1;
-        for (var i = 0; i < last; ++i)
-        {
-            var r = UnityEngine.Random.Range(i, count);
-            var tmp = list[i];
-            list[i] = list[r];
-            list[r] = tmp;
-        }
-        return list;
-    }
-
     public static Enemy GetRandomEnemy()
     {
         if (Instance.enemiesAlive.Count == 0) return null;
@@ -274,28 +261,25 @@ public class Map : MonoBehaviour
         PoolManager.CreatePool(typeof(Gem), gemPrefab, 30);
         PoolManager.CreatePool(typeof(BulletGem), bulletgemPrefab, 100);
         PoolManager.CreatePool(typeof(Coin), coinPrefab, 50);
-        PoolManager.CreatePool(typeof(TestEnemy), enemyPrefab, 10);
-        //PoolManager.CreatePool(typeof(TestBoss), bossAPrefab, 1);
         PoolManager.CreatePool(typeof(KillEffect), killEffectPrefab, 10);
         PoolManager.CreatePool(typeof(SpawnEffect), enemySpawnPrefab, 10);
         PoolManager.CreatePool(typeof(BulletBase), bulletBasePrefab, 500);
-
-        //PoolManager.CreatePool(typeof(Bullet), bulletPrefab, 100);
         PoolManager.CreatePool(typeof(BulletSpawnEffect), bulletSpawnPrefab, 100);
+        PoolManager.CreatePool(typeof(Food), foodPrefab, 50);
+        PoolManager.CreatePool(typeof(BurningVisualEffect), burningPrefab, 50);
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (!GameManager.isPaused) spawnAngle += Time.deltaTime * 30;
+
+
         if (Keyboard.current.f6Key.wasPressedThisFrame)
         {
             foreach (Enemy enemy in Instance.enemiesAlive)
             {
-                if (enemy.CanBeStunned(true)) enemy.OnStun(4);
-            }
-            foreach (Bullet bullet in Instance.bulletsSpawned)
-            {
-                bullet.OnStun(4);
+                enemy.OnBurn();
             }
         }
         HandleStageLoop();
@@ -309,48 +293,13 @@ public class Map : MonoBehaviour
             if (beats >= beatsBeforeWave)
             {
                 beats = 0;
-                for (int i = 0; i < spawnRate; i++)
+                for (int i = 0; i < spawnRate + global_enemy_spawn_modifier; i++)
                 {
                     SpawnEnemy(GetRandomEnemySpawn());
                 }
             }
         }
-        /*
-        if (BeatManager.isGameBeat && BeatManager.isPlaying)
-        {
-            beats++;
-            
-            if (part == 0)
-            {
-                if (waves < 21 && (beats >= beatsBeforeWave || enemiesAlive.Count < WaveNumberOfEnemies * 0.2f || enemiesAlive.Count <= 0))
-                {
-                    beats = 0;
-                    SpawnNextWave(partAWaves); // Normal A Wave
-                }
-                // Is next boss wave
-                if (waves == 21 && enemiesAlive.Count == 0)
-                {
-                    beatsBeforeWave = 99999999;
-                    StartCoroutine(StartBossASequence());
-                    part = 1;
-                }
-            }
-
-            if (part == 2)
-            {
-                if (waves < 42 && (beats >= beatsBeforeWave || enemiesAlive.Count < WaveNumberOfEnemies * 0.2f || enemiesAlive.Count <= 0))
-                {
-                    beats = 0;
-                    SpawnNextWave(partBWaves); // Normal A Wave
-                }
-                if (waves == 42 && enemiesAlive.Count == 0)
-                {
-                    beatsBeforeWave = 99999999;
-                    StartCoroutine(StartBossBSequence());
-                    part = 3;
-                }
-            }
-        }*/
+        
         StageTime += Time.deltaTime;
         stagePartTime += Time.deltaTime;
 
@@ -421,34 +370,56 @@ public class Map : MonoBehaviour
         PoolManager.RemovePool(typeof(Gem));
         PoolManager.RemovePool(typeof(BulletGem));
         PoolManager.RemovePool(typeof(Coin));
-        //PoolManager.RemovePool(typeof(TestEnemy));
-        //PoolManager.RemovePool(typeof(TestBoss));
         PoolManager.RemovePool(typeof(KillEffect));
         PoolManager.RemovePool(typeof(SpawnEffect));
-
-        //PoolManager.RemovePool(typeof(Bullet));
+        PoolManager.RemovePool(typeof(BulletBase));
         PoolManager.RemovePool(typeof(BulletSpawnEffect));
+        PoolManager.RemovePool(typeof(Food));
+        PoolManager.RemovePool(typeof(BurningVisualEffect));
     }
+
+    public List<int> spawnDirections = new List<int>();
 
     public static void SpawnEnemy(SpawnData spawnData)
     {
         if (spawnData == null) return;
 
-        float angle, x, y;
-        while (true)
+        float x, y;
+        if (Instance.spawnDirections.Count == 0)
         {
-            angle = Random.Range(0, 360f);
-            x = Player.instance.transform.position.x + (Instance.SpawnRadius * Mathf.Cos(angle));
-            y = Player.instance.transform.position.y + (Instance.SpawnRadius * Mathf.Sin(angle));
-            if (!isWallAt(new Vector2(x, y))) break;
+            Instance.spawnDirections = new List<int> { 0,1,2,3 };
         }
-        Vector3 spawnPos = new Vector3(x,y);
+        Vector3 spawnPos = Vector3.zero;
+        int spawnDir = Instance.spawnDirections[Random.Range(0, Instance.spawnDirections.Count - 1)];
+
+        Debug.Log(spawnDir);
+        Camera cam = Camera.main;
+        float camHeight = 2f * cam.orthographicSize;
+        float camWidth = camHeight * cam.aspect;
+
+        switch (spawnDir)
+        {
+            default:
+            case 0: // Right
+                spawnPos = new Vector2(cam.transform.position.x + (camWidth / 2) + Random.Range(0, 3), Random.Range(cam.transform.position.y - (camHeight / 2), cam.transform.position.y + (camHeight / 2)));
+                break;
+            case 1: // Top
+                spawnPos = new Vector2(Random.Range(cam.transform.position.x - (camWidth / 2), cam.transform.position.x + (camWidth / 2)), cam.transform.position.y + (camHeight / 2) + Random.Range(0, 3));
+                break;
+            case 2: // Left
+                spawnPos = new Vector2(cam.transform.position.x - (camWidth / 2) - Random.Range(0, 3), Random.Range(cam.transform.position.y - (camHeight / 2), cam.transform.position.y + (camHeight / 2)));
+                break;
+            case 3: // Bottom
+                spawnPos = new Vector2(Random.Range(cam.transform.position.x - (camWidth / 2), cam.transform.position.x + (camWidth / 2)), cam.transform.position.y - (camHeight / 2) - Random.Range(0, 3));
+                break;
+        }
 
         Enemy enemy = Enemy.GetEnemyOfType(spawnData.enemyType);
         enemy.AItype = spawnData.AItype;
         enemy.SpawnIndex = 0;
         enemy.transform.position = spawnPos;
         enemy.OnSpawn();
+        Instance.spawnDirections.Remove(spawnDir);
     }
 
     public static void SpawnElite(SpawnData spawnData)
@@ -475,7 +446,6 @@ public class Map : MonoBehaviour
         yield return new WaitForSeconds(BeatManager.GetBeatDuration() * 2);
         AudioController.PlaySound(AudioController.instance.sounds.warningWaveSound);
         yield return new WaitForSeconds(BeatManager.GetBeatDuration() * 2);
-        PoolManager.Return(spawnEffect.gameObject, typeof(SpawnEffect));
 
         Enemy enemy = Enemy.GetEnemyOfType(spawnData.enemyType);
         enemy.AItype = spawnData.AItype;
@@ -635,25 +605,27 @@ public class Map : MonoBehaviour
     {
         // This is supposed to be an animation
         ForceDespawnBullets();
-        Player.TriggerCameraShake(2f, 0.45f);
+        PlayerCamera.TriggerCameraShake(2f, 0.45f);
         Player.instance.isMoving = true;
         if (Player.instance is PlayerRabi) Player.instance.animator.Play("Rabi_Idle");
         yield return new WaitForSeconds(0.45f); // This is when the white screen is pure white
         Player.instance.canDoAnything = false;
+        PlayerCamera.instance.followPlayer = false;
         BeatManager.FadeOut(2f);
         currentBoss = null;
 
         PoolManager.Return(boss.gameObject, boss.GetType());
         Player.instance.facingRight = true;
         Player.instance.Sprite.transform.localScale = Vector3.one;
-        Camera.main.transform.position = new Vector3(Player.instance.transform.position.x, Player.instance.transform.position.y, Camera.main.transform.position.z);
+        PlayerCamera.instance.SetOnPlayer();
+
         foreach (GameObject g in stageGridObjects)
         {
             g.SetActive(false);
         }
         bossGrid.SetActive(false);
         Dialogue dialogue = Player.instance is PlayerRabi ? rabiEndDialogue : rabiEndDialogue;
-        UIManager.Instance.dialogueMenu.Open(dialogue.entries);
+        UIManager.Instance.dialogueMenu.StartCutscene(dialogue.entries);
         while (!UIManager.Instance.dialogueMenu.hasFinished) yield return new WaitForEndOfFrame();
         yield return new WaitForSeconds(1f);
 

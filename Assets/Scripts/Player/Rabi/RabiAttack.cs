@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
-public class RabiAttack : PlayerAttack
+public class RabiAttack : PlayerAttack, IDespawneable, IPlayerProjectile
 {
     [SerializeField] AudioClip attackSound;
     [SerializeField] Animator animator;
@@ -120,13 +120,6 @@ public class RabiAttack : PlayerAttack
 
     public override void OnTriggerEnter2D(Collider2D collision)
     {
-        if (pierce <= 0)
-        {
-            Player.instance.isPerformingAction = false;
-            PoolManager.Return(gameObject, GetType());
-            return;
-        }
-        
         if (collision.CompareTag("Enemy"))
         {
             Enemy enemy = collision.GetComponent<Enemy>();
@@ -136,6 +129,15 @@ public class RabiAttack : PlayerAttack
             if (isCritical) damage *= Player.instance.currentStats.CritDmg;
             enemy.TakeDamage((int)damage, isCritical);
             pierce--;
+
+            foreach (PlayerItem item in Player.instance.equippedItems)
+            {
+                item.OnAttackHit(this, damage, enemy);
+            }
+            foreach (PlayerItem item in Player.instance.evolvedItems)
+            {
+                item.OnAttackHit(this, damage, enemy);
+            }
             if (!hasExploded && Player.instance.abilityValues["Attack_Explode"] == 1)
             {
                 MoonlightShockwave shockwave = PoolManager.Get<MoonlightShockwave>();
@@ -149,5 +151,24 @@ public class RabiAttack : PlayerAttack
             cage.OnHit();
             pierce--;
         }
+
+        if (pierce <= 0)
+        {
+            Player.instance.isPerformingAction = false;
+            Player.instance.despawneables.Remove(this);
+            PoolManager.Return(gameObject, GetType());
+            return;
+        }
+    }
+
+    public override Sprite GetIcon()
+    {
+        return IconList.instance.getAbilityIcon("moonlightdaggers");
+    }
+
+    public void ForceDespawn()
+    {
+        StopAllCoroutines();
+        PoolManager.Return(gameObject, GetType());
     }
 }

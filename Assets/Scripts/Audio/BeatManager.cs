@@ -14,6 +14,11 @@ public class BeatManager : MonoBehaviour
     public float secondsPerBeat, nextBeat, lastBeat;
     public float currentTime;
 
+    public float nextMidBeat, lastMidBeat;
+    public float nextQuarterBeat, lastQuarterBeat;
+    public static bool isMidBeat, isQuarterBeat;
+    public int midbeats, quarterBeats;
+
     [Header("Loop")]
     public float loopStartOffset;
     public float loopTriggerOffset;
@@ -56,12 +61,18 @@ public class BeatManager : MonoBehaviour
     {
         instance.music.Stop();
         beats = 0;
+        instance.quarterBeats = 0;
+        instance.midbeats = 0;
         instance.currentMapTrack = track;
         instance.secondsPerBeat = 60f / track.tempo;
         instance.music.clip = track.music;
         instance.offset = track.offset;
         instance.nextBeat = track.offset + audio_offset;
+        instance.nextMidBeat = track.offset + audio_offset;
+        instance.nextQuarterBeat = track.offset + audio_offset;
         instance.lastBeat = 0;
+        instance.lastMidBeat = 0;
+        instance.lastQuarterBeat = 0;
         instance.loopStartOffset = track.loopStart;
         instance.loopTriggerOffset = track.loopEnd;
         instance.currentTime = instance.music.time + audio_offset;
@@ -74,6 +85,8 @@ public class BeatManager : MonoBehaviour
         instance.music.time = 0;
         instance.music.Stop();
         beats = 0;
+        instance.quarterBeats = 0;
+        instance.midbeats = 0;
         instance.targetBeatPulseAlpha = 0;
     }
 
@@ -174,6 +187,8 @@ public class BeatManager : MonoBehaviour
             beatPulseAnimator.ResetTrigger("OnBeat");
         }
         if (isBeat) isBeat = false;
+        if (isQuarterBeat) isQuarterBeat = false;
+        if (isMidBeat) isMidBeat = false;
         
         if (currentTime < 1 && beats > 20)
         {
@@ -196,7 +211,23 @@ public class BeatManager : MonoBehaviour
             nextBeat = offset + audio_offset + (secondsPerBeat * beats);
             OnBeat();
         }
-        
+
+        if (music.time >= nextMidBeat)
+        {
+            midbeats++;
+            lastMidBeat = nextMidBeat;
+            nextMidBeat = offset + audio_offset + ((secondsPerBeat / 2f) * midbeats);
+            isMidBeat = true;
+        }
+
+        if (music.time >= nextQuarterBeat)
+        {
+            quarterBeats++;
+            lastQuarterBeat = nextQuarterBeat;
+            nextQuarterBeat = offset + audio_offset + ((secondsPerBeat / 4f) * quarterBeats);
+            isQuarterBeat = true;
+        }
+
         UpdateUI();
         //if (!compassless) CheckForGameBeat();
     }
@@ -206,6 +237,14 @@ public class BeatManager : MonoBehaviour
         beats = (int)((time - offset - audio_offset) / secondsPerBeat);
         nextBeat = offset + audio_offset + (secondsPerBeat * beats);
         lastBeat = nextBeat - secondsPerBeat;
+
+        midbeats = (int)((time - offset - audio_offset) / (secondsPerBeat / 2f));
+        nextMidBeat = offset + audio_offset + ((secondsPerBeat / 2f) * midbeats);
+        lastMidBeat = nextMidBeat - (secondsPerBeat / 2f);
+
+        quarterBeats = (int)((time - offset - audio_offset) / (secondsPerBeat / 4f));
+        nextQuarterBeat = offset + audio_offset + ((secondsPerBeat / 4f) * quarterBeats);
+        lastQuarterBeat = nextQuarterBeat - (secondsPerBeat / 4f);
     }
 
     private void CheckForGameBeat()

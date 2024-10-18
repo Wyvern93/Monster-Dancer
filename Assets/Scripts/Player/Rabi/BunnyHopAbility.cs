@@ -5,9 +5,6 @@ public class BunnyHopAbility : PlayerAbility
 {
     public int minCooldown = 1;
     int level;
-    public BunnyHopAbility() : base(6) // 20
-    {
-    }
 
     public override bool CanCast()
     {
@@ -35,7 +32,7 @@ public class BunnyHopAbility : PlayerAbility
         return new List<Enhancement>() { };
     }
 
-    public override string getID()
+    public override string getId()
     {
         return "rabi.bunnyhop";
     }

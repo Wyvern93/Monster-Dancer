@@ -38,19 +38,13 @@ public class MovSpeedEnhancement : Enhancement
         return "Mov Speed";
     }
 
-    public override string getType()
+    public override string getDescriptionType()
     {
         return "Stat Up";
     }
 
-    public override bool isUnique()
-    {
-        return false;
-    }
-
     public override void OnEquip()
     {
-        if (isUnique()) GameManager.runData.RemoveStatEnhancement(this);
         Player.instance.enhancements.Add(new MovSpeedEnhancement());
         Player.instance.CalculateStats();
     }
@@ -58,5 +52,10 @@ public class MovSpeedEnhancement : Enhancement
     public override void OnStatCalculate(ref PlayerStats flatBonus, ref PlayerStats percentBonus)
     {
         flatBonus.Speed += 0.05f;
+    }
+
+    public override EnhancementType GetEnhancementType()
+    {
+        return EnhancementType.Stat;
     }
 }

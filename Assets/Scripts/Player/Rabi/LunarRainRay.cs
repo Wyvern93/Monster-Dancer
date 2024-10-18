@@ -13,7 +13,7 @@ public class LunarRainRay : MonoBehaviour
     {
         level = (int)Player.instance.abilityValues["ability.lunarrain.level"];
 
-        dmg = level < 4 ? level < 2 ? 14f : 18f : 24f;
+        dmg = level < 4 ? level < 2 ? 15f : 30f : 50f;
 
         AudioController.PlaySound(sound, Random.Range(0.8f, 1.2f));
     }

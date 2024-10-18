@@ -39,13 +39,7 @@ public class IllusionDashAbilityEnhancement : Enhancement
 
     public override string getId()
     {
-        return "rabi.illusiondash";
-    }
-
-    public override int getLevel()
-    {
-        if (!Player.instance.abilityValues.ContainsKey("ability.illusiondash.level")) return 0;
-        else return (int)Player.instance.abilityValues["ability.illusiondash.level"];
+        return "illusiondash";
     }
 
     public override string getName()
@@ -53,7 +47,7 @@ public class IllusionDashAbilityEnhancement : Enhancement
         return "Illusion Dash";
     }
 
-    public override string getType()
+    public override string getDescriptionType()
     {
         return "Active";
     }
@@ -63,53 +57,12 @@ public class IllusionDashAbilityEnhancement : Enhancement
         return 2;
     }
 
-    public override bool isAvailable()
+    public override PlayerAbility getAbility()
     {
-        bool available = false;
-        if (Player.instance.activeAbility == null) available = true;
-        else
-        {
-            if (Player.instance.activeAbility.getID() == "rabi.illusiondash")
-            {
-                if (Player.instance.abilityValues["ability.illusiondash.level"] < 7) available = true;
-            }
-        }
-
-        return available;
+        return new IllusionDashAbility();
     }
-
-    public override bool isUnique()
+    public override EnhancementType GetEnhancementType()
     {
-        return false;
-    }
-
-    public override Sprite getIcon()
-    {
-        return IconList.instance.illusionDash;
-    }
-
-    public override void OnEquip()
-    {
-        if (isUnique()) GameManager.runData.RemoveSkillEnhancement(this);
-        Player.instance.enhancements.Add(new IllusionDashAbilityEnhancement());
-        if (!Player.instance.abilityValues.ContainsKey("ability.illusiondash.level"))
-        {
-            Player.instance.abilityValues.Add("ability.illusiondash.level", 1);
-            Player.instance.activeAbility = new IllusionDashAbility();
-            UIManager.Instance.PlayerUI.SetActiveIcon(IconList.instance.illusionDash, 1, false);
-        }
-        else
-        {
-            Player.instance.abilityValues["ability.illusiondash.level"] += 1;
-            int level = (int)Player.instance.abilityValues["ability.illusiondash.level"];
-            UIManager.Instance.PlayerUI.SetActiveLevel(level, level >= 4);
-        }
-        
-        Player.instance.CalculateStats();
-    }
-
-    public override void OnStatCalculate(ref PlayerStats flatBonus, ref PlayerStats percentBonus)
-    {
-
+        return EnhancementType.Ability;
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class DancearuneElite : Enemy
@@ -40,11 +41,9 @@ public class DancearuneElite : Enemy
         BulletSpawnEffect bulletSpawnEffect = PoolManager.Get<BulletSpawnEffect>();
         bulletSpawnEffect.source = this;
         bulletSpawnEffect.transform.position = transform.position;
+        bulletSpawnEffect.finalScale = 1f;
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
         while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
-
-        Vector2 dir = Player.instance.GetClosestPlayer(transform.position) - transform.position;
-        dir.Normalize();
 
         if (diagonal)
         {
@@ -60,6 +59,9 @@ public class DancearuneElite : Enemy
             SpawnBullet(new Vector2(-1, 0));
             SpawnBullet(new Vector2(1, 0));
         }
+
+        AudioController.PlaySound(AudioController.instance.sounds.bulletwaveShootSound);
+
         diagonal = !diagonal;
         bulletSpawnEffect.Despawn();
         animator.Play("dancearune_normal");
@@ -69,17 +71,24 @@ public class DancearuneElite : Enemy
 
     private void SpawnBullet(Vector2 dir)
     {
-        PetalBullet bullet = PoolManager.Get<PetalBullet>();
-        bullet.transform.position = transform.position + (Vector3.one * 0.5f);
+        BulletBase bullet = PoolManager.Get<BulletBase>();
+
+        bullet.transform.position = transform.position + ((Vector3)dir * 0.3f) + (Vector3.up * 0.5f);
         bullet.direction = dir;
-        bullet.origSpeed = 5f;
-        bullet.speed = 5f;
-        bullet.enemySource = this;
-        bullet.atk = atk / 4;
+        bullet.speed = 8;
+        bullet.atk = 5;
         bullet.lifetime = 14;
-        bullet.transform.localScale = Vector3.one;
-        bullet.follow = true;
         bullet.transform.localScale = Vector3.one * 2f;
+        bullet.startOnBeat = true;
+        bullet.behaviours = new List<BulletBehaviour>
+            {
+                new SpriteLookAngleBehaviour() { start = 0, end = -1 },
+                new SpeedOverTimeBehaviour() { start = 0, end = 4, speedPerBeat = 0.6f, targetSpeed = 0},
+                new SpeedOverTimeBehaviour() { start = 4, end = -1, speedPerBeat = 10, targetSpeed = 14 },
+                new HomingToPlayerBehaviour(Player.instance.gameObject, 10) { start = 4, end = 4 }
+            };
+        bullet.animator.Play("petalbullet");
+        bullet.enemySource = this;
         bullet.OnSpawn();
     }
 
@@ -129,7 +138,7 @@ public class DancearuneElite : Enemy
         }
         animator.Play("dancearune_normal");
         AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
-        Player.TriggerCameraShake(0.5f, 0.2f);
+        PlayerCamera.TriggerCameraShake(0.5f, 0.2f);
         velocity = Vector2.zero;
         Sprite.transform.localPosition = Vector3.zero;
 

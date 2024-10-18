@@ -89,8 +89,8 @@ public class Bullet : MonoBehaviour
             stunStatus.duration--;
         }
 
-        emission -= Time.deltaTime * 3f;
-        if (emission < -0.1) emission = 0.2f;
+        emission -= Time.deltaTime * 1f;
+        if (emission < -0.1) emission = 0.03f;
         beatScale = Mathf.MoveTowards(beatScale, 1, Time.deltaTime * 2f);
         spriteRenderer.transform.localScale = Vector3.one * beatScale;
         spriteRendererMat.SetColor("_EmissionColor", new Color(1, 1, 1, emission));

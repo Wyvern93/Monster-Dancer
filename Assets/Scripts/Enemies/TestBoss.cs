@@ -125,7 +125,7 @@ public class TestBoss : Boss
             yield return new WaitForEndOfFrame();
         }
         AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
-        Player.TriggerCameraShake(0.5f, 0.2f);
+        PlayerCamera.TriggerCameraShake(0.5f, 0.2f);
         Sprite.transform.localPosition = Vector3.zero;
         transform.position = targetPos;
 
@@ -190,7 +190,7 @@ public class TestBoss : Boss
             yield return new WaitForEndOfFrame();
         }
         AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
-        Player.TriggerCameraShake(1.5f, 0.3f);
+        PlayerCamera.TriggerCameraShake(1.5f, 0.3f);
         boxCollider.enabled = true;
         isJumping = false;
         yield break;
@@ -201,7 +201,7 @@ public class TestBoss : Boss
         return true;
     }
 
-    public override void TakeDamage(int damage, bool isCritical)
+    public override void TakeDamage(float damage, bool isCritical)
     {
         base.TakeDamage(damage, isCritical);
         UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
