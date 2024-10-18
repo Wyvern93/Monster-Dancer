@@ -89,7 +89,7 @@ public class PoisyElite : Enemy
                 new SpeedOverTimeBehaviour() { start = 0, end = -1, speedPerBeat = 0.5f, targetSpeed = 7 },
                 new PoisonBehaviour(3) { start = 0, end = -1},
             };
-        bullet.animator.Play("poisonbullet");
+        bullet.animator.Play("bigpoisonbullet");
         bullet.OnSpawn();
         AudioController.PlaySound(AudioController.instance.sounds.bulletwaveShootSound);
     }

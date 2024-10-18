@@ -138,45 +138,45 @@ public class Stage1a : Map
         {
             // Spawn Rates
             
-            new ChangeSpawnRateEvent(5, 0), // start
-            new ChangeSpawnRateEvent(7, 30),
-            new ChangeSpawnRateEvent(9, 60),
-            new ChangeSpawnRateEvent(9, 90),
+            new ChangeSpawnRateEvent(2, 0), // start
+            new ChangeSpawnRateEvent(2, 30),
+            new ChangeSpawnRateEvent(3, 60),
+            new ChangeSpawnRateEvent(4, 90),
             new ChangeSpawnRateEvent(5, 120), // first elite
-            new ChangeSpawnRateEvent(9, 150),
-            new ChangeSpawnRateEvent(10, 180),
-            new ChangeSpawnRateEvent(10, 210),
-            new ChangeSpawnRateEvent(7, 240), // second elite
-            new ChangeSpawnRateEvent(9, 270),
-            new ChangeSpawnRateEvent(10, 300),
-            new ChangeSpawnRateEvent(11, 330),
-            new ChangeSpawnRateEvent(7, 360), // third elite
-            new ChangeSpawnRateEvent(8, 390),
-            new ChangeSpawnRateEvent(9, 420),
-            new ChangeSpawnRateEvent(10, 450),
-            new ChangeSpawnRateEvent(7, 480), // 4 elite
-            new ChangeSpawnRateEvent(9, 510),
-            new ChangeSpawnRateEvent(10, 540),
-            new ChangeSpawnRateEvent(11, 570),
+            new ChangeSpawnRateEvent(2, 150),
+            new ChangeSpawnRateEvent(3, 180),
+            new ChangeSpawnRateEvent(3, 210),
+            new ChangeSpawnRateEvent(4, 240), // second elite
+            new ChangeSpawnRateEvent(2, 270),
+            new ChangeSpawnRateEvent(3, 300),
+            new ChangeSpawnRateEvent(4, 330),
+            new ChangeSpawnRateEvent(5, 360), // third elite
+            new ChangeSpawnRateEvent(2, 390),
+            new ChangeSpawnRateEvent(3, 420),
+            new ChangeSpawnRateEvent(4, 450),
+            new ChangeSpawnRateEvent(5, 480), // 4 elite
+            new ChangeSpawnRateEvent(4, 510),
+            new ChangeSpawnRateEvent(5, 540),
+            new ChangeSpawnRateEvent(6, 570),
             new ChangeSpawnRateEvent(0, 595), // boss
 
-            new ChangeSpawnCooldownEvent(12, 0),
-            new ChangeSpawnCooldownEvent(10, 30),
-            new ChangeSpawnCooldownEvent(12, 120),
-            new ChangeSpawnCooldownEvent(11, 180),
-            new ChangeSpawnCooldownEvent(11, 240),
-            new ChangeSpawnCooldownEvent(9, 360),
-            new ChangeSpawnCooldownEvent(12, 480),
-            new ChangeSpawnCooldownEvent(9, 540),
+            new ChangeSpawnCooldownEvent(6, 0), // 12
+            new ChangeSpawnCooldownEvent(5, 30), // 10
+            new ChangeSpawnCooldownEvent(6, 120), // 12
+            new ChangeSpawnCooldownEvent(5, 180), // 11
+            new ChangeSpawnCooldownEvent(4, 240), // 11
+            new ChangeSpawnCooldownEvent(3, 360), // 9
+            new ChangeSpawnCooldownEvent(4, 480), // 12
+            new ChangeSpawnCooldownEvent(3, 540), // 9
 
             new AddEnemyEvent(EnemyType.NomSlime, 5, 0, 0), // nomslime
             new AddEnemyEvent(EnemyType.SlimeDancer, 1, 0, 30),
-            new AddEnemyEvent(EnemyType.ZombieThief, 5, 0, 150),
+            new AddEnemyEvent(EnemyType.ZombieThief, 6, 0, 150),
             new AddEnemyEvent(EnemyType.BooJr, 1, 0, 200),
             new AddEnemyEvent(EnemyType.Poisy, 3, 0, 300),
             new AddEnemyEvent(EnemyType.Tronco, 4, 0, 330),
             new AddEnemyEvent(EnemyType.Dancearune, 1, 0, 360),
-            new AddEnemyEvent(EnemyType.Skeleko, 3, 0, 390),
+            new AddEnemyEvent(EnemyType.Skeleko, 2, 0, 390),
             new AddEnemyEvent(EnemyType.ZombieBride, 1, 0, 450),
 
             new RemoveEnemyEvent(EnemyType.NomSlime, 0, 180),
@@ -186,8 +186,8 @@ public class Stage1a : Map
             new RemoveEnemyEvent(EnemyType.Poisy, 0, 480),
             new RemoveEnemyEvent(EnemyType.Tronco, 0, 520),
             new RemoveEnemyEvent(EnemyType.Dancearune, 0, 580),
-            new RemoveEnemyEvent(EnemyType.Skeleko, 0, 590),
-            new RemoveEnemyEvent(EnemyType.ZombieBride, 0, 590),
+            new RemoveEnemyEvent(EnemyType.Skeleko, 0, 595),
+            new RemoveEnemyEvent(EnemyType.ZombieBride, 0, 595),
             
             new SpawnEliteEvent(EnemyType.NomSlimeElite, 120),
             
@@ -196,12 +196,8 @@ public class Stage1a : Map
             new SpawnEliteEvent(EnemyType.DancearuneElite, 480), // 480
             
             new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 520),
-            new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 540),
             new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 560),
-            new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 570),
             new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 580),
-            new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 585),
-            new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 590),
             new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 595),
             
             new SpawnBossEvent(EnemyType.Usarin, 600), // 600

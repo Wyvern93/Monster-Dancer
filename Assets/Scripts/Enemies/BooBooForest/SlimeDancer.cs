@@ -73,11 +73,6 @@ public class SlimeDancer : Enemy
 
         SpawnBullet(dir, 10f, 0f);
         AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
-        yield return new WaitForSeconds(BeatManager.GetBeatDuration());
-        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
-
-        SpawnBullet(dir, 10f, 0f);
-        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
         bulletSpawnEffect.Despawn();
         isAttacking = false;
         animator.Play("slimedancer_normal");

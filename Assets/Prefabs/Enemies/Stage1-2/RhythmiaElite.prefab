@@ -256,8 +256,8 @@ MonoBehaviour:
   Sprite: {fileID: 288785147411649963}
   rb: {fileID: 7657724470701423805}
   SpriteSize: 1
-  MaxHP: 1200
-  CurrentHP: 1200
+  MaxHP: 1500
+  CurrentHP: 1500
   SpawnIndex: 0
   AItype: 0
   experience: 300

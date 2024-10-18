@@ -136,36 +136,36 @@ public class Stage1b : Map
         {
             // Spawn Rates
             
-            new ChangeSpawnRateEvent(7, 0), // start
-            new ChangeSpawnRateEvent(7, 30),
-            new ChangeSpawnRateEvent(8, 60),
-            new ChangeSpawnRateEvent(9, 90),
+            new ChangeSpawnRateEvent(2, 0), // start
+            new ChangeSpawnRateEvent(2, 30),
+            new ChangeSpawnRateEvent(3, 60),
+            new ChangeSpawnRateEvent(4, 90),
             new ChangeSpawnRateEvent(5, 120), // first elite
-            new ChangeSpawnRateEvent(7, 150),
-            new ChangeSpawnRateEvent(8, 180),
-            new ChangeSpawnRateEvent(9, 210),
-            new ChangeSpawnRateEvent(7, 240), // second elite
-            new ChangeSpawnRateEvent(9, 270),
-            new ChangeSpawnRateEvent(10, 300),
-            new ChangeSpawnRateEvent(10, 330),
-            new ChangeSpawnRateEvent(8, 360), // third elite
-            new ChangeSpawnRateEvent(8, 390),
-            new ChangeSpawnRateEvent(8, 420),
-            new ChangeSpawnRateEvent(9, 450),
-            new ChangeSpawnRateEvent(7, 480), // 4 elite
-            new ChangeSpawnRateEvent(8, 510),
-            new ChangeSpawnRateEvent(9, 540),
-            new ChangeSpawnRateEvent(10, 570),
+            new ChangeSpawnRateEvent(2, 150),
+            new ChangeSpawnRateEvent(3, 180),
+            new ChangeSpawnRateEvent(3, 210),
+            new ChangeSpawnRateEvent(4, 240), // second elite
+            new ChangeSpawnRateEvent(2, 270),
+            new ChangeSpawnRateEvent(3, 300),
+            new ChangeSpawnRateEvent(4, 330),
+            new ChangeSpawnRateEvent(5, 360), // third elite
+            new ChangeSpawnRateEvent(2, 390),
+            new ChangeSpawnRateEvent(3, 420),
+            new ChangeSpawnRateEvent(4, 450),
+            new ChangeSpawnRateEvent(5, 480), // 4 elite
+            new ChangeSpawnRateEvent(4, 510),
+            new ChangeSpawnRateEvent(5, 540),
+            new ChangeSpawnRateEvent(6, 570),
             new ChangeSpawnRateEvent(0, 595), // boss
 
-            new ChangeSpawnCooldownEvent(10, 0),
-            new ChangeSpawnCooldownEvent(9, 30),
-            new ChangeSpawnCooldownEvent(11, 120),
-            new ChangeSpawnCooldownEvent(10, 180),
-            new ChangeSpawnCooldownEvent(12, 240),
-            new ChangeSpawnCooldownEvent(11, 360),
-            new ChangeSpawnCooldownEvent(12, 480),
-            new ChangeSpawnCooldownEvent(10, 540),
+            new ChangeSpawnCooldownEvent(6, 0), // 12
+            new ChangeSpawnCooldownEvent(5, 30), // 10
+            new ChangeSpawnCooldownEvent(6, 120), // 12
+            new ChangeSpawnCooldownEvent(5, 180), // 11
+            new ChangeSpawnCooldownEvent(4, 240), // 11
+            new ChangeSpawnCooldownEvent(3, 360), // 9
+            new ChangeSpawnCooldownEvent(4, 480), // 12
+            new ChangeSpawnCooldownEvent(3, 540), // 9
             
             new AddEnemyEvent(EnemyType.WiggleViper, 5, 0, 0), // wiggleviper
             new AddEnemyEvent(EnemyType.MuscleHare, 1, 0, 30),
@@ -177,10 +177,10 @@ public class Stage1b : Map
             new AddEnemyEvent(EnemyType.Kappa, 1, 0, 530),
 
             new RemoveEnemyEvent(EnemyType.WiggleViper, 0, 180),
-            new RemoveEnemyEvent(EnemyType.MuscleHare, 0, 300),
+            new RemoveEnemyEvent(EnemyType.MuscleHare, 0, 150),
             new RemoveEnemyEvent(EnemyType.Rhytmia, 0, 300),
             new RemoveEnemyEvent(EnemyType.Fungoo, 0, 360),
-            new RemoveEnemyEvent(EnemyType.StayinUndead, 0, 420),
+            new RemoveEnemyEvent(EnemyType.StayinUndead, 0, 450),
             new RemoveEnemyEvent(EnemyType.Purrfessor, 0, 480),
             new RemoveEnemyEvent(EnemyType.ZippyBat, 0, 595),
             //new RemoveEnemyEvent(EnemyType.VampiLoli, 0, 540),
@@ -193,15 +193,10 @@ public class Stage1b : Map
             new SpawnEliteEvent(EnemyType.StayinUndeadElite, 480), // 480
             
             new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 400),
-            new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 420),
-            new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 440),
             new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 460),
-            new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 480),
             new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 500),
-            new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 510),
             new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 520),
             new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 530),
-            new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 535),
             new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 540),
             
             new SpawnBossEvent(EnemyType.Nebulion, 600)

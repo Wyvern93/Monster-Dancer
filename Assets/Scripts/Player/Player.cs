@@ -350,6 +350,7 @@ public class Player : MonoBehaviour
 
         if (Keyboard.current.numpad1Key.wasPressedThisFrame)
         {
+            Level++;
             OnLevelUp();
         }
         if (Keyboard.current.numpad2Key.wasPressedThisFrame)

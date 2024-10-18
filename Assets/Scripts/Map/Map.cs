@@ -70,6 +70,7 @@ public class Map : MonoBehaviour
     [SerializeField] public Animator CutsceneAnimator;
 
     public Fairy fairyCage;
+    public static int global_enemy_spawn_modifier = 4;
 
     public static void ForceDespawnEnemies()
     {
@@ -232,20 +233,6 @@ public class Map : MonoBehaviour
         return weightedList[randomIndex];
     }
 
-    private List<Wave> ShuffleWaves(List<Wave> list)
-    {
-        var count = list.Count;
-        var last = count - 1;
-        for (var i = 0; i < last; ++i)
-        {
-            var r = UnityEngine.Random.Range(i, count);
-            var tmp = list[i];
-            list[i] = list[r];
-            list[r] = tmp;
-        }
-        return list;
-    }
-
     public static Enemy GetRandomEnemy()
     {
         if (Instance.enemiesAlive.Count == 0) return null;
@@ -306,48 +293,13 @@ public class Map : MonoBehaviour
             if (beats >= beatsBeforeWave)
             {
                 beats = 0;
-                for (int i = 0; i < spawnRate; i++)
+                for (int i = 0; i < spawnRate + global_enemy_spawn_modifier; i++)
                 {
                     SpawnEnemy(GetRandomEnemySpawn());
                 }
             }
         }
-        /*
-        if (BeatManager.isGameBeat && BeatManager.isPlaying)
-        {
-            beats++;
-            
-            if (part == 0)
-            {
-                if (waves < 21 && (beats >= beatsBeforeWave || enemiesAlive.Count < WaveNumberOfEnemies * 0.2f || enemiesAlive.Count <= 0))
-                {
-                    beats = 0;
-                    SpawnNextWave(partAWaves); // Normal A Wave
-                }
-                // Is next boss wave
-                if (waves == 21 && enemiesAlive.Count == 0)
-                {
-                    beatsBeforeWave = 99999999;
-                    StartCoroutine(StartBossASequence());
-                    part = 1;
-                }
-            }
-
-            if (part == 2)
-            {
-                if (waves < 42 && (beats >= beatsBeforeWave || enemiesAlive.Count < WaveNumberOfEnemies * 0.2f || enemiesAlive.Count <= 0))
-                {
-                    beats = 0;
-                    SpawnNextWave(partBWaves); // Normal A Wave
-                }
-                if (waves == 42 && enemiesAlive.Count == 0)
-                {
-                    beatsBeforeWave = 99999999;
-                    StartCoroutine(StartBossBSequence());
-                    part = 3;
-                }
-            }
-        }*/
+        
         StageTime += Time.deltaTime;
         stagePartTime += Time.deltaTime;
 
@@ -426,26 +378,48 @@ public class Map : MonoBehaviour
         PoolManager.RemovePool(typeof(BurningVisualEffect));
     }
 
+    public List<int> spawnDirections = new List<int>();
+
     public static void SpawnEnemy(SpawnData spawnData)
     {
         if (spawnData == null) return;
 
-
         float x, y;
-        while (true)
+        if (Instance.spawnDirections.Count == 0)
         {
-            Instance.spawnAngle += 1;
-            x = Player.instance.transform.position.x + (Instance.SpawnRadius * 1.7f * Mathf.Cos(Instance.spawnAngle));
-            y = Player.instance.transform.position.y + (Instance.SpawnRadius * Mathf.Sin(Instance.spawnAngle));
-            if (!isWallAt(new Vector2(x, y))) break;
+            Instance.spawnDirections = new List<int> { 0,1,2,3 };
         }
-        Vector3 spawnPos = new Vector3(x,y);
+        Vector3 spawnPos = Vector3.zero;
+        int spawnDir = Instance.spawnDirections[Random.Range(0, Instance.spawnDirections.Count - 1)];
+
+        Debug.Log(spawnDir);
+        Camera cam = Camera.main;
+        float camHeight = 2f * cam.orthographicSize;
+        float camWidth = camHeight * cam.aspect;
+
+        switch (spawnDir)
+        {
+            default:
+            case 0: // Right
+                spawnPos = new Vector2(cam.transform.position.x + (camWidth / 2) + Random.Range(0, 3), Random.Range(cam.transform.position.y - (camHeight / 2), cam.transform.position.y + (camHeight / 2)));
+                break;
+            case 1: // Top
+                spawnPos = new Vector2(Random.Range(cam.transform.position.x - (camWidth / 2), cam.transform.position.x + (camWidth / 2)), cam.transform.position.y + (camHeight / 2) + Random.Range(0, 3));
+                break;
+            case 2: // Left
+                spawnPos = new Vector2(cam.transform.position.x - (camWidth / 2) - Random.Range(0, 3), Random.Range(cam.transform.position.y - (camHeight / 2), cam.transform.position.y + (camHeight / 2)));
+                break;
+            case 3: // Bottom
+                spawnPos = new Vector2(Random.Range(cam.transform.position.x - (camWidth / 2), cam.transform.position.x + (camWidth / 2)), cam.transform.position.y - (camHeight / 2) - Random.Range(0, 3));
+                break;
+        }
 
         Enemy enemy = Enemy.GetEnemyOfType(spawnData.enemyType);
         enemy.AItype = spawnData.AItype;
         enemy.SpawnIndex = 0;
         enemy.transform.position = spawnPos;
         enemy.OnSpawn();
+        Instance.spawnDirections.Remove(spawnDir);
     }
 
     public static void SpawnElite(SpawnData spawnData)
