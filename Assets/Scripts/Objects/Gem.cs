@@ -7,7 +7,7 @@ public class Gem : Drop
     public Vector2 dir;
     public int exp;
 
-    
+
     // Start is called before the first frame update
     void Start()
     {

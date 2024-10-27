@@ -278,7 +278,7 @@ public abstract class Enemy : MonoBehaviour
         CurrentHP = Mathf.Clamp(CurrentHP - Mathf.RoundToInt(damage), 0, MaxHP);
         //Player.TriggerCameraShake(0.4f, 0.2f);
         AudioController.PlaySound(AudioController.instance.sounds.enemyHurtSound, Random.Range(0.95f, 1.05f));
-        emissionColor = new Color(1, 1, 1, 1);
+        emissionColor = new Color(1, 1, 1, 0.5f);
         UIManager.Instance.PlayerUI.SpawnDamageText(transform.position, Mathf.RoundToInt(damage), isCritical ? DamageTextType.Critical : DamageTextType.Normal);
 
         if (CurrentHP <= 0 && !isDead)
@@ -333,27 +333,39 @@ public abstract class Enemy : MonoBehaviour
             }
         }
 
+        // Gather all gems around as experience
         int expToUse = experience;
+        
+        Collider2D[] gemColliders = Physics2D.OverlapCircleAll(transform.position, 2f);
+        List<Gem> gems = new List<Gem>();
+        foreach (Collider2D col  in gemColliders)
+        {
+            Gem gem = col.GetComponent<Gem>();
+            if (gem != null) gems.Add(gem);
+        }
+
+        if (gems.Count > 2)
+        {
+            int count = gems.Count - 3;
+            experience += gems[0].exp;
+            for (int i = 0; i < count; i++)
+            {
+                gems[i].ForceDespawn();
+            }
+        }
+        /*
+        foreach (Collider2D col in gemColliders)
+        {
+            Gem gem = col.GetComponent<Gem>();
+            if (gem == null) continue;
+
+            experience += gem.exp;
+            gem.ForceDespawn();
+        }*/
         while (expToUse > 0)
         {
-            if (expToUse <= 10)
-            {
-                BulletGem gem = PoolManager.Get<BulletGem>();
-                gem.dir = Random.insideUnitCircle * 2.4f;
-                gem.transform.position = transform.position;//(Vector2)transform.position + (Random.insideUnitCircle * 0.4f);
-                gem.exp = expToUse;
-                expToUse -= expToUse;
-            }
-            else if (expToUse <= 25)
-            {
-                Gem gem = PoolManager.Get<Gem>();
-                gem.dir = Random.insideUnitCircle * 2.4f;
-                gem.transform.position = transform.position;
-                gem.exp = Mathf.Clamp(expToUse, 0, 25);
-                expToUse -= expToUse;
-                gem.animator.Play("MonsterGem");
-            }
-            else if (expToUse > 25)
+            Debug.Log(expToUse);
+            if (expToUse > 25)
             {
                 Gem gem = PoolManager.Get<Gem>();
                 gem.dir = Random.insideUnitCircle * 2.4f;
@@ -369,6 +381,23 @@ public abstract class Enemy : MonoBehaviour
                     gem.exp = expToUse;
                     expToUse = 0;
                 }
+            }
+            else if (expToUse <= 25 && expToUse > 10)
+            {
+                Gem gem = PoolManager.Get<Gem>();
+                gem.dir = Random.insideUnitCircle * 2.4f;
+                gem.transform.position = transform.position;
+                gem.exp = Mathf.Clamp(expToUse, 0, 25);
+                expToUse -= expToUse;
+                gem.animator.Play("MonsterGem");
+            }
+            else if (expToUse <= 10)
+            {
+                BulletGem gem = PoolManager.Get<BulletGem>();
+                gem.dir = Random.insideUnitCircle * 2.4f;
+                gem.transform.position = transform.position;//(Vector2)transform.position + (Random.insideUnitCircle * 0.4f);
+                gem.exp = expToUse;
+                expToUse -= expToUse;
             }
         }
 
