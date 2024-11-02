@@ -6,7 +6,7 @@ public class HideableObject : MonoBehaviour
     [SerializeField] SpriteRenderer spr;
     public void Hide()
     {
-        spr.color = new Color(1, 1, 1, 0.3f);
+        spr.color = new Color(1, 1, 1, 0.5f);
     }
 
     public void UnHide()

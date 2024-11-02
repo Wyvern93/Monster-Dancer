@@ -176,7 +176,7 @@ public class Stage1a : Map
             new AddEnemyEvent(EnemyType.Poisy, 3, 0, 300),
             new AddEnemyEvent(EnemyType.Tronco, 4, 0, 330),
             new AddEnemyEvent(EnemyType.Dancearune, 1, 0, 360),
-            new AddEnemyEvent(EnemyType.Skeleko, 2, 0, 390),
+            new AddEnemyEvent(EnemyType.Skeleko, 2, 0, 400),
             new AddEnemyEvent(EnemyType.ZombieBride, 1, 0, 450),
 
             new RemoveEnemyEvent(EnemyType.NomSlime, 0, 180),
@@ -184,7 +184,7 @@ public class Stage1a : Map
             new RemoveEnemyEvent(EnemyType.ZombieThief, 0, 300),
             new RemoveEnemyEvent(EnemyType.BooJr, 0, 360),
             new RemoveEnemyEvent(EnemyType.Poisy, 0, 480),
-            new RemoveEnemyEvent(EnemyType.Tronco, 0, 520),
+            new RemoveEnemyEvent(EnemyType.Tronco, 0, 580),
             new RemoveEnemyEvent(EnemyType.Dancearune, 0, 580),
             new RemoveEnemyEvent(EnemyType.Skeleko, 0, 595),
             new RemoveEnemyEvent(EnemyType.ZombieBride, 0, 595),

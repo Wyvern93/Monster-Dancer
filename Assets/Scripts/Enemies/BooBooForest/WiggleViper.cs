@@ -50,6 +50,7 @@ public class WiggleViper : Enemy
         dir.Normalize();
 
         SpawnBullet(dir);
+        bulletSpawnEffect.Despawn();
         isAttacking = false;
         yield break;
     }

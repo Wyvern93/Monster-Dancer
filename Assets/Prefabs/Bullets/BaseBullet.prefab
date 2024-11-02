@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6318464000145159592}
   - component: {fileID: 7468113504598096850}
   - component: {fileID: 220885958002423677}
+  - component: {fileID: 5071803711599928912}
   m_Layer: 11
   m_Name: BaseBullet
   m_TagString: Bullet
@@ -117,6 +118,20 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5071803711599928912
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1992495900768505411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93e79f91e06a8f1488eac89df3b794ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spr: {fileID: 7196845805914686167}
+  glowColor: {r: 0, g: 1.6022043, b: 47.937256, a: 1}
 --- !u!1 &3697733038795096648
 GameObject:
   m_ObjectHideFlags: 0

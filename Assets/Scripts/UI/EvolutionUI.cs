@@ -44,7 +44,7 @@ public class EvolutionUI : MonoBehaviour
         evolveButton.gameObject.SetActive(true);
         backButton.gameObject.SetActive(true);
         evolveButton.interactable = false;
-        backButton.interactable = false;
+        backButton.interactable = true;
         enhancementPanel.gameObject.SetActive(false);
         selectedAbility.color = Color.clear;
         selectedItem.color = Color.clear;

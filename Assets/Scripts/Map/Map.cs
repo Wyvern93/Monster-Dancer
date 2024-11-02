@@ -70,7 +70,7 @@ public class Map : MonoBehaviour
     [SerializeField] public Animator CutsceneAnimator;
 
     public Fairy fairyCage;
-    public static int global_enemy_spawn_modifier = 4;
+    public static int global_enemy_spawn_modifier = 0;
 
     public static void ForceDespawnEnemies()
     {
@@ -392,7 +392,6 @@ public class Map : MonoBehaviour
         Vector3 spawnPos = Vector3.zero;
         int spawnDir = Instance.spawnDirections[Random.Range(0, Instance.spawnDirections.Count - 1)];
 
-        Debug.Log(spawnDir);
         Camera cam = Camera.main;
         float camHeight = 2f * cam.orthographicSize;
         float camWidth = camHeight * cam.aspect;
