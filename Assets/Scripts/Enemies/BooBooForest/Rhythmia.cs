@@ -16,7 +16,7 @@ public class Rhythmia : Enemy
         Sprite.transform.localPosition = Vector3.zero;
         isAttacking = false;
         animator.Play("rhythmia_normal");
-        animator.speed = 1f / BeatManager.GetBeatDuration() * 2;
+        animator.speed = 1f / BeatManager.GetBeatDuration();
     }
     protected override void OnBeat()
     {

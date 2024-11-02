@@ -330,6 +330,122 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: stage1_tilemap2_9
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 256
+        width: 32
+        height: 28
+      alignment: 9
+      pivot: {x: 0.5, y: 0.2857143}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape:
+      - - {x: -16, y: 1}
+        - {x: -16, y: -14}
+        - {x: 16, y: -14}
+        - {x: 16, y: 1}
+      tessellationDetail: 0
+      bones: []
+      spriteID: dddcf0e4b4c0ee5428b079f1f4ab0ea5
+      internalID: -1206989465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: stage1_tilemap2_10
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 256
+        width: 112
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape:
+      - - {x: -56, y: 24}
+        - {x: -56, y: 23}
+        - {x: 56, y: 23}
+        - {x: 56, y: 24}
+      - - {x: -56, y: -24}
+        - {x: -56, y: 23}
+        - {x: -55, y: 23}
+        - {x: -55, y: -24}
+      - - {x: 55, y: -24}
+        - {x: 55, y: 23}
+        - {x: 56, y: 23}
+        - {x: 56, y: -24}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 54aaf4dbad34a3643ad80931236ab4be
+      internalID: -392104130
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: stage1_tilemap2_11
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 240
+        width: 112
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape:
+      - - {x: -56, y: 8}
+        - {x: -56, y: -8}
+        - {x: 56, y: -8}
+        - {x: 56, y: 8}
+      tessellationDetail: 0
+      bones: []
+      spriteID: fffb0d263c122304b8e6d1fa8ceaa8a5
+      internalID: 756484471
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: stage1_tilemap2_12
+      rect:
+        serializedVersion: 2
+        x: 305
+        y: 238
+        width: 94
+        height: 82
+      alignment: 9
+      pivot: {x: 0.5, y: 0.09756097}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape:
+      - - {x: -39, y: -7}
+        - {x: -41, y: 32}
+        - {x: 41, y: 32}
+        - {x: 38, y: -7}
+      - - {x: -39, y: -41}
+        - {x: -39, y: -34}
+        - {x: -32, y: -34}
+        - {x: -32, y: -41}
+      - - {x: 31, y: -41}
+        - {x: 31, y: -34}
+        - {x: 38, y: -34}
+        - {x: 38, y: -41}
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6cc66f4f43c79c54b99b8634fe82ff57
+      internalID: -416997574
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -343,6 +459,9 @@ TextureImporter:
     nameFileIdTable:
       stage1_tilemap2_0: -753293228
       stage1_tilemap2_1: 924835367
+      stage1_tilemap2_10: -392104130
+      stage1_tilemap2_11: 756484471
+      stage1_tilemap2_12: -416997574
       stage1_tilemap2_2: -690425473
       stage1_tilemap2_3: -1756762833
       stage1_tilemap2_4: -237596203
@@ -350,6 +469,7 @@ TextureImporter:
       stage1_tilemap2_6: -1173827228
       stage1_tilemap2_7: -623264588
       stage1_tilemap2_8: -1279905825
+      stage1_tilemap2_9: -1206989465
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

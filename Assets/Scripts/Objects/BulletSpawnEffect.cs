@@ -32,7 +32,7 @@ public class BulletSpawnEffect : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * finalScale, Time.deltaTime);
+        transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * finalScale, Time.deltaTime * 2);
         transform.eulerAngles = new Vector3(45f, 0f, transform.eulerAngles.z + (30 * Time.deltaTime));
         if (BeatManager.isGameBeat) beats++;
 
