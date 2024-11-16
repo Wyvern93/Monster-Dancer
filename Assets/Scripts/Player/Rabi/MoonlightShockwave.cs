@@ -3,6 +3,7 @@ using UnityEngine;
 public class MoonlightShockwave : MonoBehaviour
 {
     public float dmg;
+    [SerializeField] AudioClip sfx;
 
     [SerializeField] SpriteRenderer spriteRenderer;
     float alpha;
@@ -12,6 +13,7 @@ public class MoonlightShockwave : MonoBehaviour
         spriteRenderer.color = new Color(1,1,1, alpha);
 
         dmg = 8;
+        AudioController.PlaySound(sfx);
     }
 
     public void Update()

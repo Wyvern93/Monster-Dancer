@@ -6,6 +6,7 @@ using UnityEngine;
 public class IconList
 {
     public Sprite[] abilityAtlas;
+    public Sprite[] reloadAtlas;
     public Sprite[] itemAtlas;
     [Header("Stats")]
     public Sprite hpUp;
@@ -42,6 +43,11 @@ public class IconList
     public Sprite getAbilityIcon(string id)
     {
         return abilityAtlas.Single(s => s.name == id);
+    }
+
+    public Sprite getReloadIcon(string id)
+    {
+        return reloadAtlas.Single(s => s.name == id);
     }
 
     public Sprite getItemIcon(string id)

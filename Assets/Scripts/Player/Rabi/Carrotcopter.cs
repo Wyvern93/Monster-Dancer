@@ -5,175 +5,79 @@ using UnityEngine;
 public class CarrotCopter : MonoBehaviour, IDespawneable
 {
     private Enemy currentTarget;
-    private bool isAttacking;
+    private Vector2 targetPos;
     private bool isInRange;
-    private Vector2 targetPosition;
     private int level;
     private float dmg;
-    private int ammo;
     private float speed;
     private float currentDistance;
     private bool enemiesAround;
     [SerializeField] AudioClip shootSound;
+    [SerializeField] GameObject shootFx;
+    float despawnFXtime;
     public void OnEnable()
     {
         currentTarget = null;
-        isAttacking = false;
         speed = 1f;
     }
     public void Update()
     {
         transform.position = new Vector3(transform.position.x, transform.position.y, 10);
-        if (!BeatManager.isGameBeat || GameManager.isPaused) return;
-        if (currentTarget == null)
-        {
-            SearchTarget();
-            if (currentTarget == null)
-            {
-                StartCoroutine(MoveTowardsPlayer());
-                return;
-            }
-        }
-        if (!currentTarget.gameObject.activeSelf)
-        {
-            SearchTarget();
-        }
-        if (!enemiesAround)
-        {
-            StartCoroutine(MoveTowardsPlayer());
-            return;
-        }
+        if (GameManager.isPaused) return;
 
-        CheckIfInRange();
-        if (isInRange)
-        {
+        targetPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
 
-            if (!isAttacking) StartCoroutine(AttackCoroutine());
-
-        }
-        else
-        {
-            StartCoroutine(MoveTowardsTarget());
-        }
+        if (BeatManager.isGameBeat) UpdateStats();
+        CheckPlayerInRange();
+        MoveTowardsTarget();
+        if (despawnFXtime > 0) despawnFXtime -= Time.deltaTime;
+        else shootFx.SetActive(false);
     }
 
-    private void SearchTarget()
+    private void CheckPlayerInRange()
     {
-        Collider2D[] cols = Physics2D.OverlapBoxAll(Player.instance.transform.position, Vector2.one * 14f, 0);
-        List<Enemy> enemies = new List<Enemy>();
-        foreach (Collider2D collider in cols)
-        {
-            //if (collider == null) continue;
-            //if (collider.gameObject.activeSelf) continue;
-            Enemy enemy = collider.gameObject.GetComponent<Enemy>();
-            if (enemy) enemies.Add(enemy);
-        }
-        bool hasEnemy = false;
-        foreach (Enemy enemy in enemies)
-        {
-            if (enemy.isElite)
-            {
-                currentTarget = enemy;
-                hasEnemy = true;
-            }
-            if (enemy is Boss)
-            {
-                currentTarget = enemy;
-                hasEnemy = true;
-            }
-        }
-        if (!hasEnemy && enemies.Count > 0)
-        {
-            Enemy e = enemies[0];
-            float distance = 9999;
-            Vector3 pos = Player.instance.transform.position;
-            foreach (Enemy enemy in enemies)
-            {
-                float dist = Vector2.Distance(pos, enemy.transform.position);
-                if (dist < distance)
-                {
-                    e = enemy;
-                    distance = dist;
-                }
-            }
-            currentTarget = e;
-        }
-        enemiesAround = enemies.Count > 0;
+        isInRange = Vector3.Distance(transform.position, targetPos) <= 3;
     }
 
-    private void CheckIfInRange()
+    private float GetAcceleration()
     {
-        currentDistance = Vector2.Distance(transform.position - (Vector3.up * 4f), currentTarget.transform.position);
-        isInRange = currentDistance < 4f;
+        float currentDistance = Vector2.Distance(transform.position - (Vector3.up * 4f), targetPos) / 2.5f;
+        currentDistance = Mathf.Clamp(currentDistance, 0, 2f);
+        return currentDistance;
     }
 
-    private IEnumerator MoveTowardsTarget()
+    private void MoveTowardsTarget()
     {
-        float time = 0;
-        Vector3 targetPos = currentTarget.transform.position;
-        Vector2 dir = (targetPos - transform.position).normalized;
-        while (time <= BeatManager.GetBeatDuration() / 2)
-        {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
-            transform.position = Vector3.Lerp(transform.position, targetPos + (Vector3.up * 4f), Time.deltaTime * speed);
-            transform.position = new Vector3(transform.position.x, transform.position.y, 10);
-            time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
-        }
-        yield break;
+        float acceleration = GetAcceleration() * 7f;
+        if (shootFx.activeSelf) acceleration *= 0.5f;
+        if (GameManager.isPaused) return;
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * speed * acceleration);
+        transform.position = new Vector3(transform.position.x, transform.position.y, 10);
     }
 
-    private IEnumerator MoveTowardsPlayer()
+    public bool CanShoot()
     {
-        float time = 0;
-        Vector3 targetPos = Player.instance.transform.position;
-        Vector2 dir = (targetPos - transform.position).normalized;
-        while (time <= BeatManager.GetBeatDuration() / 2)
-        {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
-            transform.position = Vector3.Lerp(transform.position, Player.instance.transform.position + (Vector3.up * 4f), Time.deltaTime * speed);
-            transform.position = new Vector3(transform.position.x, transform.position.y, 10);
-            time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
-        }
-        yield break;
+        Enemy e = Map.GetClosestEnemyTo(transform.position, 5f);
+        currentTarget = e;
+        if (e == null) return false;
+        return true;
     }
 
-    private IEnumerator AttackCoroutine()
+    public void Shoot()
     {
-        isAttacking = true;
-        UpdateStats();
-        int current_ammo = ammo;
-        float current_dmg = dmg;
+        Vector2 difference = (targetPos - (Vector2)transform.position).normalized;
+        Vector2 animDir = new Vector2(difference.y, -difference.x);
 
-        while (current_ammo > 0)
-        {
-            if (currentTarget == null)
-            {
-                current_ammo = 0;
-            }
-            else if (!currentTarget.gameObject.activeSelf)
-            {
-                current_ammo = 0;
-            }
-            else
-            {
-                current_ammo--;
-                ShootCarrot();
-                yield return new WaitForSeconds(BeatManager.GetBeatDuration() / 4f);
-            }
-        }
-        isAttacking = false;
-        currentTarget = null;
-        yield break;
+        shootFx.transform.localPosition = difference * 0.25f;
+        shootFx.transform.localEulerAngles = new Vector3(0, 0, Vector2.SignedAngle(Vector2.down, animDir));
+        ShootCarrot();
     }
 
     private void UpdateStats()
     {
         level = (int)Player.instance.abilityValues["ability.carrotcopter.level"];
-        dmg = level < 4 ? level < 2 ? 3 : 6 : 12; // 200% 200%
-        ammo = level < 5 ? 4 : 8; // 4->8
-        speed = level < 6 ? level < 3 ? 1f : 1.5f : 2f; // 25%
+        dmg = level < 4 ? level < 2 ? 15 : 30 : 45; // 200% 200%
+        speed = level < 6 ? level < 3 ? 1f : 2f : 3f; // 25%
         // Lvl 2 and 4 DMG+
         // Lvl 5 Ammo
         // So Lvl 3 and 6 should be speed
@@ -183,6 +87,8 @@ public class CarrotCopter : MonoBehaviour, IDespawneable
 
     public void ShootCarrot()
     {
+        despawnFXtime = 0.17f;
+        shootFx.SetActive(true);
         CarrotBullet carrot = PoolManager.Get<CarrotBullet>();
         carrot.transform.position = transform.position;
         carrot.isPiercing = level >= 7;

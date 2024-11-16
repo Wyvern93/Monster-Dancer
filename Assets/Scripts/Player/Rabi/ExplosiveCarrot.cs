@@ -4,83 +4,63 @@ using UnityEngine;
 
 public class ExplosiveCarrot : MonoBehaviour, IDespawneable
 {
-    public Vector2 direction;
-    public float height;
-    public float force;
+    public Vector3 start, end;
+    private float height;
+    [SerializeField] float maxHeight;
 
     public bool isSmall;
 
     [SerializeField] SpriteRenderer carrotSpr;
-    [SerializeField] AudioSource spinSource;
 
     public float dmg;
     int level;
+    private Vector2 origDir;
 
-    public void Init(Vector2 dir)
+    public void Init(Vector3 dir)
     {
         level = (int)Player.instance.abilityValues["ability.carrotbarrage.level"];
         transform.localScale = Vector3.one * (isSmall ? 0.75f : 1f);
         height = 0.3f;
-        force = 15f;
-        direction = dir;
+        origDir = dir;
+        start = transform.position;
+        end = start + dir;
+
         carrotSpr.transform.localEulerAngles = Vector3.zero;
         StartCoroutine(Throw());
     }
-    public void PlaySpin()
+
+    private float CalculateHeight(Vector2 position)
     {
-        spinSource.Play();
+        float distanceToEnemy = Vector3.Distance(position, end);
+        float maxDistance = Vector3.Distance(start, end);
+        float result = Mathf.Sin((distanceToEnemy / maxDistance) * Mathf.PI) * maxHeight;
+        maxHeight = maxDistance / 2f;
+        result = Mathf.Clamp(result, 0, maxHeight);
+
+        return result;
     }
 
     IEnumerator Throw()
     {
-        //carrotSpr.sortingOrder = 3;
         Vector3 origin = transform.position;
-        float angle = direction.x < 0 ? -800 : 800;
-        float heightSpeed = isSmall ? 120f : 60f;
-        while (height > 0.1f)
+        while (Vector2.Distance(transform.position, end) > 0.01f)
         {
             while (GameManager.isPaused) yield return new WaitForEndOfFrame();
-            height += force * Time.deltaTime;
-            force -= Time.deltaTime * heightSpeed;
+
             carrotSpr.transform.localPosition = new Vector3(0, height, height * 2);
-            carrotSpr.transform.localEulerAngles = new Vector3(0, 0, carrotSpr.transform.localEulerAngles.z + ((angle * Mathf.Abs(height)) * Time.deltaTime));
-            force = Mathf.Clamp(force, -20f, 20f);
-            height = Mathf.Clamp(height, 0, 10);
-            transform.position = Vector3.Lerp(transform.position, origin + ((Vector3)direction * 2f), Time.deltaTime * 8f);
+            carrotSpr.transform.localEulerAngles = new Vector3(0, 0, carrotSpr.transform.localEulerAngles.z + Time.deltaTime * 1200f);
+            height = CalculateHeight(transform.position);
+            transform.position = Vector3.MoveTowards(transform.position, end, Time.deltaTime * 8f);
             
             yield return new WaitForEndOfFrame();
         }
-        spinSource.Stop();
-        /*
-        int i = 20;
-        float timer = 0.2f;
-        float totaltimer = 0.2f;
-        while (i > 0)
-        {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
-            if (timer > 0)
-            {
-                timer -= Time.deltaTime;
-            }
-            else
-            {
-                totaltimer -= 0.02f;
-                timer = totaltimer;
-                if (i % 2 == 0) carrotSpr.color = Color.red;
-                else carrotSpr.color = Color.white;
-                i--;
-            }
-            yield return new WaitForEndOfFrame();
-        }
-        */
-        //carrotSpr.sortingOrder = 2;
-
+        
         if (!isSmall && level >= 7)
         {
             float angleDiff = 360f / 3f;
             for (int i = 0; i < 3; i++)
             {
-                Vector2 dir = BulletBase.angleToVector((angleDiff * i) + angle);
+                Vector2 dir = BulletBase.angleToVector((angleDiff * i) + BulletBase.VectorToAngle(origDir));
                 CastCarrot(dir, dmg, i == 0);
             }
         }
@@ -104,6 +84,7 @@ public class ExplosiveCarrot : MonoBehaviour, IDespawneable
             }
         }
 
+        PlayerCamera.TriggerCameraShake(0.6f, 0.3f);
         Player.instance.despawneables.Remove(this);
         PoolManager.Return(gameObject, GetType());
         yield return null;
@@ -116,7 +97,6 @@ public class ExplosiveCarrot : MonoBehaviour, IDespawneable
         carrot.dmg = damage;
         carrot.isSmall = true;
         carrot.Init(direction);
-        if (playSound) carrot.PlaySpin();
         Player.instance.despawneables.Add(carrot.GetComponent<IDespawneable>());
     }
 

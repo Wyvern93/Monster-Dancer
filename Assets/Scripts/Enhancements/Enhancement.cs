@@ -57,24 +57,26 @@ public abstract class Enhancement
     {
         Player.instance.enhancements.Add(this);
         int level = getLevel();
+        
         if (level == 0)
         {
             if (GetEnhancementType() == EnhancementType.Ability || GetEnhancementType() == EnhancementType.EvolvedAbility)
             {
+                PlayerAbility ability = getAbility();
                 Player.instance.abilityValues.Add($"ability.{getId()}.level", 1);
                 if (getDescriptionType() == "Passive")
                 {
-                    Player.instance.equippedPassiveAbilities.Add(getAbility());
-                    UIManager.Instance.PlayerUI.SetPassiveIcon(getIcon(), 1, false, Player.instance.getPassiveAbilityIndex(getAbility().GetType()));
+                    Player.instance.equippedPassiveAbilities.Add(ability);
+                    UIManager.Instance.PlayerUI.SetPassiveIcon(getIcon(), 1, false, Player.instance.getPassiveAbilityIndex(ability.GetType()));
                 }
                 else if (getDescriptionType() == "Active")
                 {
-                    Player.instance.activeAbility = getAbility();
+                    Player.instance.activeAbility = ability;
                     UIManager.Instance.PlayerUI.SetActiveIcon(getIcon(), 1, false);
                 }
                 else if (getDescriptionType() == "Special")
                 {
-                    Player.instance.ultimateAbility = getAbility();
+                    Player.instance.ultimateAbility = ability;
                     Player.AddSP(250);
                     UIManager.Instance.PlayerUI.ShowSPBar();
                     UIManager.Instance.PlayerUI.SetUltimateIcon(getIcon(), 1, false);
@@ -152,7 +154,7 @@ public abstract class Enhancement
         {
             if (getDescriptionType() == "Passive")
             {
-                if (Player.instance.equippedPassiveAbilities.Count == 5) available = false;
+                if (Player.instance.equippedPassiveAbilities.Count == 6) available = false;
                 if (Player.instance.equippedPassiveAbilities.Find(x => x.getId() == getId()) != null)
                 {
                     if (getLevel() < 7) available = true;

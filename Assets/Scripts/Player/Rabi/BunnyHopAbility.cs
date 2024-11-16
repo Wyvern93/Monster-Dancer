@@ -3,8 +3,6 @@ using UnityEngine;
 
 public class BunnyHopAbility : PlayerAbility
 {
-    public int minCooldown = 1;
-    int level;
 
     public override bool CanCast()
     {
@@ -43,19 +41,6 @@ public class BunnyHopAbility : PlayerAbility
     }
     public override void OnCast()
     {
-        level = (int)Player.instance.abilityValues["ability.bunnyhop.level"];
-        if (level == 1)
-        {
-            maxCooldown = 20;
-        }
-        else if (level == 2)
-        {
-            maxCooldown = 16;
-        }
-        else if (level >= 3)
-        {
-            maxCooldown = 12;
-        }
         maxCooldown = 6; // 6
         currentCooldown = maxCooldown;
 
@@ -70,6 +55,6 @@ public class BunnyHopAbility : PlayerAbility
 
     public override void OnUpdate()
     {
-        if (BeatManager.isGameBeat && currentCooldown > 0) currentCooldown--;
+        if (BeatManager.isQuarterBeat && currentCooldown > 0) currentCooldown-= 0.25f;
     }
 }

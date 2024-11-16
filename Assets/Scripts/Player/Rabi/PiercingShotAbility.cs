@@ -36,7 +36,6 @@ public class PiercingShotAbility : PlayerAbility, IPlayerProjectile
     {
         int level = (int)Player.instance.abilityValues["ability.piercingshot.level"];
         maxCooldown = level < 3 ? 10 : 7;
-        currentCooldown = maxCooldown;
         Player.instance.StartCoroutine(CastCoroutine(level));
     }
 

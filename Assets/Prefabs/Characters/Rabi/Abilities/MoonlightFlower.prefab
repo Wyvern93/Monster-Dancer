@@ -120,11 +120,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e681f004b381a1648a9c34ca8efa5644, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sprite: {fileID: 6388920412374806758}
   beats: 0
   dmg: 0
-  angle: 0
   level: 0
+  sfx: {fileID: 8300000, guid: eb4df72e8349dd841b91b0a3671dd461, type: 3}
 --- !u!58 &557682725584334417
 CircleCollider2D:
   m_ObjectHideFlags: 0

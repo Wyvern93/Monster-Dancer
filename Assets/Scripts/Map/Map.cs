@@ -239,21 +239,51 @@ public class Map : MonoBehaviour
         return Instance.enemiesAlive[Random.Range(0, Instance.enemiesAlive.Count - 1)];
     }
 
-    public static Enemy GetRandomClosebyEnemy()
+    public static Enemy GetRandomClosebyEnemy(Vector2 basePos, float range = 6)
     {
         if (Instance.enemiesAlive.Count == 0) return null;
         Enemy e = null;
         int attempts = 40;
 
-        Vector3 playerPos = Player.instance.transform.position;
         while (true)
         {
             if (attempts <= 0) break;
             attempts--;
             e = Instance.enemiesAlive[Random.Range(0, Instance.enemiesAlive.Count - 1)];
-            if (Vector2.Distance(e.transform.position, playerPos) < 6) return e;
+            if (e.CurrentHP <= 0) continue;
+            if (Vector2.Distance(e.transform.position, basePos) < range) return e;
         }
         return null;
+    }
+
+    public static Enemy GetClosestEnemyTo(Vector2 basePos, float range = 6)
+    {
+        if (Instance.enemiesAlive.Count == 0) return null;
+        List<Enemy> closeEnemies = new List<Enemy>();
+        Enemy e = null;
+        int attempts = 40;
+
+        while (true)
+        {
+            if (attempts <= 0) break;
+            attempts--;
+            e = Instance.enemiesAlive[Random.Range(0, Instance.enemiesAlive.Count - 1)];
+            if (e.CurrentHP <= 0) continue;
+            if (Vector2.Distance(e.transform.position, basePos) < range) closeEnemies.Add(e);
+        }
+        if (closeEnemies.Count == 0) return null;
+
+        float dist = 999;
+        foreach (Enemy enemy in closeEnemies)
+        {
+            float enemyDist = Vector2.Distance(enemy.transform.position, basePos);
+            if (enemyDist < dist)
+            {
+                dist = enemyDist;
+                e = enemy;
+            }
+        }
+        return e;
     }
 
     public virtual void SetPools()

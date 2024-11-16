@@ -1,12 +1,24 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CarrotBarrageAbility : PlayerAbility
 {
     private List<ExplosiveCarrot> carrots = new List<ExplosiveCarrot>();
+    
+    public CarrotBarrageAbility()
+    {
+        maxAmmo = 3;
+        maxAttackSpeedCD = 3f;
+        maxCooldown = 6;
+
+        currentAmmo = maxAmmo;
+        currentAttackSpeedCD = 0;
+        currentCooldown = 0;
+    }
     public override bool CanCast()
     {
-        return currentCooldown == 0;
+        return currentCooldown == 0 && currentAttackSpeedCD == 0;
     }
 
     public override string getAbilityDescription()
@@ -32,24 +44,64 @@ public class CarrotBarrageAbility : PlayerAbility
         return "carrotbarrage";
     }
 
+    public override Color GetRechargeColor()
+    {
+        return new Color(1f, 0.5f, 0f);
+    }
+
     public override void OnCast()
     {
         int level = (int)Player.instance.abilityValues["ability.carrotbarrage.level"];
         carrots.Clear();
-        maxCooldown = level < 6 ? level < 3 ? 10 : 8 : 6;
-        currentCooldown = maxCooldown;
+        //maxCooldown = level < 6 ? level < 3 ? 10 : 8 : 6;
+        
+        maxCooldown = 4;//level < 4 ? 3 : 2;
+        //currentCooldown = maxCooldown;
+        maxAmmo = 3;
+        maxAttackSpeedCD = 2f;
+        if (currentAmmo - 1 > 0)
+        {
+            currentAmmo--;
+            currentAttackSpeedCD = maxAttackSpeedCD;
+        }
+        else
+        {
+            currentAmmo--;
+            currentCooldown = maxCooldown;
+            currentAttackSpeedCD = maxAttackSpeedCD;
+            AudioController.PlaySound(AudioController.instance.sounds.reloadSfx);
+        }
+        UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, maxAmmo);
 
         float dmg = level < 4 ? level < 2 ? 25 : 40 : 65;
         int numberOfCarrots = level < 5 ? 3 : 5;
 
-        float angleDiff = 360f / numberOfCarrots;
+        Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
+        Vector2 difference = (crosshairPos - (Vector2)Player.instance.transform.position).normalized;
+
+        float baseAngle = BulletBase.VectorToAngle(difference);
+        float perCarrotAngle = (10 / (numberOfCarrots / 2));
+        baseAngle -= 10;
+
+        float distanceToCursor = (crosshairPos - (Vector2)Player.instance.transform.position).magnitude;
+        distanceToCursor = Mathf.Clamp(distanceToCursor, 0, 5);
+
         for (int i = 0; i < numberOfCarrots; i++) 
         {
-            Vector2 dir = BulletBase.angleToVector((angleDiff * i) + 45f);
+            float angle = baseAngle + (perCarrotAngle * i);
+
+            // Calculate distance multiplier: center carrots go farther than those on the sides
+            float distanceMultiplier = 1f - Mathf.Abs((i - (numberOfCarrots - 1) / 2f) / (numberOfCarrots / 2f));
+            float carrotDistance = distanceToCursor * (0.5f + distanceMultiplier * 0.5f);
+
+            // Determine direction and distance for each carrot
+            Vector2 dir = BulletBase.angleToVector(angle).normalized * carrotDistance;
             CastCarrot(dir, dmg, i == 0);
         }
-
+        AudioController.PlaySound((Player.instance as PlayerRabi).throwSound);
     }
+
+
 
     public void CastCarrot(Vector2 direction, float damage, bool playSound)
     {
@@ -59,18 +111,29 @@ public class CarrotBarrageAbility : PlayerAbility
         carrot.Init(direction);
         carrot.dmg = damage;
         
-        if (playSound) carrot.PlaySpin();
         Player.instance.despawneables.Add(carrot.GetComponent<IDespawneable>());
     }
 
-    public override void OnEquip()
+    public override Sprite GetReloadIcon()
     {
-        
+        return IconList.instance.getReloadIcon("rabi_carrot");
     }
 
     public override void OnUpdate()
     {
-        if (BeatManager.isGameBeat && currentCooldown > 0) currentCooldown--;
+        if (BeatManager.isQuarterBeat && currentCooldown > 0)
+        {
+            currentCooldown -= 0.25f;
+            if (currentCooldown == 0)
+            {
+                currentAmmo = maxAmmo;
+            }
+        }
+        if (BeatManager.isQuarterBeat && currentAttackSpeedCD > 0) currentAttackSpeedCD -= 0.25f;
+        if (IsCurrentWeaponSelected())
+        {
+            UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, maxAmmo);
+        }
     }
 
     public override System.Type getEvolutionItemType()

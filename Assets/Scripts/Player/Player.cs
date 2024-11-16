@@ -5,7 +5,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using static UnityEngine.GraphicsBuffer;
 
 public class Player : MonoBehaviour
 {
@@ -70,10 +69,6 @@ public class Player : MonoBehaviour
     public List<PlayerItem> equippedItems;
     public List<PlayerItem> evolvedItems;
 
-    [Header("Prefabs")]
-    public GameObject attackPrefab;
-    protected int attackCD;
-
     public List<GameObject> playerClones;
     public bool isInvulnerable;
     [SerializeField] public SpriteRenderer grazeSprite;
@@ -85,6 +80,11 @@ public class Player : MonoBehaviour
     public GameObject Exclamation;
     public int poisonStatus;
     public List<IDespawneable> despawneables;
+
+    public int currentWeapon;
+    public bool isShooting;
+    [SerializeField] public SpriteRenderer rechargeFX;
+    public Color rechargeFXcolor;
 
     public bool isPoisoned()
     {
@@ -329,9 +329,14 @@ public class Player : MonoBehaviour
             activeAbility.currentCooldown = 0;
             UIManager.Instance.PlayerUI.activeCDImage.transform.position = Sprite.transform.position + new Vector3(0.7f, 0.9f, 1f);
             HandleSprite();
+            isShooting = false;
             return;
         }
-        
+
+        if (Keyboard.current.digit1Key.wasPressedThisFrame && equippedPassiveAbilities.Count > 0) SetEquippedAbility(0);
+        if (Keyboard.current.digit2Key.wasPressedThisFrame && equippedPassiveAbilities.Count > 1) SetEquippedAbility(1);
+        if (Keyboard.current.digit3Key.wasPressedThisFrame && equippedPassiveAbilities.Count > 2) SetEquippedAbility(2);
+
         invulTime = Mathf.MoveTowards(invulTime, 0, Time.deltaTime);
 
         if (!isDead)
@@ -353,10 +358,6 @@ public class Player : MonoBehaviour
             Level++;
             OnLevelUp();
         }
-        if (Keyboard.current.numpad2Key.wasPressedThisFrame)
-        {
-            ForceDespawnAbilities(true);
-        }
 
         if (BeatManager.isGameBeat)
         {
@@ -367,6 +368,20 @@ public class Player : MonoBehaviour
             if (poisonStatus > 5) poisonStatus = 5;
             if (poisonStatus > 0) poisonStatus--;
             if (poisonStatus > 0) TakeDamage(GetPoisonDamage());
+        }
+
+        if (equippedPassiveAbilities[currentWeapon].currentAmmo == 0)
+        {
+            rechargeFXcolor.r = equippedPassiveAbilities[currentWeapon].GetRechargeColor().r;
+            rechargeFXcolor.g = equippedPassiveAbilities[currentWeapon].GetRechargeColor().g;
+            rechargeFXcolor.b = equippedPassiveAbilities[currentWeapon].GetRechargeColor().b;
+            rechargeFXcolor.a = Mathf.Lerp(rechargeFXcolor.a, 1, Time.deltaTime * 8f);
+            rechargeFX.color = rechargeFXcolor;
+        }
+        else
+        {
+            rechargeFXcolor.a = Mathf.Lerp(rechargeFXcolor.a, 0, Time.deltaTime * 8f);
+            rechargeFX.color = rechargeFXcolor;
         }
 
         foreach (PlayerAbility ability in equippedPassiveAbilities)
@@ -399,28 +414,17 @@ public class Player : MonoBehaviour
 
     }
 
+    public void SetEquippedAbility(int n)
+    {
+        if (currentWeapon == n) return;
+        equippedPassiveAbilities[currentWeapon].OnChange();
+        currentWeapon = n;
+        equippedPassiveAbilities[currentWeapon].OnSelect();
+    }
+
     public void SetDirection(Vector2 dir)
     {
         direction = dir;
-    }
-
-    public virtual void OnAttack()
-    {
-        
-        if (attackCD > 0)
-        {
-            attackCD--;
-            return;
-        }
-        else
-        {
-            attackCD = (int)abilityValues["Attack_Cooldown"];
-        }
-        PlayerAttack atkEntity = PoolManager.Get<PlayerAttack>();
-        atkEntity.Attack(direction);
-        despawneables.Add(atkEntity);
-        if (direction.x < 0) facingRight = false;
-        else facingRight = true;
     }
 
     public virtual void OnPassiveAbilityUse() { }
@@ -455,17 +459,13 @@ public class Player : MonoBehaviour
         if (InputManager.IsStickMovementThisFrame())
         {
             action = PlayerAction.Move;
-            if (direction.x == -1) facingRight = false;
-            if (direction.x == 1) facingRight = true;
         }
         if (Keyboard.current.aKey.wasPressedThisFrame || Keyboard.current.sKey.wasPressedThisFrame || Keyboard.current.dKey.wasPressedThisFrame || Keyboard.current.wKey.wasPressedThisFrame || Keyboard.current.leftArrowKey.wasPressedThisFrame || Keyboard.current.rightArrowKey.wasPressedThisFrame || Keyboard.current.downArrowKey.wasPressedThisFrame || Keyboard.current.upArrowKey.wasPressedThisFrame)
         {
             action = PlayerAction.Move;
-            if (direction.x == -1) facingRight = false;
-            if (direction.x == 1) facingRight = true;
         }
 
-        if (BeatManager.isGameBeat) 
+        if (BeatManager.isQuarterBeat && InputManager.ActionHold(InputActionType.ATTACK))
         {
             PerformAutomatedAction();
         }
@@ -589,11 +589,19 @@ public class Player : MonoBehaviour
             Vector2 difference = (crosshairPos - (Vector2)transform.position).normalized;
 
             Vector2 lookDir = difference;
-            if (direction.x < 0) facingRight = false;
-            if (direction.x > 0) facingRight = true;
+            if (difference.x < 0) facingRight = false;
+            if (difference.x > 0) facingRight = true;
         }
 
-        if (BeatManager.isGameBeat)
+        if (InputManager.ActionHold(InputActionType.ATTACK)) isShooting = true;
+        else isShooting = false;
+        /*
+        if (isShooting)
+        {
+            facingRight = direction.x > 0;
+        }*/
+
+        if (BeatManager.isQuarterBeat && InputManager.ActionHold(InputActionType.ATTACK))
         {
             PerformAutomatedAction();
         }
@@ -631,7 +639,8 @@ public class Player : MonoBehaviour
 
     public void PerformAutomatedAction()
     {
-        OnAttack();
+        if (direction.x < 0) facingRight = false;
+        else facingRight = true;
         OnPassiveAbilityUse();
     }
 
