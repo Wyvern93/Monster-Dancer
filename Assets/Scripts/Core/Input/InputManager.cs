@@ -100,6 +100,8 @@ public class InputManager : MonoBehaviour
                 case InputActionType.CANCEL:
                     return Mouse.current.rightButton;
                 case InputActionType.ABILITY:
+                    return Keyboard.current.spaceKey;
+                case InputActionType.ATTACK:
                     return Mouse.current.leftButton;
                 case InputActionType.ULTIMATE:
                     return Mouse.current.rightButton;

@@ -45,7 +45,7 @@ public class HotSauceBottleItemEnhancement : Enhancement
 
     public override PlayerAbility getAbility()
     {
-        return new BoxOfCarrotsAbility();
+        return new CarrotBusterAbility();
     }
 
     public override PlayerItem getItem()

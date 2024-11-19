@@ -3,9 +3,20 @@ using UnityEngine;
 
 public class CarrotJuiceAbility : PlayerAbility
 {
+    public CarrotJuiceAbility()
+    {
+        maxAmmo = 3;
+        maxAttackSpeedCD = 2f;
+        maxCooldown = 8;
+
+        currentAmmo = maxAmmo;
+        currentAttackSpeedCD = 0;
+        currentCooldown = 0;
+    }
+
     public override bool CanCast()
     {
-        return currentCooldown == 0;
+        return currentCooldown == 0 && currentAttackSpeedCD == 0;
     }
 
     public override string getAbilityDescription()
@@ -34,11 +45,28 @@ public class CarrotJuiceAbility : PlayerAbility
     public override void OnCast()
     {
         int level = (int)Player.instance.abilityValues["ability.carrotjuice.level"];
-        maxCooldown = level < 3 ? 16 : 12; 
-        currentCooldown = maxCooldown;
+        if (currentAmmo - 1 > 0)
+        {
+            currentAmmo--;
+            currentAttackSpeedCD = maxAttackSpeedCD;
+        }
+        else
+        {
+            currentAmmo--;
+            currentCooldown = maxCooldown;
+            currentAttackSpeedCD = maxAttackSpeedCD;
+            AudioController.PlaySound(AudioController.instance.sounds.reloadSfx);
+        }
+        UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, maxAmmo);
 
-        CastBottle(Random.insideUnitCircle * 6f);
-        if (level >= 7) CastBottle(Random.insideUnitCircle * 6f);
+        AudioController.PlaySound((Player.instance as PlayerRabi).throwSound);
+
+        Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
+        Vector2 difference = (crosshairPos - (Vector2)Player.instance.transform.position).normalized;
+        float distanceToCursor = (crosshairPos - (Vector2)Player.instance.transform.position).magnitude;
+        distanceToCursor = Mathf.Clamp(distanceToCursor, 0, 6);
+
+        CastBottle(difference * distanceToCursor);
     }
 
     public void CastBottle(Vector2 direction)
@@ -49,6 +77,16 @@ public class CarrotJuiceAbility : PlayerAbility
         Player.instance.despawneables.Add(bottle);
     }
 
+    public override Sprite GetReloadIcon()
+    {
+        return IconList.instance.getReloadIcon("rabi_carrot");
+    }
+
+    public override Color GetRechargeColor()
+    {
+        return new Color(1f, 0.5f, 0f);
+    }
+
     public override void OnEquip()
     {
         
@@ -56,7 +94,19 @@ public class CarrotJuiceAbility : PlayerAbility
 
     public override void OnUpdate()
     {
-        if (BeatManager.isGameBeat && currentCooldown > 0) currentCooldown--;
+        if (BeatManager.isQuarterBeat && currentCooldown > 0)
+        {
+            currentCooldown -= 0.25f;
+            if (currentCooldown == 0)
+            {
+                currentAmmo = maxAmmo;
+            }
+        }
+        if (BeatManager.isQuarterBeat && currentAttackSpeedCD > 0) currentAttackSpeedCD -= 0.25f;
+        if (IsCurrentWeaponSelected())
+        {
+            UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, maxAmmo);
+        }
     }
 
     public override System.Type getEvolutionItemType()

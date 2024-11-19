@@ -39,13 +39,13 @@ public class FireworksKitItemEnhancement : Enhancement
         if (Player.instance.equippedItems.Count == 6) return available = false;
         if (Player.instance.equippedItems.Find(x => x.getId() == getId()) != null) return available = false;
         if (Player.instance.equippedPassiveAbilities.Any(x => x.GetType() == typeof(CarrotBarrageAbility))) return true;
-        if (Player.instance.equippedPassiveAbilities.Any(x => x.GetType() == typeof(BoxOfCarrotsAbility))) return true;
+        if (Player.instance.equippedPassiveAbilities.Any(x => x.GetType() == typeof(CarrotBusterAbility))) return true;
         return available;
     }
 
     public override PlayerAbility getAbility()
     {
-        return new BoxOfCarrotsAbility();
+        return new CarrotBusterAbility();
     }
 
     public override PlayerItem getItem()

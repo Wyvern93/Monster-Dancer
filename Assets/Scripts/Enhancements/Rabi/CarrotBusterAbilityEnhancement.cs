@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BoxOfCarrotsAbilityEnhancement : Enhancement
+public class CarrotBusterAbilityEnhancement : Enhancement
 {
     public override string GetDescription()
     {
@@ -8,7 +8,7 @@ public class BoxOfCarrotsAbilityEnhancement : Enhancement
         switch (level)
         {
             default:
-            case 1: return "Boxes fall from the sky, healing the player on contact or exploding when touched by enemies";
+            case 1: return "Slash with a giant carrot sword with great power";
             case 2: return "Increases damage from <color=\"green\">30 -> 42</color>";
             case 3: return "Reduces the cooldown from <color=\"green\">18->12</color> beats";
             case 4: return "Increases damage from <color=\"green\">42 -> 59</color>";
@@ -20,12 +20,12 @@ public class BoxOfCarrotsAbilityEnhancement : Enhancement
 
     public override string getName()
     {
-        return "Box of Carrots";
+        return "Carrot Buster";
     }
 
     public override string getId()
     {
-        return "boxofcarrots";
+        return "carrotbuster";
     }
 
     public override string getDescriptionType()
@@ -40,7 +40,7 @@ public class BoxOfCarrotsAbilityEnhancement : Enhancement
 
     public override PlayerAbility getAbility()
     {
-        return new BoxOfCarrotsAbility();
+        return new CarrotBusterAbility();
     }
 
     public override EnhancementType GetEnhancementType()

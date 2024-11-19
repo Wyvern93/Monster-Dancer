@@ -36,7 +36,7 @@ public class MoonlightDaggersEnhancement : Enhancement
 
     public override string getDescriptionType()
     {
-        return "Attack";
+        return "Passive";
     }
 
     public override int getWeight()
@@ -46,29 +46,18 @@ public class MoonlightDaggersEnhancement : Enhancement
 
     public override bool isAvailable()
     {
-        return Player.instance.abilityValues[$"attack.{getId()}.level"] < 6;
+        return Player.instance.abilityValues[$"ability.{getId()}.level"] < 6;
     }
 
     public override int getLevel()
     {
-        if (!Player.instance.abilityValues.ContainsKey($"attack.{getId()}.level")) return 0;
-        else return (int)Player.instance.abilityValues[$"attack.{getId()}.level"];
+        if (!Player.instance.abilityValues.ContainsKey($"ability.{getId()}.level")) return 0;
+        else return (int)Player.instance.abilityValues[$"ability.{getId()}.level"];
     }
 
     public override void OnEquip()
     {
-        Player.instance.enhancements.Add(this);
-        if (getLevel() == 0)
-        {
-            Player.instance.abilityValues.Add($"attack.{getId()}.level", 1);
-            UIManager.Instance.PlayerUI.SetWeaponIcon(getIcon(), 1, false);
-        }
-        else
-        {
-            Player.instance.abilityValues[$"attack.{getId()}.level"] += 1;
-            int level = (int)Player.instance.abilityValues[$"attack.{getId()}.level"];
-            UIManager.Instance.PlayerUI.SetWeaponLevel(level, level >= 7);
-        }
+        base.OnEquip();
 
         int lv = getLevel();
 
@@ -85,7 +74,7 @@ public class MoonlightDaggersEnhancement : Enhancement
 
     public override PlayerAbility getAbility()
     {
-        return new BoxOfCarrotsAbility();
+        return new MoonlightDaggersAbility();
     }
     public override EnhancementType GetEnhancementType()
     {

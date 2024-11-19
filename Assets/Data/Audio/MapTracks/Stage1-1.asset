@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Stage1-1
   m_EditorClassIdentifier: 
   music: {fileID: 8300000, guid: a76bd3770088e9346b459a74f02b96fd, type: 3}
-  tempo: 135
+  tempo: 128
   offset: 0.469
   loopStart: 0.469
   loopEnd: 122.967

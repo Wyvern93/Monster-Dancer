@@ -1,76 +1,44 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Net.Http.Headers;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
-public class RabiAttack : PlayerAttack, IDespawneable, IPlayerProjectile
+public class MoonlightDaggerWave : MonoBehaviour, IDespawneable, IPlayerProjectile
 {
     [SerializeField] AudioClip attackSound;
     [SerializeField] Animator animator;
     int pierce;
     bool hasExploded;
+    Vector3 dir;
+    float quarterbeats;
+    float velocity;
+    float spread;
 
-    public override void Start()
+    public void OnEnable()
     {
-        base.Start();
-    }
-
-    public override void Attack(Vector2 direction)
-    {
-        int level = (int)Player.instance.abilityValues["attack.moonlightdaggers.level"];
+        dir = Vector3.zero;
+        int level = (int)Player.instance.abilityValues["ability.moonlightdaggers.level"];
         pierce = (int)Player.instance.abilityValues["Attack_Pierce"];
         hasExploded = false;
-        StartCoroutine(AttackCoroutine(direction));
-    }
+        animator.speed = 1f / BeatManager.GetBeatDuration() * 2f;
+        AudioController.PlaySoundWithoutCooldown(attackSound);
+        quarterbeats = 2;
+        velocity = 15f * Player.instance.abilityValues["Attack_Velocity"];
+        spread = Player.instance.abilityValues["Attack_Spread"];
 
-    public IEnumerator AttackCoroutine(Vector2 direction)
-    {
-        animator.speed = 1.0f / BeatManager.GetBeatDuration();
-
-        float time = 0;
-
-        // Read direction
         Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
         Vector2 difference = (crosshairPos - (Vector2)Player.instance.transform.position).normalized;
         Vector2 animDir;
-        float spread = Player.instance.abilityValues["Attack_Spread"];
         spread = Random.Range(-spread, spread);
         difference = rotate(difference, spread);
 
         animDir = new Vector2(difference.y, -difference.x);
-        direction = difference;
 
-        if (direction == Vector2.zero) direction = Vector2.right;
-        transform.position = Player.instance.transform.position + (Vector3)direction;
-
-        spr_renderer.enabled = true;
-        boxCollider.enabled = true;
-
-        // Sprite directions
+        if (difference == Vector2.zero) difference = Vector2.right;
+        transform.position = Player.instance.transform.position + ((Vector3)difference);
         transform.localEulerAngles = new Vector3(0, 0, Vector2.SignedAngle(Vector2.down, animDir));//getAngleFromVector(animDir));
-
-        AudioController.PlaySound(attackSound);
-
-        float velocity = 10f * Player.instance.abilityValues["Attack_Velocity"];
-        
-        dir = direction;
-
-        float abilityDuration = Player.instance.abilityValues["Attack_Time"];
-        while (time <= abilityDuration)
-        {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
-            time += Time.deltaTime;
-            transform.position += ((Vector3)dir * velocity * Time.deltaTime);
-            yield return new WaitForEndOfFrame();
-        }
-        Player.instance.isPerformingAction = false;
-
-        
-
-        PoolManager.Return(gameObject, GetType());
-        yield break;
+        dir = difference;
     }
 
     public Vector2 rotate(Vector2 v, float delta)
@@ -113,12 +81,26 @@ public class RabiAttack : PlayerAttack, IDespawneable, IPlayerProjectile
         return 0;
     }
 
-    public override void Update()
+    public void Update()
     {
-        
+        if (GameManager.isPaused) return;
+        if (BeatManager.isQuarterBeat)
+        {
+            quarterbeats--;
+        }
+
+        if (quarterbeats <= 0)
+        {
+            Player.instance.despawneables.Remove(this);
+            PoolManager.Return(gameObject, GetType());
+        }
+        else
+        {
+            transform.position += (dir * velocity * Time.deltaTime);
+        }
     }
 
-    public override void OnTriggerEnter2D(Collider2D collision)
+    public void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Enemy"))
         {
@@ -132,17 +114,20 @@ public class RabiAttack : PlayerAttack, IDespawneable, IPlayerProjectile
 
             foreach (PlayerItem item in Player.instance.equippedItems)
             {
-                item.OnAttackHit(this, damage, enemy);
+                item.OnHit(Player.instance.equippedPassiveAbilities.Find(x => x.GetType() == typeof(MoonlightDaggersAbility)), damage, enemy);
             }
             foreach (PlayerItem item in Player.instance.evolvedItems)
             {
-                item.OnAttackHit(this, damage, enemy);
+                item.OnHit(Player.instance.equippedPassiveAbilities.Find(x => x.GetType() == typeof(MoonlightDaggersAbility)), damage, enemy);
             }
             if (!hasExploded && Player.instance.abilityValues["Attack_Explode"] == 1)
             {
                 MoonlightShockwave shockwave = PoolManager.Get<MoonlightShockwave>();
                 shockwave.transform.position = transform.position;
             }
+
+            Vector2 dir = enemy.transform.position - Player.instance.transform.position;
+            enemy.PushEnemy(dir, 2f);
         }
 
         if (collision.CompareTag("FairyCage"))
@@ -161,14 +146,8 @@ public class RabiAttack : PlayerAttack, IDespawneable, IPlayerProjectile
         }
     }
 
-    public override Sprite GetIcon()
+    public void ForceDespawn(bool instant = false)
     {
-        return IconList.instance.getAbilityIcon("moonlightdaggers");
-    }
-
-    public void ForceDespawn()
-    {
-        StopAllCoroutines();
         PoolManager.Return(gameObject, GetType());
     }
 }

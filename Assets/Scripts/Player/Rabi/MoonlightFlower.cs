@@ -4,57 +4,64 @@ using UnityEngine;
 
 public class MoonlightFlower : MonoBehaviour, IDespawneable
 {
-    [SerializeField] SpriteRenderer sprite;
-    Color color = Color.white;
     public int beats;
     public float dmg;
-    public float angle;
     public int level;
-    private Transform playerTransform;
     private List<Enemy> enemies = new List<Enemy>();
-    private float cd;
     private float speed;
+    [SerializeField] AudioClip sfx;
+    private Vector2 targetPos;
+    private float scale = 0;
 
     public void OnEnable()
     {
+        scale = 0.2f;
+        transform.localScale = Vector3.one * scale;
         enemies.Clear();
         GetComponent<Animator>().speed = 1f / BeatManager.GetBeatDuration();
         level = (int)Player.instance.abilityValues["ability.moonlightflower.level"];
-        color.a = 1;
-        beats = level < 3 ? 6 : 12;
-        sprite.color = color;
+        beats = level < 3 ? 6 : 10;
         dmg = level < 4 ? level < 2 ? 3f : 6f : 12f;
         dmg *= Player.instance.itemValues["orbitalDamage"];
-        playerTransform = Player.instance.transform;
-        cd = 0;
-        color.a = 1;
-        speed = 50 * Player.instance.itemValues["orbitalSpeed"];
+        speed = 4 * Player.instance.itemValues["orbitalSpeed"];
+        AudioController.PlaySound(sfx);
     }
 
     public void OnSpawn()
     {
-        playerTransform = Player.instance.transform;
-        transform.position = new Vector3(playerTransform.position.x + (8 * Mathf.Cos(angle * Mathf.Deg2Rad)), playerTransform.position.y + (4f * Mathf.Sin(angle * Mathf.Deg2Rad)), 2f);
         transform.localEulerAngles = new Vector3(0, 0, transform.localEulerAngles.z - (Time.deltaTime * 100));
+    }
+    private void MoveTowardsTarget()
+    {
+        float acceleration = GetAcceleration() * speed;
+        if (GameManager.isPaused) return;
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * speed * acceleration);
+        transform.position = new Vector3(transform.position.x, transform.position.y, 10);
+    }
+    private float GetAcceleration()
+    {
+        float currentDistance = Vector2.Distance(transform.position, targetPos) * 4f;
+        currentDistance = Mathf.Clamp(currentDistance, 0, 1f);
+        return currentDistance;
     }
 
     public void Update()
     {
+        if (GameManager.isPaused) return;
+
+        scale = Mathf.MoveTowards(scale, 1f, Time.deltaTime * 4f);
+        transform.localScale = Vector3.one * scale;
+
+        targetPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
+        MoveTowardsTarget();
         if (BeatManager.isGameBeat)
         {
-            if (beats > 0) color.a = 1;
             beats--;
         }
-        if (color.a > 0) color.a -= Time.deltaTime;
-        sprite.color = color;
-
-        angle -= Time.deltaTime * speed;
-        transform.position = new Vector3(playerTransform.position.x + (8 * Mathf.Cos(angle * Mathf.Deg2Rad)), playerTransform.position.y + (4f * Mathf.Sin(angle * Mathf.Deg2Rad)), 2f);
         transform.localEulerAngles = new Vector3(0, 0, transform.localEulerAngles.z - (Time.deltaTime * 100));
 
-        if (cd <= 0)
+        if (BeatManager.isQuarterBeat)
         {
-            cd = BeatManager.GetBeatDuration() / 4f;
             for (int i = 0; i < enemies.Count; i++)
             {
                 float damage = (int)(Player.instance.currentStats.Atk * dmg);
@@ -67,16 +74,14 @@ public class MoonlightFlower : MonoBehaviour, IDespawneable
                     enemies[i].PushEnemy(dir, 1f);
                 }
                 enemies[i].TakeDamage((int)damage, isCritical);
-                
             }
         }
-        else
-        {
-            cd -= Time.deltaTime;
-        }
 
-        if (color.a <= 0 && beats <= 0)
+        if (beats <= 0)
         {
+            MoonlightShockwave shockwave = PoolManager.Get<MoonlightShockwave>();
+            shockwave.dmg = 24;
+            shockwave.transform.position = transform.position;
             Player.instance.despawneables.Remove(this);
             PoolManager.Return(gameObject, typeof(MoonlightFlower));
         }
@@ -84,6 +89,9 @@ public class MoonlightFlower : MonoBehaviour, IDespawneable
 
     private void OnDespawn()
     {
+        MoonlightShockwave shockwave = PoolManager.Get<MoonlightShockwave>();
+        shockwave.dmg = 4;
+        shockwave.transform.position = transform.position;
         beats = 0;
     }
 

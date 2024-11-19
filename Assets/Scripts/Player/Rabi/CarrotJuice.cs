@@ -5,69 +5,57 @@ using UnityEngine.UIElements;
 
 public class CarrotJuice : MonoBehaviour, IDespawneable
 {
-    private int beats = 16;
-    [SerializeField] Animator animator;
+    private float beats = 12;
     [SerializeField] AudioClip breakSound;
-
-    private float cd;
 
     List<Enemy> enemies;
     private float dmg = 1;
+    private float targetSize;
 
     public void OnEnable()
     {
         int level = (int)Player.instance.abilityValues["ability.carrotjuice.level"];
-        transform.localScale = Vector3.one * (level < 5 ? 1f : 1.5f);
+        targetSize = level < 5 ? 1f : 1.5f;
+        transform.localScale = Vector3.one * 0.1f;
 
         dmg = level < 6 ? level < 4 ? level < 2 ? 4f : 6f : 8f : 12f;
 
-        animator.Play("CarrotJuice_Spawn");
         enemies = new List<Enemy>();
-        cd = 0;
         beats = 12;
         AudioController.PlaySound(breakSound, Random.Range(0.8f, 1.2f));
     }
-    public void OnAnimationEnd()
+
+    public void OnDespawn()
     {
         Player.instance.despawneables.Remove(this);
         PoolManager.Return(gameObject, GetType());
     }
 
-    public void OnDespawn()
-    {
-        animator.Play("CarrotJuice_Despawn");
-    }
-
     public void Update()
     {
         if (GameManager.isPaused) return;
-        if (BeatManager.isGameBeat)
+        if (BeatManager.isQuarterBeat)
         {
-            beats--;
-            if (beats == 0)
-            {
-                OnDespawn();
-            }
+            beats -= 0.25f;
+            if (beats <= 0) targetSize = 0;
         }
+
+        transform.localScale = Vector3.MoveTowards(transform.localScale, Vector3.one * targetSize, Time.deltaTime * 4f);
+        if (transform.localScale.magnitude <= 0.1f) OnDespawn();
 
         if (beats <= 0) return;
 
-        if (cd <= 0)
+        if (BeatManager.isQuarterBeat)
         {
-            cd = BeatManager.GetBeatDuration() / 4f;
             for (int i = 0; i < enemies.Count; i++)
             {
                 float damage = Player.instance.currentStats.Atk * dmg;
                 if (damage < 1) damage = 1;
                 bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
                 if (isCritical) damage *= Player.instance.currentStats.CritDmg;
-
+                if (enemies[i].CanBeSlowed(false)) enemies[i].OnSlow(1, 0.5f);
                 enemies[i].TakeDamage((int)damage, isCritical);
             }
-        }
-        else
-        {
-            cd -= Time.deltaTime;
         }
     }
 

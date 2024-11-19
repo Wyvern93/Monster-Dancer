@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerRabi : Player
 {
+
     [Header("Ability Prefabs")]
+    [SerializeField] GameObject moonlightDaggerWavePrefab;
     [SerializeField] GameObject explosiveCarrot;
     [SerializeField] GameObject carrotExplosionPrefab;
     [SerializeField] GameObject rabiClonePrefab;
@@ -25,10 +26,12 @@ public class PlayerRabi : Player
     [SerializeField] GameObject moonlightShockwavePrefab;
     [SerializeField] GameObject rabiEclipsePrefab;
     [SerializeField] GameObject piercingShotPrefab;
-    [SerializeField] GameObject boxofCarrotsPrefab;
+    [SerializeField] GameObject carrotBusterPrefab;
     [SerializeField] GameObject carrotcopterPrefab;
     [SerializeField] GameObject moonlightFlowerPrefab;
     [SerializeField] GameObject lunarAuraPrefab;
+
+    [SerializeField] GameObject juiceExplosionPrefab;
 
     [SerializeField] GameObject sanctuaryPrefab;
     [SerializeField] GameObject sanctuaryPulsePrefab;
@@ -44,6 +47,7 @@ public class PlayerRabi : Player
     [SerializeField] SpriteTrail spriteTrail;
     [SerializeField] CircleCollider2D dashHitBox;
     [SerializeField] AudioClip dashSound;
+    [SerializeField] public AudioClip throwSound;
     [SerializeField] public AudioClip piercingShotChargeSound;
     [SerializeField] public AudioClip flamingDrillChargeSound;
     [SerializeField] public AudioClip fireworkSound;
@@ -62,15 +66,16 @@ public class PlayerRabi : Player
     public override void Start()
     {
         base.Start();
-        PoolManager.CreatePool(typeof(RabiAttack), attackPrefab, 20);
+        //PoolManager.CreatePool(typeof(RabiAttack), attackPrefab, 20);
+        PoolManager.CreatePool(typeof(MoonlightDaggerWave), moonlightDaggerWavePrefab, 12);
         PoolManager.CreatePool(typeof(ExplosiveCarrot), explosiveCarrot, 120);
         PoolManager.CreatePool(typeof(SmokeExplosion), smokeExplosionPrefab, 100);
         PoolManager.CreatePool(typeof(RabiClone), rabiClonePrefab, 10);
         PoolManager.CreatePool(typeof(CarrotExplosion), carrotExplosionPrefab, 120);
-        PoolManager.CreatePool(typeof(MoonBeam), moonBeamPrefab, 4);
+        PoolManager.CreatePool(typeof(MoonbeamLaser), moonBeamPrefab, 4);
         PoolManager.CreatePool(typeof(OrbitalMoon), orbitalMoonPrefab, 12);
         PoolManager.CreatePool(typeof(CarrotJuice), carrotJuicePrefab, 12);
-        PoolManager.CreatePool(typeof(CarrotJuiceBottle), carrotJuiceBottlePrefab, 12);
+        PoolManager.CreatePool(typeof(CarrotJuiceBottle), carrotJuiceBottlePrefab, 4);
         PoolManager.CreatePool(typeof(LunarPulse), lunarPulsePrefab, 12);
         PoolManager.CreatePool(typeof(LunarRainRay), lunarRainBeamPrefab, 30);
         PoolManager.CreatePool(typeof(CarrotDeliveryTruck), truckPrefab, 20);
@@ -78,10 +83,11 @@ public class PlayerRabi : Player
         PoolManager.CreatePool(typeof(MoonlightShockwave), moonlightShockwavePrefab, 30);
         PoolManager.CreatePool(typeof(RabiEclipse), rabiEclipsePrefab, 1);
         PoolManager.CreatePool(typeof(PiercingShot), piercingShotPrefab, 10);
-        PoolManager.CreatePool(typeof(BoxOfCarrots), boxofCarrotsPrefab, 15);
+        PoolManager.CreatePool(typeof(CarrotBuster), carrotBusterPrefab, 1);
         PoolManager.CreatePool(typeof(CarrotCopter), carrotcopterPrefab, 8);
         PoolManager.CreatePool(typeof(MoonlightFlower), moonlightFlowerPrefab, 8);
         PoolManager.CreatePool(typeof(LunarAura), lunarAuraPrefab, 1);
+        PoolManager.CreatePool(typeof(JuiceExplosion), juiceExplosionPrefab, 5);
 
         PoolManager.CreatePool(typeof(SanctuaryAura), sanctuaryPrefab, 1);
         PoolManager.CreatePool(typeof(SanctuaryPulse), sanctuaryPulsePrefab, 1);
@@ -96,18 +102,16 @@ public class PlayerRabi : Player
         GameManager.runData.possibleSkillEnhancements = new List<Enhancement>()
         { 
             new MoonlightDaggersEnhancement(),
-            new MoonlightDaggersMasterfulEnhancement(),
-            new MoonlightDaggersPowerfulEnhancement(),
             new CarrotBarrageAbilityEnhancement(),
             new MoonBeamAbilityEnhancement(),
             new OrbitalMoonAbilityEnhancement(),
             new CarrotJuiceAbilityEnhancement(),
-            new LunarAuraAbilityEnhancement(),
-            new PiercingShotAbilityEnhancement(),
+            //new LunarAuraAbilityEnhancement(),
+            //new PiercingShotAbilityEnhancement(),
             new LunarRainAbilityEnhancement(),
             new CarrotDeliveryAbilityEnhancement(),
             new EclipseAbilityEnhancement(),
-            new BoxOfCarrotsAbilityEnhancement(),
+            new CarrotBusterAbilityEnhancement(),
             new CarrotcopterAbilityEnhancement(),
             new MoonlightFlowerAbilityEnhancement()
         };
@@ -134,18 +138,19 @@ public class PlayerRabi : Player
         abilityValues.Add("Attack_Spread", 0);
         abilityValues.Add("Attack_Explode", 0);
 
+        // Moonlight Daggers Spell-Shot
         MoonlightDaggersEnhancement attack = new MoonlightDaggersEnhancement();
         attack.OnEquip();
     }
 
     public override void Despawn()
     {
-        PoolManager.RemovePool(typeof(RabiAttack));
+        PoolManager.RemovePool(typeof(MoonlightDaggerWave));
         PoolManager.RemovePool(typeof(ExplosiveCarrot));
         PoolManager.RemovePool(typeof(CarrotExplosion));
         PoolManager.RemovePool(typeof(RabiClone));
         PoolManager.RemovePool(typeof(SmokeExplosion));
-        PoolManager.RemovePool(typeof(MoonBeam));
+        PoolManager.RemovePool(typeof(MoonbeamLaser));
         PoolManager.RemovePool(typeof(OrbitalMoon));
         PoolManager.RemovePool(typeof(CarrotJuice));
         PoolManager.RemovePool(typeof(CarrotJuiceBottle));
@@ -155,10 +160,11 @@ public class PlayerRabi : Player
         PoolManager.RemovePool(typeof(CarrotBullet));
         PoolManager.RemovePool(typeof(RabiEclipse));
         PoolManager.RemovePool(typeof(PiercingShot));
-        PoolManager.RemovePool(typeof(BoxOfCarrots));
+        PoolManager.RemovePool(typeof(CarrotBuster));
         PoolManager.RemovePool(typeof(CarrotCopter));
         PoolManager.RemovePool(typeof(MoonlightFlower));
         PoolManager.RemovePool(typeof(LunarAura));
+        PoolManager.RemovePool(typeof(JuiceExplosion));
 
         PoolManager.RemovePool(typeof(SanctuaryAura));
         PoolManager.RemovePool(typeof(SanctuaryPulse));
@@ -187,8 +193,6 @@ public class PlayerRabi : Player
         return new List<Enhancement>()
         {
             new MoonlightDaggersEnhancement(),
-            new MoonlightDaggersMasterfulEnhancement(),
-            new MoonlightDaggersPowerfulEnhancement()
         };
     }
 
@@ -364,23 +368,6 @@ public class PlayerRabi : Player
 
         yield break;
     }
-    
-
-    public override void OnAttack()
-    {
-        if (attackCD > 0)
-        {
-            attackCD--;
-            return;
-        }
-        else
-        {
-            attackCD = (int)abilityValues["Attack_Cooldown"];
-        }
-        if (UIManager.Instance.PlayerUI.crosshair.transform.position.x > transform.position.x) facingRight = true;
-        else facingRight = false;
-        StartCoroutine(AttackCoroutine());
-    }
 
     public override void Move(Vector2 targetPos)
     {
@@ -478,41 +465,16 @@ public class PlayerRabi : Player
         yield break;
     }
 
-    private IEnumerator AttackCoroutine()
-    {
-        int numAttacks = 2;
-        int attackLevel = (int)abilityValues["Attack_Number"];
-
-        numAttacks = attackLevel;
-
-        float attackduration = 0;
-        float baseBeat = BeatManager.GetBeatDuration();
-
-        attackduration = baseBeat / (numAttacks * 2);
-        if (numAttacks == 2) attackduration = baseBeat / 4f;
-        if (numAttacks == 4) attackduration = baseBeat / 8f;
-        if (numAttacks == 6) attackduration = baseBeat / 12f;
-
-        float remainingAttacks = numAttacks;
-        while (remainingAttacks > 0)
-        {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
-            PlayerAttack atkEntity = PoolManager.Get<RabiAttack>();
-            atkEntity.Attack(direction);
-            atkEntity.transform.localScale = Vector3.one * abilityValues["Attack_Size"];
-            despawneables.Add(atkEntity);
-            remainingAttacks--;
-            yield return new WaitForSeconds(attackduration);
-        }
-        yield break;
-    }
-
     public override void OnPassiveAbilityUse()
     {
+        PlayerAbility a = equippedPassiveAbilities[currentWeapon];
+        if (a.CanCast()) a.OnCast();
+        /*
         foreach (PlayerAbility ability in equippedPassiveAbilities)
         {
             if (ability.CanCast()) ability.OnCast();
         }
+        */
     }
 
     public override void OnActiveAbilityUse() 

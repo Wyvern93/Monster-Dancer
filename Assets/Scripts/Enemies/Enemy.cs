@@ -43,6 +43,7 @@ public abstract class Enemy : MonoBehaviour
 
     public StunEffect stunStatus;
     public BurningEffect burnStatus;
+    public SlownessEffect slownessStatus;
     private float oldAnimSpeed;
     private Vector2 deathDir;
     public bool CanMove()
@@ -53,6 +54,13 @@ public abstract class Enemy : MonoBehaviour
     }
 
     public virtual bool CanBeStunned(bool isUltimate)
+    {
+        if (isUltimate) return true;
+        if (this is Boss) return false;
+        return true;
+    }
+
+    public virtual bool CanBeSlowed(bool isUltimate)
     {
         if (isUltimate) return true;
         if (this is Boss) return false;
@@ -71,6 +79,12 @@ public abstract class Enemy : MonoBehaviour
         stunStatus.duration = time;
         animator.speed = 0;
         Sprite.color = new Color(0.8f, 0.8f, 1f, 1f);
+    }
+
+    public void OnSlow(int time, float amount)
+    {
+        slownessStatus.duration = time;
+        if (slownessStatus.amount < amount) slownessStatus.amount = amount;
     }
 
     public void OnBurn()
@@ -145,6 +159,7 @@ public abstract class Enemy : MonoBehaviour
     {
         stunStatus = new StunEffect();
         burnStatus = new BurningEffect();
+        slownessStatus = new SlownessEffect();
         spriteRendererMat = Sprite.material;
         facingRight = true;
         animator = GetComponentInChildren<Animator>();
@@ -162,7 +177,7 @@ public abstract class Enemy : MonoBehaviour
         if (GameManager.runData == null) return;
         if (origHealth == 0) origHealth = MaxHP;
         float minutes = (Map.StageTime / 120f) + (6 * GameManager.runData.stageMulti);
-        float scale = 1 + Mathf.Clamp(minutes - 1, 0, 10000);
+        float scale = 1 + (Mathf.Clamp(minutes - 1, 0, 10000)/4f);
         // Minute 0 -> 1x
         // Minute 10 -> 10x
         int baseHealth = (int)(origHealth * scale);
@@ -224,10 +239,19 @@ public abstract class Enemy : MonoBehaviour
             if (stunStatus.duration == 1) OnStunEnd();
             stunStatus.duration--;
         }
+        if (BeatManager.isGameBeat && slownessStatus.duration > 0)
+        {
+            slownessStatus.duration--;
+        }
 
-        
+
         if (stunStatus.isStunned()) rb.velocity = Vector2.zero;
-        else rb.velocity = velocity + (knockback * 2);
+        else
+        {
+            Vector3 speed = slownessStatus.isSlowed() ? slownessStatus.ApplySlow(velocity.magnitude) * velocity.normalized : velocity;
+            rb.velocity = speed + (knockback * 2);
+        }
+        
         HandleSprite();
         HandleKnockback();
     }
@@ -312,6 +336,7 @@ public abstract class Enemy : MonoBehaviour
         deathDir = (transform.position - Player.instance.transform.position).normalized;
         stunStatus.duration = 0;
         burnStatus.duration = 0;
+        slownessStatus.duration = 0;
         //KillEffect deathFx = PoolManager.Get<KillEffect>();
         //deathFx.transform.position = transform.position;
         //Map.Instance.enemiesAlive.Remove(this);
@@ -364,7 +389,6 @@ public abstract class Enemy : MonoBehaviour
         }*/
         while (expToUse > 0)
         {
-            Debug.Log(expToUse);
             if (expToUse > 25)
             {
                 Gem gem = PoolManager.Get<Gem>();

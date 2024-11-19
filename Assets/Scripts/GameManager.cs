@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour
         instance = this;
         DontDestroyOnLoad(gameObject);
         iconList.abilityAtlas = Resources.LoadAll<Sprite>("UI/AbilityList");
+        iconList.reloadAtlas = Resources.LoadAll<Sprite>("UI/reloadIcons");
         iconList.itemAtlas = Resources.LoadAll<Sprite>("UI/ItemList");
         UIManager.Instance.PlayerUI.HideUI();
         UIManager.Instance.SetGameOverBG(false);

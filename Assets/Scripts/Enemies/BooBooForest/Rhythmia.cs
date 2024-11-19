@@ -53,7 +53,7 @@ public class Rhythmia : Enemy
         SpawnBullet(0);
         SpawnBullet(120);
         SpawnBullet(240);
-        AudioController.PlaySound(AudioController.instance.sounds.bulletwaveShootSound);
+        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
         bulletSpawnEffect.Despawn();
         animator.Play("rhythmia_normal");
         isAttacking = false;

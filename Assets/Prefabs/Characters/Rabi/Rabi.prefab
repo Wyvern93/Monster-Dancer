@@ -137,6 +137,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 8859566794998209886}
   - {fileID: 3798350261671299771}
   - {fileID: 7254530756958566533}
   - {fileID: 2922399811109229182}
@@ -350,7 +351,6 @@ MonoBehaviour:
     Speed: 0
   music_theme: {fileID: 8300000, guid: 91327df76b7541940a4738d91fcb8c17, type: 3}
   enhancements: []
-  attackPrefab: {fileID: 238526771677291766, guid: 4af89ea480ae3f04eaeed59c29c97ba3, type: 3}
   playerClones: []
   isInvulnerable: 0
   grazeSprite: {fileID: 8249613087250414989}
@@ -360,11 +360,16 @@ MonoBehaviour:
   invulTime: 0
   Exclamation: {fileID: 1219958621631604314}
   poisonStatus: 0
+  currentWeapon: 0
+  isShooting: 0
+  rechargeFX: {fileID: 3849218236984956810}
+  rechargeFXcolor: {r: 0, g: 0, b: 0, a: 0}
+  moonlightDaggerWavePrefab: {fileID: 238526771677291766, guid: 4af89ea480ae3f04eaeed59c29c97ba3, type: 3}
   explosiveCarrot: {fileID: 6176280003804827367, guid: 3022bd6a79b7630479f72639d2475f67, type: 3}
   carrotExplosionPrefab: {fileID: 2605593471026702462, guid: 941e5a73124b6514cacc803978b84e0a, type: 3}
   rabiClonePrefab: {fileID: 2259806814164270096, guid: 62879664afbba8f4a813d773bdc57f27, type: 3}
   smokeExplosionPrefab: {fileID: 3869742542325795476, guid: 76d3dd6862e3fc14b81df8305c3505d9, type: 3}
-  moonBeamPrefab: {fileID: 6350518795406112733, guid: 9dc45a1711b3d86499d77b015aced650, type: 3}
+  moonBeamPrefab: {fileID: 3155321679640558860, guid: 25acc0ee02486034b8ae06cd26b9d9b5, type: 3}
   orbitalMoonPrefab: {fileID: 6847253542831245153, guid: c0331f1d765435646862497fa9c8e606, type: 3}
   carrotJuicePrefab: {fileID: 7296180965819219976, guid: 29d554b9cab531c40850f5f35747e932, type: 3}
   carrotJuiceBottlePrefab: {fileID: 5557208887217081932, guid: 2f2e552663a79974ba3391da98c56111, type: 3}
@@ -375,10 +380,11 @@ MonoBehaviour:
   moonlightShockwavePrefab: {fileID: 4163177863434745036, guid: def8eb86107984148ad0e97d62c8ef22, type: 3}
   rabiEclipsePrefab: {fileID: 7892215351694188037, guid: 841e205ca6af3d344b4ab7d4839173ca, type: 3}
   piercingShotPrefab: {fileID: 4352397607850131520, guid: 79471f49fb66d1442a18767207966990, type: 3}
-  boxofCarrotsPrefab: {fileID: 2268989308770497195, guid: 31e889eb307f3054c807216e612bc1b1, type: 3}
+  carrotBusterPrefab: {fileID: 2373612644486412397, guid: f79d5991bb815e44fb8dab7ed56b620e, type: 3}
   carrotcopterPrefab: {fileID: 3425642355969134211, guid: d00d1c6e96ff75d40bb8a7cac7e20e4e, type: 3}
   moonlightFlowerPrefab: {fileID: 191912119710237282, guid: a014cdfc807c77d4e88a6e18a4c5aa49, type: 3}
   lunarAuraPrefab: {fileID: 6512445447011835760, guid: 21dd3efcf3de78746bb9adb505000609, type: 3}
+  juiceExplosionPrefab: {fileID: 6891515725880679145, guid: 4ed748d18e40e5e4c85ed62e84083572, type: 3}
   sanctuaryPrefab: {fileID: 447770707882610931, guid: b14fe2d6085ea8a45991c24842d5533e, type: 3}
   sanctuaryPulsePrefab: {fileID: 6582179206276219419, guid: 1d571eb514d006d42bc666602f4b2e22, type: 3}
   holyOrbPrefab: {fileID: 1447474559152972855, guid: e1b36be15436ff0428fefbb73ff633c9, type: 3}
@@ -390,6 +396,7 @@ MonoBehaviour:
   spriteTrail: {fileID: 4465351908415658744}
   dashHitBox: {fileID: 7102733586936279029}
   dashSound: {fileID: 8300000, guid: 7903361135f538e44bab3cd4f2380af2, type: 3}
+  throwSound: {fileID: 8300000, guid: ba24113c40ea57c458b245508d53e05f, type: 3}
   piercingShotChargeSound: {fileID: 8300000, guid: e5fca25ee446ef2419cf2fe15cbed7d9, type: 3}
   flamingDrillChargeSound: {fileID: 8300000, guid: 1e03a7b6b5a52e844b92a439fcbe186f, type: 3}
   fireworkSound: {fileID: 8300000, guid: 29f71132360851045bb4d5a49e8f7984, type: 3}
@@ -937,6 +944,112 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &5594845631129412491
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8859566794998209886}
+  - component: {fileID: 3849218236984956810}
+  - component: {fileID: 5218687572923513036}
+  m_Layer: 0
+  m_Name: Recharge
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8859566794998209886
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5594845631129412491}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.3, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8192707018515921040}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &3849218236984956810
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5594845631129412491}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 042d0b1bfd7e11241b4f7de02ed00591, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 3
+  m_Sprite: {fileID: 21300000, guid: 80831632e3495cd4e9a4dea5cce97ade, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1, y: 1}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
+--- !u!95 &5218687572923513036
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5594845631129412491}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: ede42bb094636454fa117bc8c40773bc, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &7754144329018009409
 GameObject:
   m_ObjectHideFlags: 0

@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 using UnityEngine.InputSystem;
+using UnityEngine.U2D;
 using UnityEngine.UI;
 
 public class PlayerUI : MonoBehaviour
@@ -46,6 +48,13 @@ public class PlayerUI : MonoBehaviour
 
     [SerializeField] Image playerIcon;
     [SerializeField] TextMeshProUGUI playerName;
+
+    // Ammo stuff
+    [SerializeField] List<Image> bullets;
+    public GameObject reloadUI;
+    [SerializeField] AbilityIconUI abilityIcon1, abilityIcon2, abilityIcon3;
+    [SerializeField] TextMeshProUGUI ammoNumber;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -66,6 +75,50 @@ public class PlayerUI : MonoBehaviour
         {
             icon.Display(null, 0, false, true);
         }
+
+        abilityIcon1.SetAbilityIcon(null, 0, false, false);
+        abilityIcon2.SetAbilityIcon(null, 0, false, false);
+        abilityIcon3.SetAbilityIcon(null, 0, false, false);
+
+        abilityIcon1.cooldown = 0;
+        abilityIcon2.cooldown = 0;
+        abilityIcon3.cooldown = 0;
+
+        abilityIcon1.SetFrame(true);
+        abilityIcon2.SetFrame(false);
+        abilityIcon3.SetFrame(false);
+    }
+
+    public void SetAmmo(int current, int max)
+    {
+        for (int i = 0; i < bullets.Count; i++)
+        {
+            if (i < max) bullets[i].gameObject.SetActive(true);
+            else bullets[i].gameObject.SetActive(false);
+
+            if (i < current) bullets[i].color = Color.white;
+            else bullets[i].color = Color.black;
+        }
+    }
+
+    public void SetAmmoIcons(Sprite sprite)
+    {
+        foreach (Image spr in bullets)
+        {
+            spr.sprite = sprite;
+        }
+    }
+
+    public float GetAbilityPercent(int id)
+    {
+        PlayerAbility ability = Player.instance.equippedPassiveAbilities[id];
+        if (ability.currentAmmo > 0) return 0;
+
+        float current = ability.currentCooldown;
+        float max = ability.maxCooldown;
+        float percent = 0;
+        if (current > 0) percent = (current / max);
+        return percent;
     }
 
     public void SetPlayerCharacter(Sprite icon, string name)
@@ -109,6 +162,36 @@ public class PlayerUI : MonoBehaviour
             UpdateStageTime();
             bossBarGroup.alpha = Mathf.MoveTowards(bossBarGroup.alpha, Map.isBossWave ? 1 : 0, Time.deltaTime);
         }
+        if (Player.instance == null) return;
+        UpdateAbilityUI();
+    }
+
+    void UpdateAbilityUI()
+    {
+        int currentAbility = Player.instance.currentWeapon;
+        if (currentAbility == 0)
+        {
+            abilityIcon1.SetFrame(true);
+            abilityIcon2.SetFrame(false);
+            abilityIcon3.SetFrame(false);
+        }
+        if (currentAbility == 1)
+        {
+            abilityIcon1.SetFrame(false);
+            abilityIcon2.SetFrame(true);
+            abilityIcon3.SetFrame(false);
+        }
+        if (currentAbility == 2)
+        {
+            abilityIcon1.SetFrame(false);
+            abilityIcon2.SetFrame(false);
+            abilityIcon3.SetFrame(true);
+        }
+
+        if (Player.instance.equippedPassiveAbilities.Count > 0) abilityIcon1.setCooldown(GetAbilityPercent(0));
+        if (Player.instance.equippedPassiveAbilities.Count > 1) abilityIcon2.setCooldown(GetAbilityPercent(1));
+        if (Player.instance.equippedPassiveAbilities.Count > 2) abilityIcon3.setCooldown(GetAbilityPercent(2));
+        ammoNumber.text = $"{Player.instance.equippedPassiveAbilities[currentAbility].currentAmmo}/{Player.instance.equippedPassiveAbilities[currentAbility].maxAmmo}";
     }
 
     public void SetStageText(string text)
@@ -122,16 +205,6 @@ public class PlayerUI : MonoBehaviour
         float width = (int)(182f * health);
         bossBarTransform.sizeDelta = new Vector2(width, bossBarTransform.sizeDelta.y);
         bossBarHPText.text = $"{current}/{max}";
-    }
-
-    public void SetWeaponIcon(Sprite sprite, int level, bool maxed)
-    {
-        abilityIcons[0].Display(sprite, level, maxed, false);
-    }
-
-    public void SetWeaponLevel(int level, bool maxed)
-    {
-        abilityIcons[0].SetLevel(level, maxed, false);
     }
 
     public void SetUltimateIcon(Sprite sprite, int level, bool maxed)
@@ -159,12 +232,18 @@ public class PlayerUI : MonoBehaviour
 
     public void SetPassiveIcon(Sprite sprite, int level, bool maxed, int id)
     {
-        abilityIcons[id + 1].Display(sprite, level, maxed, false);
+        //abilityIcons[id].Display(sprite, level, maxed, false);
+        if (id == 0) abilityIcon1.SetAbilityIcon(sprite, level, maxed, false);
+        if (id == 1) abilityIcon2.SetAbilityIcon(sprite, level, maxed, false);
+        if (id == 2) abilityIcon3.SetAbilityIcon(sprite, level, maxed, false);
     }
 
     public void SetPassiveLevel(int level, bool maxed, int id)
     {
-        abilityIcons[id + 1].SetLevel(level, maxed, false);
+        //abilityIcons[id].SetLevel(level, maxed, false);
+        if (id == 0) abilityIcon1.SetLevel(level, maxed, false);
+        if (id == 1) abilityIcon2.SetLevel(level, maxed, false);
+        if (id == 2) abilityIcon3.SetLevel(level, maxed, false);
     }
 
     public void SetItemIcon(Sprite sprite, int level, bool maxed, int id)
@@ -261,8 +340,7 @@ public class PlayerUI : MonoBehaviour
     public void UpdateSpecial()
     {
         float special = (float)Player.instance.CurrentSP / (float)Player.instance.MaxSP;
-        float width = (int)(135f * special);
-        spBar.fillAmount = 1f - special;
+        spBar.fillAmount = special;
         //spTransform.sizeDelta = new Vector2(width, spTransform.sizeDelta.y);
     }
 

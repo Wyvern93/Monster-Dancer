@@ -28,6 +28,8 @@ public class LunarRainRay : MonoBehaviour
         
     }
 
+
+
     public void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Enemy"))
@@ -37,26 +39,8 @@ public class LunarRainRay : MonoBehaviour
             float damage = Player.instance.currentStats.Atk * dmg;
             bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
             if (isCritical) damage *= Player.instance.currentStats.CritDmg;
-
-            bool damageAnotherEnemy = false;
-            if ((int)Player.instance.abilityValues["ability.lunarrain.level"] >= 7)
-            {
-                if (enemy.CurrentHP - damage <= 0)
-                {
-                    damageAnotherEnemy = true;
-                }
-            }
             
             enemy.TakeDamage((int)damage, isCritical);
-
-            if (damageAnotherEnemy)
-            {
-                Enemy e = Map.GetRandomClosebyEnemy();
-                if (e == null) return;
-
-                LunarRainRay ray = PoolManager.Get<LunarRainRay>();
-                ray.transform.position = e.transform.position;
-            }
         }
 
         if (collision.CompareTag("FairyCage"))
