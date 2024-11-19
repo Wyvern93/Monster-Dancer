@@ -73,7 +73,7 @@ public class CarrotBarrageAbility : PlayerAbility
         }
         UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, maxAmmo);
 
-        float dmg = level < 4 ? level < 2 ? 25 : 40 : 65;
+        float dmg = level < 4 ? level < 2 ? 15 : 25 : 40;
         int numberOfCarrots = level < 5 ? 3 : 5;
 
         Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
@@ -84,7 +84,7 @@ public class CarrotBarrageAbility : PlayerAbility
         baseAngle -= 10;
 
         float distanceToCursor = (crosshairPos - (Vector2)Player.instance.transform.position).magnitude;
-        distanceToCursor = Mathf.Clamp(distanceToCursor, 0, 5);
+        distanceToCursor = Mathf.Clamp(distanceToCursor, 0, 7);
 
         for (int i = 0; i < numberOfCarrots; i++) 
         {

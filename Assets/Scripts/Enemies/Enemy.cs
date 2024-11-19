@@ -177,7 +177,7 @@ public abstract class Enemy : MonoBehaviour
         if (GameManager.runData == null) return;
         if (origHealth == 0) origHealth = MaxHP;
         float minutes = (Map.StageTime / 120f) + (6 * GameManager.runData.stageMulti);
-        float scale = 1 + Mathf.Clamp(minutes - 1, 0, 10000);
+        float scale = 1 + (Mathf.Clamp(minutes - 1, 0, 10000)/4f);
         // Minute 0 -> 1x
         // Minute 10 -> 10x
         int baseHealth = (int)(origHealth * scale);
