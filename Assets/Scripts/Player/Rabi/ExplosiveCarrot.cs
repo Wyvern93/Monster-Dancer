@@ -13,12 +13,10 @@ public class ExplosiveCarrot : MonoBehaviour, IDespawneable
     [SerializeField] SpriteRenderer carrotSpr;
 
     public float dmg;
-    int level;
     private Vector2 origDir;
 
     public void Init(Vector3 dir)
     {
-        level = (int)Player.instance.abilityValues["ability.carrotbarrage.level"];
         transform.localScale = Vector3.one * (isSmall ? 0.75f : 1f);
         height = 0.3f;
         origDir = dir;
@@ -53,16 +51,6 @@ public class ExplosiveCarrot : MonoBehaviour, IDespawneable
             transform.position = Vector3.MoveTowards(transform.position, end, Time.deltaTime * 8f);
             
             yield return new WaitForEndOfFrame();
-        }
-        
-        if (!isSmall && level >= 7)
-        {
-            float angleDiff = 360f / 3f;
-            for (int i = 0; i < 3; i++)
-            {
-                Vector2 dir = BulletBase.angleToVector((angleDiff * i) + BulletBase.VectorToAngle(origDir));
-                CastCarrot(dir, dmg, i == 0);
-            }
         }
 
         CarrotExplosion carrotExplosion = PoolManager.Get<CarrotExplosion>();

@@ -53,6 +53,6 @@ public class CursedNecklaceItemEnhancement : Enhancement
 
     public override EnhancementType GetEnhancementType()
     {
-        return EnhancementType.StackableItem;
+        return EnhancementType.Item;
     }
 }

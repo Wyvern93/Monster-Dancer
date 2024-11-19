@@ -65,11 +65,11 @@ public class FlamingDrill : MonoBehaviour, IDespawneable
             enemy.TakeDamage((int)damage, isCritical);
             foreach (PlayerItem item in Player.instance.equippedItems)
             {
-                item.OnHit(Player.instance.equippedPassiveAbilities.Find(x => x.GetType() == typeof(PiercingShotAbility)), damage, enemy);
+                //item.OnHit(Player.instance.equippedPassiveAbilities.Find(x => x.GetType() == typeof(PiercingShotAbility)), damage, enemy);
             }
             foreach (PlayerItem item in Player.instance.evolvedItems)
             {
-                item.OnHit(Player.instance.equippedPassiveAbilities.Find(x => x.GetType() == typeof(PiercingShotAbility)), damage, enemy);
+                //item.OnHit(Player.instance.equippedPassiveAbilities.Find(x => x.GetType() == typeof(PiercingShotAbility)), damage, enemy);
             }
             if (!firstHit)
             {

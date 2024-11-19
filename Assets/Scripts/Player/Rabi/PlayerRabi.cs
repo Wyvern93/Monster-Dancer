@@ -70,23 +70,18 @@ public class PlayerRabi : Player
         PoolManager.CreatePool(typeof(MoonlightDaggerWave), moonlightDaggerWavePrefab, 12);
         PoolManager.CreatePool(typeof(ExplosiveCarrot), explosiveCarrot, 120);
         PoolManager.CreatePool(typeof(SmokeExplosion), smokeExplosionPrefab, 100);
-        PoolManager.CreatePool(typeof(RabiClone), rabiClonePrefab, 10);
         PoolManager.CreatePool(typeof(CarrotExplosion), carrotExplosionPrefab, 120);
         PoolManager.CreatePool(typeof(MoonbeamLaser), moonBeamPrefab, 4);
-        PoolManager.CreatePool(typeof(OrbitalMoon), orbitalMoonPrefab, 12);
         PoolManager.CreatePool(typeof(CarrotJuice), carrotJuicePrefab, 12);
         PoolManager.CreatePool(typeof(CarrotJuiceBottle), carrotJuiceBottlePrefab, 4);
-        PoolManager.CreatePool(typeof(LunarPulse), lunarPulsePrefab, 12);
         PoolManager.CreatePool(typeof(LunarRainRay), lunarRainBeamPrefab, 30);
         PoolManager.CreatePool(typeof(CarrotDeliveryTruck), truckPrefab, 20);
         PoolManager.CreatePool(typeof(CarrotBullet), carrotBulletPrefab, 150);
         PoolManager.CreatePool(typeof(MoonlightShockwave), moonlightShockwavePrefab, 30);
         PoolManager.CreatePool(typeof(RabiEclipse), rabiEclipsePrefab, 1);
-        PoolManager.CreatePool(typeof(PiercingShot), piercingShotPrefab, 10);
         PoolManager.CreatePool(typeof(CarrotBuster), carrotBusterPrefab, 1);
         PoolManager.CreatePool(typeof(CarrotCopter), carrotcopterPrefab, 8);
         PoolManager.CreatePool(typeof(MoonlightFlower), moonlightFlowerPrefab, 8);
-        PoolManager.CreatePool(typeof(LunarAura), lunarAuraPrefab, 1);
         PoolManager.CreatePool(typeof(JuiceExplosion), juiceExplosionPrefab, 5);
 
         PoolManager.CreatePool(typeof(SanctuaryAura), sanctuaryPrefab, 1);
@@ -104,10 +99,7 @@ public class PlayerRabi : Player
             new MoonlightDaggersEnhancement(),
             new CarrotBarrageAbilityEnhancement(),
             new MoonBeamAbilityEnhancement(),
-            new OrbitalMoonAbilityEnhancement(),
             new CarrotJuiceAbilityEnhancement(),
-            //new LunarAuraAbilityEnhancement(),
-            //new PiercingShotAbilityEnhancement(),
             new LunarRainAbilityEnhancement(),
             new CarrotDeliveryAbilityEnhancement(),
             new EclipseAbilityEnhancement(),
@@ -148,22 +140,17 @@ public class PlayerRabi : Player
         PoolManager.RemovePool(typeof(MoonlightDaggerWave));
         PoolManager.RemovePool(typeof(ExplosiveCarrot));
         PoolManager.RemovePool(typeof(CarrotExplosion));
-        PoolManager.RemovePool(typeof(RabiClone));
         PoolManager.RemovePool(typeof(SmokeExplosion));
         PoolManager.RemovePool(typeof(MoonbeamLaser));
-        PoolManager.RemovePool(typeof(OrbitalMoon));
         PoolManager.RemovePool(typeof(CarrotJuice));
         PoolManager.RemovePool(typeof(CarrotJuiceBottle));
-        PoolManager.RemovePool(typeof(LunarPulse));
         PoolManager.RemovePool(typeof(LunarRainRay));
         PoolManager.RemovePool(typeof(CarrotDeliveryTruck));
         PoolManager.RemovePool(typeof(CarrotBullet));
         PoolManager.RemovePool(typeof(RabiEclipse));
-        PoolManager.RemovePool(typeof(PiercingShot));
         PoolManager.RemovePool(typeof(CarrotBuster));
         PoolManager.RemovePool(typeof(CarrotCopter));
         PoolManager.RemovePool(typeof(MoonlightFlower));
-        PoolManager.RemovePool(typeof(LunarAura));
         PoolManager.RemovePool(typeof(JuiceExplosion));
 
         PoolManager.RemovePool(typeof(SanctuaryAura));
@@ -497,12 +484,6 @@ public class PlayerRabi : Player
         else
         {
             invulTime = 0.2f;
-        }
-
-        RabbitReflexesAbility reflexes = (RabbitReflexesAbility)equippedPassiveAbilities.FirstOrDefault(x=> x.GetType() == typeof(RabbitReflexesAbility));
-        if (reflexes != null)
-        {
-            reflexes.OnDamage();
         }
 
         bool doDamage = true;

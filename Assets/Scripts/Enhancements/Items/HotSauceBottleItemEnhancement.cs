@@ -38,8 +38,8 @@ public class HotSauceBottleItemEnhancement : Enhancement
         bool available = false;
         if (Player.instance.equippedItems.Count == 6) return available = false;
         if (Player.instance.equippedItems.Find(x => x.getId() == getId()) != null) return available = false;
-        if (Player.instance.equippedPassiveAbilities.Any(x => x.GetType() == typeof(PiercingShotAbility))) return true;
-        if (Player.instance.equippedPassiveAbilities.Any(x => x.GetType() == typeof(OrbitalMoonAbility))) return true;
+        //if (Player.instance.equippedPassiveAbilities.Any(x => x.GetType() == typeof(PiercingShotAbility))) return true;
+        //if (Player.instance.equippedPassiveAbilities.Any(x => x.GetType() == typeof(OrbitalMoonAbility))) return true;
         return available;
     }
 
@@ -55,7 +55,7 @@ public class HotSauceBottleItemEnhancement : Enhancement
 
     public override EnhancementType GetEnhancementType()
     {
-        return EnhancementType.EvolutionItem;
+        return EnhancementType.Item;
     }
 
     public override void OnEquip()

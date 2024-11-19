@@ -16,16 +16,12 @@ public class MoonbeamLaser : MonoBehaviour
     private int frames;
 
     public Vector3 start, end;
-    int level;
     float abilityDamage;
     Vector2 diff;
 
     void OnEnable()
     {
-        int abilityLevel = (int)Player.instance.abilityValues["ability.moonbeam.level"];
-        level = abilityLevel;
-
-        abilityDamage = abilityLevel < 4 ? abilityLevel < 2 ? 40 : 60 : 80;
+        abilityDamage = 40f;
         AudioController.PlaySound(sound);
         SetPosition();
         timer = 0;

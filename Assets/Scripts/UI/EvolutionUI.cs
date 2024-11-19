@@ -136,8 +136,6 @@ public class EvolutionUI : MonoBehaviour
         if (ability == null) return false;
         if (item == null) return false;
         if (ability.isEvolved()) return false;
-
-        if (ability.GetLevel() < 7) return false;
         if (item.GetType() == ability.getEvolutionItemType()) return true;
         return false;
     }
@@ -219,7 +217,6 @@ public class EvolutionUI : MonoBehaviour
 
                 if (ability.isEvolved()) continue;
                 if (item == null) continue;
-                if (ability.GetLevel() < 7) continue;
 
                 if (item.GetType() == ability.getEvolutionItemType())
                 {

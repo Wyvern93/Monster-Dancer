@@ -21,11 +21,6 @@ public abstract class PlayerItem
     public abstract string getItemDescription();
     public abstract string getId();
 
-    public virtual int GetLevel()
-    {
-        return (int)Player.instance.itemValues[$"item.{getId()}.level"];
-    }
-
     public virtual float OnPreHeal(float amount)
     {
         return amount;

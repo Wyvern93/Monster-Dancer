@@ -7,7 +7,6 @@ public class CarrotCopter : MonoBehaviour, IDespawneable
     private Enemy currentTarget;
     private Vector2 targetPos;
     private bool isInRange;
-    private int level;
     private float dmg;
     private float speed;
     private float currentDistance;
@@ -75,9 +74,8 @@ public class CarrotCopter : MonoBehaviour, IDespawneable
 
     private void UpdateStats()
     {
-        level = (int)Player.instance.abilityValues["ability.carrotcopter.level"];
-        dmg = level < 4 ? level < 2 ? 15 : 30 : 45; // 200% 200%
-        speed = level < 6 ? level < 3 ? 1f : 2f : 3f; // 25%
+        dmg = 15f; // 200% 200%
+        speed = 1f; // 25%
         // Lvl 2 and 4 DMG+
         // Lvl 5 Ammo
         // So Lvl 3 and 6 should be speed
@@ -91,7 +89,7 @@ public class CarrotCopter : MonoBehaviour, IDespawneable
         shootFx.SetActive(true);
         CarrotBullet carrot = PoolManager.Get<CarrotBullet>();
         carrot.transform.position = transform.position;
-        carrot.isPiercing = level >= 7;
+        carrot.isPiercing = false;
         carrot.dmg = dmg;
         carrot.abilitySource = Player.instance.equippedPassiveAbilities.Find(x => x.GetType() == typeof(CarrotcopterAbility));
         Player.instance.despawneables.Add(carrot.GetComponent<IDespawneable>());

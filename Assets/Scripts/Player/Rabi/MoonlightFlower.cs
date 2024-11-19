@@ -6,7 +6,6 @@ public class MoonlightFlower : MonoBehaviour, IDespawneable
 {
     public int beats;
     public float dmg;
-    public int level;
     private List<Enemy> enemies = new List<Enemy>();
     private float speed;
     [SerializeField] AudioClip sfx;
@@ -19,9 +18,8 @@ public class MoonlightFlower : MonoBehaviour, IDespawneable
         transform.localScale = Vector3.one * scale;
         enemies.Clear();
         GetComponent<Animator>().speed = 1f / BeatManager.GetBeatDuration();
-        level = (int)Player.instance.abilityValues["ability.moonlightflower.level"];
-        beats = level < 3 ? 6 : 10;
-        dmg = level < 4 ? level < 2 ? 3f : 6f : 12f;
+        beats = 6;
+        dmg = 3f;
         dmg *= Player.instance.itemValues["orbitalDamage"];
         speed = 4 * Player.instance.itemValues["orbitalSpeed"];
         AudioController.PlaySound(sfx);
@@ -67,12 +65,6 @@ public class MoonlightFlower : MonoBehaviour, IDespawneable
                 float damage = (int)(Player.instance.currentStats.Atk * dmg);
                 bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
                 if (isCritical) damage *= Player.instance.currentStats.CritDmg;
-
-                if (level >= 7)
-                {
-                    Vector2 dir = enemies[i].transform.position - Player.instance.transform.position;
-                    enemies[i].PushEnemy(dir, 1f);
-                }
                 enemies[i].TakeDamage((int)damage, isCritical);
             }
         }

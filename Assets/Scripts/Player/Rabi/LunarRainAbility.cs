@@ -46,14 +46,6 @@ public class LunarRainAbility : PlayerAbility
     }
     public override void OnCast()
     {
-        int level = (int)Player.instance.abilityValues["ability.lunarrain.level"];
-        //maxCooldown = level < 5 ? level < 3 ? 4 : 2 : 1;
-        //currentCooldown = maxCooldown;
-
-        //maxCooldown = 4;//level < 4 ? 3 : 2;
-        //currentCooldown = maxCooldown;
-        //maxAmmo = 3;
-        //maxAttackSpeedCD = 2f;
         List<Enemy> enemies = getAllEnemies();
         if (enemies.Count <= 0) return;
 

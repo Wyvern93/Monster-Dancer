@@ -252,14 +252,10 @@ public class Player : MonoBehaviour
         foreach (PlayerAbility ability in equippedPassiveAbilities)
         {
             if (ability.isEvolved()) continue;
-            if (ability.GetLevel() >= 7)
-            {
-                PlayerItem item = equippedItems.FirstOrDefault(x => x.GetType() == ability.getEvolutionItemType());
-                
-                if (item == null) continue;
 
-                if (item.GetLevel() >= 1) return true;
-            }
+            PlayerItem item = equippedItems.FirstOrDefault(x => x.GetType() == ability.getEvolutionItemType());
+            if (item == null) continue;
+            return true;
         }
         return false;
     }

@@ -46,7 +46,6 @@ public class MoonlightFlowerAbility : PlayerAbility
 
     public override void OnCast()
     {
-        int level = (int)Player.instance.abilityValues["ability.moonlightflower.level"];
         if (currentAmmo - 1 > 0)
         {
             currentAmmo--;

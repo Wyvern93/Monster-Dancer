@@ -58,9 +58,7 @@ public class CarrotcopterAbility : PlayerAbility, IPlayerProjectile
 
     public override void OnCast()
     {
-        int level = (int)Player.instance.abilityValues["ability.carrotcopter.level"];
-
-        maxAmmo = level < 5 ? 4 : 8;
+        maxAmmo = 4;
 
         bool canShoot = currentDrone.CanShoot();
         if (!canShoot) return;

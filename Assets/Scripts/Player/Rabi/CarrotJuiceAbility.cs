@@ -44,7 +44,6 @@ public class CarrotJuiceAbility : PlayerAbility
     }
     public override void OnCast()
     {
-        int level = (int)Player.instance.abilityValues["ability.carrotjuice.level"];
         if (currentAmmo - 1 > 0)
         {
             currentAmmo--;

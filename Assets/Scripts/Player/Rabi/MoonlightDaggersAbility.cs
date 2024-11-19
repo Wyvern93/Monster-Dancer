@@ -45,11 +45,6 @@ public class MoonlightDaggersAbility : PlayerAbility, IPlayerProjectile
 
     public override void OnCast()
     {
-        int level = (int)Player.instance.abilityValues["ability.moonlightdaggers.level"];
-
-        //maxCooldown = 4;//level < 4 ? 3 : 2;
-        //maxAmmo = 2;
-        //maxAttackSpeedCD = 0f;
         if (currentAmmo - 1 > 0)
         {
             currentAmmo--;

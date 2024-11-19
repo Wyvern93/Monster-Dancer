@@ -51,12 +51,9 @@ public class CarrotBarrageAbility : PlayerAbility
 
     public override void OnCast()
     {
-        int level = (int)Player.instance.abilityValues["ability.carrotbarrage.level"];
         carrots.Clear();
-        //maxCooldown = level < 6 ? level < 3 ? 10 : 8 : 6;
         
-        maxCooldown = 4;//level < 4 ? 3 : 2;
-        //currentCooldown = maxCooldown;
+        maxCooldown = 4;
         maxAmmo = 3;
         maxAttackSpeedCD = 2f;
         if (currentAmmo - 1 > 0)
@@ -73,8 +70,8 @@ public class CarrotBarrageAbility : PlayerAbility
         }
         UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, maxAmmo);
 
-        float dmg = level < 4 ? level < 2 ? 15 : 25 : 40;
-        int numberOfCarrots = level < 5 ? 3 : 5;
+        float dmg = 15f;
+        int numberOfCarrots = 3;
 
         Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
         Vector2 difference = (crosshairPos - (Vector2)Player.instance.transform.position).normalized;

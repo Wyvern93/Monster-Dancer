@@ -34,13 +34,12 @@ public class FlamingDrillAbilityEvolution : PlayerAbility, IPlayerProjectile
 
     public override void OnCast()
     {
-        int level = (int)Player.instance.abilityValues["ability.flamingdrill.level"];
         maxCooldown = 7;
         currentCooldown = maxCooldown;
-        Player.instance.StartCoroutine(CastCoroutine(level));
+        Player.instance.StartCoroutine(CastCoroutine());
     }
 
-    public IEnumerator CastCoroutine(int level)
+    public IEnumerator CastCoroutine()
     {
         float time = BeatManager.GetBeatDuration() * 2f;
         AudioController.PlaySound((Player.instance as PlayerRabi).flamingDrillChargeSound);
@@ -55,11 +54,11 @@ public class FlamingDrillAbilityEvolution : PlayerAbility, IPlayerProjectile
         Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
         Vector2 difference = (crosshairPos - (Vector2)Player.instance.transform.position).normalized;
 
-        ShootCarrot(difference, level);
+        ShootCarrot(difference);
         yield break;
     }
 
-    public void ShootCarrot(Vector2 direction, int level)
+    public void ShootCarrot(Vector2 direction)
     {
         FlamingDrill carrot = PoolManager.Get<FlamingDrill>();
         carrot.transform.position = Player.instance.transform.position;

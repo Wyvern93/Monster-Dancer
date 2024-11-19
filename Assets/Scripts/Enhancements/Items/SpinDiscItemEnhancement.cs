@@ -60,6 +60,6 @@ public class SpindiscItemEnhancement : Enhancement
 
     public override EnhancementType GetEnhancementType()
     {
-        return EnhancementType.StackableItem;
+        return EnhancementType.Item;
     }
 }

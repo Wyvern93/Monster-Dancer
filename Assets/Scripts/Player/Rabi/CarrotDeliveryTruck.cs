@@ -7,7 +7,6 @@ public class CarrotDeliveryTruck : MonoBehaviour, IDespawneable
     public int numbeats;
     public int lap, maxlaps;
     public int dmg;
-    public int level;
     public float velocity;
     public float cd, maxcd;
 
@@ -29,13 +28,12 @@ public class CarrotDeliveryTruck : MonoBehaviour, IDespawneable
     };
     public void OnEnable()
     {
-        level = (int)Player.instance.abilityValues["ability.carrotdelivery.level"];
         dmg = 150;
-        maxlaps = level < 5 ? 4 : 8;
+        maxlaps = 4;
         facingRight = true;
         transform.position = new Vector3(Player.instance.transform.position.x - 12, Player.instance.transform.position.y + offsets[0], 0);
         lap = 0;
-        velocity = level < 5 ? 10f : 15f;
+        velocity = 10f;
         transform.localScale = Vector3.one;
         maxcd = BeatManager.GetBeatDuration() / 8;
     }
@@ -96,7 +94,7 @@ public class CarrotDeliveryTruck : MonoBehaviour, IDespawneable
 
         Vector2 dir = ((Vector2)e.transform.position - (Vector2)transform.position).normalized;
         carrot.SetDirection(dir);
-        carrot.dmg = level < 4 ? level < 2 ? 20 : 35 : 50;
+        carrot.dmg = 20;
 
         AudioController.PlaySound(shootSound, Random.Range(0.9f, 1.1f));
     }
@@ -118,12 +116,6 @@ public class CarrotDeliveryTruck : MonoBehaviour, IDespawneable
         {
             FairyCage cage = collision.GetComponent<FairyCage>();
             cage.OnHit();
-        }
-
-        if (collision.CompareTag("Bullet") && level >= 7)
-        {
-            Bullet bullet = collision.GetComponent<Bullet>();
-            bullet.Despawn();
         }
     }
 

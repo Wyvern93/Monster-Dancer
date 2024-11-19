@@ -65,11 +65,6 @@ public abstract class PlayerAbility
         return null;
     }
 
-    public virtual int GetLevel()
-    {
-        return (int)Player.instance.abilityValues[$"ability.{getId()}.level"];
-    }
-
     public virtual bool onPlayerPreHurt(float dmg) { return true; }
     public virtual void OnPlayerPostHurt() { }
 

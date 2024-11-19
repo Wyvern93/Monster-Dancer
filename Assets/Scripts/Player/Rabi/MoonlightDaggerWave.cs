@@ -18,7 +18,6 @@ public class MoonlightDaggerWave : MonoBehaviour, IDespawneable, IPlayerProjecti
     public void OnEnable()
     {
         dir = Vector3.zero;
-        int level = (int)Player.instance.abilityValues["ability.moonlightdaggers.level"];
         pierce = (int)Player.instance.abilityValues["Attack_Pierce"];
         hasExploded = false;
         animator.speed = 1f / BeatManager.GetBeatDuration() * 2f;

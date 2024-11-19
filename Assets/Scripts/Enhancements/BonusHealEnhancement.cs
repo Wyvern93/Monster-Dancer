@@ -27,11 +27,6 @@ public class BonusHealEnhancement : Enhancement
         return IconList.instance.heal;
     }
 
-    public override int getLevel()
-    {
-        return 0;
-    }
-
     public override string getName()
     {
         return "Heal";

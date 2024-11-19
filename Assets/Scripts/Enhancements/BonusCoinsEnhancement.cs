@@ -29,11 +29,6 @@ public class BonusCoinsEnhancement : Enhancement
         return IconList.instance.coins;
     }
 
-    public override int getLevel()
-    {
-        return 0;
-    }
-
     public override string getName()
     {
         return "Monster Coins";

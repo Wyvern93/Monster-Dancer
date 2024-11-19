@@ -5,24 +5,7 @@ public class BunnyHopAbilityEnhancement : Enhancement
 {
     public override string GetDescription()
     {
-        int level = getLevel() + 1;
-        if (level == 1)
-        {
-            return "Rabi can jump over tiles and obstacles, leaving behind a perfectly identical clone that lasts for <color=\"yellow\">20</color> beats.";
-        }
-        if (level == 2)
-        {
-            return "Reduces the cooldown from <color=\"yellow\">20 -> 16</color> beats.";
-        }
-        if (level == 3)
-        {
-            return "Reduces the cooldown from <color=\"yellow\">16 -> 12</color> beats.";
-        }
-        if (level == 4)
-        {
-            return "Rabi's perfectly identical clone lasts <color=\"yellow\">12 -> 20</color> beats.";
-        }
-        return "";
+        return "Rabi can jump over tiles and obstacles, leaving behind a perfectly identical clone that lasts for <color=\"yellow\">20</color> beats.";
     }
 
     public override string getId()

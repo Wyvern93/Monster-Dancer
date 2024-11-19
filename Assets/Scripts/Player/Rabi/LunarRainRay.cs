@@ -4,16 +4,13 @@ public class LunarRainRay : MonoBehaviour
 {
     public float cooldown;
     public float dmg;
-    int level;
 
     [SerializeField] SpriteRenderer spriteRenderer;
     [SerializeField] AudioClip sound;
     float alpha;
     public void OnEnable()
     {
-        level = (int)Player.instance.abilityValues["ability.lunarrain.level"];
-
-        dmg = level < 4 ? level < 2 ? 15f : 30f : 50f;
+        dmg = 15f;
 
         AudioController.PlaySound(sound, Random.Range(0.8f, 1.2f));
     }

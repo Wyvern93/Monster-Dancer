@@ -5,15 +5,13 @@ public class RabiEclipse : MonoBehaviour, IDespawneable
     [SerializeField] AudioClip pulseSfx;
     [SerializeField] Animator animator;
     [SerializeField] AudioSource sfxSource;
-    int level;
     int dmg;
     float time;
     float healing;
     public void OnEnable()
     {
         animator.speed = 1f / BeatManager.GetBeatDuration() / 2F;
-        level = (int)Player.instance.abilityValues["ability.eclipse.level"];
-        string anim = level < 5 ? level < 2 ? "Eclipse" : "EclipseMedium" : "EclipseLong";
+        string anim = "EclipseMedium";
         animator.Play(anim);
 
         dmg = 12;
@@ -25,8 +23,7 @@ public class RabiEclipse : MonoBehaviour, IDespawneable
     public void PlayPulse()
     {
         PlayerCamera.TriggerCameraShake(0.3f, 0.3f);
-        level = (int)Player.instance.abilityValues["ability.eclipse.level"];
-        healing = level < 6 ? level < 4 ? 0.06f : 0.08f : 0.1f;
+        healing = 0.08f;
         int healnumber = (int)(Player.instance.currentStats.MaxHP * healing);
         Player.instance.Heal(healnumber);
         AudioController.PlaySound(pulseSfx);
@@ -50,15 +47,14 @@ public class RabiEclipse : MonoBehaviour, IDespawneable
 
             bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
             if (isCritical) damage *= Player.instance.currentStats.CritDmg;
-            if (level >= 3) damage += (enemy.MaxHP * 0.05f);
+            damage += (enemy.MaxHP * 0.05f);
 
             enemy.TakeDamage((int)damage, isCritical);
         }
         if (collision.CompareTag("Bullet"))
         {
             Bullet bullet = collision.GetComponent<Bullet>();
-            if (level >= 7) bullet.Despawn();
-            else bullet.OnStun(3);
+            bullet.Despawn();
         }
     }
     public void Update()
@@ -68,12 +64,7 @@ public class RabiEclipse : MonoBehaviour, IDespawneable
             sfxSource.volume = Mathf.MoveTowards(sfxSource.volume, 1f, Time.deltaTime / BeatManager.GetBeatDuration());
         }
 
-        if (time >= 4 && level < 5)
-        {
-            sfxSource.volume = Mathf.MoveTowards(sfxSource.volume, 0, (Time.deltaTime / BeatManager.GetBeatDuration()) * 4f);
-        }
-
-        if (time >= 6 && level >= 5)
+        if (time >= 4)
         {
             sfxSource.volume = Mathf.MoveTowards(sfxSource.volume, 0, (Time.deltaTime / BeatManager.GetBeatDuration()) * 4f);
         }

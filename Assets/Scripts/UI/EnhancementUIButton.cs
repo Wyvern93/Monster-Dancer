@@ -21,9 +21,6 @@ public class EnhancementUIButton : MonoBehaviour
         currentEnhancement = enhancement;
         title.text = enhancement.getName();
 
-        int level = enhancement.getLevel() + 1;
-        if (level > 1 && enhancement.GetEnhancementType() == EnhancementType.Ability) title.text += " Lv. " + level;
-
         description.text = enhancement.GetDescription();
         type.text = enhancement.getDescriptionType();
 

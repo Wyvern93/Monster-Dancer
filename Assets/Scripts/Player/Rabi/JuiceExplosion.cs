@@ -7,8 +7,7 @@ public class JuiceExplosion : MonoBehaviour
 
     private void OnEnable()
     {
-        int level = (int)Player.instance.abilityValues["ability.carrotjuice.level"];
-        dmg = level < 6 ? level < 4 ? level < 2 ? 8f : 12f : 18f : 20f;
+        dmg = 8f;
     }
     public void OnFinish()
     {

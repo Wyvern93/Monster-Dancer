@@ -55,7 +55,7 @@ public class FireworksKitItemEnhancement : Enhancement
 
     public override EnhancementType GetEnhancementType()
     {
-        return EnhancementType.EvolutionItem;
+        return EnhancementType.Item;
     }
 
     public override void OnEquip()

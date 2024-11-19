@@ -9,8 +9,7 @@ public class CarrotBuster : MonoBehaviour
     public void OnEnable()
     {
         transform.parent = Player.instance.transform;
-        int level = (int)Player.instance.abilityValues["ability.carrotbuster.level"];
-        abilityDamage = level < 4 ? level < 2 ? 12 : 18 : 24; // 200% 200%
+        abilityDamage = 12; // 200% 200%
         left = !left;
         animator.Play(left ? "carrotbuster_left" : "carrotbuster_right");
         AudioController.PlaySound(sfx, Random.Range(0.95f, 1.05f));

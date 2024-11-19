@@ -14,11 +14,10 @@ public class CarrotJuice : MonoBehaviour, IDespawneable
 
     public void OnEnable()
     {
-        int level = (int)Player.instance.abilityValues["ability.carrotjuice.level"];
-        targetSize = level < 5 ? 1f : 1.5f;
+        targetSize = 1f;
         transform.localScale = Vector3.one * 0.1f;
 
-        dmg = level < 6 ? level < 4 ? level < 2 ? 4f : 6f : 8f : 12f;
+        dmg = 4f;
 
         enemies = new List<Enemy>();
         beats = 12;

@@ -5,7 +5,6 @@ using UnityEngine;
 public class CarrotDeliveryAbility : PlayerAbility, IPlayerProjectile
 {
     public int minCooldown = 1;
-    int level;
 
     public override bool CanCast()
     {
@@ -37,7 +36,6 @@ public class CarrotDeliveryAbility : PlayerAbility, IPlayerProjectile
 
     public override void OnCast()
     {
-        level = (int)Player.instance.abilityValues["ability.carrotdelivery.level"];
         Player.instance.CurrentSP = 0;
         UIManager.Instance.PlayerUI.UpdateSpecial();
         Player.instance.StartCoroutine(UltimateCast());

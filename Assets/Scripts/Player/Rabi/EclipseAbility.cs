@@ -7,7 +7,6 @@ using UnityEngine.Experimental.Rendering.Universal;
 public class EclipseAbility : PlayerAbility
 {
     public int minCooldown = 1;
-    int level;
 
     public override bool CanCast()
     {
@@ -39,7 +38,6 @@ public class EclipseAbility : PlayerAbility
 
     public override void OnCast()
     {
-        level = (int)Player.instance.abilityValues["ability.eclipse.level"];
         Player.instance.CurrentSP = 0;
         UIManager.Instance.PlayerUI.UpdateSpecial();
         Player.instance.StartCoroutine(UltimateCast());
