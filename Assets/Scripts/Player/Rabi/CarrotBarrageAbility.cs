@@ -1,34 +1,84 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using System.Linq;
 using UnityEngine;
 
-public class CarrotBarrageAbility : PlayerAbility
+public class CarrotBarrageAbility : PlayerAbility, IPlayerExplosion
 {
     private List<ExplosiveCarrot> carrots = new List<ExplosiveCarrot>();
-    
-    public CarrotBarrageAbility()
-    {
-        maxAmmo = 3;
-        maxAttackSpeedCD = 3f;
-        maxCooldown = 6;
 
-        currentAmmo = maxAmmo;
+    public override float GetDamage() // Explosion Damage
+    {
+        float explosionSize = itemValues["explosionSize"];
+        float explosionDamage = itemValues["explosionDamage"];
+        if (hasItem(typeof(DetonationCatalystItem)))
+        {
+            explosionDamage *= explosionSize;
+        }
+        return Mathf.Clamp(baseDamage * itemValues["damageMultiplier"] * explosionDamage, 1, 10000);
+    }
+
+    public override float GetSize()
+    {
+        float rawSize = baseSize * itemValues["sizeMultiplier"] * itemValues["explosionSize"];
+        return Mathf.Clamp(rawSize, 1, 100);
+    }
+
+    public CarrotBarrageAbility() : base()
+    {
+        baseAmmo = 3;
+        baseAttackSpeed = 2f;
+        baseCooldown = 4;
+        baseDamage = 25;
+        baseKnockback = 0;
+        baseCritChance = 0;
+        baseDuration = 2;
+        baseSpeed = 8;
+        baseReach = 7;
+        baseSpread = 15;
+        baseSize = 1.5f;
+
+        currentAmmo = GetMaxAmmo();
         currentAttackSpeedCD = 0;
         currentCooldown = 0;
     }
+
+    public override string getAbilityDescription()
+    {
+        string starColor = GetStarColorText();
+
+        string description = $"<color=#FFFF88>Shoots three carrots in a cone into the air that explode after falling</color>\n\n";
+        description += AddStat("Uses", baseAmmo, GetMaxAmmo(), true);
+        description += AddStat("Cooldown", baseCooldown, GetMaxCooldown(), false, " Beats");
+        description += AddStat("Attack Speed", baseAttackSpeed, GetAttackSpeed(), false, " Beats");
+        description += AddStat("Damage per Wave", baseDamage, GetDamage(), true);
+        description += AddStat("Crit Chance", baseCritChance * 100, GetCritChance() * 100, true, "%");
+        description += AddStat("Reach", baseReach, GetReach(), true);
+        description += AddStat("Spread", baseSpread, GetSpread(), true);
+        description += AddStat("Speed", baseSpeed, GetSpeed(), true);
+        description += AddStat("Explosion Size", baseSize, GetSize(), true);
+        description += $"\nEvolves with: {starColor}{getEvolutionStarType()} Star";
+
+        return description;
+    }
+
+    public override string getTags()
+    {
+        return "Tags: Projectile, Explosion, Carrot, Falling";
+    }
+
+    public override Color GetTooltipColor()
+    {
+        return new Color(1, 0.5f, 0f);
+    }
+
     public override bool CanCast()
     {
         return currentCooldown == 0 && currentAttackSpeedCD == 0;
     }
 
-    public override string getAbilityDescription()
-    {
-        throw new System.NotImplementedException();
-    }
-
     public override string getAbilityName()
     {
-        return Localization.GetLocalizedString("ability.rabi.carrotbarrage.name");
+        return "Carrot Barrage";
     }
 
     public override List<Enhancement> getEnhancementList()
@@ -51,40 +101,34 @@ public class CarrotBarrageAbility : PlayerAbility
 
     public override void OnCast()
     {
-        int level = (int)Player.instance.abilityValues["ability.carrotbarrage.level"];
         carrots.Clear();
-        //maxCooldown = level < 6 ? level < 3 ? 10 : 8 : 6;
         
-        maxCooldown = 4;//level < 4 ? 3 : 2;
-        //currentCooldown = maxCooldown;
-        maxAmmo = 3;
-        maxAttackSpeedCD = 2f;
         if (currentAmmo - 1 > 0)
         {
             currentAmmo--;
-            currentAttackSpeedCD = maxAttackSpeedCD;
+            currentAttackSpeedCD = GetAttackSpeed();
         }
         else
         {
             currentAmmo--;
-            currentCooldown = maxCooldown;
-            currentAttackSpeedCD = maxAttackSpeedCD;
+            currentCooldown = GetMaxCooldown();
+            currentAttackSpeedCD = GetAttackSpeed();
             AudioController.PlaySound(AudioController.instance.sounds.reloadSfx);
         }
-        UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, maxAmmo);
+        UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, GetMaxAmmo());
 
-        float dmg = level < 4 ? level < 2 ? 15 : 25 : 40;
-        int numberOfCarrots = level < 5 ? 3 : 5;
+        float dmg = GetDamage();
+        int numberOfCarrots = 3;
 
         Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
         Vector2 difference = (crosshairPos - (Vector2)Player.instance.transform.position).normalized;
 
         float baseAngle = BulletBase.VectorToAngle(difference);
-        float perCarrotAngle = (10 / (numberOfCarrots / 2));
-        baseAngle -= 10;
+        float perCarrotAngle = (GetSpread() / (numberOfCarrots / 2));
+        baseAngle -= GetSpread();
 
         float distanceToCursor = (crosshairPos - (Vector2)Player.instance.transform.position).magnitude;
-        distanceToCursor = Mathf.Clamp(distanceToCursor, 0, 7);
+        distanceToCursor = Mathf.Clamp(distanceToCursor, 0, GetReach());
 
         for (int i = 0; i < numberOfCarrots; i++) 
         {
@@ -106,6 +150,7 @@ public class CarrotBarrageAbility : PlayerAbility
     public void CastCarrot(Vector2 direction, float damage, bool playSound)
     {
         ExplosiveCarrot carrot = PoolManager.Get<ExplosiveCarrot>();
+        carrot.abilitySource = this;
         carrot.transform.position = Player.instance.transform.position;
         carrot.isSmall = false;
         carrot.Init(direction);
@@ -126,19 +171,14 @@ public class CarrotBarrageAbility : PlayerAbility
             currentCooldown -= 0.25f;
             if (currentCooldown == 0)
             {
-                currentAmmo = maxAmmo;
+                currentAmmo = GetMaxAmmo();
             }
         }
         if (BeatManager.isQuarterBeat && currentAttackSpeedCD > 0) currentAttackSpeedCD -= 0.25f;
         if (IsCurrentWeaponSelected())
         {
-            UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, maxAmmo);
+            UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, GetMaxAmmo());
         }
-    }
-
-    public override System.Type getEvolutionItemType()
-    {
-        return typeof(FireworksKitItem);
     }
 
     public override Enhancement getEvolutionEnhancement()

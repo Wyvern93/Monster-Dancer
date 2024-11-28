@@ -5,10 +5,7 @@ public class RabiDashHitbox : MonoBehaviour
     public float dmg;
     public void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!Player.instance.abilityValues.ContainsKey("ability.illusiondash.level")) return;
-        
-        int level = (int)Player.instance.abilityValues["ability.illusiondash.level"];
-        dmg = level < 5 ? level < 2 ? 60 : 75 : 98;
+        dmg = 60;
 
         if (collision.CompareTag("Enemy"))
         {
@@ -20,11 +17,8 @@ public class RabiDashHitbox : MonoBehaviour
 
             enemy.TakeDamage((int)dmg, isCritical);
 
-            if (level >= 7)
-            {
-                Vector2 dir = enemy.transform.position - Player.instance.transform.position;
-                enemy.PushEnemy(dir, 4f);
-            }
+            Vector2 dir = enemy.transform.position - Player.instance.transform.position;
+            enemy.PushEnemy(dir, 4f);
         }
 
         if (collision.CompareTag("Bullet"))

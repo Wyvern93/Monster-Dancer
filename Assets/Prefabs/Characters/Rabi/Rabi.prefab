@@ -140,7 +140,6 @@ Transform:
   - {fileID: 8859566794998209886}
   - {fileID: 3798350261671299771}
   - {fileID: 7254530756958566533}
-  - {fileID: 2922399811109229182}
   m_Father: {fileID: 3504097488020087185}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -359.949}
 --- !u!212 &8181644374423735234
@@ -364,6 +363,12 @@ MonoBehaviour:
   isShooting: 0
   rechargeFX: {fileID: 3849218236984956810}
   rechargeFXcolor: {r: 0, g: 0, b: 0, a: 0}
+  fireStars: 0
+  waterStars: 0
+  earthStars: 0
+  windStars: 0
+  lightStars: 0
+  darkStars: 0
   moonlightDaggerWavePrefab: {fileID: 238526771677291766, guid: 4af89ea480ae3f04eaeed59c29c97ba3, type: 3}
   explosiveCarrot: {fileID: 6176280003804827367, guid: 3022bd6a79b7630479f72639d2475f67, type: 3}
   carrotExplosionPrefab: {fileID: 2605593471026702462, guid: 941e5a73124b6514cacc803978b84e0a, type: 3}
@@ -394,7 +399,7 @@ MonoBehaviour:
   fireworkPrefab: {fileID: 775206094103201475, guid: 138f7d2e39717cf4f990335769dd3483, type: 3}
   fireworkExplosionPrefab: {fileID: 6664872255475693508, guid: 492362b2b12a15d4589314b885a3824e, type: 3}
   spriteTrail: {fileID: 4465351908415658744}
-  dashHitBox: {fileID: 7102733586936279029}
+  dashHitBox: {fileID: 0}
   dashSound: {fileID: 8300000, guid: 7903361135f538e44bab3cd4f2380af2, type: 3}
   throwSound: {fileID: 8300000, guid: ba24113c40ea57c458b245508d53e05f, type: 3}
   piercingShotChargeSound: {fileID: 8300000, guid: e5fca25ee446ef2419cf2fe15cbed7d9, type: 3}
@@ -1050,112 +1055,3 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!1 &7754144329018009409
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2922399811109229182}
-  - component: {fileID: 7102733586936279029}
-  - component: {fileID: 1760803071661726549}
-  - component: {fileID: 1195543157373371911}
-  m_Layer: 9
-  m_Name: DashHitbox
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2922399811109229182
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7754144329018009409}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 8192707018515921040}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!58 &7102733586936279029
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7754144329018009409}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 1}
-  serializedVersion: 2
-  m_Radius: 1.5
---- !u!50 &1760803071661726549
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7754144329018009409}
-  m_BodyType: 1
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 7
---- !u!114 &1195543157373371911
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7754144329018009409}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 34e9044bfc02d3c49abc8922277c2532, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dmg: 0

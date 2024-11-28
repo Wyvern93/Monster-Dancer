@@ -29,11 +29,6 @@ public class StatHPEnhancement : Enhancement
         return IconList.instance.hpUp;
     }
 
-    public override int getLevel()
-    {
-        return 0;
-    }
-
     public override string getName()
     {
         return "Health";

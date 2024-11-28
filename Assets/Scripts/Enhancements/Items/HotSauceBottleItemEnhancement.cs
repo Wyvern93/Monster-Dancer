@@ -8,8 +8,7 @@ public class HotSauceBottleItemEnhancement : Enhancement
 {
     public override string GetDescription()
     {
-        float damage = Player.instance.itemValues["burnDamage"] * 100;
-        return $"Increases damage from burning effects from <color=\"green\">{damage} -> {damage + 50}%</color>. Additionally, <color=\"blue\">Projectiles</color> burn enemies";
+        return $"Increases damage from burning effects by <color=\"green\">50%</color>. Additionally, <color=\"blue\">Projectiles</color> burn enemies";
     }
 
     public override string getName()
@@ -24,7 +23,7 @@ public class HotSauceBottleItemEnhancement : Enhancement
 
     public override string getDescriptionType()
     {
-        return "Evolution Item";
+        return "Item";
     }
 
     public override int getWeight()
@@ -34,13 +33,7 @@ public class HotSauceBottleItemEnhancement : Enhancement
 
     public override bool isAvailable()
     {
-        // PASSIVES
-        bool available = false;
-        if (Player.instance.equippedItems.Count == 6) return available = false;
-        if (Player.instance.equippedItems.Find(x => x.getId() == getId()) != null) return available = false;
-        if (Player.instance.equippedPassiveAbilities.Any(x => x.GetType() == typeof(PiercingShotAbility))) return true;
-        if (Player.instance.equippedPassiveAbilities.Any(x => x.GetType() == typeof(OrbitalMoonAbility))) return true;
-        return available;
+        return base.isAvailable();
     }
 
     public override PlayerAbility getAbility()
@@ -55,12 +48,12 @@ public class HotSauceBottleItemEnhancement : Enhancement
 
     public override EnhancementType GetEnhancementType()
     {
-        return EnhancementType.EvolutionItem;
+        return EnhancementType.Item;
     }
 
     public override void OnEquip()
     {
         base.OnEquip();
-        Player.instance.itemValues["burnDamage"] += 0.5f;
+        //Player.instance.itemValues["burnDamage"] += 0.5f;
     }
 }

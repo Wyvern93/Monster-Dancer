@@ -87,15 +87,15 @@ public abstract class Enemy : MonoBehaviour
         if (slownessStatus.amount < amount) slownessStatus.amount = amount;
     }
 
-    public void OnBurn()
+    public void OnBurn(PlayerAbility abilitySource, float damage, float duration)
     {
-        int time = (int)Player.instance.itemValues["burnDuration"];
+        if (isDead) return;
         if (!burnStatus.isBurning())
         {
             BurningVisualEffect eff = PoolManager.Get<BurningVisualEffect>();
             eff.source = this;
         }
-        if (burnStatus.duration < time) burnStatus.duration = time;
+        burnStatus.AddBurn(new BurnSource(damage, duration));
     }
 
     public void OnStunEnd()
@@ -222,19 +222,17 @@ public abstract class Enemy : MonoBehaviour
                 OnBeat();
             }
         }
-
-        if (burnStatus.isBurning())
+        if (BeatManager.isQuarterBeat)
         {
-            if (BeatManager.isQuarterBeat)
+            float burnDamage = burnStatus.OnBurnTick();
+
+            if (burnStatus.isBurning())
             {
-                TakeDamage(2f * Player.instance.itemValues["burnDamage"], false);
-            }
-            if (BeatManager.isGameBeat)
-            {
-                burnStatus.duration--;
+                TakeDamage(burnDamage, false);
             }
         }
-        else if (BeatManager.isGameBeat && stunStatus.duration > 0)
+        
+        if (BeatManager.isGameBeat && stunStatus.duration > 0)
         {
             if (stunStatus.duration == 1) OnStunEnd();
             stunStatus.duration--;
@@ -319,6 +317,9 @@ public abstract class Enemy : MonoBehaviour
             //KillEffect deathFx = PoolManager.Get<KillEffect>();
             //deathFx.transform.position = transform.position;
         }
+        stunStatus.duration = 0;
+        burnStatus.Clear();
+        slownessStatus.duration = 0;
         isDead = true;
         deathDir = (transform.position - Player.instance.transform.position).normalized;
     }
@@ -335,7 +336,7 @@ public abstract class Enemy : MonoBehaviour
         isDead = true;
         deathDir = (transform.position - Player.instance.transform.position).normalized;
         stunStatus.duration = 0;
-        burnStatus.duration = 0;
+        burnStatus.Clear();
         slownessStatus.duration = 0;
         //KillEffect deathFx = PoolManager.Get<KillEffect>();
         //deathFx.transform.position = transform.position;

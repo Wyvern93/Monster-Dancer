@@ -1,25 +1,57 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CarrotDeliveryAbility : PlayerAbility, IPlayerProjectile
 {
-    public int minCooldown = 1;
-    int level;
+    public int baseRunOverDamage;
 
-    public override bool CanCast()
+    public float GetRunOverDamage()
     {
-        return Player.instance.CurrentSP >= Player.instance.MaxSP;
+        return Mathf.Clamp(baseRunOverDamage * itemValues["damageMultiplier"], 0, 1000);
+    }
+    public CarrotDeliveryAbility() : base()
+    {
+        baseCooldown = 180;
+        baseDamage = 30;
+        baseRunOverDamage = 150;
+        baseSpeed = 10;
+
+        currentCooldown = 0;
     }
 
     public override string getAbilityDescription()
     {
-        throw new System.NotImplementedException();
+        string starColor = GetStarColorText();
+
+        string description = $"<color=#FFFF88>Calls a delivery truck that does 4 laps running over and shooting enemies</color>\n\n";
+        description += AddStat("Cooldown", baseCooldown, GetMaxCooldown(), false, " Beats");
+        description += AddStat("Run Over Damage", baseRunOverDamage, GetRunOverDamage(), true);
+        description += AddStat("Bullet Damage", baseDamage, GetDamage(), true);
+        description += AddStat("Velocity", baseSpeed, GetSpeed(), true);
+
+        return description;
+    }
+
+    public override Color GetTooltipColor()
+    {
+        return new Color(1, 0.5f, 0f);
+    }
+
+    public override bool CanCast()
+    {
+        return currentCooldown <= 0;
+    }
+
+    public override void OnChange()
+    {
+        
     }
 
     public override string getAbilityName()
     {
-        return Localization.GetLocalizedString("ability.rabi.carrotdelivery.name");
+        return "Carrot Delivery";
     }
 
     public override List<Enhancement> getEnhancementList()
@@ -37,15 +69,13 @@ public class CarrotDeliveryAbility : PlayerAbility, IPlayerProjectile
 
     public override void OnCast()
     {
-        level = (int)Player.instance.abilityValues["ability.carrotdelivery.level"];
-        Player.instance.CurrentSP = 0;
-        UIManager.Instance.PlayerUI.UpdateSpecial();
+        currentCooldown = GetMaxCooldown();
+        UIManager.Instance.PlayerUI.UpdateSpecial(currentCooldown, GetMaxCooldown());
         Player.instance.StartCoroutine(UltimateCast());
     }
 
     public IEnumerator UltimateCast()
     {
-        Camera cam = Camera.main;
         PlayerRabi rabi = (PlayerRabi)Player.instance;
         rabi.animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration());
         rabi.animator.Play("Rabi_Ultimate");
@@ -54,6 +84,9 @@ public class CarrotDeliveryAbility : PlayerAbility, IPlayerProjectile
         PlayerCamera.TriggerCameraShake(3f, 1f);
         CarrotDeliveryTruck truck = PoolManager.Get<CarrotDeliveryTruck>();
         truck.ability = this;
+        truck.truckDmg = GetRunOverDamage();
+        truck.bulletDmg = GetDamage();
+        truck.velocity = GetSpeed();
         Player.instance.despawneables.Add(truck);
 
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
@@ -64,11 +97,12 @@ public class CarrotDeliveryAbility : PlayerAbility, IPlayerProjectile
     }
     public override void OnEquip()
     {
-        
+        UIManager.Instance.PlayerUI.UpdateSpecial(currentCooldown, GetMaxCooldown());
     }
 
     public override void OnUpdate()
     {
-        if (BeatManager.isGameBeat && currentCooldown > 0) currentCooldown--;
+        if (BeatManager.isQuarterBeat && currentCooldown > 0) currentCooldown -= 0.25f;
+        UIManager.Instance.PlayerUI.UpdateSpecial(currentCooldown, GetMaxCooldown());
     }
 }

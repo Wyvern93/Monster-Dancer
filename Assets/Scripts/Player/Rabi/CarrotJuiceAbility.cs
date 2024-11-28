@@ -3,15 +3,71 @@ using UnityEngine;
 
 public class CarrotJuiceAbility : PlayerAbility
 {
-    public CarrotJuiceAbility()
-    {
-        maxAmmo = 3;
-        maxAttackSpeedCD = 2f;
-        maxCooldown = 8;
+    public float baseSplashDamage;
+    float juiceSizeBase = 2.93f;
+    float splashSize = 0.9f;
+    float baseSlow = 0.5f;
 
-        currentAmmo = maxAmmo;
+    public float GetSplashDamage()
+    {
+        return Mathf.Clamp(baseSplashDamage * itemValues["damageMultiplier"], 0, 1000);
+    }
+
+    public float GetSlow()
+    {
+        return Mathf.Clamp(baseSlow * itemValues["slowMultiplier"], 0, 100);
+    }
+
+    public CarrotJuiceAbility() : base()
+    {
+        baseAmmo = 3;
+        baseAttackSpeed = 2f;
+        baseCooldown = 8;
+
+        baseDamage = 4;
+        baseSplashDamage = 8;
+        baseDuration = 12;
+        baseSpeed = 8;
+        baseCritChance = 0;
+        baseReach = 6;
+        baseSlow = 0.5f;
+        baseSize = 1;
+
+        currentAmmo = GetMaxAmmo();
         currentAttackSpeedCD = 0;
         currentCooldown = 0;
+    }
+
+    public override string getAbilityDescription()
+    {
+        string starColor = GetStarColorText();
+
+        string description = $"<color=#FFFF88>Throw a bottle of carrot juice that splashes on enemies and leaves juice on the ground, dealing damage and slowing enemies</color>\n\n";
+        description += AddStat("Uses", baseAmmo, GetMaxAmmo(), true);
+        description += AddStat("Cooldown", baseCooldown, GetMaxCooldown(), false, " Beats");
+        description += AddStat("Attack Speed", baseAttackSpeed, GetAttackSpeed(), false, " Beats");
+        description += AddStat("Splash Damage", baseSplashDamage, GetSplashDamage(), true);
+        description += AddStat("Juice Damage", baseDamage, GetDamage(), true);
+        description += AddStat("Crit Chance", baseCritChance * 100, GetCritChance() * 100, true, "%");
+        description += AddStat("Slowness", baseSlow * 100, GetSlow() * 100, true, "%");
+        description += AddStat("Juice Duration", baseDuration, GetDuration(), true, " Beats");
+        description += AddStat("Splash Size", splashSize, splashSize * GetSize(), true);
+        description += AddStat("Juice Size", juiceSizeBase, juiceSizeBase * GetSize(), true);
+        description += AddStat("Reach", baseReach, GetReach(), true);
+        description += AddStat("Throw Speed", baseSpeed, GetSpeed(), true);
+        description += $"\nEvolves with: {starColor}{getEvolutionStarType()} Star";
+
+        return description;
+    }
+
+    public override string getTags()
+    {
+        return "Tags: Projectile, AOE, Debuff, Carrot, Falling";
+    }
+
+    public override Color GetTooltipColor()
+    {
+        return new Color(1, 0.5f, 0f);
     }
 
     public override bool CanCast()
@@ -19,14 +75,9 @@ public class CarrotJuiceAbility : PlayerAbility
         return currentCooldown == 0 && currentAttackSpeedCD == 0;
     }
 
-    public override string getAbilityDescription()
-    {
-        throw new System.NotImplementedException();
-    }
-
     public override string getAbilityName()
     {
-        return Localization.GetLocalizedString("ability.rabi.carrotjuice.name");
+        return "Carrot Juice";
     }
 
     public override List<Enhancement> getEnhancementList()
@@ -44,20 +95,19 @@ public class CarrotJuiceAbility : PlayerAbility
     }
     public override void OnCast()
     {
-        int level = (int)Player.instance.abilityValues["ability.carrotjuice.level"];
         if (currentAmmo - 1 > 0)
         {
             currentAmmo--;
-            currentAttackSpeedCD = maxAttackSpeedCD;
+            currentAttackSpeedCD = GetAttackSpeed();
         }
         else
         {
             currentAmmo--;
-            currentCooldown = maxCooldown;
-            currentAttackSpeedCD = maxAttackSpeedCD;
+            currentCooldown = GetMaxCooldown();
+            currentAttackSpeedCD = GetAttackSpeed();
             AudioController.PlaySound(AudioController.instance.sounds.reloadSfx);
         }
-        UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, maxAmmo);
+        UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, GetMaxAmmo());
 
         AudioController.PlaySound((Player.instance as PlayerRabi).throwSound);
 
@@ -74,6 +124,7 @@ public class CarrotJuiceAbility : PlayerAbility
         CarrotJuiceBottle bottle = PoolManager.Get<CarrotJuiceBottle>();
         bottle.transform.position = Player.instance.transform.position;
         bottle.Init(direction);
+        bottle.ability = this;
         Player.instance.despawneables.Add(bottle);
     }
 
@@ -99,18 +150,13 @@ public class CarrotJuiceAbility : PlayerAbility
             currentCooldown -= 0.25f;
             if (currentCooldown == 0)
             {
-                currentAmmo = maxAmmo;
+                currentAmmo = GetMaxAmmo();
             }
         }
         if (BeatManager.isQuarterBeat && currentAttackSpeedCD > 0) currentAttackSpeedCD -= 0.25f;
         if (IsCurrentWeaponSelected())
         {
-            UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, maxAmmo);
+            UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, GetMaxAmmo());
         }
-    }
-
-    public override System.Type getEvolutionItemType()
-    {
-        return typeof(BlessedFigureItem);
     }
 }

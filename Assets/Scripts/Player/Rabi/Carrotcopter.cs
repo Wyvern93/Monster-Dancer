@@ -4,21 +4,18 @@ using UnityEngine;
 
 public class CarrotCopter : MonoBehaviour, IDespawneable
 {
+    public PlayerAbility abilitySource;
     private Enemy currentTarget;
     private Vector2 targetPos;
-    private bool isInRange;
-    private int level;
     private float dmg;
-    private float speed;
     private float currentDistance;
-    private bool enemiesAround;
+    private float reach;
     [SerializeField] AudioClip shootSound;
     [SerializeField] GameObject shootFx;
     float despawnFXtime;
     public void OnEnable()
     {
         currentTarget = null;
-        speed = 1f;
     }
     public void Update()
     {
@@ -28,15 +25,9 @@ public class CarrotCopter : MonoBehaviour, IDespawneable
         targetPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
 
         if (BeatManager.isGameBeat) UpdateStats();
-        CheckPlayerInRange();
         MoveTowardsTarget();
         if (despawnFXtime > 0) despawnFXtime -= Time.deltaTime;
         else shootFx.SetActive(false);
-    }
-
-    private void CheckPlayerInRange()
-    {
-        isInRange = Vector3.Distance(transform.position, targetPos) <= 3;
     }
 
     private float GetAcceleration()
@@ -48,16 +39,16 @@ public class CarrotCopter : MonoBehaviour, IDespawneable
 
     private void MoveTowardsTarget()
     {
-        float acceleration = GetAcceleration() * 7f;
+        float acceleration = GetAcceleration() * abilitySource.GetSpeed();
         if (shootFx.activeSelf) acceleration *= 0.5f;
         if (GameManager.isPaused) return;
-        transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * speed * acceleration);
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * acceleration);
         transform.position = new Vector3(transform.position.x, transform.position.y, 10);
     }
 
     public bool CanShoot()
     {
-        Enemy e = Map.GetClosestEnemyTo(transform.position, 5f);
+        Enemy e = Map.GetClosestEnemyTo(transform.position, reach);
         currentTarget = e;
         if (e == null) return false;
         return true;
@@ -75,13 +66,8 @@ public class CarrotCopter : MonoBehaviour, IDespawneable
 
     private void UpdateStats()
     {
-        level = (int)Player.instance.abilityValues["ability.carrotcopter.level"];
-        dmg = level < 4 ? level < 2 ? 15 : 30 : 45; // 200% 200%
-        speed = level < 6 ? level < 3 ? 1f : 2f : 3f; // 25%
-        // Lvl 2 and 4 DMG+
-        // Lvl 5 Ammo
-        // So Lvl 3 and 6 should be speed
-        // Lvl 7 makes the drone's piercing
+        dmg = abilitySource.GetDamage();
+        reach = abilitySource.GetReach();
     }
 
 
@@ -90,8 +76,9 @@ public class CarrotCopter : MonoBehaviour, IDespawneable
         despawnFXtime = 0.17f;
         shootFx.SetActive(true);
         CarrotBullet carrot = PoolManager.Get<CarrotBullet>();
+        carrot.abilitySource = abilitySource;
         carrot.transform.position = transform.position;
-        carrot.isPiercing = level >= 7;
+        carrot.isPiercing = false;
         carrot.dmg = dmg;
         carrot.abilitySource = Player.instance.equippedPassiveAbilities.Find(x => x.GetType() == typeof(CarrotcopterAbility));
         Player.instance.despawneables.Add(carrot.GetComponent<IDespawneable>());

@@ -24,7 +24,11 @@ public class BlessedFigureItem : PlayerItem
 
     public override string getItemDescription()
     {
-        return "";
+        string description = $"<color=#FFFF88>Increases healing from abilities and allows ability heals to critical strike</color>\n\n";
+        description += AddStat("Healing", 25, true, "%");
+        description += AddStat("Crit Chance", 15, true, "%");
+
+        return description;
     }
 
     public override string getItemName()
@@ -32,14 +36,14 @@ public class BlessedFigureItem : PlayerItem
         return "Blessed Figure";
     }
 
+    public override int getRarity()
+    {
+        return 2;
+    }
+
     public override void OnCast()
     {
         throw new System.NotImplementedException();
-    }
-
-    public override void OnEquip()
-    {
-        
     }
 
     public override void OnUpdate()

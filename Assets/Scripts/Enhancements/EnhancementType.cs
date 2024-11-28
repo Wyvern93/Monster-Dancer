@@ -1,4 +1,4 @@
 public enum EnhancementType
 {
-    Ability, Stat, StackableItem, EvolutionItem, EvolvedAbility
+    Ability, Stat, Item, EvolvedAbility
 }

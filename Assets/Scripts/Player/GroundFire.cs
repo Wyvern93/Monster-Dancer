@@ -20,7 +20,7 @@ public class GroundFire : MonoBehaviour
             Enemy enemy = collision.GetComponent<Enemy>();
 
             enemy.TakeDamage(2, false);
-            enemy.OnBurn();
+            //enemy.OnBurn();
         }
     }
 }

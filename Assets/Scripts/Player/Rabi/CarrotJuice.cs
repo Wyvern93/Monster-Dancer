@@ -1,27 +1,21 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class CarrotJuice : MonoBehaviour, IDespawneable
 {
-    private float beats = 12;
+    public float duration = 12;
     [SerializeField] AudioClip breakSound;
+    public CarrotJuiceAbility abilitySource;
 
     List<Enemy> enemies;
-    private float dmg = 1;
-    private float targetSize;
+    public float dmg = 1;
+    public float targetSize;
 
     public void OnEnable()
     {
-        int level = (int)Player.instance.abilityValues["ability.carrotjuice.level"];
-        targetSize = level < 5 ? 1f : 1.5f;
         transform.localScale = Vector3.one * 0.1f;
 
-        dmg = level < 6 ? level < 4 ? level < 2 ? 4f : 6f : 8f : 12f;
-
         enemies = new List<Enemy>();
-        beats = 12;
         AudioController.PlaySound(breakSound, Random.Range(0.8f, 1.2f));
     }
 
@@ -36,14 +30,14 @@ public class CarrotJuice : MonoBehaviour, IDespawneable
         if (GameManager.isPaused) return;
         if (BeatManager.isQuarterBeat)
         {
-            beats -= 0.25f;
-            if (beats <= 0) targetSize = 0;
+            duration -= 0.25f;
+            if (duration <= 0) targetSize = 0;
         }
 
         transform.localScale = Vector3.MoveTowards(transform.localScale, Vector3.one * targetSize, Time.deltaTime * 4f);
         if (transform.localScale.magnitude <= 0.1f) OnDespawn();
 
-        if (beats <= 0) return;
+        if (duration <= 0) return;
 
         if (BeatManager.isQuarterBeat)
         {
@@ -51,10 +45,17 @@ public class CarrotJuice : MonoBehaviour, IDespawneable
             {
                 float damage = Player.instance.currentStats.Atk * dmg;
                 if (damage < 1) damage = 1;
-                bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
-                if (isCritical) damage *= Player.instance.currentStats.CritDmg;
-                if (enemies[i].CanBeSlowed(false)) enemies[i].OnSlow(1, 0.5f);
+                bool isCritical = abilitySource.GetCritChance() > Random.Range(0f, 100f);
+                if (isCritical) dmg *= 2.5f;
+
+                if (enemies[i].CanBeSlowed(false)) enemies[i].OnSlow(1, abilitySource.GetSlow());
                 enemies[i].TakeDamage((int)damage, isCritical);
+
+                foreach (PlayerItem item in abilitySource.equippedItems)
+                {
+                    if (item == null) continue;
+                    item.OnHit(abilitySource, damage, enemies[i]);
+                }
             }
         }
     }

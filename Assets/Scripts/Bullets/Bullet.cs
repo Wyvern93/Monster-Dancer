@@ -182,15 +182,6 @@ public class Bullet : MonoBehaviour
 
         if (enemySource != null) if (!enemySource.isActiveAndEnabled) SpawnDrop();
 
-        if (superGrazed)
-        {
-            RabbitReflexesAbility reflexes = (RabbitReflexesAbility)Player.instance.equippedPassiveAbilities.FirstOrDefault(x => x.GetType() == typeof(RabbitReflexesAbility));
-            if (reflexes != null)
-            {
-                reflexes.OnBulletDespawn(this);
-            }
-        }
-
         superGrazed = false;
         grazePulse = null;
         grazed = false;

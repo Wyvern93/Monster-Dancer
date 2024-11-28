@@ -6,8 +6,8 @@ public class CarrotDeliveryTruck : MonoBehaviour, IDespawneable
 {
     public int numbeats;
     public int lap, maxlaps;
-    public int dmg;
-    public int level;
+    public float truckDmg;
+    public float bulletDmg; 
     public float velocity;
     public float cd, maxcd;
 
@@ -29,13 +29,10 @@ public class CarrotDeliveryTruck : MonoBehaviour, IDespawneable
     };
     public void OnEnable()
     {
-        level = (int)Player.instance.abilityValues["ability.carrotdelivery.level"];
-        dmg = 150;
-        maxlaps = level < 5 ? 4 : 8;
+        maxlaps = 4;
         facingRight = true;
         transform.position = new Vector3(Player.instance.transform.position.x - 12, Player.instance.transform.position.y + offsets[0], 0);
         lap = 0;
-        velocity = level < 5 ? 10f : 15f;
         transform.localScale = Vector3.one;
         maxcd = BeatManager.GetBeatDuration() / 8;
     }
@@ -57,7 +54,6 @@ public class CarrotDeliveryTruck : MonoBehaviour, IDespawneable
         }
         else if (transform.position.x < Player.instance.transform.position.x - 12 && !facingRight)
         {
-            Debug.Log("ended on left");
             facingRight = true;
             lap++;
             if (lap >= maxlaps) PoolManager.Return(gameObject, GetType());
@@ -80,9 +76,9 @@ public class CarrotDeliveryTruck : MonoBehaviour, IDespawneable
     public void ShootCarrot()
     {
         CarrotBullet carrot = PoolManager.Get<CarrotBullet>();
+        carrot.abilitySource = ability;
         carrot.transform.position = transform.position;
         carrot.isPiercing = false;
-        carrot.abilitySource = Player.instance.equippedPassiveAbilities.Find(x => x.GetType() == typeof(CarrotDeliveryAbilityEnhancement));
         Player.instance.despawneables.Add(carrot.GetComponent<IDespawneable>());
 
         Enemy e = Map.GetRandomEnemy();
@@ -96,7 +92,7 @@ public class CarrotDeliveryTruck : MonoBehaviour, IDespawneable
 
         Vector2 dir = ((Vector2)e.transform.position - (Vector2)transform.position).normalized;
         carrot.SetDirection(dir);
-        carrot.dmg = level < 4 ? level < 2 ? 20 : 35 : 50;
+        carrot.dmg = bulletDmg;
 
         AudioController.PlaySound(shootSound, Random.Range(0.9f, 1.1f));
     }
@@ -107,23 +103,13 @@ public class CarrotDeliveryTruck : MonoBehaviour, IDespawneable
         {
             Enemy enemy = collision.GetComponent<Enemy>();
 
-            float damage = (int)(Player.instance.currentStats.Atk * dmg);
-            bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
-            if (isCritical) damage *= Player.instance.currentStats.CritDmg;
-
-            enemy.TakeDamage((int)dmg, isCritical);
+            enemy.TakeDamage((int)truckDmg, false);
         }
 
         if (collision.CompareTag("FairyCage"))
         {
             FairyCage cage = collision.GetComponent<FairyCage>();
             cage.OnHit();
-        }
-
-        if (collision.CompareTag("Bullet") && level >= 7)
-        {
-            Bullet bullet = collision.GetComponent<Bullet>();
-            bullet.Despawn();
         }
     }
 

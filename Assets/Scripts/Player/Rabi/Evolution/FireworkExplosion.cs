@@ -9,28 +9,20 @@ public class FireworkExplosion : MonoBehaviour
 
     public float minTime;
 
-    private int explosions = 3;
+    private int explosions = 1;
     private float totalTime;
+    public PlayerAbility abilitySource;
     public void OnEnable()
     {
+        Debug.Log("firework!");
         transform.localScale = Vector3.one;
         AudioController.PlaySound(explosionSound);
         explosions = Random.Range(1, 3);
-        minTime = 0.3f;
         totalTime = 1f;
     }
 
     private void Update()
     {
-        if (minTime > 0)
-        {
-            minTime -= Time.deltaTime;
-        }
-        else
-        {
-            if (explosions > 0) SpawnMiniExplosion();
-            minTime = 0.3f;
-        }
 
         if (totalTime > 0)
         {
@@ -42,30 +34,16 @@ public class FireworkExplosion : MonoBehaviour
         }
     }
 
-    private void SpawnMiniExplosion()
-    {
-        if (!canSpawnMini) return;
-        explosions--;
-        FireworkExplosion explosion = PoolManager.Get<FireworkExplosion>();
-        explosion.dmg = dmg * 0.5f;
-        explosion.canSpawnMini = false;
-        explosion.transform.localScale = Vector3.one * 0.5f;
-        explosion.transform.position = transform.position + (Vector3)((Random.insideUnitCircle.normalized));
-    }
-
     public void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Enemy"))
         {
             Enemy enemy = collision.GetComponent<Enemy>();
 
-            float damage = Player.instance.currentStats.Atk * dmg * Player.instance.itemValues["explosionDamage"];
-            if (Player.instance.enhancements.Any(x => x.GetType() == typeof(DetonationCatalystItemEnhancement))) damage *= (Player.instance.itemValues["explosionSize"] * 1.5f) - 0.5f;
+            bool isCritical = abilitySource.GetCritChance() > Random.Range(0f, 100f);
+            if (isCritical) dmg *= 2.5f;
 
-            bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
-            if (isCritical) damage *= Player.instance.currentStats.CritDmg;
-
-            enemy.TakeDamage(damage, isCritical);
+            enemy.TakeDamage(dmg, isCritical);
         }
 
         if (collision.CompareTag("FairyCage"))

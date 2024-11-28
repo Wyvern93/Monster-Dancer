@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6770769441753601102}
   - component: {fileID: 5903109299186941886}
-  - component: {fileID: 9207377658091513001}
   m_Layer: 9
   m_Name: Ball
   m_TagString: Untagged
@@ -85,27 +84,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!95 &9207377658091513001
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1076087468422392147}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 531cff83b3212e94c8fdfb0c98b57fb8, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &3155321679640558860
 GameObject:
   m_ObjectHideFlags: 0
@@ -118,6 +96,7 @@ GameObject:
   - component: {fileID: 5644529810227435823}
   - component: {fileID: 8228877103419741643}
   - component: {fileID: 505184669421375634}
+  - component: {fileID: 1284070587023604118}
   m_Layer: 9
   m_Name: Moonbeam
   m_TagString: Untagged
@@ -235,7 +214,7 @@ LineRenderer:
       atime6: 0
       atime7: 0
       m_Mode: 0
-      m_ColorSpace: -1
+      m_ColorSpace: 0
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
     numCornerVertices: 0
@@ -263,14 +242,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   edgeCollider: {fileID: 505184669421375634}
   lineRenderer: {fileID: 5644529810227435823}
-  spriteSheet: {fileID: 2800000, guid: 89226b695d39a954cbdea9cea457c046, type: 3}
-  columns: 1
-  rows: 4
-  frameDuration: 0.05
-  currentFrame: 2
   sound: {fileID: 8300000, guid: 4fb13baeceb095e49ae7151153906226, type: 3}
+  animator: {fileID: 1284070587023604118}
   start: {x: 0, y: 0, z: 0}
   end: {x: 0, y: 0, z: 0}
+  abilityDamage: 0
 --- !u!68 &505184669421375634
 EdgeCollider2D:
   m_ObjectHideFlags: 0
@@ -304,7 +280,7 @@ EdgeCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_EdgeRadius: 0.33
+  m_EdgeRadius: 0.6
   m_Points:
   - {x: 0, y: 0}
   - {x: 0, y: 0}
@@ -316,3 +292,24 @@ EdgeCollider2D:
   m_AdjacentEndPoint: {x: 0, y: 0}
   m_UseAdjacentStartPoint: 0
   m_UseAdjacentEndPoint: 0
+--- !u!95 &1284070587023604118
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3155321679640558860}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 675f253e0163c504c8459df52435fe04, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

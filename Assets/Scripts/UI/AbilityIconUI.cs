@@ -9,9 +9,8 @@ public class AbilityIconUI : MonoBehaviour
     [SerializeField] private Image cdImage;
     public float cooldown;
     [SerializeField] private Color frameColor;
-    [SerializeField] TextMeshProUGUI levelText;
 
-    public void SetAbilityIcon(Sprite sprite, int level, bool isMaxed, bool isItem)
+    public void SetAbilityIcon(Sprite sprite, bool isItem)
     {
         if (sprite == null)
         {
@@ -19,13 +18,11 @@ public class AbilityIconUI : MonoBehaviour
             frame.color = Color.black;
             cooldown = 0;
             cdImage.fillAmount = 0;
-            levelText.text = "";
         }
         else
         {
             icon.color = Color.white;
             icon.sprite = sprite;
-            SetLevel(level, isMaxed, isItem);
         }
     }
 
@@ -38,15 +35,5 @@ public class AbilityIconUI : MonoBehaviour
     {
         cooldown = value;
         cdImage.fillAmount = cooldown; 
-    }
-
-    public void SetLevel(int level, bool isMaxed, bool isItem)
-    {
-        if (isMaxed) levelText.color = Color.yellow;
-        else levelText.color = Color.white;
-
-        if (isItem) levelText.text = $"x{level}";
-        else levelText.text = $"LV {level}";
-
     }
 }

@@ -4,15 +4,46 @@ using UnityEngine;
 
 public class CarrotBusterAbility : PlayerAbility
 {
-    public CarrotBusterAbility()
+    public CarrotBusterAbility() : base()
     {
-        maxAmmo = 2;
-        maxAttackSpeedCD = 1f;
-        maxCooldown = 4;
+        baseAmmo = 2;
+        baseAttackSpeed = 1f;
+        baseCooldown = 4;
+        baseDamage = 20;
+        baseDuration = 2;
+        baseSize = 1f;
+        baseKnockback = 5;
+        baseCritChance = 0;
 
-        currentAmmo = maxAmmo;
+        currentAmmo = GetMaxAmmo();
         currentAttackSpeedCD = 0;
         currentCooldown = 0;
+    }
+    public override string getAbilityDescription()
+    {
+        string starColor = GetStarColorText();
+
+        string description = $"<color=#FFFF88>Swing a giant sword-shaped carrot that deals damage and pushes enemies</color>\n\n";
+        description += AddStat("Uses", baseAmmo, GetMaxAmmo(), true);
+        description += AddStat("Cooldown", baseCooldown, GetMaxCooldown(), false, " Beats");
+        description += AddStat("Attack Speed", baseAttackSpeed, GetAttackSpeed(), false, " Beats");
+        description += AddStat("Damage", baseDamage, GetDamage(), true);
+        description += AddStat("Crit Chance", baseCritChance * 100, GetCritChance() * 100, true, "%");
+        description += AddStat("Size", baseSize * 3.5f, 3.5f * GetSize(), true);
+        description += AddStat("Knockback", baseKnockback, GetKnockback(), true);
+        description += $"\nEvolves with: {starColor}{getEvolutionStarType()} Star";
+
+        return description;
+    }
+
+    public override string getTags()
+    {
+        return "Tags: Melee, Carrot, Knockback";
+    }
+
+    public override Color GetTooltipColor()
+    {
+        return new Color(1, 0.5f, 0f);
     }
 
     public override bool CanCast()
@@ -20,14 +51,9 @@ public class CarrotBusterAbility : PlayerAbility
         return currentCooldown == 0 && currentAttackSpeedCD == 0;
     }
 
-    public override string getAbilityDescription()
-    {
-        throw new System.NotImplementedException();
-    }
-
     public override string getAbilityName()
     {
-        return Localization.GetLocalizedString("ability.rabi.carrotbuster.name");
+        return "Carrot Buster";
     }
 
     public override List<Enhancement> getEnhancementList()
@@ -45,22 +71,24 @@ public class CarrotBusterAbility : PlayerAbility
 
     public override void OnCast()
     {
-        int level = (int)Player.instance.abilityValues["ability.carrotbuster.level"];
         if (currentAmmo - 1 > 0)
         {
             currentAmmo--;
-            currentAttackSpeedCD = maxAttackSpeedCD;
+            currentAttackSpeedCD = GetAttackSpeed();
         }
         else
         {
             currentAmmo--;
-            currentCooldown = maxCooldown;
-            currentAttackSpeedCD = maxAttackSpeedCD;
+            currentCooldown = GetMaxCooldown();
+            currentAttackSpeedCD = GetAttackSpeed();
             AudioController.PlaySound(AudioController.instance.sounds.reloadSfx);
         }
-        UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, maxAmmo);
+        UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, GetMaxAmmo());
 
         CarrotBuster carrotBuster = PoolManager.Get<CarrotBuster>();
+        carrotBuster.abilitySource = this;
+        carrotBuster.damage = GetDamage();
+        carrotBuster.transform.localScale = Vector3.one * GetSize();
         PlayerCamera.TriggerCameraShake(0.4f, 0.4f);
     }
 
@@ -86,18 +114,13 @@ public class CarrotBusterAbility : PlayerAbility
             currentCooldown -= 0.25f;
             if (currentCooldown == 0)
             {
-                currentAmmo = maxAmmo;
+                currentAmmo = GetMaxAmmo();
             }
         }
         if (BeatManager.isQuarterBeat && currentAttackSpeedCD > 0) currentAttackSpeedCD -= 0.25f;
         if (IsCurrentWeaponSelected())
         {
-            UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, maxAmmo);
+            UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, GetMaxAmmo());
         }
-    }
-
-    public override System.Type getEvolutionItemType()
-    {
-        return typeof(FireworksKitItem);
     }
 }

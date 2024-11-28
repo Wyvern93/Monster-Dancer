@@ -16,6 +16,7 @@ public class SanctuaryAura : MonoBehaviour, IDespawneable
 
     [SerializeField] SpriteRenderer cross;
     [SerializeField] SanctuaryWave wave;
+    public PlayerAbility abilitySource;
 
     public void OnLoseShield()
     {
@@ -83,13 +84,10 @@ public class SanctuaryAura : MonoBehaviour, IDespawneable
 
                 if ((enemies[i].CurrentHP * 100f / enemies[i].MaxHP) <= 25f && enemies[i] is not Boss) damage = enemies[i].CurrentHP; // Execute
                 enemies[i].TakeDamage((int)damage, isCritical);
-                foreach (PlayerItem item in Player.instance.equippedItems)
+                foreach (PlayerItem item in abilitySource.equippedItems)
                 {
-                    item.OnHit(Player.instance.equippedPassiveAbilities.Find(x=> x.GetType() == typeof(SanctuaryAbilityEvolution)), damage, enemies[i]);
-                }
-                foreach (PlayerItem item in Player.instance.evolvedItems)
-                {
-                    item.OnHit(Player.instance.equippedPassiveAbilities.Find(x => x.GetType() == typeof(SanctuaryAbilityEvolution)), damage, enemies[i]);
+                    if (item == null) continue;
+                    item.OnHit(abilitySource, damage, enemies[i]);
                 }
             }
         }

@@ -3,6 +3,7 @@ using UnityEngine;
 public class FlamingDrillFlames : MonoBehaviour
 {
     public float time;
+    public PlayerAbility abilitySource;
 
     private void OnEnable()
     {
@@ -24,15 +25,12 @@ public class FlamingDrillFlames : MonoBehaviour
             if (isCritical) damage *= Player.instance.currentStats.CritDmg;
 
             enemy.TakeDamage((int)damage, isCritical);
-            foreach (PlayerItem item in Player.instance.equippedItems)
+            foreach (PlayerItem item in abilitySource.equippedItems)
             {
-                item.OnHit(Player.instance.equippedPassiveAbilities.Find(x => x.GetType() == typeof(FlamingDrillAbilityEvolution)), damage, enemy);
+                if (item == null) continue;
+                item.OnHit(abilitySource, damage, enemy);
             }
-            foreach (PlayerItem item in Player.instance.evolvedItems)
-            {
-                item.OnHit(Player.instance.equippedPassiveAbilities.Find(x => x.GetType() == typeof(FlamingDrillAbilityEvolution)), damage, enemy);
-            }
-            enemy.OnBurn();
+            enemy.OnBurn(abilitySource, damage, 4);
         }
     }
 }

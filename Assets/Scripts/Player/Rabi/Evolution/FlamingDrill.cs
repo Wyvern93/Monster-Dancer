@@ -17,6 +17,7 @@ public class FlamingDrill : MonoBehaviour, IDespawneable
 
     bool firstHit;
     GroundFire lastfire;
+    public PlayerAbility abilitySource;
 
     public void OnEnable()
     {
@@ -63,17 +64,14 @@ public class FlamingDrill : MonoBehaviour, IDespawneable
             if (isCritical) damage *= Player.instance.currentStats.CritDmg;
 
             enemy.TakeDamage((int)damage, isCritical);
-            foreach (PlayerItem item in Player.instance.equippedItems)
+            foreach (PlayerItem item in Player.instance.inventory)
             {
-                item.OnHit(Player.instance.equippedPassiveAbilities.Find(x => x.GetType() == typeof(PiercingShotAbility)), damage, enemy);
-            }
-            foreach (PlayerItem item in Player.instance.evolvedItems)
-            {
-                item.OnHit(Player.instance.equippedPassiveAbilities.Find(x => x.GetType() == typeof(PiercingShotAbility)), damage, enemy);
+                //item.OnHit(Player.instance.equippedPassiveAbilities.Find(x => x.GetType() == typeof(PiercingShotAbility)), damage, enemy);
             }
             if (!firstHit)
             {
                 FlamingDrillFlames blast = PoolManager.Get<FlamingDrillFlames>();
+                blast.abilitySource = abilitySource;
                 blast.transform.position = transform.position;
                 blast.transform.eulerAngles = transform.eulerAngles;
                 AudioController.PlaySound(blastSound);

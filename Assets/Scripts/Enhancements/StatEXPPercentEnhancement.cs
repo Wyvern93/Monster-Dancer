@@ -29,11 +29,6 @@ public class StatEXPPercentEnhancement : Enhancement
         return true;
     }
 
-    public override int getLevel()
-    {
-        return 0;
-    }
-
     public override string getName()
     {
         return "Exp. Multi";

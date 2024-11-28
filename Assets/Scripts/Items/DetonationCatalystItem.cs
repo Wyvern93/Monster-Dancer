@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 using UnityEngine.UIElements.Experimental;
 
@@ -23,7 +22,10 @@ public class DetonationCatalystItem : PlayerItem
 
     public override string getItemDescription()
     {
-        return "";
+        string description = $"<color=#FFFF88>All explosions deal bonus percent damage based on their bonus size</color>\n\n";
+        description += AddStat("Explosion Size", 20, true, "%");
+
+        return description;
     }
 
     public override string getItemName()
@@ -31,14 +33,26 @@ public class DetonationCatalystItem : PlayerItem
         return "Detonation Catalyst";
     }
 
+    public override int getRarity()
+    {
+        return 3;
+    }
+
     public override void OnCast()
     {
         throw new System.NotImplementedException();
     }
 
-    public override void OnEquip()
+    public override void OnEquip(PlayerAbility ability, int slot)
     {
-        
+        base.OnEquip(ability, slot);
+        ability.itemValues["explosionSize"] += 0.20f;
+    }
+
+    public override void OnUnequip(PlayerAbility ability, int originalSlot)
+    {
+        base.OnUnequip(ability, originalSlot);
+        ability.itemValues["explosionSize"] -= 0.20f;
     }
 
     public override void OnUpdate()

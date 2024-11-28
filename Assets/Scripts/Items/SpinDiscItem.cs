@@ -23,7 +23,12 @@ public class SpinDiscItem : PlayerItem
 
     public override string getItemDescription()
     {
-        return "";
+        string description = $"<color=#FFFF88>Speeds up cooldowns and attack speed at the cost of damage</color>\n\n";
+        description += AddStat("Cooldown", -1f, false, " Beats");
+        description += AddStat("Attack Speed", -0.5f, false, " Beats");
+        description += AddStat("Damage", -25, true, "%");
+
+        return description;
     }
 
     public override string getItemName()
@@ -31,14 +36,30 @@ public class SpinDiscItem : PlayerItem
         return "Spin Disc";
     }
 
+    public override int getRarity()
+    {
+        return 4;
+    }
+
     public override void OnCast()
     {
         throw new System.NotImplementedException();
     }
 
-    public override void OnEquip()
+    public override void OnEquip(PlayerAbility ability, int slot)
     {
-        
+        base.OnEquip(ability, slot);
+        ability.itemValues["damageMultiplier"] -= 0.25f;
+        ability.itemValues["bonusCooldown"] -= 1f;
+        ability.itemValues["bonusAtkSpeed"] -= 0.25f;
+    }
+
+    public override void OnUnequip(PlayerAbility ability, int originalSlot)
+    {
+        base.OnUnequip(ability, originalSlot);
+        ability.itemValues["damageMultiplier"] += 0.25f;
+        ability.itemValues["bonusCooldown"] += 1f;
+        ability.itemValues["bonusAtkSpeed"] += 0.25f;
     }
 
     public override void OnUpdate()

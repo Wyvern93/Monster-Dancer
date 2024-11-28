@@ -13,12 +13,11 @@ public class ExplosiveCarrot : MonoBehaviour, IDespawneable
     [SerializeField] SpriteRenderer carrotSpr;
 
     public float dmg;
-    int level;
     private Vector2 origDir;
+    public PlayerAbility abilitySource;
 
     public void Init(Vector3 dir)
     {
-        level = (int)Player.instance.abilityValues["ability.carrotbarrage.level"];
         transform.localScale = Vector3.one * (isSmall ? 0.75f : 1f);
         height = 0.3f;
         origDir = dir;
@@ -54,35 +53,12 @@ public class ExplosiveCarrot : MonoBehaviour, IDespawneable
             
             yield return new WaitForEndOfFrame();
         }
-        
-        if (!isSmall && level >= 7)
-        {
-            float angleDiff = 360f / 3f;
-            for (int i = 0; i < 3; i++)
-            {
-                Vector2 dir = BulletBase.angleToVector((angleDiff * i) + BulletBase.VectorToAngle(origDir));
-                CastCarrot(dir, dmg, i == 0);
-            }
-        }
 
         CarrotExplosion carrotExplosion = PoolManager.Get<CarrotExplosion>();
+        carrotExplosion.abilitySource = abilitySource;
         carrotExplosion.transform.position = transform.position;
         carrotExplosion.dmg = isSmall ? dmg * 0.5f : dmg;
-        carrotExplosion.transform.localScale = Vector3.one * Player.instance.itemValues["explosionSize"];
-
-        if (Player.instance.enhancements.Any(x => x.GetType() == typeof(FireworksKitItemEnhancement))) // This is never removed even with evolutions
-        {
-            bool doExplosion = Random.Range(0, 20) <= 0;
-            if (doExplosion)
-            {
-                Vector2 explosionPos = transform.position + (Random.insideUnitSphere.normalized * 2f);
-
-                CarrotExplosion carrotExplosion2 = PoolManager.Get<CarrotExplosion>();
-                carrotExplosion2.transform.position = transform.position;
-                carrotExplosion2.transform.localScale = transform.localScale * 0.5f * Player.instance.itemValues["explosionSize"];
-                carrotExplosion2.dmg = isSmall ? dmg * 0.25f : dmg * 0.5f;
-            }
-        }
+        carrotExplosion.transform.localScale = Vector3.one * abilitySource.itemValues["explosionSize"];
 
         PlayerCamera.TriggerCameraShake(0.6f, 0.3f);
         Player.instance.despawneables.Remove(this);
@@ -93,6 +69,7 @@ public class ExplosiveCarrot : MonoBehaviour, IDespawneable
     public void CastCarrot(Vector2 direction, float damage, bool playSound)
     {
         ExplosiveCarrot carrot = PoolManager.Get<ExplosiveCarrot>();
+        carrot.abilitySource = abilitySource;
         carrot.transform.position = transform.position;
         carrot.dmg = damage;
         carrot.isSmall = true;

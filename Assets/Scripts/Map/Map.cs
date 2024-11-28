@@ -304,14 +304,6 @@ public class Map : MonoBehaviour
     {
         if (!GameManager.isPaused) spawnAngle += Time.deltaTime * 30;
 
-
-        if (Keyboard.current.f6Key.wasPressedThisFrame)
-        {
-            foreach (Enemy enemy in Instance.enemiesAlive)
-            {
-                enemy.OnBurn();
-            }
-        }
         HandleStageLoop();
         
         if (BeatManager.isGameBeat && BeatManager.isPlaying)

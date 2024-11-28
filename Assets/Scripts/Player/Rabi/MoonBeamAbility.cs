@@ -1,24 +1,52 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering.Universal;
-using UnityEngine.UIElements;
-
 public class MoonBeamAbility : PlayerAbility
 {
     public int minCooldown = 1;
-    int level;
+    private float xscale;
 
-    public MoonBeamAbility()
+    public MoonBeamAbility() : base()
     {
-        maxAmmo = 1;
-        maxAttackSpeedCD = 0f;
-        maxCooldown = 8;
+        baseAmmo = 1;
+        baseAttackSpeed = 0.25f;
+        baseCooldown = 8;
 
-        currentAmmo = maxAmmo;
+        baseDamage = 40;
+        baseCritChance = 0;
+        baseDuration = 0.25f;
+        baseSize = 1f;
+
+        currentAmmo = GetMaxAmmo();
         currentAttackSpeedCD = 0;
         currentCooldown = 0;
+    }
+
+    public override string getAbilityDescription()
+    {
+        string starColor = GetStarColorText();
+
+        string description = $"<color=#FFFF88>Shoots a powerful lunar beam across the screen that damages enemies in a burst</color>\n\n";
+        description += AddStat("Uses", baseAmmo, GetMaxAmmo(), true);
+        description += AddStat("Cooldown", baseCooldown, GetMaxCooldown(), false, " Beats");
+        description += AddStat("Attack Speed", baseAttackSpeed, GetAttackSpeed(), false, " Beats");
+        description += AddStat("Damage", baseDamage, GetDamage(), true);
+        description += AddStat("Crit Chance", baseCritChance * 100, GetCritChance() * 100, true, "%");
+        description += AddStat("Duration", baseDuration, GetDuration(), true);
+        description += AddStat("Size", baseSize * 0.6f, GetSize() * 0.6f, true);
+        description += $"\nEvolves with: {starColor}{getEvolutionStarType()} Star";
+
+        return description;
+    }
+
+    public override string getTags()
+    {
+        return "Tags: AOE, Lunar, Spin";
+    }
+
+    public override Color GetTooltipColor()
+    {
+        return new Color(0, 0.5f, 1f);
     }
 
     public override bool CanCast()
@@ -26,14 +54,9 @@ public class MoonBeamAbility : PlayerAbility
         return currentCooldown == 0 && currentAttackSpeedCD == 0;
     }
 
-    public override string getAbilityDescription()
-    {
-        throw new System.NotImplementedException();
-    }
-
     public override string getAbilityName()
     {
-        return Localization.GetLocalizedString("ability.rabi.moonbeam.name");
+        return "Moon Beam";
     }
 
     public override List<Enhancement> getEnhancementList()
@@ -51,40 +74,24 @@ public class MoonBeamAbility : PlayerAbility
     }
     public override void OnCast()
     {
-        level = (int)Player.instance.abilityValues["ability.moonbeam.level"];
-        //maxCooldown = 14; //level < 4 ? level < 3 ? level < 2 ? 4 : 3 : 2 : 1;
-
-        //currentCooldown = maxCooldown;
-
         if (currentAmmo - 1 > 0)
         {
             currentAmmo--;
-            currentAttackSpeedCD = maxAttackSpeedCD;
+            currentAttackSpeedCD = GetAttackSpeed();
         }
         else
         {
             currentAmmo--;
-            currentCooldown = maxCooldown;
-            currentAttackSpeedCD = maxAttackSpeedCD;
+            currentCooldown = GetMaxCooldown();
+            currentAttackSpeedCD = GetAttackSpeed();
             AudioController.PlaySound(AudioController.instance.sounds.reloadSfx);
         }
-        UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, maxAmmo);
+        UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, GetMaxAmmo());
         MoonbeamLaser laser = PoolManager.Get<MoonbeamLaser>();
+        laser.abilitySource = this;
+        laser.abilityDamage = GetDamage();
+        laser.Init(GetDuration(), GetSize());
         PlayerCamera.TriggerCameraShake(0.6f, 0.4f);
-        /*
-        PlayerRabi rabi = (PlayerRabi)Player.instance;
-        int beams = level < 5 ? 1 : 2;
-        for (int i = 0; i < beams; i++)
-        {
-            MoonBeam moonBeam = PoolManager.Get<MoonBeam>();
-            moonBeam.transform.position = new Vector3(rabi.transform.position.x, rabi.transform.position.y + 1.5f, 10f);
-            moonBeam.transform.localEulerAngles = new Vector3(0, 0, 45f);
-            Player.instance.despawneables.Add(moonBeam);
-
-            Enemy e = Map.GetRandomClosebyEnemy(rabi.transform.position);
-            if (e == null) moonBeam.movDir = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f));
-            else moonBeam.movDir = (e.transform.position - rabi.transform.position);
-        }*/
     }
 
     public override Sprite GetReloadIcon()
@@ -109,13 +116,13 @@ public class MoonBeamAbility : PlayerAbility
             currentCooldown -= 0.25f;
             if (currentCooldown == 0)
             {
-                currentAmmo = maxAmmo;
+                currentAmmo = GetMaxAmmo();
             }
         }
         if (BeatManager.isQuarterBeat && currentAttackSpeedCD > 0) currentAttackSpeedCD -= 0.25f;
         if (IsCurrentWeaponSelected())
         {
-            UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, maxAmmo);
+            UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, GetMaxAmmo());
         }
     }
 }

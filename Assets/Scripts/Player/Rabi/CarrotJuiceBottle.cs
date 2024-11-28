@@ -51,10 +51,18 @@ public class CarrotJuiceBottle : MonoBehaviour, IDespawneable
         }
 
         CarrotJuice carrotJuice = PoolManager.Get<CarrotJuice>();
+        carrotJuice.abilitySource = ability;
+        carrotJuice.dmg = ability.GetDamage();
+        carrotJuice.duration = ability.GetDuration();
+        carrotJuice.targetSize = ability.GetSize();
+        carrotJuice.transform.localScale = Vector3.one * ability.GetSize();
         carrotJuice.transform.position = transform.position;
         Player.instance.despawneables.Add(carrotJuice.GetComponent<IDespawneable>());
 
         JuiceExplosion explosion = PoolManager.Get<JuiceExplosion>();
+        explosion.abilitySource = ability;
+        explosion.dmg = ability.GetSplashDamage();
+        explosion.transform.localScale = Vector3.one * ability.GetSize();
         explosion.transform.position = transform.position;
 
         Player.instance.despawneables.Remove(this);

@@ -40,11 +40,8 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] TextMeshProUGUI bossBarHPText;
     public Image activeCDImage;
     public TextMeshProUGUI coinText;
-    [SerializeField] List<PlayerUIIcon> abilityIcons;
-    [SerializeField] List<PlayerUIIcon> itemIcons;
 
     [SerializeField] Image ultimateIcon;
-    [SerializeField] TextMeshProUGUI ultimateLevelText;
 
     [SerializeField] Image playerIcon;
     [SerializeField] TextMeshProUGUI playerName;
@@ -54,6 +51,9 @@ public class PlayerUI : MonoBehaviour
     public GameObject reloadUI;
     [SerializeField] AbilityIconUI abilityIcon1, abilityIcon2, abilityIcon3;
     [SerializeField] TextMeshProUGUI ammoNumber;
+
+    [SerializeField] CombatCursorHandler combatcursor1, combatcursor2, combatcursor3;
+    [SerializeField] TextMeshProUGUI cursorAmmoText;
 
     // Start is called before the first frame update
     void Awake()
@@ -67,18 +67,9 @@ public class PlayerUI : MonoBehaviour
         bossBarTransform = bossBar.GetComponent<RectTransform>();
         bossBarGroup.alpha = 0;
 
-        foreach (PlayerUIIcon icon in abilityIcons)
-        {
-            icon.Display(null, 0, false, false);
-        }
-        foreach (PlayerUIIcon icon in itemIcons)
-        {
-            icon.Display(null, 0, false, true);
-        }
-
-        abilityIcon1.SetAbilityIcon(null, 0, false, false);
-        abilityIcon2.SetAbilityIcon(null, 0, false, false);
-        abilityIcon3.SetAbilityIcon(null, 0, false, false);
+        abilityIcon1.SetAbilityIcon(null, false);
+        abilityIcon2.SetAbilityIcon(null, false);
+        abilityIcon3.SetAbilityIcon(null, false);
 
         abilityIcon1.cooldown = 0;
         abilityIcon2.cooldown = 0;
@@ -87,6 +78,20 @@ public class PlayerUI : MonoBehaviour
         abilityIcon1.SetFrame(true);
         abilityIcon2.SetFrame(false);
         abilityIcon3.SetFrame(false);
+
+        combatcursor1.SetVisibility(true);
+        combatcursor2.SetVisibility(false);
+        combatcursor3.SetVisibility(false);
+
+        combatcursor1.SetCooldown(0, 0);
+
+        combatcursor2.SetCooldown(1, 0);
+        combatcursor2.SetCooldown(2, 0);
+
+        combatcursor3.SetCooldown(0, 0);
+        combatcursor3.SetCooldown(1, 0);
+        combatcursor3.SetCooldown(2, 0);
+
     }
 
     public void SetAmmo(int current, int max)
@@ -115,7 +120,7 @@ public class PlayerUI : MonoBehaviour
         if (ability.currentAmmo > 0) return 0;
 
         float current = ability.currentCooldown;
-        float max = ability.maxCooldown;
+        float max = ability.GetMaxCooldown();
         float percent = 0;
         if (current > 0) percent = (current / max);
         return percent;
@@ -125,6 +130,9 @@ public class PlayerUI : MonoBehaviour
     {
         playerIcon.sprite = icon;
         playerName.text = name;
+        combatcursor1.SetVisibility(true);
+        combatcursor2.SetVisibility(false);
+        combatcursor3.SetVisibility(false);
     }
 
     public void CreatePools()
@@ -162,7 +170,11 @@ public class PlayerUI : MonoBehaviour
             UpdateStageTime();
             bossBarGroup.alpha = Mathf.MoveTowards(bossBarGroup.alpha, Map.isBossWave ? 1 : 0, Time.deltaTime);
         }
-        if (Player.instance == null) return;
+        if (Player.instance == null)
+        {
+            // Put here a normal cursor instead
+            return;
+        }
         UpdateAbilityUI();
     }
 
@@ -188,10 +200,45 @@ public class PlayerUI : MonoBehaviour
             abilityIcon3.SetFrame(true);
         }
 
-        if (Player.instance.equippedPassiveAbilities.Count > 0) abilityIcon1.setCooldown(GetAbilityPercent(0));
-        if (Player.instance.equippedPassiveAbilities.Count > 1) abilityIcon2.setCooldown(GetAbilityPercent(1));
-        if (Player.instance.equippedPassiveAbilities.Count > 2) abilityIcon3.setCooldown(GetAbilityPercent(2));
-        ammoNumber.text = $"{Player.instance.equippedPassiveAbilities[currentAbility].currentAmmo}/{Player.instance.equippedPassiveAbilities[currentAbility].maxAmmo}";
+        if (Player.instance.equippedPassiveAbilities.Count == 1)
+        {
+            combatcursor1.SetVisibility(true);
+            combatcursor2.SetVisibility(false);
+            combatcursor3.SetVisibility(false);
+            combatcursor1.SetCooldown(0, GetAbilityPercent(0));
+        }
+        else if (Player.instance.equippedPassiveAbilities.Count == 2)
+        {
+            combatcursor1.SetVisibility(false);
+            combatcursor2.SetVisibility(true);
+            combatcursor3.SetVisibility(false);
+            combatcursor2.SetCooldown(0, GetAbilityPercent(0));
+            combatcursor2.SetCooldown(1, GetAbilityPercent(1));
+        }
+        else if (Player.instance.equippedPassiveAbilities.Count == 3)
+        {
+            combatcursor1.SetVisibility(false);
+            combatcursor2.SetVisibility(false);
+            combatcursor3.SetVisibility(true);
+            combatcursor3.SetCooldown(0, GetAbilityPercent(0));
+            combatcursor3.SetCooldown(1, GetAbilityPercent(1));
+            combatcursor3.SetCooldown(2, GetAbilityPercent(2));
+        }
+
+        if (Player.instance.equippedPassiveAbilities.Count > 0)
+        {
+            abilityIcon1.setCooldown(GetAbilityPercent(0));
+        }
+        if (Player.instance.equippedPassiveAbilities.Count > 1)
+        {
+            abilityIcon2.setCooldown(GetAbilityPercent(1));  
+        }
+        if (Player.instance.equippedPassiveAbilities.Count > 2)
+        {
+            abilityIcon3.setCooldown(GetAbilityPercent(2));
+        }
+        ammoNumber.text = $"{Player.instance.equippedPassiveAbilities[currentAbility].currentAmmo}/{Player.instance.equippedPassiveAbilities[currentAbility].GetMaxAmmo()}";
+        cursorAmmoText.text = $"{Player.instance.equippedPassiveAbilities[currentAbility].currentAmmo}/{Player.instance.equippedPassiveAbilities[currentAbility].GetMaxAmmo()}";
     }
 
     public void SetStageText(string text)
@@ -207,71 +254,37 @@ public class PlayerUI : MonoBehaviour
         bossBarHPText.text = $"{current}/{max}";
     }
 
-    public void SetUltimateIcon(Sprite sprite, int level, bool maxed)
+    public void SetUltimateIcon(Sprite sprite)
     {
         ultimateIcon.sprite = sprite;
-        ultimateLevelText.text = "Lv" + level;
-        ultimateLevelText.color = maxed ? Color.yellow : Color.white;
     }
 
-    public void SetUltimateLevel(int level, bool maxed)
-    {
-        ultimateLevelText.text = "Lv" + level;
-        ultimateLevelText.color = maxed ? Color.yellow : Color.white;
-    }
-
-    public void SetActiveIcon(Sprite sprite, int level, bool maxed)
-    {
-        //abilityIcons[2].Display(sprite, level, maxed);
-    }
-
-    public void SetActiveLevel(int level, bool maxed)
-    {
-        //abilityIcons[2].SetLevel(level, maxed);
-    }
-
-    public void SetPassiveIcon(Sprite sprite, int level, bool maxed, int id)
+    public void SetPassiveIcon(Sprite sprite, int id)
     {
         //abilityIcons[id].Display(sprite, level, maxed, false);
-        if (id == 0) abilityIcon1.SetAbilityIcon(sprite, level, maxed, false);
-        if (id == 1) abilityIcon2.SetAbilityIcon(sprite, level, maxed, false);
-        if (id == 2) abilityIcon3.SetAbilityIcon(sprite, level, maxed, false);
-    }
+        if (id == 0) abilityIcon1.SetAbilityIcon(sprite, false);
+        if (id == 1) abilityIcon2.SetAbilityIcon(sprite, false);
+        if (id == 2) abilityIcon3.SetAbilityIcon(sprite, false);
 
-    public void SetPassiveLevel(int level, bool maxed, int id)
-    {
-        //abilityIcons[id].SetLevel(level, maxed, false);
-        if (id == 0) abilityIcon1.SetLevel(level, maxed, false);
-        if (id == 1) abilityIcon2.SetLevel(level, maxed, false);
-        if (id == 2) abilityIcon3.SetLevel(level, maxed, false);
-    }
-
-    public void SetItemIcon(Sprite sprite, int level, bool maxed, int id)
-    {
-        itemIcons[id].Display(sprite, level, maxed, true);
-    }
-
-    public void SetItemLevel(int level, bool maxed, int id)
-    {
-        itemIcons[id].SetLevel(level, maxed, true);
-    }
-
-    public void UpdateItemIcons()
-    {
-        for (int i = 0; i < 6; i++)
+        if (Player.instance.equippedPassiveAbilities.Count == 1)
         {
-            if (i < Player.instance.equippedItems.Count)
-            {
-                PlayerItem item = Player.instance.equippedItems[i];
-                itemIcons[i].Display(item.GetIcon(), item.GetLevel(), item.GetLevel() >= 4, true); ;
-            }
-            else
-            {
-                itemIcons[i].Display(null, 0, false, true);
-            }
+            combatcursor1.SetVisibility(true);
+            combatcursor2.SetVisibility(false);
+            combatcursor3.SetVisibility(false);
+        }
+        else if (Player.instance.equippedPassiveAbilities.Count == 2)
+        {
+            combatcursor1.SetVisibility(false);
+            combatcursor2.SetVisibility(true);
+            combatcursor3.SetVisibility(false);
+        }
+        else if (Player.instance.equippedPassiveAbilities.Count == 3)
+        {
+            combatcursor1.SetVisibility(false);
+            combatcursor2.SetVisibility(false);
+            combatcursor3.SetVisibility(true);
         }
     }
-
 
     public void ShowSPBar()
     {
@@ -337,10 +350,10 @@ public class PlayerUI : MonoBehaviour
         hpText.text = $"{Player.instance.CurrentHP}/{Player.instance.currentStats.MaxHP}";
     }
 
-    public void UpdateSpecial()
+    public void UpdateSpecial(float current, float max)
     {
-        float special = (float)Player.instance.CurrentSP / (float)Player.instance.MaxSP;
-        spBar.fillAmount = special;
+        float special = current / max;
+        spBar.fillAmount = 1 - special;
         //spTransform.sizeDelta = new Vector2(width, spTransform.sizeDelta.y);
     }
 

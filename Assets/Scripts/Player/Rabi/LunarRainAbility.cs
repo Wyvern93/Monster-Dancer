@@ -3,17 +3,51 @@ using UnityEngine;
 
 public class LunarRainAbility : PlayerAbility
 {
-    float range = 2;
-    int numEnemies = 15;
-    public LunarRainAbility()
+    int numEnemies = 50;
+    public LunarRainAbility() : base()
     {
-        maxAmmo = 3;
-        maxAttackSpeedCD = 2f;
-        maxCooldown = 8;
+        baseAmmo = 3;
+        baseAttackSpeed = 2f;
+        baseCooldown = 8;
 
-        currentAmmo = maxAmmo;
+        baseDamage = 20;
+        baseKnockback = 0;
+        baseCritChance = 0;
+        baseDuration = 0;
+        baseSpeed = 0;
+        baseReach = 2;
+        baseSpread = 0;
+        baseSize = 1.0f;
+
+        currentAmmo = GetMaxAmmo();
         currentAttackSpeedCD = 0;
         currentCooldown = 0;
+    }
+
+    public override string getAbilityDescription()
+    {
+        string starColor = GetStarColorText();
+
+        string description = $"<color=#FFFF88>Strike enemies in an area with falling beams of moon energy that deal damage</color>\n\n";
+        description += AddStat("Uses", baseAmmo, GetMaxAmmo(), true);
+        description += AddStat("Cooldown", baseCooldown, GetMaxCooldown(), false, " Beats");
+        description += AddStat("Attack Speed", baseAttackSpeed, GetAttackSpeed(), false, " Beats");
+        description += AddStat("Damage per beam", baseDamage, GetDamage(), true);
+        description += AddStat("Crit Chance", baseCritChance * 100, GetCritChance() * 100, true, "%");
+        description += AddStat("Area Reach", baseReach, GetReach(), true);
+        description += $"\nEvolves with: {starColor}{getEvolutionStarType()} Star";
+
+        return description;
+    }
+
+    public override string getTags()
+    {
+        return "Tags: Beam, Lunar, Single-Target";
+    }
+
+    public override Color GetTooltipColor()
+    {
+        return new Color(0, 0.5f, 1f);
     }
 
     public override bool CanCast()
@@ -21,14 +55,10 @@ public class LunarRainAbility : PlayerAbility
         return currentCooldown == 0 && currentAttackSpeedCD == 0;
     }
 
-    public override string getAbilityDescription()
-    {
-        throw new System.NotImplementedException();
-    }
 
     public override string getAbilityName()
     {
-        return Localization.GetLocalizedString("ability.rabi.lunarrain.name");
+        return "Lunar Rain";
     }
 
     public override List<Enhancement> getEnhancementList()
@@ -46,30 +76,22 @@ public class LunarRainAbility : PlayerAbility
     }
     public override void OnCast()
     {
-        int level = (int)Player.instance.abilityValues["ability.lunarrain.level"];
-        //maxCooldown = level < 5 ? level < 3 ? 4 : 2 : 1;
-        //currentCooldown = maxCooldown;
-
-        //maxCooldown = 4;//level < 4 ? 3 : 2;
-        //currentCooldown = maxCooldown;
-        //maxAmmo = 3;
-        //maxAttackSpeedCD = 2f;
         List<Enemy> enemies = getAllEnemies();
         if (enemies.Count <= 0) return;
 
         if (currentAmmo - 1 > 0)
         {
             currentAmmo--;
-            currentAttackSpeedCD = maxAttackSpeedCD;
+            currentAttackSpeedCD = GetAttackSpeed();
         }
         else
         {
             currentAmmo--;
-            currentCooldown = maxCooldown;
-            currentAttackSpeedCD = maxAttackSpeedCD;
+            currentCooldown = GetMaxCooldown();
+            currentAttackSpeedCD = GetAttackSpeed();
             AudioController.PlaySound(AudioController.instance.sounds.reloadSfx);
         }
-        UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, maxAmmo);
+        UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, GetMaxAmmo());
         foreach (Enemy e in enemies)
         {
             CastRay(e);
@@ -85,7 +107,7 @@ public class LunarRainAbility : PlayerAbility
         {
             if (enemy == null) continue;
             if (enemies.Count >= numEnemies) return enemies;
-            if (Vector2.Distance(enemy.transform.position, crosshairPos) < range) enemies.Add(enemy);
+            if (Vector2.Distance(enemy.transform.position, crosshairPos) < GetReach()) enemies.Add(enemy);
         }
 
         return enemies;
@@ -95,6 +117,19 @@ public class LunarRainAbility : PlayerAbility
     {
         LunarRainRay ray = PoolManager.Get<LunarRainRay>();
         ray.transform.position = e.transform.position;
+        ray.abilitySource = this;
+        ray.dmg = GetDamage();
+
+        float damage = GetDamage();
+        bool isCritical = GetCritChance() > Random.Range(0f, 100f);
+        if (isCritical) damage *= 2.5f;
+
+        e.TakeDamage((int)damage, isCritical);
+        foreach (PlayerItem item in equippedItems)
+        {
+            if (item == null) continue;
+            item.OnHit(this, GetDamage(), e);
+        }
     }
 
     public override Sprite GetReloadIcon()
@@ -114,13 +149,13 @@ public class LunarRainAbility : PlayerAbility
             currentCooldown -= 0.25f;
             if (currentCooldown == 0)
             {
-                currentAmmo = maxAmmo;
+                currentAmmo = GetMaxAmmo();
             }
         }
         if (BeatManager.isQuarterBeat && currentAttackSpeedCD > 0) currentAttackSpeedCD -= 0.25f;
         if (IsCurrentWeaponSelected())
         {
-            UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, maxAmmo);
+            UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, GetMaxAmmo());
         }
     }
 }

@@ -28,11 +28,6 @@ public class StatDMGEnhancement : Enhancement
         return true;
     }
 
-    public override int getLevel()
-    {
-        return 0;
-    }
-
     public override string getName()
     {
         return "Attack Damage";

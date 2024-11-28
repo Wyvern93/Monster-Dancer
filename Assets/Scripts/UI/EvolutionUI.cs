@@ -82,12 +82,12 @@ public class EvolutionUI : MonoBehaviour
             }
 
         }
-
+        /*
         for (int i = 0; i < itemIcons.Count; i++)
         {
-            if (i < Player.instance.equippedItems.Count) itemIcons[i].Display(Player.instance.equippedItems[i]);
+            if (i < Player.instance.inventory.Count) itemIcons[i].Display(Player.instance.inventory[i]);
             else itemIcons[i].Clear(false);
-        }
+        }*/
     }
 
     public void Close()
@@ -136,9 +136,7 @@ public class EvolutionUI : MonoBehaviour
         if (ability == null) return false;
         if (item == null) return false;
         if (ability.isEvolved()) return false;
-
-        if (ability.GetLevel() < 7) return false;
-        if (item.GetType() == ability.getEvolutionItemType()) return true;
+        if (ability.canEvolve()) return true;
         return false;
     }
 
@@ -215,17 +213,14 @@ public class EvolutionUI : MonoBehaviour
             if (i < Player.instance.equippedPassiveAbilities.Count)
             {
                 PlayerAbility ability = Player.instance.equippedPassiveAbilities[i];
-                PlayerItem item = Player.instance.equippedItems.FirstOrDefault(x => x.GetType() == ability.getEvolutionItemType());
+                //PlayerItem item = Player.instance.inventory.FirstOrDefault(x => x.GetType() == ability.getEvolutionItemType());
 
                 if (ability.isEvolved()) continue;
-                if (item == null) continue;
-                if (ability.GetLevel() < 7) continue;
-
-                if (item.GetType() == ability.getEvolutionItemType())
+                if (ability.canEvolve())
                 {
                     abilityIcons[i + 1].SetSpark(true);
-                    int itemId = Player.instance.equippedItems.IndexOf(item);
-                    itemIcons[itemId].SetSpark(true);
+                    //int itemId = Player.instance.inventory.IndexOf(item);
+                    //itemIcons[itemId].SetSpark(true);
                 }
             }
 

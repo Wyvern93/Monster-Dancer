@@ -41,18 +41,14 @@ public class CarrotBullet : MonoBehaviour, IDespawneable
         {
             Enemy enemy = collision.GetComponent<Enemy>();
 
-            float damage = Player.instance.currentStats.Atk * dmg;
-            bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
-            if (isCritical) damage *= Player.instance.currentStats.CritDmg;
+            bool isCritical = abilitySource.GetCritChance() > Random.Range(0f, 100f);
+            if (isCritical) dmg *= 2.5f;
 
-            enemy.TakeDamage((int)damage, isCritical);
-            foreach (PlayerItem item in Player.instance.equippedItems)
+            enemy.TakeDamage((int)dmg, isCritical);
+            foreach (PlayerItem item in abilitySource.equippedItems)
             {
-                item.OnHit(abilitySource, damage, enemy);
-            }
-            foreach (PlayerItem item in Player.instance.evolvedItems)
-            {
-                item.OnHit(abilitySource, damage, enemy);
+                if (item == null) continue;
+                item.OnHit(abilitySource, dmg, enemy);
             }
             if (!isPiercing)
             {

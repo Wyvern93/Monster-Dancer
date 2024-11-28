@@ -6,6 +6,7 @@ public class MoonlightShockwave : MonoBehaviour
     [SerializeField] AudioClip sfx;
 
     [SerializeField] SpriteRenderer spriteRenderer;
+    public MoonlightFlowerAbility abilitySource;
     float alpha;
     public void OnEnable()
     {
@@ -39,8 +40,8 @@ public class MoonlightShockwave : MonoBehaviour
 
             dmg = 8;
             float damage = Player.instance.currentStats.Atk * dmg;
-            bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
-            if (isCritical) damage *= Player.instance.currentStats.CritDmg;
+            bool isCritical = abilitySource.GetCritChance() > Random.Range(0f, 100f);
+            if (isCritical) dmg *= 2.5f;
 
             enemy.TakeDamage((int)damage, isCritical);
         }
