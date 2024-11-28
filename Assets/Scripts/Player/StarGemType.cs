@@ -1,0 +1,1 @@
+public enum StarGemType { Fire, Water, Wind, Earth, Light, Darkness }

@@ -52,6 +52,9 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] AbilityIconUI abilityIcon1, abilityIcon2, abilityIcon3;
     [SerializeField] TextMeshProUGUI ammoNumber;
 
+    [SerializeField] CombatCursorHandler combatcursor1, combatcursor2, combatcursor3;
+    [SerializeField] TextMeshProUGUI cursorAmmoText;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -75,6 +78,20 @@ public class PlayerUI : MonoBehaviour
         abilityIcon1.SetFrame(true);
         abilityIcon2.SetFrame(false);
         abilityIcon3.SetFrame(false);
+
+        combatcursor1.SetVisibility(true);
+        combatcursor2.SetVisibility(false);
+        combatcursor3.SetVisibility(false);
+
+        combatcursor1.SetCooldown(0, 0);
+
+        combatcursor2.SetCooldown(1, 0);
+        combatcursor2.SetCooldown(2, 0);
+
+        combatcursor3.SetCooldown(0, 0);
+        combatcursor3.SetCooldown(1, 0);
+        combatcursor3.SetCooldown(2, 0);
+
     }
 
     public void SetAmmo(int current, int max)
@@ -103,7 +120,7 @@ public class PlayerUI : MonoBehaviour
         if (ability.currentAmmo > 0) return 0;
 
         float current = ability.currentCooldown;
-        float max = ability.maxCooldown;
+        float max = ability.GetMaxCooldown();
         float percent = 0;
         if (current > 0) percent = (current / max);
         return percent;
@@ -113,6 +130,9 @@ public class PlayerUI : MonoBehaviour
     {
         playerIcon.sprite = icon;
         playerName.text = name;
+        combatcursor1.SetVisibility(true);
+        combatcursor2.SetVisibility(false);
+        combatcursor3.SetVisibility(false);
     }
 
     public void CreatePools()
@@ -150,7 +170,11 @@ public class PlayerUI : MonoBehaviour
             UpdateStageTime();
             bossBarGroup.alpha = Mathf.MoveTowards(bossBarGroup.alpha, Map.isBossWave ? 1 : 0, Time.deltaTime);
         }
-        if (Player.instance == null) return;
+        if (Player.instance == null)
+        {
+            // Put here a normal cursor instead
+            return;
+        }
         UpdateAbilityUI();
     }
 
@@ -176,10 +200,45 @@ public class PlayerUI : MonoBehaviour
             abilityIcon3.SetFrame(true);
         }
 
-        if (Player.instance.equippedPassiveAbilities.Count > 0) abilityIcon1.setCooldown(GetAbilityPercent(0));
-        if (Player.instance.equippedPassiveAbilities.Count > 1) abilityIcon2.setCooldown(GetAbilityPercent(1));
-        if (Player.instance.equippedPassiveAbilities.Count > 2) abilityIcon3.setCooldown(GetAbilityPercent(2));
-        ammoNumber.text = $"{Player.instance.equippedPassiveAbilities[currentAbility].currentAmmo}/{Player.instance.equippedPassiveAbilities[currentAbility].maxAmmo}";
+        if (Player.instance.equippedPassiveAbilities.Count == 1)
+        {
+            combatcursor1.SetVisibility(true);
+            combatcursor2.SetVisibility(false);
+            combatcursor3.SetVisibility(false);
+            combatcursor1.SetCooldown(0, GetAbilityPercent(0));
+        }
+        else if (Player.instance.equippedPassiveAbilities.Count == 2)
+        {
+            combatcursor1.SetVisibility(false);
+            combatcursor2.SetVisibility(true);
+            combatcursor3.SetVisibility(false);
+            combatcursor2.SetCooldown(0, GetAbilityPercent(0));
+            combatcursor2.SetCooldown(1, GetAbilityPercent(1));
+        }
+        else if (Player.instance.equippedPassiveAbilities.Count == 3)
+        {
+            combatcursor1.SetVisibility(false);
+            combatcursor2.SetVisibility(false);
+            combatcursor3.SetVisibility(true);
+            combatcursor3.SetCooldown(0, GetAbilityPercent(0));
+            combatcursor3.SetCooldown(1, GetAbilityPercent(1));
+            combatcursor3.SetCooldown(2, GetAbilityPercent(2));
+        }
+
+        if (Player.instance.equippedPassiveAbilities.Count > 0)
+        {
+            abilityIcon1.setCooldown(GetAbilityPercent(0));
+        }
+        if (Player.instance.equippedPassiveAbilities.Count > 1)
+        {
+            abilityIcon2.setCooldown(GetAbilityPercent(1));  
+        }
+        if (Player.instance.equippedPassiveAbilities.Count > 2)
+        {
+            abilityIcon3.setCooldown(GetAbilityPercent(2));
+        }
+        ammoNumber.text = $"{Player.instance.equippedPassiveAbilities[currentAbility].currentAmmo}/{Player.instance.equippedPassiveAbilities[currentAbility].GetMaxAmmo()}";
+        cursorAmmoText.text = $"{Player.instance.equippedPassiveAbilities[currentAbility].currentAmmo}/{Player.instance.equippedPassiveAbilities[currentAbility].GetMaxAmmo()}";
     }
 
     public void SetStageText(string text)
@@ -206,6 +265,25 @@ public class PlayerUI : MonoBehaviour
         if (id == 0) abilityIcon1.SetAbilityIcon(sprite, false);
         if (id == 1) abilityIcon2.SetAbilityIcon(sprite, false);
         if (id == 2) abilityIcon3.SetAbilityIcon(sprite, false);
+
+        if (Player.instance.equippedPassiveAbilities.Count == 1)
+        {
+            combatcursor1.SetVisibility(true);
+            combatcursor2.SetVisibility(false);
+            combatcursor3.SetVisibility(false);
+        }
+        else if (Player.instance.equippedPassiveAbilities.Count == 2)
+        {
+            combatcursor1.SetVisibility(false);
+            combatcursor2.SetVisibility(true);
+            combatcursor3.SetVisibility(false);
+        }
+        else if (Player.instance.equippedPassiveAbilities.Count == 3)
+        {
+            combatcursor1.SetVisibility(false);
+            combatcursor2.SetVisibility(false);
+            combatcursor3.SetVisibility(true);
+        }
     }
 
     public void ShowSPBar()
@@ -272,10 +350,10 @@ public class PlayerUI : MonoBehaviour
         hpText.text = $"{Player.instance.CurrentHP}/{Player.instance.currentStats.MaxHP}";
     }
 
-    public void UpdateSpecial()
+    public void UpdateSpecial(float current, float max)
     {
-        float special = (float)Player.instance.CurrentSP / (float)Player.instance.MaxSP;
-        spBar.fillAmount = special;
+        float special = current / max;
+        spBar.fillAmount = 1 - special;
         //spTransform.sizeDelta = new Vector2(width, spTransform.sizeDelta.y);
     }
 

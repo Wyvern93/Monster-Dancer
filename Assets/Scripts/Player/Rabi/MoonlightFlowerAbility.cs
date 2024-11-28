@@ -3,17 +3,71 @@ using UnityEngine;
 
 public class MoonlightFlowerAbility : PlayerAbility
 {
-    public List<MoonlightFlower> currentFlowers;
-    public MoonlightFlowerAbility()
-    {
-        maxAmmo = 1;
-        maxAttackSpeedCD = 0f;
-        maxCooldown = 8;
+    public float baseShockwaveDamage;
 
-        currentAmmo = maxAmmo;
+    public List<MoonlightFlower> currentFlowers;
+    public MoonlightFlowerAbility() : base()
+    {
+        baseAmmo = 1;
+        baseAttackSpeed = 0f;
+        baseCooldown = 8;
+
+        baseDamage = 4;
+        baseShockwaveDamage = 12;
+        baseKnockback = 0;
+        baseCritChance = 0;
+        baseDuration = 6;
+        baseSpeed = 4;
+        baseSize = 1f;
+
+        currentAmmo = GetMaxAmmo();
         currentAttackSpeedCD = 0;
         currentCooldown = 0;
         currentFlowers = new List<MoonlightFlower>();
+    }
+
+    public override string getAbilityDescription()
+    {
+        string starColor = GetStarColorText();
+
+        string description = $"<color=#FFFF88>Shoots a flower of moon energy that moves towards the cursor, dealing damage every 1/4 Beats in an area.\n\nSends a shockwave upon despawning</color>\n\n";
+        description += AddStat("Uses", baseAmmo, GetMaxAmmo(), true);
+        description += AddStat("Cooldown", baseCooldown, GetMaxCooldown(), false, " Beats");
+        description += AddStat("Attack Speed", baseAttackSpeed, GetAttackSpeed(), false, " Beats");
+        description += AddStat("Damage", baseDamage, GetDamage(), true);
+        description += AddStat("Shockwave Damage", baseShockwaveDamage, GetShockwaveDamage(), true);
+        description += AddStat("Crit Chance", baseCritChance * 100, GetCritChance() * 100, true, "%");
+        description += AddStat("Size", baseSize * 3f, GetSize() * 3f, true);
+        description += $"\nEvolves with: {starColor}{getEvolutionStarType()} Star";
+
+        return description;
+    }
+
+    public override Color GetTooltipColor()
+    {
+        return new Color(0, 0.5f, 1f);
+    }
+
+    public override string getTags()
+    {
+        return "Tags: AOE, Lunar, Spin";
+    }
+
+    public override float GetDamage()
+    {
+        float rawDmg = baseDamage * itemValues["damageMultiplier"] * itemValues["orbitalDamage"];
+        return Mathf.Clamp(rawDmg, 1, 1000);
+    }
+
+    public override float GetSpeed()
+    {
+        float rawSpeed = baseSpeed * itemValues["speedMultiplier"] * itemValues["orbitalSpeed"];
+        return Mathf.Clamp(rawSpeed, 1, 1000);
+    }
+
+    public float GetShockwaveDamage()
+    {
+        return Mathf.Clamp(baseShockwaveDamage * itemValues["damageMultiplier"], 0, 1000);
     }
 
     public override bool CanCast()
@@ -21,14 +75,9 @@ public class MoonlightFlowerAbility : PlayerAbility
         return currentCooldown == 0 && currentAttackSpeedCD == 0;
     }
 
-    public override string getAbilityDescription()
-    {
-        throw new System.NotImplementedException();
-    }
-
     public override string getAbilityName()
     {
-        return Localization.GetLocalizedString("ability.rabi.moonlightflower.name");
+        return "Moonlight Flower";
     }
 
     public override List<Enhancement> getEnhancementList()
@@ -49,16 +98,16 @@ public class MoonlightFlowerAbility : PlayerAbility
         if (currentAmmo - 1 > 0)
         {
             currentAmmo--;
-            currentAttackSpeedCD = maxAttackSpeedCD;
+            currentAttackSpeedCD = GetAttackSpeed();
         }
         else
         {
             currentAmmo--;
-            currentCooldown = maxCooldown;
-            currentAttackSpeedCD = maxAttackSpeedCD;
+            currentCooldown = GetMaxCooldown();
+            currentAttackSpeedCD = GetAttackSpeed();
             AudioController.PlaySound(AudioController.instance.sounds.reloadSfx);
         }
-        UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, maxAmmo);
+        UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, GetMaxAmmo());
         SpawnFlower();
         PlayerCamera.TriggerCameraShake(0.6f, 0.4f);
     }
@@ -76,6 +125,11 @@ public class MoonlightFlowerAbility : PlayerAbility
     public void SpawnFlower()
     {
         MoonlightFlower moon = PoolManager.Get<MoonlightFlower>();
+        moon.abilitySource = this;
+        moon.dmg = GetDamage();
+        moon.speed = GetSpeed();
+        moon.beats = GetDuration();
+        moon.targetScale = GetSize();
         Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
         Vector2 difference = (crosshairPos - (Vector2)Player.instance.transform.position).normalized;
 
@@ -90,7 +144,8 @@ public class MoonlightFlowerAbility : PlayerAbility
     public override void OnChange()
     {
         base.OnChange();
-        foreach (MoonlightFlower flower in currentFlowers)
+        List<MoonlightFlower> list = currentFlowers;
+        foreach (MoonlightFlower flower in list)
         {
             if (flower != null)
             {
@@ -113,13 +168,13 @@ public class MoonlightFlowerAbility : PlayerAbility
             currentCooldown -= 0.25f;
             if (currentCooldown == 0)
             {
-                currentAmmo = maxAmmo;
+                currentAmmo = GetMaxAmmo();
             }
         }
         if (BeatManager.isQuarterBeat && currentAttackSpeedCD > 0) currentAttackSpeedCD -= 0.25f;
         if (IsCurrentWeaponSelected())
         {
-            UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, maxAmmo);
+            UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, GetMaxAmmo());
         }
     }
 }

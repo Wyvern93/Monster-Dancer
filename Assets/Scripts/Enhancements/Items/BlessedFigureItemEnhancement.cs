@@ -24,22 +24,17 @@ public class BlessedFigureItemEnhancement : Enhancement
 
     public override string getDescriptionType()
     {
-        return "Evolution Item";
+        return "Item";
     }
 
     public override int getWeight()
     {
-        return 1;
+        return 2;
     }
 
     public override bool isAvailable()
     {
-        // PASSIVES
-        bool available = false;
-        if (Player.instance.equippedItems.Count == 6) return available = false;
-        if (Player.instance.equippedItems.Find(x => x.getId() == getId()) != null) return available = false;
-        if (Player.instance.equippedPassiveAbilities.Any(x => x.GetType() == typeof(CarrotJuiceAbility))) return true;
-        return available;
+        return base.isAvailable();
     }
 
     public override PlayerAbility getAbility()

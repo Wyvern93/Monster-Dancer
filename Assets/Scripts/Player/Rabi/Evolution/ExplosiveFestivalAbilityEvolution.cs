@@ -35,8 +35,8 @@ public class ExplosiveFestialAbilityEvolution : PlayerAbility
     public override void OnCast()
     {
         carrots.Clear();
-        maxCooldown = 6;
-        currentCooldown = maxCooldown;
+        baseCooldown = 6;
+        currentCooldown = GetMaxCooldown();
 
         float dmg = 65;
         int numberOfCarrots = 5;
@@ -57,6 +57,7 @@ public class ExplosiveFestialAbilityEvolution : PlayerAbility
         if (enemy != null)
         {
             Firework carrot = PoolManager.Get<Firework>();
+            carrot.abilitySource = this;
             carrot.transform.position = Player.instance.transform.position;
             Player.instance.despawneables.Add(carrot.GetComponent<IDespawneable>());
             carrot.start = Player.instance.transform.position;
@@ -74,11 +75,6 @@ public class ExplosiveFestialAbilityEvolution : PlayerAbility
     public override void OnUpdate()
     {
         if (BeatManager.isGameBeat && currentCooldown > 0) currentCooldown--;
-    }
-
-    public override System.Type getEvolutionItemType()
-    {
-        return typeof(FireworksKitItem);
     }
 
     public override bool isEvolved()

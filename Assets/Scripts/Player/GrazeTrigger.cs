@@ -8,7 +8,6 @@ public class GrazeTrigger : MonoBehaviour
         if (collision.CompareTag("Bullet"))
         {
             AudioController.PlaySound(AudioController.instance.sounds.grazeSound);
-            Player.AddSP(1);
         }
     }
 }

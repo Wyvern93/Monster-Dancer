@@ -33,7 +33,6 @@ public class Player : MonoBehaviour
     protected PlayerAction action;
 
     public int CurrentHP;
-    public int MaxSP, CurrentSP;
     public int MaxExp, CurrentExp, Level;
 
     public int baseAtk = 12;
@@ -53,8 +52,6 @@ public class Player : MonoBehaviour
 
     public PlayerStats flatBonusStats;
     public PlayerStats percentBonusStats;
-    public Dictionary<string, float> abilityValues;
-    public Dictionary<string, float> itemValues;
 
     public AudioClip music_theme;
 
@@ -66,8 +63,8 @@ public class Player : MonoBehaviour
     public PlayerAbility ultimateAbility;
 
     [Header("Items")]
-    public List<PlayerItem> equippedItems;
-    public List<PlayerItem> evolvedItems;
+    public PlayerInventoryObject[] inventory;
+    public PlayerInventoryObject offinventoryObject;
 
     public List<GameObject> playerClones;
     public bool isInvulnerable;
@@ -86,6 +83,8 @@ public class Player : MonoBehaviour
     [SerializeField] public SpriteRenderer rechargeFX;
     public Color rechargeFXcolor;
 
+    public int fireStars, waterStars, earthStars, windStars, lightStars, darkStars;
+
     public bool isPoisoned()
     {
         return poisonStatus > 0;
@@ -96,22 +95,54 @@ public class Player : MonoBehaviour
         return poisonStatus;
     }
 
-    public void SetMaxSP(int n)
+    public bool AddItemToInventory(PlayerItem item, int index = -1)
     {
-        bool playSound = false;
-        if (CurrentSP < MaxSP) playSound = true;
-        MaxSP = n;
-        if (CurrentSP > MaxSP)
+        if (index == -1)
         {
-            CurrentSP = MaxSP;
+            for (int i = 0; i < inventory.Length; i++)
+            {
+                if (inventory[i] == null) index = i;
+            }
+            if (index == -1)
+            {
+                offinventoryObject = item;
+                EnhancementMenu.instance.SetOffInventory(offinventoryObject);
+                return false;
+            }
         }
-        if (CurrentSP == MaxSP && playSound)
-        {
-             AudioController.PlaySound(AudioController.instance.sounds.playerSpecialAvailableSfx);
-        }
-        instance.CurrentSP = Mathf.Clamp(instance.CurrentSP + n, 0, MaxSP);
-        UIManager.Instance.PlayerUI.UpdateSpecial();
 
+        inventory[index] = item;
+        return true;
+    }
+
+    public bool AddAbilityToInventory(PlayerAbility item, int index = -1)
+    {
+        if (index == -1)
+        {
+            for (int i = 0; i < inventory.Length; i++)
+            {
+                if (inventory[i] == null) index = i;
+            }
+            if (index == -1)
+            {
+                offinventoryObject = item;
+                EnhancementMenu.instance.SetOffInventory(offinventoryObject);
+                return false;
+            }
+        }
+
+        inventory[index] = item;
+        return true;
+    }
+
+    public bool DoesInventoryContain(string id)
+    {
+        foreach (PlayerInventoryObject a in inventory)
+        {
+            if (a == null) continue;
+            if (a.getId() == id) return true;
+        }
+        return false;
     }
 
     public void ForceDespawnAbilities(bool instant)
@@ -170,19 +201,6 @@ public class Player : MonoBehaviour
         }
     }
 
-    public int getItemIndex(System.Type itemType)
-    {
-        PlayerItem searchAbility = equippedItems.FirstOrDefault<PlayerItem>(x => x.GetType() == itemType);
-        if (searchAbility != null)
-        {
-            return equippedItems.IndexOf(searchAbility);
-        }
-        else
-        {
-            return equippedItems.Count();
-        }
-    }
-
     public virtual void Despawn()
     {
 
@@ -201,12 +219,9 @@ public class Player : MonoBehaviour
         instance = this;
         cam = PlayerCamera.instance;
         UIManager.Instance.PlayerUI.SetPlayerCharacter(icon, charactername);
-        abilityValues = new Dictionary<string, float>();
-        itemValues = new Dictionary<string, float>();
         despawneables = new List<IDespawneable>();
         equippedPassiveAbilities = new List<PlayerAbility>();
-        equippedItems = new List<PlayerItem>();
-        evolvedItems = new List<PlayerItem>();
+        inventory = new PlayerInventoryObject[20];
         spriteRendererMat = Sprite.material;
         Exclamation.SetActive(false);
         Level = 1;
@@ -214,21 +229,13 @@ public class Player : MonoBehaviour
 
         CalculateStats();
         CurrentHP = (int)currentStats.MaxHP;
-        CurrentSP = 0;
 
         grazeSprite.color = Color.clear;
 
         UIManager.Instance.PlayerUI.UpdateHealth();
         UIManager.Instance.PlayerUI.UpdateExp();
-        UIManager.Instance.PlayerUI.UpdateSpecial();
+        UIManager.Instance.PlayerUI.UpdateSpecial(0,0);
         UIManager.Instance.PlayerUI.coinText.text = "0";
-
-        itemValues.Add("orbitalSpeed", 1.0f);
-        itemValues.Add("orbitalDamage", 1.0f);
-        itemValues.Add("explosionDamage", 1.0f);
-        itemValues.Add("explosionSize", 1.0f);
-        itemValues.Add("burnDamage", 1.0f);
-        itemValues.Add("burnDuration", 3);
     }
 
     public int CalculateExpCurve(int lv)
@@ -252,10 +259,7 @@ public class Player : MonoBehaviour
         foreach (PlayerAbility ability in equippedPassiveAbilities)
         {
             if (ability.isEvolved()) continue;
-
-            PlayerItem item = equippedItems.FirstOrDefault(x => x.GetType() == ability.getEvolutionItemType());
-            if (item == null) continue;
-            return true;
+            if (ability.canEvolve()) return true;
         }
         return false;
     }
@@ -287,21 +291,23 @@ public class Player : MonoBehaviour
         cam.followPlayer = true;
     }
 
-    public void Heal(float amount)
+    public void Heal(float amount, PlayerAbility source = null)
     {
         float baseamount = amount;
-        foreach (PlayerItem item in equippedItems)
+        bool canCrit = false;
+
+        if (source != null)
         {
-            amount += item.OnPreHeal(baseamount) - baseamount;
+            foreach (PlayerItem item in source.equippedItems)
+            {
+                if (item == null) continue;
+                amount += item.OnPreHeal(baseamount) - baseamount;
+                if (item is BlessedFigureItem) canCrit = true;
+            }
         }
-        foreach (PlayerItem item in evolvedItems)
-        {
-            amount += item.OnPreHeal(baseamount) - baseamount;
-        }
+        
         if (amount == 0) return;
 
-        bool canCrit = false;
-        if (itemValues.ContainsKey("item.blessedfigure.level")) canCrit = true;
         bool isCritical = false;
         if (canCrit)
         {
@@ -335,6 +341,11 @@ public class Player : MonoBehaviour
 
         invulTime = Mathf.MoveTowards(invulTime, 0, Time.deltaTime);
 
+        foreach (PlayerAbility ability in equippedPassiveAbilities)
+        {
+            if (ability != null) ability.OnUpdate();
+        }
+
         if (!isDead)
         {
             HandleInput();
@@ -357,9 +368,6 @@ public class Player : MonoBehaviour
 
         if (BeatManager.isGameBeat)
         {
-            if (ultimateAbility != null) AddSP(1);
-
-            UIManager.Instance.PlayerUI.UpdateSpecial();
             animator.updateMode = AnimatorUpdateMode.Normal;
             if (poisonStatus > 5) poisonStatus = 5;
             if (poisonStatus > 0) poisonStatus--;
@@ -380,18 +388,12 @@ public class Player : MonoBehaviour
             rechargeFX.color = rechargeFXcolor;
         }
 
-        foreach (PlayerAbility ability in equippedPassiveAbilities)
-        {
-            if (ability != null) ability.OnUpdate();
-        }
-        foreach (PlayerItem item in equippedItems)
+        
+        /*
+        foreach (PlayerItem item in inventory)
         {
             if (item != null) item.OnUpdate();
-        }
-        foreach (PlayerItem item in evolvedItems)
-        {
-            if (item != null) item.OnUpdate();
-        }
+        }*/
 
         if (activeAbility != null) { activeAbility.OnUpdate(); }
         if (ultimateAbility != null) { ultimateAbility.OnUpdate(); }
@@ -400,7 +402,7 @@ public class Player : MonoBehaviour
         else
         {
             float currentCD = activeAbility.currentCooldown;
-            float maxCD = activeAbility.maxCooldown;
+            float maxCD = activeAbility.GetMaxCooldown();
 
             if (currentCD == 0) UIManager.Instance.PlayerUI.activeCDImage.fillAmount = 0;
             else UIManager.Instance.PlayerUI.activeCDImage.fillAmount = (currentCD / maxCD);
@@ -794,14 +796,6 @@ public class Player : MonoBehaviour
             instance.OnLevelUp();
         }
         UIManager.Instance.PlayerUI.UpdateExp();
-    }
-
-    public static void AddSP(int n)
-    {
-        if (instance.isDead) return;
-        if (instance.CurrentSP < instance.MaxSP && instance.CurrentSP + n >= instance.MaxSP) AudioController.PlaySound(AudioController.instance.sounds.playerSpecialAvailableSfx);
-        instance.CurrentSP = Mathf.Clamp(instance.CurrentSP + n, 0, instance.MaxSP);
-        UIManager.Instance.PlayerUI.UpdateSpecial();
     }
 
     public void OnLevelUp()

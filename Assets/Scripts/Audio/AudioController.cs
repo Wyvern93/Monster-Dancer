@@ -72,7 +72,6 @@ public class AudioController : MonoBehaviour
     public static void PlaySound(AudioClip sound, float pitch = 1f, bool side = false)
     {
         if (instance.clipsPlaying.Contains(sound)) return;
-
         // Cooldown
         bool play = true;
         if (sfxCooldowns.ContainsKey(sound.name))

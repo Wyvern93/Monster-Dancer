@@ -4,13 +4,18 @@ using UnityEngine;
 
 public class MoonlightDaggersAbility : PlayerAbility, IPlayerProjectile
 {
-    public MoonlightDaggersAbility()
+    public MoonlightDaggersAbility() : base()
     {
-        maxAmmo = 2;
-        maxAttackSpeedCD = 0f;
-        maxCooldown = 2;
+        baseAmmo = 2;
+        baseAttackSpeed = 0.25f;
+        baseCooldown = 2;
+        baseDamage = 12;
+        baseDuration = 2;
+        baseSpeed = 10;
+        baseKnockback = 2;
+        baseCritChance = 0;
 
-        currentAmmo = maxAmmo;
+        currentAmmo = GetMaxAmmo();
         currentAttackSpeedCD = 0;
         currentCooldown = 0;
     }
@@ -20,14 +25,37 @@ public class MoonlightDaggersAbility : PlayerAbility, IPlayerProjectile
         return currentCooldown == 0 && currentAttackSpeedCD == 0;
     }
 
+    public override Color GetTooltipColor()
+    {
+        return new Color(0, 0.5f, 1f);
+    }
+
     public override string getAbilityDescription()
     {
-        throw new System.NotImplementedException(); // This is unused since it's used the AbilityEnhancement
+        string starColor = GetStarColorText();
+
+        string description = $"<color=#FFFF88>Shoots two waves of moonlight energy that pierce and pushes through enemies</color>\n\n";
+        description += AddStat("Uses", baseAmmo, GetMaxAmmo(), true);
+        description += AddStat("Cooldown", baseCooldown, GetMaxCooldown(), false, " Beats");
+        description += AddStat("Attack Speed", baseAttackSpeed, GetAttackSpeed(), false, " Beats");
+        description += AddStat("Damage per Wave", baseDamage, GetDamage(), true);
+        description += AddStat("Crit Chance", baseCritChance * 100, GetCritChance() * 100, true, "%");
+        description += AddStat("Speed", baseSpeed, GetSpeed(), true);
+        description += AddStat("Duration", baseDuration, GetDuration(), true, " Beats");
+        description += AddStat("Knockback", baseKnockback, GetKnockback(), true);
+        description += $"\nEvolves with: {starColor}{getEvolutionStarType()} Star";
+
+        return description;
+    }
+
+    public override string getTags()
+    {
+        return "Tags: Projectile, Piercing, Lunar, Knockback";
     }
 
     public override string getAbilityName()
     {
-        return Localization.GetLocalizedString("ability.rabi.moonlightdaggers.name"); // Unused
+        return "Moonlight Daggers";
     }
 
     public override List<Enhancement> getEnhancementList()
@@ -48,16 +76,16 @@ public class MoonlightDaggersAbility : PlayerAbility, IPlayerProjectile
         if (currentAmmo - 1 > 0)
         {
             currentAmmo--;
-            currentAttackSpeedCD = maxAttackSpeedCD;
+            currentAttackSpeedCD = GetAttackSpeed();
         }
         else
         {
             currentAmmo--;
-            currentCooldown = maxCooldown;
-            currentAttackSpeedCD = maxAttackSpeedCD;
+            currentCooldown = GetMaxCooldown();
+            currentAttackSpeedCD = GetAttackSpeed();
             AudioController.PlaySound(AudioController.instance.sounds.reloadSfx);
         }
-        UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, maxAmmo);
+        UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, GetMaxAmmo());
         ShootWave();
     }
 
@@ -90,6 +118,11 @@ public class MoonlightDaggersAbility : PlayerAbility, IPlayerProjectile
     public void ShootWave()
     {
         MoonlightDaggerWave wave = PoolManager.Get<MoonlightDaggerWave>();
+        wave.quarterbeats = GetDuration();
+        wave.velocity = GetSpeed();
+        wave.dmg = GetDamage();
+        wave.abilitySource = this;
+        Debug.Log(wave.abilitySource);
         PlayerCamera.TriggerCameraShake(0.4f, 0.15f);
         Player.instance.despawneables.Add(wave.GetComponent<IDespawneable>());
     }
@@ -101,19 +134,14 @@ public class MoonlightDaggersAbility : PlayerAbility, IPlayerProjectile
             currentCooldown -= 0.25f;
             if (currentCooldown == 0)
             {
-                currentAmmo = maxAmmo;   
+                currentAmmo = GetMaxAmmo();   
             }
         }
         if (BeatManager.isQuarterBeat && currentAttackSpeedCD > 0) currentAttackSpeedCD -= 0.25f;
         if (IsCurrentWeaponSelected())
         {
-            UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, maxAmmo);
+            UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, GetMaxAmmo());
         }
-    }
-
-    public override System.Type getEvolutionItemType()
-    {
-        return typeof(HotSauceBottleItem);
     }
 
     public override Enhancement getEvolutionEnhancement()

@@ -146,6 +146,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackSound: {fileID: 8300000, guid: 7b96591a9d08b6c4bb5446f634a2cf77, type: 3}
   animator: {fileID: 2316910607497260211}
+  quarterbeats: 0
+  velocity: 0
+  dmg: 0
 --- !u!95 &2316910607497260211
 Animator:
   serializedVersion: 5

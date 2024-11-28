@@ -5,8 +5,6 @@ public class RabiDashHitbox : MonoBehaviour
     public float dmg;
     public void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!Player.instance.abilityValues.ContainsKey("ability.illusiondash.level")) return;
-       
         dmg = 60;
 
         if (collision.CompareTag("Enemy"))

@@ -4,13 +4,15 @@ using UnityEngine;
 
 public class MoonlightFlower : MonoBehaviour, IDespawneable
 {
-    public int beats;
+    public float beats;
     public float dmg;
     private List<Enemy> enemies = new List<Enemy>();
-    private float speed;
+    public float speed;
     [SerializeField] AudioClip sfx;
     private Vector2 targetPos;
     private float scale = 0;
+    public float targetScale;
+    public MoonlightFlowerAbility abilitySource;
 
     public void OnEnable()
     {
@@ -18,16 +20,12 @@ public class MoonlightFlower : MonoBehaviour, IDespawneable
         transform.localScale = Vector3.one * scale;
         enemies.Clear();
         GetComponent<Animator>().speed = 1f / BeatManager.GetBeatDuration();
-        beats = 6;
-        dmg = 3f;
-        dmg *= Player.instance.itemValues["orbitalDamage"];
-        speed = 4 * Player.instance.itemValues["orbitalSpeed"];
         AudioController.PlaySound(sfx);
     }
 
     public void OnSpawn()
     {
-        transform.localEulerAngles = new Vector3(0, 0, transform.localEulerAngles.z - (Time.deltaTime * 100));
+        transform.localEulerAngles = new Vector3(0, 0, transform.localEulerAngles.z - (Time.deltaTime * 100 * abilitySource.itemValues["orbitalSpeed"]));
     }
     private void MoveTowardsTarget()
     {
@@ -38,7 +36,7 @@ public class MoonlightFlower : MonoBehaviour, IDespawneable
     }
     private float GetAcceleration()
     {
-        float currentDistance = Vector2.Distance(transform.position, targetPos) * 4f;
+        float currentDistance = Vector2.Distance(transform.position, targetPos) * speed;
         currentDistance = Mathf.Clamp(currentDistance, 0, 1f);
         return currentDistance;
     }
@@ -47,14 +45,14 @@ public class MoonlightFlower : MonoBehaviour, IDespawneable
     {
         if (GameManager.isPaused) return;
 
-        scale = Mathf.MoveTowards(scale, 1f, Time.deltaTime * 4f);
+        scale = Mathf.MoveTowards(scale, targetScale, Time.deltaTime * 4f);
         transform.localScale = Vector3.one * scale;
 
         targetPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
         MoveTowardsTarget();
-        if (BeatManager.isGameBeat)
+        if (BeatManager.isQuarterBeat)
         {
-            beats--;
+            beats -= 0.25f;
         }
         transform.localEulerAngles = new Vector3(0, 0, transform.localEulerAngles.z - (Time.deltaTime * 100));
 
@@ -62,17 +60,24 @@ public class MoonlightFlower : MonoBehaviour, IDespawneable
         {
             for (int i = 0; i < enemies.Count; i++)
             {
-                float damage = (int)(Player.instance.currentStats.Atk * dmg);
-                bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
-                if (isCritical) damage *= Player.instance.currentStats.CritDmg;
+                float damage = dmg;
+                bool isCritical = abilitySource.GetCritChance() > Random.Range(0f, 100f);
+                if (isCritical) dmg *= 2.5f;
                 enemies[i].TakeDamage((int)damage, isCritical);
+                foreach (PlayerItem item in abilitySource.equippedItems)
+                {
+                    if (item == null) continue;
+                    item.OnHit(abilitySource, dmg, enemies[i]);
+                }
             }
         }
 
         if (beats <= 0)
         {
             MoonlightShockwave shockwave = PoolManager.Get<MoonlightShockwave>();
-            shockwave.dmg = 24;
+            shockwave.abilitySource = abilitySource;
+            shockwave.dmg = abilitySource.GetShockwaveDamage();
+            shockwave.transform.localScale = Vector3.one * scale;
             shockwave.transform.position = transform.position;
             Player.instance.despawneables.Remove(this);
             PoolManager.Return(gameObject, typeof(MoonlightFlower));
@@ -82,7 +87,9 @@ public class MoonlightFlower : MonoBehaviour, IDespawneable
     private void OnDespawn()
     {
         MoonlightShockwave shockwave = PoolManager.Get<MoonlightShockwave>();
-        shockwave.dmg = 4;
+        shockwave.abilitySource = abilitySource;
+        shockwave.dmg = abilitySource.GetShockwaveDamage();
+        shockwave.transform.localScale = Vector3.one * scale;
         shockwave.transform.position = transform.position;
         beats = 0;
     }

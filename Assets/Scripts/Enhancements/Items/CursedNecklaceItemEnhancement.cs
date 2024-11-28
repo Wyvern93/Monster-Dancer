@@ -6,8 +6,7 @@ public class CursedNecklaceItemEnhancement : Enhancement
 {
     public override string GetDescription()
     {
-        float size = Player.instance.itemValues["burnDuration"];
-        return $"Increases duration of damaging status effects from <color=\"green\">{size} -> {size + 2}</color> beats";
+        return $"Increases duration of damaging status effects by <color=\"green\">2</color> beats";
     }
 
     public override string getName()
@@ -27,7 +26,7 @@ public class CursedNecklaceItemEnhancement : Enhancement
 
     public override int getWeight()
     {
-        return 4;
+        return 3;
     }
 
     public override PlayerAbility getAbility()
@@ -48,7 +47,7 @@ public class CursedNecklaceItemEnhancement : Enhancement
     public override void OnEquip()
     {
         base.OnEquip();
-        Player.instance.itemValues["burnDuration"] += 2;
+        //Player.instance.itemValues["burnDuration"] += 2;
     }
 
     public override EnhancementType GetEnhancementType()

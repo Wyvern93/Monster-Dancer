@@ -5,15 +5,50 @@ using UnityEngine;
 public class CarrotcopterAbility : PlayerAbility, IPlayerProjectile
 {
     CarrotCopter currentDrone;
-    public CarrotcopterAbility()
+    public CarrotcopterAbility() : base()
     {
-        maxAmmo = 4;
-        maxAttackSpeedCD = 0f;
-        maxCooldown = 4;
+        baseAmmo = 4;
+        baseAttackSpeed = 0.25f;
+        baseCooldown = 4;
 
-        currentAmmo = maxAmmo;
+        baseDamage = 15;
+        baseKnockback = 0;
+        baseCritChance = 0;
+        baseDuration = 0;
+        baseSpeed = 7;
+        baseReach = 5;
+        baseSize = 5f;
+
+        currentAmmo = GetMaxAmmo();
         currentAttackSpeedCD = 0;
         currentCooldown = 0;
+    }
+
+    public override string getAbilityDescription()
+    {
+        string starColor = GetStarColorText();
+
+        string description = $"<color=#FFFF88>A drone that shoots targeted enemies in an area</color>\n\n";
+        description += AddStat("Uses", baseAmmo, GetMaxAmmo(), true);
+        description += AddStat("Cooldown", baseCooldown, GetMaxCooldown(), false, " Beats");
+        description += AddStat("Attack Speed", baseAttackSpeed, GetAttackSpeed(), false, " Beats");
+        description += AddStat("Damage per Bullet", baseDamage, GetDamage(), true);
+        description += AddStat("Crit Chance", baseCritChance * 100, GetCritChance() * 100, true, "%");
+        description += AddStat("Drone Reach", baseReach, GetReach(), true);
+        description += AddStat("Speed", baseSpeed, GetSpeed(), true);
+        description += $"\nEvolves with: {starColor}{getEvolutionStarType()} Star";
+
+        return description;
+    }
+
+    public override string getTags()
+    {
+        return "Tags: Projectile, Summon, Single-Target";
+    }
+
+    public override Color GetTooltipColor()
+    {
+        return new Color(1, 0.5f, 0f);
     }
 
     public override bool CanCast()
@@ -21,14 +56,9 @@ public class CarrotcopterAbility : PlayerAbility, IPlayerProjectile
         return currentCooldown == 0 && currentAttackSpeedCD == 0;
     }
 
-    public override string getAbilityDescription()
-    {
-        throw new System.NotImplementedException();
-    }
-
     public override string getAbilityName()
     {
-        return Localization.GetLocalizedString("ability.rabi.carrotcopter.name");
+        return "Carrotcopter";
     }
 
     public override List<Enhancement> getEnhancementList()
@@ -53,29 +83,29 @@ public class CarrotcopterAbility : PlayerAbility, IPlayerProjectile
     public override void OnChange()
     {
         base.OnChange();
+        if (currentDrone == null) return;
         currentDrone.ForceDespawn(true);
     }
 
     public override void OnCast()
     {
-        maxAmmo = 4;
-
+        if (currentDrone == null) return;
         bool canShoot = currentDrone.CanShoot();
         if (!canShoot) return;
 
         if (currentAmmo - 1 > 0)
         {
             currentAmmo--;
-            currentAttackSpeedCD = maxAttackSpeedCD;
+            currentAttackSpeedCD = GetAttackSpeed();
         }
         else
         {
             currentAmmo--;
-            currentCooldown = maxCooldown;
-            currentAttackSpeedCD = maxAttackSpeedCD;
+            currentCooldown = GetMaxCooldown();
+            currentAttackSpeedCD = GetAttackSpeed();
             AudioController.PlaySound(AudioController.instance.sounds.reloadSfx);
         }
-        UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, maxAmmo);
+        UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, GetMaxAmmo());
         currentDrone.Shoot();
         PlayerCamera.TriggerCameraShake(0.4f, 0.15f);
     }
@@ -83,6 +113,7 @@ public class CarrotcopterAbility : PlayerAbility, IPlayerProjectile
     private void SpawnDrone()
     {
         CarrotCopter carrotcopter = PoolManager.Get<CarrotCopter>();
+        carrotcopter.abilitySource = this;
         carrotcopter.transform.position = Player.instance.transform.position;
         currentDrone = carrotcopter;
         Player.instance.despawneables.Add(carrotcopter);
@@ -110,13 +141,13 @@ public class CarrotcopterAbility : PlayerAbility, IPlayerProjectile
             currentCooldown -= 0.25f;
             if (currentCooldown == 0)
             {
-                currentAmmo = maxAmmo;
+                currentAmmo = GetMaxAmmo();
             }
         }
         if (BeatManager.isQuarterBeat && currentAttackSpeedCD > 0) currentAttackSpeedCD -= 0.25f;
         if (IsCurrentWeaponSelected())
         {
-            UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, maxAmmo);
+            UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, GetMaxAmmo());
         }
     }
 }

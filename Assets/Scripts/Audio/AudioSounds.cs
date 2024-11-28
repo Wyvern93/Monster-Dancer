@@ -9,6 +9,10 @@ public class AudioSounds
     public AudioClip ui_select;
     public AudioClip ui_dialogue_char;
     public AudioClip ui_evolve;
+    public AudioClip ui_choice;
+    public AudioClip ui_inventory_hover;
+    public AudioClip ui_inventory_hover2;
+    public AudioClip ui_inventory_drag;
 
     [Header("Player Sounds")]
     public AudioClip playerHurtSfx;
@@ -17,6 +21,7 @@ public class AudioSounds
     public AudioClip surpriseSfx;
     public AudioClip playerSpecialUseSfx;
     public AudioClip reloadSfx;
+    public AudioClip abilityReadySfx;
 
     [Header("Enemy Sounds")]
     public AudioClip enemyHurtSound;

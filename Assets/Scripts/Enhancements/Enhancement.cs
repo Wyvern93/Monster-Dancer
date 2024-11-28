@@ -40,21 +40,29 @@ public abstract class Enhancement
             PlayerAbility ability = getAbility();
             if (getDescriptionType() == "Passive")
             {
-                Player.instance.equippedPassiveAbilities.Add(ability);
-                UIManager.Instance.PlayerUI.SetPassiveIcon(getIcon(), Player.instance.getPassiveAbilityIndex(ability.GetType()));
+                if (Player.instance.equippedPassiveAbilities.Count < 3)
+                {
+                    Player.instance.equippedPassiveAbilities.Add(ability);
+                    UIManager.Instance.PlayerUI.SetPassiveIcon(getIcon(), Player.instance.getPassiveAbilityIndex(ability.GetType()));
+                }
+                else
+                {
+                    Player.instance.AddAbilityToInventory(ability);
+                }
+                
             }
             else if (getDescriptionType() == "Special")
             {
                 Player.instance.ultimateAbility = ability;
-                Player.AddSP(250);
                 UIManager.Instance.PlayerUI.ShowSPBar();
                 UIManager.Instance.PlayerUI.SetUltimateIcon(getIcon());
-                UIManager.Instance.PlayerUI.UpdateSpecial();
+                ability.OnEquip();
+                //UIManager.Instance.PlayerUI.UpdateSpecial();
             }
         }
         else if (GetEnhancementType() == EnhancementType.Item)
         {
-            Player.instance.equippedItems.Add(getItem());
+            Player.instance.AddItemToInventory(getItem());
         }
         Player.instance.CalculateStats();
     }
@@ -67,10 +75,7 @@ public abstract class Enhancement
     public virtual void OnEvolutionEquip(int slot)
     {
         Player.instance.enhancements.Add(this);
-        Player.instance.abilityValues.Add($"ability.{getId()}.level", 1);
         Player.instance.equippedPassiveAbilities[slot] = getAbility();
-        Player.instance.evolvedItems.Add(Player.instance.equippedItems.Find(x => x.GetType() == getEvolutionItemType()));
-        Player.instance.equippedItems.RemoveAll(x=> x.GetType() == getEvolutionItemType());
         UIManager.Instance.PlayerUI.SetPassiveIcon(getIcon(), slot);
         Player.instance.CalculateStats();
     }
@@ -85,6 +90,7 @@ public abstract class Enhancement
             if (getDescriptionType() == "Passive")
             {
                 if (Player.instance.equippedPassiveAbilities.Find(x => x.getId() == getId()) != null) available = false;
+                if (Player.instance.DoesInventoryContain(getId())) available = false;
             }
             else if (getDescriptionType() == "Special")
             {
@@ -94,7 +100,7 @@ public abstract class Enhancement
         }
         else if (GetEnhancementType() == EnhancementType.Item)
         {
-            if (Player.instance.equippedItems.Find(x => x.getId() == getId()) != null) available = true;
+            available = true;
         }
         
 

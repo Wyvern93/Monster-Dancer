@@ -3,12 +3,9 @@ using UnityEngine;
 
 public class JuiceExplosion : MonoBehaviour
 {
-    private float dmg;
+    public float dmg;
+    public CarrotJuiceAbility abilitySource;
 
-    private void OnEnable()
-    {
-        dmg = 8f;
-    }
     public void OnFinish()
     {
         PoolManager.Return(gameObject, GetType());
@@ -20,13 +17,17 @@ public class JuiceExplosion : MonoBehaviour
         {
             Enemy enemy = collision.GetComponent<Enemy>();
 
-            float damage = Player.instance.currentStats.Atk * dmg * Player.instance.itemValues["explosionDamage"];
-            if (Player.instance.enhancements.Any(x => x.GetType() == typeof(DetonationCatalystItemEnhancement))) damage *= (Player.instance.itemValues["explosionSize"] * 1.5f) - 0.5f;
+            float damage = abilitySource.GetSplashDamage();
 
-            bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
-            if (isCritical) damage *= Player.instance.currentStats.CritDmg;
+            bool isCritical = abilitySource.GetCritChance() > Random.Range(0f, 100f);
+            if (isCritical) dmg *= 2.5f;
 
             enemy.TakeDamage(damage, isCritical);
+            foreach (PlayerItem item in abilitySource.equippedItems)
+            {
+                if (item == null) continue;
+                item.OnHit(abilitySource, dmg, enemy);
+            }
         }
 
         if (collision.CompareTag("FairyCage"))

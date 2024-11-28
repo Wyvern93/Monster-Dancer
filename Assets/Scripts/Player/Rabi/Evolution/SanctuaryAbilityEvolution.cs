@@ -38,10 +38,11 @@ public class SanctuaryAbilityEvolution : PlayerAbility, IPlayerAura
 
     public override void OnCast()
     {
-        maxCooldown = 16;
-        currentCooldown = maxCooldown;
+        baseCooldown = 16;
+        currentCooldown = GetMaxCooldown();
         currentCooldown = -1;
         SanctuaryAura sanctuaryAura = PoolManager.Get<SanctuaryAura>();
+        sanctuaryAura.abilitySource = this;
         aura = sanctuaryAura;
         Player.instance.despawneables.Add(sanctuaryAura);
     }
@@ -75,11 +76,6 @@ public class SanctuaryAbilityEvolution : PlayerAbility, IPlayerAura
     public override void OnUpdate()
     {
         if (BeatManager.isGameBeat && currentCooldown > 0) currentCooldown--;
-    }
-
-    public override System.Type getEvolutionItemType()
-    {
-        return typeof(BlessedFigureItem);
     }
 
     public override Type getEvolutionAbilityType()

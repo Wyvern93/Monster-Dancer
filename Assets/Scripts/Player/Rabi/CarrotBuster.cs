@@ -5,11 +5,11 @@ public class CarrotBuster : MonoBehaviour
     bool left = false;
     [SerializeField] Animator animator;
     [SerializeField] AudioClip sfx;
-    float abilityDamage;
+    public float damage;
+    public PlayerAbility abilitySource;
     public void OnEnable()
     {
         transform.parent = Player.instance.transform;
-        abilityDamage = 12; // 200% 200%
         left = !left;
         animator.Play(left ? "carrotbuster_left" : "carrotbuster_right");
         AudioController.PlaySound(sfx, Random.Range(0.95f, 1.05f));
@@ -38,12 +38,16 @@ public class CarrotBuster : MonoBehaviour
             Enemy enemy = collision.GetComponent<Enemy>();
 
             Vector2 dir = enemy.transform.position - Player.instance.transform.position;
-            enemy.PushEnemy(dir, 5f);
-
-            float damage = (int)(Player.instance.currentStats.Atk * abilityDamage);
-            bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
-            if (isCritical) damage *= Player.instance.currentStats.CritDmg;
+            enemy.PushEnemy(dir, abilitySource.GetKnockback());
+;
+            bool isCritical = abilitySource.GetCritChance() > Random.Range(0f, 100f);
+            if (isCritical) damage *= 2.5f;
             enemy.TakeDamage((int)damage, isCritical);
+            foreach (PlayerItem item in abilitySource.equippedItems)
+            {
+                if (item == null) continue;
+                item.OnHit(abilitySource, damage, enemy);
+            }
         }
 
         if (collision.CompareTag("FairyCage"))

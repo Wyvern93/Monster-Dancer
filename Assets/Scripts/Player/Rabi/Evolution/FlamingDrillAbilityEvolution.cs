@@ -34,8 +34,8 @@ public class FlamingDrillAbilityEvolution : PlayerAbility, IPlayerProjectile
 
     public override void OnCast()
     {
-        maxCooldown = 7;
-        currentCooldown = maxCooldown;
+        baseCooldown = 7;
+        currentCooldown = GetMaxCooldown();
         Player.instance.StartCoroutine(CastCoroutine());
     }
 
@@ -61,6 +61,7 @@ public class FlamingDrillAbilityEvolution : PlayerAbility, IPlayerProjectile
     public void ShootCarrot(Vector2 direction)
     {
         FlamingDrill carrot = PoolManager.Get<FlamingDrill>();
+        carrot.abilitySource = this;
         carrot.transform.position = Player.instance.transform.position;
         carrot.dir = direction;
         carrot.transform.position = Player.instance.transform.position;
@@ -75,11 +76,6 @@ public class FlamingDrillAbilityEvolution : PlayerAbility, IPlayerProjectile
     public override void OnUpdate()
     {
         if (BeatManager.isGameBeat && currentCooldown > 0) currentCooldown--;
-    }
-
-    public override System.Type getEvolutionItemType()
-    {
-        return typeof(HotSauceBottleItem);
     }
 
     public override bool isEvolved()

@@ -32,14 +32,6 @@ public class MoonlightDaggersEnhancement : Enhancement
     {
         base.OnEquip();
 
-        Player.instance.abilityValues["Attack_Number"] = 2;
-        Player.instance.abilityValues["Attack_Size"] = 1f;
-        Player.instance.abilityValues["Attack_Damage"] = 12f;
-        Player.instance.abilityValues["Attack_Velocity"] = 1;
-        Player.instance.abilityValues["Attack_Time"] = 0.25f;
-        Player.instance.abilityValues["Attack_Cooldown"] = 2f;
-        Player.instance.abilityValues["Attack_Pierce"] = 9999;
-
         Player.instance.CalculateStats();
     }
 

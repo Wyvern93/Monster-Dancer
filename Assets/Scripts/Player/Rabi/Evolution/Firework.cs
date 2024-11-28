@@ -1,7 +1,4 @@
-using TMPro;
 using UnityEngine;
-using UnityEngine.U2D;
-using UnityEngine.UIElements;
 
 public class Firework : MonoBehaviour, IDespawneable
 {
@@ -15,6 +12,7 @@ public class Firework : MonoBehaviour, IDespawneable
     private Vector2 direction;
     [SerializeField] float speed;
     [SerializeField] float startingTime;
+    public PlayerAbility abilitySource;
 
     public void OnEnable()
     {
@@ -53,10 +51,11 @@ public class Firework : MonoBehaviour, IDespawneable
     void Explode()
     {
         FireworkExplosion explosion = PoolManager.Get<FireworkExplosion>();
+        explosion.abilitySource = abilitySource;
         explosion.dmg = 65;
         explosion.canSpawnMini = true;
         explosion.transform.position = transform.position;
-        explosion.transform.localScale = Vector3.one * Player.instance.itemValues["explosionSize"];
+        explosion.transform.localScale = Vector3.one * abilitySource.itemValues["explosionSize"];
         PoolManager.Return(gameObject, typeof(Firework));
     }
 

@@ -5,16 +5,15 @@ public class RabiEclipse : MonoBehaviour, IDespawneable
     [SerializeField] AudioClip pulseSfx;
     [SerializeField] Animator animator;
     [SerializeField] AudioSource sfxSource;
-    int dmg;
+    public float dmg;
     float time;
-    float healing;
+    public float healing;
     public void OnEnable()
     {
         animator.speed = 1f / BeatManager.GetBeatDuration() / 2F;
         string anim = "EclipseMedium";
         animator.Play(anim);
 
-        dmg = 12;
         time = 0;
         transform.parent = Player.instance.transform;
         transform.localPosition = Vector3.zero;
@@ -23,7 +22,6 @@ public class RabiEclipse : MonoBehaviour, IDespawneable
     public void PlayPulse()
     {
         PlayerCamera.TriggerCameraShake(0.3f, 0.3f);
-        healing = 0.08f;
         int healnumber = (int)(Player.instance.currentStats.MaxHP * healing);
         Player.instance.Heal(healnumber);
         AudioController.PlaySound(pulseSfx);

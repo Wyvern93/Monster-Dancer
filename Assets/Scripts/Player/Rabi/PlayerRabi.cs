@@ -112,23 +112,8 @@ public class PlayerRabi : Player
         hop.OnEquip();
         activeAbility = hop;
         //equippedPassiveAbilities.Add(orbitalmoon);
-        abilityValues.Add("ability.bunnyhop.level", 1);
         UIManager.Instance.PlayerUI.activeCDImage.fillAmount = 0;
         activeAbility.currentCooldown = 0;
-
-        //ultimateAbility = new CarrotDeliveryAbility();
-        //ultimateAbility.OnEquip();
-        //instance.abilityValues.Add("ability.carrotdelivery.level", 1);
-        //CurrentSP = MaxSP;
-
-        abilityValues.Add("Attack_Number", 2); // 4 Upgrades
-        abilityValues.Add("Attack_Size", 1f); // 20 Upgrades
-        abilityValues.Add("Attack_Velocity", 1); // 20 Upgrades
-        abilityValues.Add("Attack_Time", 1f); // 10 Upgrades
-        abilityValues.Add("Attack_Cooldown", 4);
-        abilityValues.Add("Attack_Pierce", 3);
-        abilityValues.Add("Attack_Spread", 0);
-        abilityValues.Add("Attack_Explode", 0);
 
         // Moonlight Daggers Spell-Shot
         MoonlightDaggersEnhancement attack = new MoonlightDaggersEnhancement();

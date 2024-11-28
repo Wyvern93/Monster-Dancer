@@ -3,11 +3,19 @@ using UnityEngine;
 
 public class BunnyHopAbility : PlayerAbility
 {
-
+    public BunnyHopAbility() : base()
+    {
+        baseCooldown = 6;
+    }
     public override bool CanCast()
     {
         if (((PlayerRabi)Player.instance).isCastingBunnyHop) return false;
         return currentCooldown == 0;
+    }
+
+    public override void OnChange()
+    {
+        
     }
 
     public override string getAbilityDescription()
@@ -41,8 +49,7 @@ public class BunnyHopAbility : PlayerAbility
     }
     public override void OnCast()
     {
-        maxCooldown = 6; // 6
-        currentCooldown = maxCooldown;
+        currentCooldown = baseCooldown;
 
         PlayerRabi rabi = (PlayerRabi)Player.instance;
         rabi.DoBunnyHop();

@@ -1,36 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
 
 public class MoonlightDaggerWave : MonoBehaviour, IDespawneable, IPlayerProjectile
 {
     [SerializeField] AudioClip attackSound;
     [SerializeField] Animator animator;
-    int pierce;
-    bool hasExploded;
     Vector3 dir;
-    float quarterbeats;
-    float velocity;
-    float spread;
+    public float quarterbeats;
+    public float velocity;
+    public float dmg;
+    public PlayerAbility abilitySource;
 
     public void OnEnable()
     {
         dir = Vector3.zero;
-        pierce = (int)Player.instance.abilityValues["Attack_Pierce"];
-        hasExploded = false;
         animator.speed = 1f / BeatManager.GetBeatDuration() * 2f;
         AudioController.PlaySoundWithoutCooldown(attackSound);
-        quarterbeats = 2;
-        velocity = 15f * Player.instance.abilityValues["Attack_Velocity"];
-        spread = Player.instance.abilityValues["Attack_Spread"];
 
         Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
         Vector2 difference = (crosshairPos - (Vector2)Player.instance.transform.position).normalized;
         Vector2 animDir;
-        spread = Random.Range(-spread, spread);
-        difference = rotate(difference, spread);
 
         animDir = new Vector2(difference.y, -difference.x);
 
@@ -39,7 +29,6 @@ public class MoonlightDaggerWave : MonoBehaviour, IDespawneable, IPlayerProjecti
         transform.localEulerAngles = new Vector3(0, 0, Vector2.SignedAngle(Vector2.down, animDir));//getAngleFromVector(animDir));
         dir = difference;
     }
-
     public Vector2 rotate(Vector2 v, float delta)
     {
         return new Vector2(
@@ -105,43 +94,25 @@ public class MoonlightDaggerWave : MonoBehaviour, IDespawneable, IPlayerProjecti
         {
             Enemy enemy = collision.GetComponent<Enemy>();
 
-            float damage = Player.instance.abilityValues["Attack_Damage"] * Player.instance.currentStats.Atk;
-            bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
-            if (isCritical) damage *= Player.instance.currentStats.CritDmg;
+            float damage = dmg;
+            bool isCritical = abilitySource.GetCritChance() > Random.Range(0f, 100f);
+            if (isCritical) damage *= 2.5f;
             enemy.TakeDamage((int)damage, isCritical);
-            pierce--;
 
-            foreach (PlayerItem item in Player.instance.equippedItems)
+            foreach (PlayerItem item in abilitySource.equippedItems)
             {
-                item.OnHit(Player.instance.equippedPassiveAbilities.Find(x => x.GetType() == typeof(MoonlightDaggersAbility)), damage, enemy);
-            }
-            foreach (PlayerItem item in Player.instance.evolvedItems)
-            {
-                item.OnHit(Player.instance.equippedPassiveAbilities.Find(x => x.GetType() == typeof(MoonlightDaggersAbility)), damage, enemy);
-            }
-            if (!hasExploded && Player.instance.abilityValues["Attack_Explode"] == 1)
-            {
-                MoonlightShockwave shockwave = PoolManager.Get<MoonlightShockwave>();
-                shockwave.transform.position = transform.position;
+                if (item == null) continue;
+                item.OnHit(abilitySource, damage, enemy);
             }
 
             Vector2 dir = enemy.transform.position - Player.instance.transform.position;
-            enemy.PushEnemy(dir, 2f);
+            enemy.PushEnemy(dir, abilitySource.GetKnockback());
         }
 
         if (collision.CompareTag("FairyCage"))
         {
             FairyCage cage = collision.GetComponent<FairyCage>();
             cage.OnHit();
-            pierce--;
-        }
-
-        if (pierce <= 0)
-        {
-            Player.instance.isPerformingAction = false;
-            Player.instance.despawneables.Remove(this);
-            PoolManager.Return(gameObject, GetType());
-            return;
         }
     }
 

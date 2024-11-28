@@ -8,8 +8,7 @@ public class FireworksKitItemEnhancement : Enhancement
 {
     public override string GetDescription()
     {
-        float damage = Player.instance.itemValues["explosionDamage"] * 100;
-        return $"Increases explosion damage from <color=\"green\">{damage} -> {damage + 25}%</color> and critical strikes have a <color=\"green\">20%</color> chance to cause another explosion";
+        return $"Increases explosion damage by <color=\"green\">25%</color> and critical strikes have a <color=\"green\">20%</color> chance to cause another explosion";
     }
 
     public override string getName()
@@ -24,23 +23,17 @@ public class FireworksKitItemEnhancement : Enhancement
 
     public override string getDescriptionType()
     {
-        return "Evolution Item";
+        return "Item";
     }
 
     public override int getWeight()
     {
-        return 1;
+        return 2;
     }
 
     public override bool isAvailable()
     {
-        // PASSIVES
-        bool available = false;
-        if (Player.instance.equippedItems.Count == 6) return available = false;
-        if (Player.instance.equippedItems.Find(x => x.getId() == getId()) != null) return available = false;
-        if (Player.instance.equippedPassiveAbilities.Any(x => x.GetType() == typeof(CarrotBarrageAbility))) return true;
-        if (Player.instance.equippedPassiveAbilities.Any(x => x.GetType() == typeof(CarrotBusterAbility))) return true;
-        return available;
+        return base.isAvailable();
     }
 
     public override PlayerAbility getAbility()
@@ -61,6 +54,6 @@ public class FireworksKitItemEnhancement : Enhancement
     public override void OnEquip()
     {
         base.OnEquip();
-        Player.instance.itemValues["explosionDamage"] += 0.25f;
+        //Player.instance.itemValues["explosionDamage"] += 0.25f;
     }
 }

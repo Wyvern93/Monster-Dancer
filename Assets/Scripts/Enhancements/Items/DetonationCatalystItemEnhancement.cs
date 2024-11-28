@@ -6,8 +6,7 @@ public class DetonationCatalystItemEnhancement : Enhancement
 {
     public override string GetDescription()
     {
-        float size = Player.instance.itemValues["explosionSize"] * 100;
-        return $"Increases size of explosions from <color=\"green\">{size} -> {size + 10}%</color>, additionally, all explosions deal damage based on their size";
+        return $"Increases size of explosions by <color=\"green\">10%</color>, additionally, all explosions deal damage based on their size";
     }
 
     public override string getName()
@@ -27,7 +26,7 @@ public class DetonationCatalystItemEnhancement : Enhancement
 
     public override int getWeight()
     {
-        return 4;
+        return 3;
     }
 
     public override PlayerAbility getAbility()
@@ -45,10 +44,11 @@ public class DetonationCatalystItemEnhancement : Enhancement
         return base.isAvailable();
     }
 
+
     public override void OnEquip()
     {
         base.OnEquip();
-        Player.instance.itemValues["explosionSize"] += 0.1f;
+        //Player.instance.itemValues["explosionSize"] += 0.1f;
     }
 
     public override EnhancementType GetEnhancementType()
