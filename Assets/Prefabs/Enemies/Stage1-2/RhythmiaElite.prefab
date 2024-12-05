@@ -256,16 +256,17 @@ MonoBehaviour:
   Sprite: {fileID: 288785147411649963}
   rb: {fileID: 7657724470701423805}
   SpriteSize: 1
-  MaxHP: 1500
-  CurrentHP: 1500
+  MaxHP: 2100
+  CurrentHP: 2100
   SpawnIndex: 0
   AItype: 0
-  experience: 300
+  experience: 800
   baseExperience: 0
   atk: 4
   speed: 0.75
   eventMove: {x: 0, y: 0, z: 0}
   lifeTime: 0
+  slownessStatus: {fileID: 0}
 --- !u!95 &6593345179753065167
 Animator:
   serializedVersion: 5

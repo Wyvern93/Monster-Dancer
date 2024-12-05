@@ -10,20 +10,23 @@ public class Stage1b : Map
     public GameObject fireflies;
 
     [Header("Enemy Prefabs")]
-    public GameObject wiggleViperPrefab;
-    public GameObject muscleHarePrefab;
-    public GameObject muscleHareElitePrefab;
-    public GameObject rhythmiaPrefab;
-    public GameObject fungooPrefab;
-    public GameObject rhythmiaElitePrefab;
-    public GameObject fungooElitePrefab;
-    public GameObject stayinundeadPrefab;
-    public GameObject purrfessorPrefab;
-    public GameObject stayinundeadElitePrefab;
-    public GameObject zippyBatPrefab;
-    public GameObject vampiLoliPrefab;
-    public GameObject ojouGuaridanPrefab;
+    public GameObject nomSlimePrefab;
+    public GameObject poisyPrefab;
+    public GameObject slimeDancerPrefab;
+    public GameObject nomSlimeElitePrefab;
     public GameObject kappaPrefab;
+    public GameObject tanukiPrefab;
+    public GameObject fungooPrefab;
+    public GameObject fungooElitePrefab;
+    public GameObject buzzBeePrefab;
+    public GameObject troncoPrefab;
+    public GameObject dancearunePrefab;
+    public GameObject dancearuneElitePrefab;
+    public GameObject wiggleViperPrefab;
+    public GameObject rhythmiaPrefab;
+    public GameObject karakasaPrefab;
+    public GameObject rhythmiaElitePrefab;
+    
 
     public GameObject nebulionBossPrefab;
 
@@ -35,20 +38,23 @@ public class Stage1b : Map
     public override void SetPools()
     {
         base.SetPools();
-        PoolManager.CreatePool(typeof(WiggleViper), wiggleViperPrefab, 50);
-        PoolManager.CreatePool(typeof(MuscleHare), muscleHarePrefab, 50);
-        PoolManager.CreatePool(typeof(MuscleHareElite), muscleHareElitePrefab, 1);
-        PoolManager.CreatePool(typeof(Rhythmia), rhythmiaPrefab, 50);
+        PoolManager.CreatePool(typeof(NomSlime), nomSlimePrefab, 50);
+        PoolManager.CreatePool(typeof(Poisy), poisyPrefab, 50);
+        PoolManager.CreatePool(typeof(SlimeDancer), slimeDancerPrefab, 50);
+        PoolManager.CreatePool(typeof(NomSlimeElite), nomSlimeElitePrefab, 1);
+        PoolManager.CreatePool(typeof(Kappa), kappaPrefab, 50);
+        PoolManager.CreatePool(typeof(Tanuki), tanukiPrefab, 50);
         PoolManager.CreatePool(typeof(Fungoo), fungooPrefab, 50);
-        PoolManager.CreatePool(typeof(RhythmiaElite), rhythmiaElitePrefab, 1);
         PoolManager.CreatePool(typeof(FungooElite), fungooElitePrefab, 1);
-        PoolManager.CreatePool(typeof(StayinUndead), stayinundeadPrefab, 50);
-        PoolManager.CreatePool(typeof(StayinUndeadElite), stayinundeadElitePrefab, 1);
-        PoolManager.CreatePool(typeof(Purrfessor), purrfessorPrefab, 50);
-        PoolManager.CreatePool(typeof(ZippyBat), zippyBatPrefab, 50);
-        PoolManager.CreatePool(typeof(VampiLoli), vampiLoliPrefab, 30);
-        PoolManager.CreatePool(typeof(OjouGuardian), ojouGuaridanPrefab, 50);
-        PoolManager.CreatePool(typeof(Kappa), kappaPrefab, 30);
+        PoolManager.CreatePool(typeof(BuzzBee), buzzBeePrefab, 50);
+        PoolManager.CreatePool(typeof(Tronco), troncoPrefab, 50);
+        PoolManager.CreatePool(typeof(Dancearune), dancearunePrefab, 50);
+        PoolManager.CreatePool(typeof(DancearuneElite), dancearuneElitePrefab, 1);
+        PoolManager.CreatePool(typeof(WiggleViper), wiggleViperPrefab, 50);
+        PoolManager.CreatePool(typeof(Rhythmia), rhythmiaPrefab, 50);
+        PoolManager.CreatePool(typeof(Karakasa), karakasaPrefab, 50);
+        PoolManager.CreatePool(typeof(RhythmiaElite), rhythmiaElitePrefab, 1);
+
         PoolManager.CreatePool(typeof(NebulionBoss), nebulionBossPrefab, 1);
     }
 
@@ -56,20 +62,22 @@ public class Stage1b : Map
     {
         Debug.Log("removed pools");
         base.RemoveAllPools();
-        PoolManager.RemovePool(typeof(WiggleViper));
-        PoolManager.RemovePool(typeof(MuscleHare));
-        PoolManager.RemovePool(typeof(MuscleHareElite));
-        PoolManager.RemovePool(typeof(Rhythmia));
-        PoolManager.RemovePool(typeof(Fungoo));
-        PoolManager.RemovePool(typeof(RhythmiaElite));
-        PoolManager.RemovePool(typeof(FungooElite));
-        PoolManager.RemovePool(typeof(StayinUndead));
-        PoolManager.RemovePool(typeof(StayinUndeadElite));
-        PoolManager.RemovePool(typeof(ZippyBat));
-        PoolManager.RemovePool(typeof(Purrfessor));
-        PoolManager.RemovePool(typeof(VampiLoli));
-        PoolManager.RemovePool(typeof(OjouGuardian));
+        PoolManager.RemovePool(typeof(NomSlime));
+        PoolManager.RemovePool(typeof(Poisy));
+        PoolManager.RemovePool(typeof(SlimeDancer));
+        PoolManager.RemovePool(typeof(NomSlimeElite));
         PoolManager.RemovePool(typeof(Kappa));
+        PoolManager.RemovePool(typeof(Tanuki));
+        PoolManager.RemovePool(typeof(Fungoo));
+        PoolManager.RemovePool(typeof(FungooElite));
+        PoolManager.RemovePool(typeof(BuzzBee));
+        PoolManager.RemovePool(typeof(Tronco));
+        PoolManager.RemovePool(typeof(Dancearune));
+        PoolManager.RemovePool(typeof(DancearuneElite));
+        PoolManager.RemovePool(typeof(WiggleViper));
+        PoolManager.RemovePool(typeof(Rhythmia));
+        PoolManager.RemovePool(typeof(Karakasa));
+        PoolManager.RemovePool(typeof(RhythmiaElite));
         PoolManager.RemovePool(typeof(NebulionBoss));
     }
 
@@ -167,37 +175,42 @@ public class Stage1b : Map
             new ChangeSpawnCooldownEvent(4, 480), // 12
             new ChangeSpawnCooldownEvent(3, 540), // 9
             
-            new AddEnemyEvent(EnemyType.WiggleViper, 5, 0, 0), // wiggleviper
-            new AddEnemyEvent(EnemyType.MuscleHare, 1, 0, 30),
-            new AddEnemyEvent(EnemyType.Rhytmia, 1, 0, 150),
-            new AddEnemyEvent(EnemyType.Fungoo, 4, 0, 200),
-            new AddEnemyEvent(EnemyType.StayinUndead, 3, 0, 300),
-            new AddEnemyEvent(EnemyType.Purrfessor, 1, 0, 330),
-            new AddEnemyEvent(EnemyType.ZippyBat, 8, 0, 400), // Needs custom spawn
-            new AddEnemyEvent(EnemyType.Kappa, 1, 0, 530),
+            new AddEnemyEvent(EnemyType.NomSlime, 6, 0, 0), // nomslime
+            new AddEnemyEvent(EnemyType.Poisy, 3, 0, 30),
+            new AddEnemyEvent(EnemyType.SlimeDancer, 1, 0, 60),
 
-            new RemoveEnemyEvent(EnemyType.WiggleViper, 0, 180),
-            new RemoveEnemyEvent(EnemyType.MuscleHare, 0, 150),
-            new RemoveEnemyEvent(EnemyType.Rhytmia, 0, 300),
-            new RemoveEnemyEvent(EnemyType.Fungoo, 0, 360),
-            new RemoveEnemyEvent(EnemyType.StayinUndead, 0, 450),
-            new RemoveEnemyEvent(EnemyType.Purrfessor, 0, 480),
-            new RemoveEnemyEvent(EnemyType.ZippyBat, 0, 595),
-            //new RemoveEnemyEvent(EnemyType.VampiLoli, 0, 540),
-            //new RemoveEnemyEvent(EnemyType.OjouGuardian, 0, 570),
-            new RemoveEnemyEvent(EnemyType.Kappa, 0, 595),
-            
-            new SpawnEliteEvent(EnemyType.MuscleHareElite, 120), // 120
-            new SpawnEliteEvent(EnemyType.RhytmiaElite, 240), // 240
-            new SpawnEliteEvent(EnemyType.FungooElite, 360), // 360
-            new SpawnEliteEvent(EnemyType.StayinUndeadElite, 480), // 480
-            
-            new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 400),
-            new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 460),
-            new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 500),
-            new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 520),
-            new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 530),
-            new SpawnUniqueEnemyEvent(EnemyType.VampiLoli, 540),
+            new AddEnemyEvent(EnemyType.Kappa, 1, 0, 130),
+            new AddEnemyEvent(EnemyType.Tanuki, 5, 0, 160),
+            new AddEnemyEvent(EnemyType.Fungoo, 3, 0, 200),
+
+            new AddEnemyEvent(EnemyType.BuzzBee, 4, 0, 310),
+            new AddEnemyEvent(EnemyType.Tronco, 6, 0, 250),
+            new AddEnemyEvent(EnemyType.Dancearune, 1, 0, 290),
+
+            new AddEnemyEvent(EnemyType.WiggleViper, 5, 0, 380),
+            new AddEnemyEvent(EnemyType.Rhytmia, 1, 0, 410),
+            new AddEnemyEvent(EnemyType.Karakasa, 3, 0, 440),
+
+            new RemoveEnemyEvent(EnemyType.NomSlime, 0, 120),
+            new RemoveEnemyEvent(EnemyType.Poisy, 0, 130),
+            new RemoveEnemyEvent(EnemyType.SlimeDancer, 0, 140),
+
+            new RemoveEnemyEvent(EnemyType.Kappa, 0, 220),
+            new RemoveEnemyEvent(EnemyType.Tanuki, 0, 260),
+            new RemoveEnemyEvent(EnemyType.Fungoo, 0, 280),
+
+            new RemoveEnemyEvent(EnemyType.BuzzBee, 0, 380),
+            new RemoveEnemyEvent(EnemyType.Tronco, 0, 390),
+            new RemoveEnemyEvent(EnemyType.Dancearune, 0, 375),
+
+            new RemoveEnemyEvent(EnemyType.WiggleViper, 0, 560),
+            new RemoveEnemyEvent(EnemyType.Rhytmia, 0, 598),
+            new RemoveEnemyEvent(EnemyType.Karakasa, 0, 598),
+
+            new SpawnEliteEvent(EnemyType.NomSlimeElite, 120),
+            new SpawnEliteEvent(EnemyType.FungooElite, 240), // 240
+            new SpawnEliteEvent(EnemyType.DancearuneElite, 360), // 360
+            new SpawnEliteEvent(EnemyType.RhytmiaElite, 480), // 480
             
             new SpawnBossEvent(EnemyType.Nebulion, 600)
         };

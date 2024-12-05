@@ -116,6 +116,7 @@ public class MoonBeamAbility : PlayerAbility
             currentCooldown -= 0.25f;
             if (currentCooldown == 0)
             {
+                currentAttackSpeedCD = 0;
                 currentAmmo = GetMaxAmmo();
             }
         }

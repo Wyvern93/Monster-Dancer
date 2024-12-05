@@ -14,7 +14,6 @@ public class FireworkExplosion : MonoBehaviour
     public PlayerAbility abilitySource;
     public void OnEnable()
     {
-        Debug.Log("firework!");
         transform.localScale = Vector3.one;
         AudioController.PlaySound(explosionSound);
         explosions = Random.Range(1, 3);

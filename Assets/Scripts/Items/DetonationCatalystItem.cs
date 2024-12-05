@@ -23,7 +23,7 @@ public class DetonationCatalystItem : PlayerItem
     public override string getItemDescription()
     {
         string description = $"<color=#FFFF88>All explosions deal bonus percent damage based on their bonus size</color>\n\n";
-        description += AddStat("Explosion Size", 20, true, "%");
+        description += AddStat("Explosion Size", 10, true, "%");
 
         return description;
     }

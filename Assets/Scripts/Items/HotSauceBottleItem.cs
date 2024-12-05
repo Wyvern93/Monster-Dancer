@@ -26,7 +26,6 @@ public class HotSauceBottleItem : PlayerItem
     {
         string description = $"<color=#FFFF88>Enemies burn on-hit</color>\n\n";
         description += AddStat("Burn Damage", 25, true, "%");
-        description += AddStat("Burn Duration", 2f, true, " Beats");
 
         return description;
     }
@@ -50,14 +49,12 @@ public class HotSauceBottleItem : PlayerItem
     {
         base.OnEquip(ability, slot);
         ability.itemValues["burnDamage"] += 0.25f;
-        ability.itemValues["burnDuration"] += 2f;
     }
 
     public override void OnUnequip(PlayerAbility ability, int originalSlot)
     {
         base.OnUnequip(ability, originalSlot);
         ability.itemValues["burnDamage"] -= 0.25f;
-        ability.itemValues["burnDuration"] -= 2f;
     }
 
     public override void OnUpdate()

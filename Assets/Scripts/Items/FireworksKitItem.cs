@@ -24,8 +24,9 @@ public class FireworksKitItem : PlayerItem
     public override string getItemDescription()
     {
         string description = $"<color=#FFFF88>When an enemy is hit by an explosion, trigger a firework explosion</color>\n\n";
-        description += AddStat("Damage", 25, true, "%");
+        description += AddStat("Explosion Damage", 25, true, "%");
         description += AddStat("Atk Speed", 25f, false, "%");
+        description += AddStat("Cooldown", 25f, false, "%");
 
         return description;
     }
@@ -48,15 +49,17 @@ public class FireworksKitItem : PlayerItem
     public override void OnEquip(PlayerAbility ability, int slot)
     {
         base.OnEquip(ability, slot);
-        ability.itemValues["damageMultiplier"] += 0.25f;
+        ability.itemValues["explosionDamage"] += 0.25f;
         ability.itemValues["atkSpeedMultiplier"] += 0.25f;
+        ability.itemValues["cooldownMultiplier"] += 0.25f;
     }
 
     public override void OnUnequip(PlayerAbility ability, int originalSlot)
     {
         base.OnUnequip(ability, originalSlot);
-        ability.itemValues["damageMultiplier"] -= 0.25f;
+        ability.itemValues["explosionDamage"] -= 0.25f;
         ability.itemValues["atkSpeedMultiplier"] -= 0.25f;
+        ability.itemValues["cooldownMultiplier"] -= 0.25f;
     }
 
     public override void OnUpdate()

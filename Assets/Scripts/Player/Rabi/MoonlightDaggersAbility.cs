@@ -122,7 +122,6 @@ public class MoonlightDaggersAbility : PlayerAbility, IPlayerProjectile
         wave.velocity = GetSpeed();
         wave.dmg = GetDamage();
         wave.abilitySource = this;
-        Debug.Log(wave.abilitySource);
         PlayerCamera.TriggerCameraShake(0.4f, 0.15f);
         Player.instance.despawneables.Add(wave.GetComponent<IDespawneable>());
     }
@@ -134,6 +133,7 @@ public class MoonlightDaggersAbility : PlayerAbility, IPlayerProjectile
             currentCooldown -= 0.25f;
             if (currentCooldown == 0)
             {
+                currentAttackSpeedCD = 0;
                 currentAmmo = GetMaxAmmo();   
             }
         }

@@ -141,6 +141,7 @@ public class CarrotcopterAbility : PlayerAbility, IPlayerProjectile
             currentCooldown -= 0.25f;
             if (currentCooldown == 0)
             {
+                currentAttackSpeedCD = 0;
                 currentAmmo = GetMaxAmmo();
             }
         }

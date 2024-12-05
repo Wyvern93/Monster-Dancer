@@ -168,6 +168,7 @@ public class MoonlightFlowerAbility : PlayerAbility
             currentCooldown -= 0.25f;
             if (currentCooldown == 0)
             {
+                currentAttackSpeedCD = 0;
                 currentAmmo = GetMaxAmmo();
             }
         }

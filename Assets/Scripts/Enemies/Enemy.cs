@@ -129,17 +129,24 @@ public abstract class Enemy : MonoBehaviour
             case EnemyType.ZippyBat: return PoolManager.Get<ZippyBat>();
             case EnemyType.Rhytmia: return PoolManager.Get<Rhythmia>();
             case EnemyType.RhytmiaElite: return PoolManager.Get<RhythmiaElite>();
-            case EnemyType.VampiLoli: return PoolManager.Get<VampiLoli>();
+            case EnemyType.VampiLoliElite: return PoolManager.Get<VampiLoliElite>();
             case EnemyType.Fungoo: return PoolManager.Get<Fungoo>();
             case EnemyType.FungooElite: return PoolManager.Get<FungooElite>();
             case EnemyType.Kappa: return PoolManager.Get<Kappa>();
             case EnemyType.MuscleHare: return PoolManager.Get<MuscleHare>();
-            case EnemyType.MuscleHareElite: return PoolManager.Get<MuscleHareElite>();
+            case EnemyType.MuscleHareElite: return PoolManager.Get<PurrfessorElite>();
             case EnemyType.OjouGuardian: return PoolManager.Get<OjouGuardian>();
             case EnemyType.Purrfessor: return PoolManager.Get<Purrfessor>();
+            case EnemyType.PurrfessorElite: return PoolManager.Get<PurrfessorElite>();
             case EnemyType.StayinUndead: return PoolManager.Get<StayinUndead>();
             case EnemyType.StayinUndeadElite: return PoolManager.Get<StayinUndeadElite>();
             case EnemyType.WiggleViper: return PoolManager.Get<WiggleViper>();
+            case EnemyType.Onibi: return PoolManager.Get<Onibi>();
+            case EnemyType.ClawRiff: return PoolManager.Get<ClawRiff>();
+            case EnemyType.RhythMaiden: return PoolManager.Get<RhythMaiden>();
+            case EnemyType.BuzzBee: return PoolManager.Get<BuzzBee>();
+            case EnemyType.Tanuki: return PoolManager.Get<Tanuki>();
+            case EnemyType.Karakasa: return PoolManager.Get<Karakasa>();
 
             case EnemyType.Usarin: return PoolManager.Get<UsarinBoss>();
             case EnemyType.Nebulion: return PoolManager.Get<NebulionBoss>();
