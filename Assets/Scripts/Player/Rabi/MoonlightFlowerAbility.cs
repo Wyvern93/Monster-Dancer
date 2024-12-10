@@ -36,7 +36,7 @@ public class MoonlightFlowerAbility : PlayerAbility
         description += AddStat("Attack Speed", baseAttackSpeed, GetAttackSpeed(), false, " Beats");
         description += AddStat("Damage", baseDamage, GetDamage(), true);
         description += AddStat("Shockwave Damage", baseShockwaveDamage, GetShockwaveDamage(), true);
-        description += AddStat("Crit Chance", baseCritChance * 100, GetCritChance() * 100, true, "%");
+        description += AddStat("Crit Chance", baseCritChance, GetCritChance(), true, "%");
         description += AddStat("Size", baseSize * 3f, GetSize() * 3f, true);
         description += $"\nEvolves with: {starColor}{getEvolutionStarType()} Star";
 
@@ -145,12 +145,12 @@ public class MoonlightFlowerAbility : PlayerAbility
     {
         base.OnChange();
         List<MoonlightFlower> list = currentFlowers;
-        foreach (MoonlightFlower flower in list)
+        for (int i = 0; i < list.Count; i++)
         {
-            if (flower != null)
+            if (list[i] != null)
             {
-                if (!flower.gameObject.activeSelf) currentFlowers.Remove(flower);
-                else flower.ForceDespawn(false);
+                if (!list[i].gameObject.activeSelf) currentFlowers.Remove(list[i]);
+                else list[i].ForceDespawn(false);
             }
         }
         

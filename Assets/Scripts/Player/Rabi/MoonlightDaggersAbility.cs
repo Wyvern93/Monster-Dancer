@@ -39,7 +39,7 @@ public class MoonlightDaggersAbility : PlayerAbility, IPlayerProjectile
         description += AddStat("Cooldown", baseCooldown, GetMaxCooldown(), false, " Beats");
         description += AddStat("Attack Speed", baseAttackSpeed, GetAttackSpeed(), false, " Beats");
         description += AddStat("Damage per Wave", baseDamage, GetDamage(), true);
-        description += AddStat("Crit Chance", baseCritChance * 100, GetCritChance() * 100, true, "%");
+        description += AddStat("Crit Chance", baseCritChance, GetCritChance(), true, "%");
         description += AddStat("Speed", baseSpeed, GetSpeed(), true);
         description += AddStat("Duration", baseDuration, GetDuration(), true, " Beats");
         description += AddStat("Knockback", baseKnockback, GetKnockback(), true);
@@ -122,7 +122,7 @@ public class MoonlightDaggersAbility : PlayerAbility, IPlayerProjectile
         wave.velocity = GetSpeed();
         wave.dmg = GetDamage();
         wave.abilitySource = this;
-        PlayerCamera.TriggerCameraShake(0.4f, 0.15f);
+        PlayerCamera.TriggerCameraShake(0.25f, 0.15f);
         Player.instance.despawneables.Add(wave.GetComponent<IDespawneable>());
     }
 

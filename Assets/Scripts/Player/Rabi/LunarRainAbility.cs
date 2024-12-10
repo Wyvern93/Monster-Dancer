@@ -33,7 +33,7 @@ public class LunarRainAbility : PlayerAbility
         description += AddStat("Cooldown", baseCooldown, GetMaxCooldown(), false, " Beats");
         description += AddStat("Attack Speed", baseAttackSpeed, GetAttackSpeed(), false, " Beats");
         description += AddStat("Damage per beam", baseDamage, GetDamage(), true);
-        description += AddStat("Crit Chance", baseCritChance * 100, GetCritChance() * 100, true, "%");
+        description += AddStat("Crit Chance", baseCritChance, GetCritChance(), true, "%");
         description += AddStat("Area Reach", baseReach, GetReach(), true);
         description += $"\nEvolves with: {starColor}{getEvolutionStarType()} Star";
 
@@ -128,7 +128,7 @@ public class LunarRainAbility : PlayerAbility
         foreach (PlayerItem item in equippedItems)
         {
             if (item == null) continue;
-            item.OnHit(this, GetDamage(), e);
+            item.OnHit(this, GetDamage(), e, isCritical);
         }
     }
 

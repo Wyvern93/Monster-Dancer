@@ -51,7 +51,7 @@ public class CarrotBarrageAbility : PlayerAbility, IPlayerExplosion
         description += AddStat("Cooldown", baseCooldown, GetMaxCooldown(), false, " Beats");
         description += AddStat("Attack Speed", baseAttackSpeed, GetAttackSpeed(), false, " Beats");
         description += AddStat("Explosion Damage", baseDamage, GetDamage(), true);
-        description += AddStat("Crit Chance", baseCritChance * 100, GetCritChance() * 100, true, "%");
+        description += AddStat("Crit Chance", baseCritChance, GetCritChance(), true, "%");
         description += AddStat("Reach", baseReach, GetReach(), true);
         description += AddStat("Spread", baseSpread, GetSpread(), true);
         description += AddStat("Speed", baseSpeed, GetSpeed(), true);

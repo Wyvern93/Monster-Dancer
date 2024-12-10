@@ -293,6 +293,7 @@ public class Player : MonoBehaviour
 
     public void Heal(float amount, PlayerAbility source = null)
     {
+        if (CurrentHP >= currentStats.MaxHP) return;
         float baseamount = amount;
         bool canCrit = false;
 
@@ -305,8 +306,8 @@ public class Player : MonoBehaviour
                 if (item is BlessedFigureItem) canCrit = true;
             }
         }
-        
-        if (amount == 0) return;
+
+        if (amount == 0) amount = 1;
 
         bool isCritical = false;
         if (canCrit)
@@ -454,38 +455,37 @@ public class Player : MonoBehaviour
             oldDir = direction;
         }
 
-        if (InputManager.IsStickMovementThisFrame())
+        if (!isMoving)
         {
-            action = PlayerAction.Move;
+            if (InputManager.IsStickMovementThisFrame())
+            {
+                action = PlayerAction.Move;
+            }
+            if (Keyboard.current.aKey.wasPressedThisFrame || Keyboard.current.sKey.wasPressedThisFrame || Keyboard.current.dKey.wasPressedThisFrame || Keyboard.current.wKey.wasPressedThisFrame || Keyboard.current.leftArrowKey.wasPressedThisFrame || Keyboard.current.rightArrowKey.wasPressedThisFrame || Keyboard.current.downArrowKey.wasPressedThisFrame || Keyboard.current.upArrowKey.wasPressedThisFrame)
+            {
+                action = PlayerAction.Move;
+            }
+
+            if (action == PlayerAction.None)
+            {
+                Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
+                Vector2 difference = (crosshairPos - (Vector2)transform.position).normalized;
+
+                Vector2 lookDir = difference;
+                if (difference.x < 0) facingRight = false;
+                if (difference.x > 0) facingRight = true;
+            }
         }
-        if (Keyboard.current.aKey.wasPressedThisFrame || Keyboard.current.sKey.wasPressedThisFrame || Keyboard.current.dKey.wasPressedThisFrame || Keyboard.current.wKey.wasPressedThisFrame || Keyboard.current.leftArrowKey.wasPressedThisFrame || Keyboard.current.rightArrowKey.wasPressedThisFrame || Keyboard.current.downArrowKey.wasPressedThisFrame || Keyboard.current.upArrowKey.wasPressedThisFrame)
-        {
-            action = PlayerAction.Move;
-        }
+
+        
+
+
+        if (InputManager.ActionHold(InputActionType.ATTACK)) isShooting = true;
+        else isShooting = false;
 
         if (BeatManager.isQuarterBeat && InputManager.ActionHold(InputActionType.ATTACK))
         {
             PerformAutomatedAction();
-        }
-
-        if (InputManager.ActionPress(InputActionType.ABILITY))
-        {
-            if (activeAbility != null)
-            {
-                BeatTrigger result = BeatManager.GetBeatSuccess();
-                if (result != BeatTrigger.FAIL && activeAbility.CanCast())
-                {
-                    OnActiveAbilityUse();
-                }
-                else
-                {
-                    PlayerCamera.TriggerCameraShake(0.04f, 0.2f);
-                    BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
-                    
-                    //waitForNextBeat = true;
-                }
-            }
-
         }
 
         if (InputManager.ActionPress(InputActionType.ULTIMATE))
@@ -506,55 +506,43 @@ public class Player : MonoBehaviour
             }
         }
 
+
         // Handle Movement
-        if (BeatManager.compassless && action != PlayerAction.None)
+        if (!waitForNextBeat && !isMoving)
         {
-            PerformAction(action);
-        }
-        else
-        {
-            if (!waitForNextBeat && !isPerformingAction)
+            BeatTrigger score = BeatManager.GetBeatSuccess();
+            if (action != PlayerAction.None)
             {
-                BeatTrigger score = BeatManager.GetBeatSuccess();
-                if (action != PlayerAction.None)
+                // Too late to the beat = fail
+                if (!BeatManager.closestIsNextBeat() && score == BeatTrigger.FAIL)
                 {
-                    // Too late to the beat = fail
-                    if (!BeatManager.closestIsNextBeat() && score == BeatTrigger.FAIL)
+                    PlayerCamera.TriggerCameraShake(0.04f, 0.2f);
+                    BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
+                    waitForNextBeat = true;
+                    action = PlayerAction.None;
+                }
+                else if (BeatManager.closestIsNextBeat() && score == BeatTrigger.FAIL)
+                {
+                    PlayerCamera.TriggerCameraShake(0.04f, 0.2f);
+                    BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
+                    waitForNextBeat = true;
+                    action = PlayerAction.None;
+                }
+                else
+                {
+                    if (BeatManager.GetBeatSuccess() == BeatTrigger.SUCCESS || score == BeatTrigger.PERFECT)
                     {
-                        PlayerCamera.TriggerCameraShake(0.04f, 0.2f);
-                        BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
-                        action = PlayerAction.None;
-                    }
-                    else if (BeatManager.closestIsNextBeat() && score == BeatTrigger.FAIL)
-                    {
-                        PlayerCamera.TriggerCameraShake(0.04f, 0.2f);
-                        BeatManager.TriggerBeatScore(BeatTrigger.FAIL);
+                        BeatManager.TriggerBeatScore(score);
+                        PerformAction(action);
                         waitForNextBeat = true;
-                        action = PlayerAction.None;
-                    }
-                    else if (!isPerformingAction)
-                    {
-                        if (BeatManager.GetBeatSuccess() == BeatTrigger.SUCCESS || score == BeatTrigger.PERFECT)
-                        {
-                            BeatManager.TriggerBeatScore(score);
-                            PerformAction(action);
-                            waitForNextBeat = true;
-                        }
                     }
                 }
             }
-        
         }
-        if (BeatManager.compassless)
+
+        if (waitForNextBeat && !BeatManager.closestIsNextBeat() && BeatManager.GetBeatSuccess() == BeatTrigger.FAIL)
         {
             waitForNextBeat = false;
-        }
-        else
-        {
-            if (waitForNextBeat && !BeatManager.closestIsNextBeat() && BeatManager.GetBeatSuccess() == BeatTrigger.FAIL)
-            {
-                waitForNextBeat = false;
-            }
         }
     }
 
@@ -564,19 +552,26 @@ public class Player : MonoBehaviour
         {
             direction.x = Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed ? -1 : Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed ? 1 : 0;
             direction.y = Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed ? -1 : Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed ? 1 : 0;
-            action = PlayerAction.Move;
+            if (!isMoving)
+            {
+                action = PlayerAction.Move;
+            }
         }
         else
         {
             Vector2 leftStick = InputManager.GetLeftStick();
             direction.x = leftStick.x > 0.4f ? 1 : leftStick.x < -0.4f ? -1 : 0;
             direction.y = leftStick.y > 0.4f ? 1 : leftStick.y < -0.4f ? -1 : 0;
-            action = PlayerAction.Move;
+            if (!isMoving)
+            {
+                action = PlayerAction.Move;
+            }
         }
         if (direction != Vector2.zero)
         {
             oldDir = direction;
         }
+        
         if (direction == Vector2.zero)
         {
             action = PlayerAction.None;
@@ -593,27 +588,10 @@ public class Player : MonoBehaviour
 
         if (InputManager.ActionHold(InputActionType.ATTACK)) isShooting = true;
         else isShooting = false;
-        /*
-        if (isShooting)
-        {
-            facingRight = direction.x > 0;
-        }*/
 
         if (BeatManager.isQuarterBeat && InputManager.ActionHold(InputActionType.ATTACK))
         {
             PerformAutomatedAction();
-        }
-
-        if (InputManager.ActionPress(InputActionType.ABILITY))
-        {
-            if (activeAbility != null)
-            {
-                if (activeAbility.CanCast())
-                {
-                    OnActiveAbilityUse();
-                }
-            }
-
         }
 
         if (InputManager.ActionPress(InputActionType.ULTIMATE))
@@ -646,6 +624,18 @@ public class Player : MonoBehaviour
     {
         if (isMoving) return;
         if (isPerformingAction) return;
+
+        isMoving = true;
+        if (InputManager.ActionHold(InputActionType.ABILITY) && activeAbility.CanCast())
+        {
+            OnActiveAbilityUse();
+        }
+        else
+        {
+            Move((Vector2)transform.position + direction);
+        }
+        action = PlayerAction.None;
+        /*
         action = PlayerAction.None;
         isPerformingAction = true;
         switch (Playeraction)
@@ -653,7 +643,7 @@ public class Player : MonoBehaviour
             case PlayerAction.Move:
                 Move((Vector2)transform.position + direction);
                 break;
-        }
+        }*/
         //if (!BeatManager.compassless) PerformAutomatedAction();
 
         BeatManager.OnPlayerAction();

@@ -29,6 +29,7 @@ public class CutsceneManager : MonoBehaviour
 
     public void StartCutscene(List<CutsceneEvent> entries)
     {
+        UIManager.Instance.PlayerUI.OnOpenMenu();
         moveToNext = false;
         index = 0;
         this.entries = entries;

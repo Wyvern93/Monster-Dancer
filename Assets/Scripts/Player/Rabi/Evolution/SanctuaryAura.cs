@@ -87,7 +87,7 @@ public class SanctuaryAura : MonoBehaviour, IDespawneable
                 foreach (PlayerItem item in abilitySource.equippedItems)
                 {
                     if (item == null) continue;
-                    item.OnHit(abilitySource, damage, enemies[i]);
+                    item.OnHit(abilitySource, damage, enemies[i], isCritical);
                 }
             }
         }

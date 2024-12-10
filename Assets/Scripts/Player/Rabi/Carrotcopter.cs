@@ -24,7 +24,7 @@ public class CarrotCopter : MonoBehaviour, IDespawneable
 
         targetPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
 
-        if (BeatManager.isGameBeat) UpdateStats();
+        if (BeatManager.isQuarterBeat) UpdateStats();
         MoveTowardsTarget();
         if (despawnFXtime > 0) despawnFXtime -= Time.deltaTime;
         else shootFx.SetActive(false);

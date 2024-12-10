@@ -196,21 +196,32 @@ public class PlayerRabi : Player
         SpriteSize = 1.2f;
         originPos = transform.position;
         float time = 0;
-        if (direction == Vector2.zero)
-        {
-            direction = (oldDir * currentStats.Speed);
-        }
 
         Vector2 dir = Vector2.zero;
+        if (InputManager.playerDevice == InputManager.InputDeviceType.Keyboard)
+        {
+            dir.x = Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed ? -1 : Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed ? 1 : 0;
+            dir.y = Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed ? -1 : Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed ? 1 : 0;
+        }
+        else
+        {
+            Vector2 leftStick = InputManager.GetLeftStick();
+            dir = leftStick;
+        }
 
         animator.Play("Rabi_Move");
         animator.speed = 1f / BeatManager.GetBeatDuration() / 0.8f;
-
-        while (time <= BeatManager.GetBeatDuration() * 0.8f)
+        float duration = BeatManager.GetBeatDuration() * 0.8f;
+        while (time <= duration)
         {
             while (GameManager.isPaused) yield return new WaitForEndOfFrame();
-            if (time <= 0.05f)
+            if (BeatManager.GetBeatSuccess() == BeatTrigger.PERFECT && time < duration / 2f)//(time <= 0.05f)
             {
+                if (InputManager.ActionHold(InputActionType.ABILITY) && activeAbility.CanCast())
+                {
+                    DoBunnyHop(true);
+                    yield break;
+                }
                 Vector2 tempDir;
                 if (InputManager.playerDevice == InputManager.InputDeviceType.Keyboard)
                 {
@@ -247,111 +258,15 @@ public class PlayerRabi : Player
         isMoving = false;
         yield break;
     }
-
-    public void DoIllusionDash(int level)
-    {
-        Vector2 dir = Vector2.zero;
-        if (InputManager.playerDevice == InputManager.InputDeviceType.Keyboard)
-        {
-            dir.x = Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed ? -1 : Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed ? 1 : 0;
-            dir.y = Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed ? -1 : Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed ? 1 : 0;
-        }
-        else
-        {
-            Vector2 leftStick = InputManager.GetLeftStick();
-            dir = leftStick;
-        }
-        if (dir == Vector2.zero)
-        {
-            dir.x = facingRight ? 1 : -1;
-        }
-        dir.Normalize();
-        isCastingBunnyHop = true;
-        direction = dir;
-        isPerformingAction = true;
-        StartCoroutine(IllusionDashCoroutine(dir, level));
-    }
-
-    private IEnumerator IllusionDashCoroutine(Vector2 dir, int level)
-    {
-        isMoving = true;
-        originPos = transform.position;
-
-        float dashSpeed = level < 4 ? 10 : 12f;
-
-        dashHitBox.enabled = true;
-        //animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration() / 4);
-        animator.speed = 1f / BeatManager.GetBeatDuration() / 4f;
-        animator.Play("Rabi_Dash");
-        spriteTrail.Play(Sprite, 10, 0.05f, Sprite.transform, new Color(0, 1, 1, 0.5f), new Vector3(0, -0.5f, -0.5f), 2f);
-        AudioController.PlaySound(dashSound);
-
-        float time = 0;
-        int beats = level < 7 ? 2 : 3;
-        float speed = 1;
-        float beatTime = 0;
-        if (BeatManager.compassless) beatTime = BeatManager.GetBeatDuration();
-        while (time < BeatManager.GetBeatDuration() / 3)
-        {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
-            if (BeatManager.isGameBeat && !BeatManager.compassless) beats--;
-            if (BeatManager.compassless)
-            {
-                if (beatTime <= 0)
-                {
-                    beats--;
-                    beatTime = BeatManager.GetBeatDuration();
-                }
-                else
-                {
-                    beatTime -= Time.deltaTime;
-                }
-            }
-
-            if (beats == 0 && time == 0) spriteTrail.Stop();
-            if (beats == 0) time += Time.deltaTime;
-
-            Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
-            Vector2 difference = (crosshairPos - (Vector2)transform.position).normalized;
-
-            Vector2 dashDir = difference;
-            if (dashDir.x > 0) facingRight = true;
-            else facingRight = false;
-            if (beats <= 1)
-            {
-                speed = Mathf.MoveTowards(speed, 0, Time.deltaTime / (BeatManager.GetBeatDuration() * 2));
-                rb.velocity = dashDir * speed * currentStats.Speed * dashSpeed;
-            } 
-            else rb.velocity = dashDir * currentStats.Speed * dashSpeed;
-            
-            yield return new WaitForEndOfFrame();
-        }
-        rb.velocity = Vector2.zero;
-        
-        dashHitBox.enabled = false;
-        //animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration());
-        animator.speed = 1f / BeatManager.GetBeatDuration();
-        animator.Play("Rabi_Idle");
-        Sprite.transform.localPosition = Vector3.zero;
-
-        isPerformingAction = false;
-        isCastingBunnyHop = false;
-        isMoving = false;
-
-        yield break;
-    }
-
+    
     public override void Move(Vector2 targetPos)
     {
-        if (isMoving) return;
         BeatManager.OnPlayerAction();
-        if (isCastingBunnyHop) return;
         StartCoroutine(MoveCoroutine(targetPos));
     }
 
-    public void DoBunnyHop()
+    public void DoBunnyHop(bool fromMove = false)
     {
-        StopCoroutine(MoveCoroutine(direction));
         Vector2 dir = Vector2.zero;
         if (InputManager.playerDevice == InputManager.InputDeviceType.Keyboard)
         {
@@ -365,24 +280,16 @@ public class PlayerRabi : Player
         }
         if (dir == Vector2.zero) dir = facingRight ? Vector2.right : Vector2.left;
         dir.Normalize();
-        dir *= currentStats.Speed * 2;
-        /*
-        Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
-        Vector2 difference = (crosshairPos - (Vector2)transform.position);
-
-        Vector2 finalPos = crosshairPos;
-        if (difference.magnitude > 3) finalPos = transform.position + (Vector3)(difference.normalized * 3);
-        */
+        dir *= currentStats.Speed * 2.5f;
         isCastingBunnyHop = true;
         direction = dir;
-        StartCoroutine(BunnyHopCoroutine((Vector2)transform.position + dir));
+        StartCoroutine(BunnyHopCoroutine((Vector2)transform.position + dir, fromMove));
 
     }
 
-    private IEnumerator BunnyHopCoroutine(Vector2 targetPos)
+    private IEnumerator BunnyHopCoroutine(Vector2 targetPos, bool fromMove)
     {
         isMoving = true;
-        bool hasSpawnedClone = false;
         SpriteSize = 1.2f;
         originPos = transform.position;
         float time = 0;
@@ -392,40 +299,31 @@ public class PlayerRabi : Player
             targetPos = (Vector2)originPos + oldDir;
         }
         if (Map.isWallAt(targetPos)) targetPos = originPos;
-            
-        //animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration() / 2f); // / 2
-        animator.speed = 1f / BeatManager.GetBeatDuration();
-        animator.Play("Rabi_BunnyHop");
+        
+        if (fromMove)
+        {
+            animator.CrossFade("Rabi_BunnyHop", 0.1f, -1, animator.GetCurrentAnimatorStateInfo(-1).normalizedTime);
+        }
+        else
+        {
+            animator.speed = 1f / BeatManager.GetBeatDuration() / 0.8f;
+            animator.Play("Rabi_BunnyHop");
+        }
+        
         spriteTrail.Play(Sprite, 10, 0.05f, Sprite.transform, new Color(0, 1, 1, 1f), new Vector3(0, 0, -0.5f), 1f);
         AudioController.PlaySound(dashSound);
-        while (time <= BeatManager.GetBeatDuration())
+        while (time <= BeatManager.GetBeatDuration() * 0.8f)
         {
             while (GameManager.isPaused) yield return new WaitForEndOfFrame();
             if (Map.isWallAt(targetPos)) targetPos = originPos;
-            // BeatDuration is 1
-            // time is x
-
-            /*
-            if (time >= BeatManager.GetBeatDuration() / 3f && !hasSpawnedClone)
-            {
-                hasSpawnedClone = true;
-                SmokeExplosion smokeExplosion = PoolManager.Get<SmokeExplosion>();
-                smokeExplosion.transform.position = originPos;
-
-                RabiClone rabiClone = PoolManager.Get<RabiClone>();
-                rabiClone.transform.position = originPos;
-                rabiClone.OnInit();
-                playerClones.Add(rabiClone.gameObject);
-
-            }*/
-            float lerpedvalue = Mathf.Lerp(0,1f, time / BeatManager.GetBeatDuration());
+            
+            float lerpedvalue = Mathf.Lerp(0,1f, time / (BeatManager.GetBeatDuration() * 0.8f));
             transform.position = Vector3.Lerp(originPos, (Vector3)targetPos, lerpedvalue);
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
         spriteTrail.Stop();
         transform.position = targetPos;
-        //animator.SetFloat("animatorSpeed", 1f / BeatManager.GetBeatDuration());
         animator.speed = 1f / BeatManager.GetBeatDuration();
         animator.Play("Rabi_Idle");
         Sprite.transform.localPosition = Vector3.zero;

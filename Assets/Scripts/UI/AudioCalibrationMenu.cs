@@ -39,9 +39,9 @@ public class AudioCalibrationMenu : MonoBehaviour
         UIManager.Fade(true);
         BeatManager.SetTrack(calibrationTrack);
         BeatManager.StartTrack();
-        continueText.text = Localization.GetLocalizedString("audiocalibration.continue");
-        titleText.text = Localization.GetLocalizedString("audiocalibration.title");
-        text.text = Localization.GetLocalizedString("audiocalibration.text");
+        continueText.text = "Continue"; //Localization.GetLocalizedString("audiocalibration.continue");
+        titleText.text = "Audio Calibration"; // Localization.GetLocalizedString("audiocalibration.title");
+        text.text = "Use the arrow keys to change the audio offset and sync it with the indicator"; //Localization.GetLocalizedString("audiocalibration.text");
         calibrationNumber.text = (Mathf.RoundToInt(BeatManager.audio_offset * 100f)).ToString();
         StartCoroutine(OpenCoroutine());
     }

@@ -118,7 +118,9 @@ public class GameManager : MonoBehaviour
             new FireworksKitItemEnhancement(),
             new DetonationCatalystItemEnhancement(),
             new HotSauceBottleItemEnhancement(),
-            new CursedNecklaceItemEnhancement()
+            new CursedNecklaceItemEnhancement(),
+            new CatEyeMedalionItemEnhancement(),
+            new TrainingCertificateItemEnhancement()
         };
     }
 
@@ -130,7 +132,6 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(0.5f); //UIManager.WaitForFade();
         if (Map.Instance) Map.StopMap();
 
-        Debug.Log(currentScene);
         if (currentScene != "")
         {
             AsyncOperation unload = SceneManager.UnloadSceneAsync(currentScene);

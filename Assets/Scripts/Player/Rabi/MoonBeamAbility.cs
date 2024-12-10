@@ -9,8 +9,8 @@ public class MoonBeamAbility : PlayerAbility
     public MoonBeamAbility() : base()
     {
         baseAmmo = 1;
-        baseAttackSpeed = 0.25f;
-        baseCooldown = 8;
+        baseAttackSpeed = 0.5f;
+        baseCooldown = 6;
 
         baseDamage = 40;
         baseCritChance = 0;
@@ -31,7 +31,7 @@ public class MoonBeamAbility : PlayerAbility
         description += AddStat("Cooldown", baseCooldown, GetMaxCooldown(), false, " Beats");
         description += AddStat("Attack Speed", baseAttackSpeed, GetAttackSpeed(), false, " Beats");
         description += AddStat("Damage", baseDamage, GetDamage(), true);
-        description += AddStat("Crit Chance", baseCritChance * 100, GetCritChance() * 100, true, "%");
+        description += AddStat("Crit Chance", baseCritChance, GetCritChance(), true, "%");
         description += AddStat("Duration", baseDuration, GetDuration(), true);
         description += AddStat("Size", baseSize * 0.6f, GetSize() * 0.6f, true);
         description += $"\nEvolves with: {starColor}{getEvolutionStarType()} Star";

@@ -67,7 +67,7 @@ public class SpinDiscItem : PlayerItem
 
     }
 
-    public override void OnHit(PlayerAbility source, float damage, Enemy target)
+    public override void OnHit(PlayerAbility source, float damage, Enemy target, bool isCritical)
     {
         /*
         if (source is IPlayerAura)

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEditor.Playables;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -466,6 +467,7 @@ public class EnhancementMenu : MonoBehaviour
 
     public void Open()
     {
+        UIManager.Instance.PlayerUI.OnOpenMenu();
         ghostIcon.color = Color.clear;
         inventory.UpdateSlots();
         abilitySlot.UpdateSlots();
@@ -529,6 +531,7 @@ public class EnhancementMenu : MonoBehaviour
         while (!BeatManager.menuGameBeat) yield return new WaitForEndOfFrame();
         GameManager.isPaused = false;
         Time.timeScale = 1.0f;
+        UIManager.Instance.PlayerUI.OnCloseMenu();
     }
 
     public Enhancement FindEnhancement(int n)

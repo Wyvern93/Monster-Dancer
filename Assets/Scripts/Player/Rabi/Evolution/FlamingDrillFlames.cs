@@ -28,7 +28,7 @@ public class FlamingDrillFlames : MonoBehaviour
             foreach (PlayerItem item in abilitySource.equippedItems)
             {
                 if (item == null) continue;
-                item.OnHit(abilitySource, damage, enemy);
+                item.OnHit(abilitySource, damage, enemy, isCritical);
             }
             enemy.OnBurn(abilitySource, damage, 4);
         }

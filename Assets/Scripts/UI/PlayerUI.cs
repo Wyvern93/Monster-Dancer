@@ -2,9 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
 using UnityEngine.InputSystem;
-using UnityEngine.U2D;
 using UnityEngine.UI;
 
 public class PlayerUI : MonoBehaviour
@@ -27,6 +25,7 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] GameObject damageText;
     [SerializeField] Transform damageTextParent;
 
+    public Image normalCursor;
     public Image crosshair;
     RectTransform crosshair_transform;
 
@@ -91,7 +90,51 @@ public class PlayerUI : MonoBehaviour
         combatcursor3.SetCooldown(0, 0);
         combatcursor3.SetCooldown(1, 0);
         combatcursor3.SetCooldown(2, 0);
+        OnOpenMenu();
+    }
 
+    public void OnOpenMenu()
+    {
+        normalCursor.enabled = true;
+        combatcursor1.SetVisibility(false);
+        combatcursor2.SetVisibility(false);
+        combatcursor3.SetVisibility(false);
+        cursorAmmoText.enabled = false;
+    }
+
+    public void OnCloseMenu()
+    {
+        normalCursor.enabled = false;
+        cursorAmmoText.enabled = true;
+        UpdateAbilityUI();
+    }
+
+    public void OnReset()
+    {
+        abilityIcon1.SetAbilityIcon(null, false);
+        abilityIcon2.SetAbilityIcon(null, false);
+        abilityIcon3.SetAbilityIcon(null, false);
+
+        abilityIcon1.cooldown = 0;
+        abilityIcon2.cooldown = 0;
+        abilityIcon3.cooldown = 0;
+
+        abilityIcon1.SetFrame(true);
+        abilityIcon2.SetFrame(false);
+        abilityIcon3.SetFrame(false);
+
+        combatcursor1.SetVisibility(true);
+        combatcursor2.SetVisibility(false);
+        combatcursor3.SetVisibility(false);
+
+        combatcursor1.SetCooldown(0, 0);
+
+        combatcursor2.SetCooldown(1, 0);
+        combatcursor2.SetCooldown(2, 0);
+
+        combatcursor3.SetCooldown(0, 0);
+        combatcursor3.SetCooldown(1, 0);
+        combatcursor3.SetCooldown(2, 0);
     }
 
     public void SetAmmo(int current, int max)

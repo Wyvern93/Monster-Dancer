@@ -166,14 +166,16 @@ public class Stage1b : Map
             new ChangeSpawnRateEvent(6, 570),
             new ChangeSpawnRateEvent(0, 595), // boss
 
-            new ChangeSpawnCooldownEvent(6, 0), // 12
-            new ChangeSpawnCooldownEvent(5, 30), // 10
-            new ChangeSpawnCooldownEvent(6, 120), // 12
+            new ChangeSpawnCooldownEvent(8, 0), // 12
+            new ChangeSpawnCooldownEvent(7, 30), // 10
+            new ChangeSpawnCooldownEvent(7, 120), // 12
+            new ChangeSpawnCooldownEvent(6, 150), // 11
             new ChangeSpawnCooldownEvent(5, 180), // 11
-            new ChangeSpawnCooldownEvent(4, 240), // 11
-            new ChangeSpawnCooldownEvent(3, 360), // 9
+            new ChangeSpawnCooldownEvent(5, 240), // 11
+            new ChangeSpawnCooldownEvent(4, 300), // 11
+            new ChangeSpawnCooldownEvent(5, 360), // 9
             new ChangeSpawnCooldownEvent(4, 480), // 12
-            new ChangeSpawnCooldownEvent(3, 540), // 9
+            new ChangeSpawnCooldownEvent(4, 540), // 9
             
             new AddEnemyEvent(EnemyType.NomSlime, 6, 0, 0), // nomslime
             new AddEnemyEvent(EnemyType.Poisy, 3, 0, 30),

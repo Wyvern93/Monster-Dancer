@@ -61,7 +61,7 @@ public class HotSauceBottleItem : PlayerItem
     {
     }
 
-    public override void OnHit(PlayerAbility source, float damage, Enemy target)
+    public override void OnHit(PlayerAbility source, float damage, Enemy target, bool isCritical)
     {
         target.OnBurn(source, 4f * source.itemValues["burnDamage"], source.itemValues["burnDuration"]);
         //if (source is IPlayerProjectile)

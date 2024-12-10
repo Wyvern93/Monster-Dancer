@@ -235,6 +235,69 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: cateyemedalion
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 620
+        width: 20
+        height: 20
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0926f36958c09b240b2e58e81c997172
+      internalID: -493184980
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: antigravitygloves
+      rect:
+        serializedVersion: 2
+        x: 140
+        y: 620
+        width: 20
+        height: 20
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9f1145c7dbca92349a4be80728843a93
+      internalID: 177459423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: trainingcertificate
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 620
+        width: 20
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7d1dfeaf8848ee641978b7fcff447c0f
+      internalID: 431153505
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -246,12 +309,15 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      antigravitygloves: 177459423
       blessedfigure: 2106700590
+      cateyemedalion: -493184980
       cursednecklace: 1100285920
       detonationcatalyst: -1109555499
       fireworkskit: 1039609131
       hotsaucebottle: -858344134
       spindisc: -778125560
+      trainingcertificate: 431153505
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

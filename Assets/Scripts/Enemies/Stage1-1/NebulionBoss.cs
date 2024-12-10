@@ -978,7 +978,7 @@ public class NebulionBoss : Boss
     public override  IEnumerator OnBattleStart()
     {
         // Fade off music
-
+        UIManager.Instance.PlayerUI.OnCloseMenu();
         BeatManager.FadeOut(1);
         Vector3 target = (new Vector3(Player.instance.transform.position.x, Player.instance.transform.position.y, Camera.main.transform.position.z) + transform.position) / 2f;
         target.z = -60;

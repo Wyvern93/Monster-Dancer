@@ -55,7 +55,7 @@ public abstract class PlayerAbility : PlayerInventoryObject
 
     public virtual float GetCritChance()
     {
-        return Mathf.Clamp(baseCritChance + itemValues["critChance"], 0, 1f);
+        return Mathf.Clamp(baseCritChance + itemValues["critChance"], 0, 100f);
     }
 
     public virtual float GetDamage()
@@ -70,7 +70,7 @@ public abstract class PlayerAbility : PlayerInventoryObject
 
     public virtual float GetDuration()
     {
-        float rawDuration = Mathf.Clamp(baseDuration * itemValues["durationMultiplier"], 0.25f, 100);
+        float rawDuration = Mathf.Clamp((baseDuration + itemValues["bonusDuration"]) * itemValues["durationMultiplier"], 0.25f, 100);
         return Mathf.Round(rawDuration / 0.25f) * 0.25f;
     }
 
@@ -124,6 +124,7 @@ public abstract class PlayerAbility : PlayerInventoryObject
             { "reachMultiplier", 1.0f },
             { "speedMultiplier", 1.0f },
             { "durationMultiplier", 1.0f },
+            { "bonusDuration", 0.0f },
             { "sizeMultiplier", 1.0f },
             { "knockbackMultiplier", 1.0f },
             { "critChance", 0.0f },

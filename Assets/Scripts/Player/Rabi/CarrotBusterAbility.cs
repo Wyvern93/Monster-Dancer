@@ -8,8 +8,8 @@ public class CarrotBusterAbility : PlayerAbility
     {
         baseAmmo = 2;
         baseAttackSpeed = 1f;
-        baseCooldown = 4;
-        baseDamage = 20;
+        baseCooldown = 2;
+        baseDamage = 25;
         baseDuration = 2;
         baseSize = 1f;
         baseKnockback = 5;
@@ -28,7 +28,7 @@ public class CarrotBusterAbility : PlayerAbility
         description += AddStat("Cooldown", baseCooldown, GetMaxCooldown(), false, " Beats");
         description += AddStat("Attack Speed", baseAttackSpeed, GetAttackSpeed(), false, " Beats");
         description += AddStat("Damage", baseDamage, GetDamage(), true);
-        description += AddStat("Crit Chance", baseCritChance * 100, GetCritChance() * 100, true, "%");
+        description += AddStat("Crit Chance", baseCritChance, GetCritChance(), true, "%");
         description += AddStat("Size", baseSize * 3.5f, 3.5f * GetSize(), true);
         description += AddStat("Knockback", baseKnockback, GetKnockback(), true);
         description += $"\nEvolves with: {starColor}{getEvolutionStarType()} Star";

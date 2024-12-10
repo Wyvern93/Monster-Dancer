@@ -67,13 +67,24 @@ public class Boss : Enemy
 
     public override void Die()
     {
+        bool full = true;
+        if (Player.instance == null) full = false;
+        else if (Player.instance.isDead) full = false;
         State = BossState.Defeat;
-        GameObject o = Instantiate(defeatEffect);
-        o.transform.position = transform.position;
-        o.SetActive(true);
+        if (full)
+        {
+            GameObject o = Instantiate(defeatEffect);
+            o.transform.position = transform.position;
+            o.SetActive(true);
 
-        AudioController.PlaySound(AudioController.instance.sounds.bossDeath, side:true);
-        Map.Instance.OnBossDeath(this);
+            AudioController.PlaySound(AudioController.instance.sounds.bossDeath, side: true);
+            Map.Instance.OnBossDeath(this);
+        }
+        else
+        {
+            PoolManager.Return(gameObject, GetType());
+        }
+        
     }
 
     public virtual string GetName()
@@ -84,6 +95,7 @@ public class Boss : Enemy
     public virtual IEnumerator OnBattleStart()
     {
         // Fade off music
+        UIManager.Instance.PlayerUI.OnCloseMenu();
         BeatManager.FadeOut(1);
         yield return new WaitForSeconds(1f);
         UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);

@@ -9,9 +9,9 @@ public class CarrotcopterAbility : PlayerAbility, IPlayerProjectile
     {
         baseAmmo = 4;
         baseAttackSpeed = 0.25f;
-        baseCooldown = 4;
+        baseCooldown = 2;
 
-        baseDamage = 15;
+        baseDamage = 20;
         baseKnockback = 0;
         baseCritChance = 0;
         baseDuration = 0;
@@ -33,7 +33,7 @@ public class CarrotcopterAbility : PlayerAbility, IPlayerProjectile
         description += AddStat("Cooldown", baseCooldown, GetMaxCooldown(), false, " Beats");
         description += AddStat("Attack Speed", baseAttackSpeed, GetAttackSpeed(), false, " Beats");
         description += AddStat("Damage per Bullet", baseDamage, GetDamage(), true);
-        description += AddStat("Crit Chance", baseCritChance * 100, GetCritChance() * 100, true, "%");
+        description += AddStat("Crit Chance", baseCritChance, GetCritChance(), true, "%");
         description += AddStat("Drone Reach", baseReach, GetReach(), true);
         description += AddStat("Speed", baseSpeed, GetSpeed(), true);
         description += $"\nEvolves with: {starColor}{getEvolutionStarType()} Star";
