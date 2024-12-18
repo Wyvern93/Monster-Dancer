@@ -74,7 +74,7 @@ public class MoonlightDaggerWave : MonoBehaviour, IDespawneable, IPlayerProjecti
         if (GameManager.isPaused) return;
         if (BeatManager.isQuarterBeat)
         {
-            quarterbeats--;
+            quarterbeats -= 0.25f;
         }
 
         if (quarterbeats <= 0)
@@ -102,7 +102,7 @@ public class MoonlightDaggerWave : MonoBehaviour, IDespawneable, IPlayerProjecti
             foreach (PlayerItem item in abilitySource.equippedItems)
             {
                 if (item == null) continue;
-                item.OnHit(abilitySource, damage, enemy);
+                item.OnHit(abilitySource, damage, enemy, isCritical);
             }
 
             Vector2 dir = enemy.transform.position - Player.instance.transform.position;

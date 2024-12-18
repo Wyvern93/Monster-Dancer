@@ -74,7 +74,7 @@ public abstract class PlayerItem : PlayerInventoryObject
         return amount;
     }
 
-    public virtual void OnHit(PlayerAbility source, float damage, Enemy target)
+    public virtual void OnHit(PlayerAbility source, float damage, Enemy target, bool critical)
     { }
 
     public abstract List<Enhancement> getEnhancementList();

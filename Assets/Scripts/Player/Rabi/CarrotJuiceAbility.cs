@@ -20,16 +20,16 @@ public class CarrotJuiceAbility : PlayerAbility
 
     public CarrotJuiceAbility() : base()
     {
-        baseAmmo = 3;
+        baseAmmo = 4;
         baseAttackSpeed = 2f;
-        baseCooldown = 8;
+        baseCooldown = 4;
 
         baseDamage = 4;
         baseSplashDamage = 8;
         baseDuration = 12;
         baseSpeed = 8;
         baseCritChance = 0;
-        baseReach = 6;
+        baseReach = 5;
         baseSlow = 0.5f;
         baseSize = 1;
 
@@ -48,7 +48,7 @@ public class CarrotJuiceAbility : PlayerAbility
         description += AddStat("Attack Speed", baseAttackSpeed, GetAttackSpeed(), false, " Beats");
         description += AddStat("Splash Damage", baseSplashDamage, GetSplashDamage(), true);
         description += AddStat("Juice Damage", baseDamage, GetDamage(), true);
-        description += AddStat("Crit Chance", baseCritChance * 100, GetCritChance() * 100, true, "%");
+        description += AddStat("Crit Chance", baseCritChance, GetCritChance(), true, "%");
         description += AddStat("Slowness", baseSlow * 100, GetSlow() * 100, true, "%");
         description += AddStat("Juice Duration", baseDuration, GetDuration(), true, " Beats");
         description += AddStat("Splash Size", splashSize, splashSize * GetSize(), true);
@@ -114,7 +114,7 @@ public class CarrotJuiceAbility : PlayerAbility
         Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
         Vector2 difference = (crosshairPos - (Vector2)Player.instance.transform.position).normalized;
         float distanceToCursor = (crosshairPos - (Vector2)Player.instance.transform.position).magnitude;
-        distanceToCursor = Mathf.Clamp(distanceToCursor, 0, 6);
+        distanceToCursor = Mathf.Clamp(distanceToCursor, 0, GetReach());
 
         CastBottle(difference * distanceToCursor);
     }
@@ -150,6 +150,7 @@ public class CarrotJuiceAbility : PlayerAbility
             currentCooldown -= 0.25f;
             if (currentCooldown == 0)
             {
+                currentAttackSpeedCD = 0;
                 currentAmmo = GetMaxAmmo();
             }
         }

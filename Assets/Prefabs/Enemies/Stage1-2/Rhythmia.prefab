@@ -336,6 +336,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   beatContact: 0
+  isElite: 0
   Sprite: {fileID: 8210852461834543947}
   rb: {fileID: 2488611297722425807}
   SpriteSize: 1
@@ -346,7 +347,10 @@ MonoBehaviour:
   experience: 8
   baseExperience: 0
   atk: 4
-  speed: 0.7
+  speed: 0.6
+  eventMove: {x: 0, y: 0, z: 0}
+  lifeTime: 0
+  slownessStatus: {fileID: 0}
 --- !u!95 &3711549056988489619
 Animator:
   serializedVersion: 5

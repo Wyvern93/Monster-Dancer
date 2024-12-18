@@ -70,7 +70,7 @@ public class Map : MonoBehaviour
     [SerializeField] public Animator CutsceneAnimator;
 
     public Fairy fairyCage;
-    public static int global_enemy_spawn_modifier = 4;
+    public static int global_enemy_spawn_modifier = 1;
 
     public static void ForceDespawnEnemies()
     {
@@ -124,6 +124,7 @@ public class Map : MonoBehaviour
         Player.instance.transform.position = startPosition.position;
         Camera.main.transform.position = new Vector3(startPosition.position.x, startPosition.position.y, -60);
         StartMapEventListA();
+        UIManager.Instance.PlayerUI.OnCloseMenu();
     }
 
     protected virtual void StartMapEventListA()
@@ -381,6 +382,9 @@ public class Map : MonoBehaviour
     public static void StopMap()
     {
         Instance.OnStopMap();
+        ForceDespawnEnemies();
+        ForceDespawnDrops();
+        ForceDespawnBullets();
         Instance.RemoveAllPools();
         Instance.StopAllCoroutines();
     }
@@ -422,16 +426,16 @@ public class Map : MonoBehaviour
         {
             default:
             case 0: // Right
-                spawnPos = new Vector2(cam.transform.position.x + (camWidth / 2) + Random.Range(0, 3), Random.Range(cam.transform.position.y - (camHeight / 2), cam.transform.position.y + (camHeight / 2)));
+                spawnPos = new Vector2(cam.transform.position.x + (camWidth / 2) + Random.Range(1, 4), Random.Range(cam.transform.position.y - (camHeight / 2), cam.transform.position.y + (camHeight / 2)));
                 break;
             case 1: // Top
-                spawnPos = new Vector2(Random.Range(cam.transform.position.x - (camWidth / 2), cam.transform.position.x + (camWidth / 2)), cam.transform.position.y + (camHeight / 2) + Random.Range(0, 3));
+                spawnPos = new Vector2(Random.Range(cam.transform.position.x - (camWidth / 2), cam.transform.position.x + (camWidth / 2)), cam.transform.position.y + (camHeight / 2) + Random.Range(1, 43));
                 break;
             case 2: // Left
-                spawnPos = new Vector2(cam.transform.position.x - (camWidth / 2) - Random.Range(0, 3), Random.Range(cam.transform.position.y - (camHeight / 2), cam.transform.position.y + (camHeight / 2)));
+                spawnPos = new Vector2(cam.transform.position.x - (camWidth / 2) - Random.Range(1, 4), Random.Range(cam.transform.position.y - (camHeight / 2), cam.transform.position.y + (camHeight / 2)));
                 break;
             case 3: // Bottom
-                spawnPos = new Vector2(Random.Range(cam.transform.position.x - (camWidth / 2), cam.transform.position.x + (camWidth / 2)), cam.transform.position.y - (camHeight / 2) - Random.Range(0, 3));
+                spawnPos = new Vector2(Random.Range(cam.transform.position.x - (camWidth / 2), cam.transform.position.x + (camWidth / 2)), cam.transform.position.y - (camHeight / 2) - Random.Range(1, 4));
                 break;
         }
 

@@ -252,19 +252,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   beatContact: 0
+  isElite: 0
   Sprite: {fileID: 572216465505719270}
   rb: {fileID: 3213843371307387682}
   SpriteSize: 1
-  MaxHP: 8
-  CurrentHP: 8
+  MaxHP: 12
+  CurrentHP: 12
   SpawnIndex: 0
   AItype: 0
   experience: 5
   baseExperience: 0
   atk: 4
-  speed: 0.6
+  speed: 0.7
   eventMove: {x: 0, y: 0, z: 0}
   lifeTime: 0
+  slownessStatus: {fileID: 0}
   isAttacking: 0
 --- !u!95 &1672325298525013493
 Animator:

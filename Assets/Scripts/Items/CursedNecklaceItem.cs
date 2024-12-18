@@ -22,10 +22,10 @@ public class CursedNecklaceItem : PlayerItem
     public override string getItemDescription()
     {
         string description = $"<color=#FFFF88>Increases the duration and damage of status effects</color>\n\n";
-        description += AddStat("Burning Damage", 25, true, "%");
-        description += AddStat("Burning Duration", 2, true, " Beats");
-        description += AddStat("Poison Damage", 25, true, "%");
-        description += AddStat("Poison Duration", 2, true, " Beats");
+        description += AddStat("Burning Damage", 12, true, "%");
+        description += AddStat("Burning Duration", 4, true, " Beats");
+        description += AddStat("Poison Damage", 12, true, "%");
+        description += AddStat("Poison Duration", 4, true, " Beats");
 
         return description;
     }
@@ -47,15 +47,15 @@ public class CursedNecklaceItem : PlayerItem
     public override void OnEquip(PlayerAbility ability, int slot)
     {
         base.OnEquip(ability, slot);
-        ability.itemValues["burnDuration"] += 2;
-        ability.itemValues["burnDamage"] += 0.25f;
+        ability.itemValues["burnDuration"] += 4;
+        ability.itemValues["burnDamage"] += 0.12f;
     }
 
     public override void OnUnequip(PlayerAbility ability, int originalSlot)
     {
         base.OnUnequip(ability, originalSlot);
         ability.itemValues["burnDuration"] -= 2;
-        ability.itemValues["burnDamage"] -= 0.25f;
+        ability.itemValues["burnDamage"] -= 0.12f;
     }
 
     public override void OnUpdate()
@@ -63,7 +63,7 @@ public class CursedNecklaceItem : PlayerItem
 
     }
 
-    public override void OnHit(PlayerAbility source, float damage, Enemy target)
+    public override void OnHit(PlayerAbility source, float damage, Enemy target, bool isCritical)
     {
         /*
         if (source is IPlayerAura)

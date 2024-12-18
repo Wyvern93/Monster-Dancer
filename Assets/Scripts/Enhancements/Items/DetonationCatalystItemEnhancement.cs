@@ -26,7 +26,7 @@ public class DetonationCatalystItemEnhancement : Enhancement
 
     public override int getWeight()
     {
-        return 3;
+        return 2;
     }
 
     public override PlayerAbility getAbility()

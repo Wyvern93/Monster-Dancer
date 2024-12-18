@@ -29,7 +29,7 @@ public class CarrotExplosion : MonoBehaviour, IPlayerExplosion
             foreach (PlayerItem item in abilitySource.equippedItems)
             {
                 if (item == null) continue;
-                item.OnHit(abilitySource, dmg, enemy);
+                item.OnHit(abilitySource, dmg, enemy, isCritical);
             }
         }
 

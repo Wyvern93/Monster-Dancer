@@ -9,21 +9,24 @@ public class Stage1a : Map
     public GameObject fireflies;
 
     [Header("Enemy Prefabs")]
-    public GameObject nomslimePrefab;
-    public GameObject slimedancerPrefab;
-    public GameObject nomslimeElitePrefab;
-    public GameObject booJrPrefab;
     public GameObject zombieThiefPrefab;
+    public GameObject stayinUndeadPrefab;
+    public GameObject stayingUndeadElitePrefab;
+    public GameObject zombieBridePrefab;
+
+    public GameObject onibiPrefab;
+    public GameObject booJrPrefab;
     public GameObject booJrElitePrefab;
-    public GameObject poisyPrefab;
-    public GameObject troncoPrefab;
-    public GameObject dancearunePrefab;
-    public GameObject poisyElitePrefab;
+
+    public GameObject clawRiffPrefab;
     public GameObject skelekoPrefab;
-    public GameObject zombiebridePrefab;
-    public GameObject dancearuneElitePrefab;
-    public GameObject carrotfanPrefab;
-    public GameObject usarinRunningPrefab;
+    public GameObject purrfessorPrefab;
+    public GameObject purrfessorElitePrefab;
+
+    public GameObject rhythMaidenPrefab;
+    public GameObject zippyBatPrefab;
+    public GameObject vampiLoliElitePrefab;
+    public GameObject ojouGuardianPrefab;
 
     public GameObject usarinBossPrefab;
 
@@ -35,21 +38,25 @@ public class Stage1a : Map
     public override void SetPools()
     {
         base.SetPools();
-        PoolManager.CreatePool(typeof(NomSlime), nomslimePrefab, 30);
-        PoolManager.CreatePool(typeof(SlimeDancer), slimedancerPrefab, 30);
-        PoolManager.CreatePool(typeof(NomSlimeElite), nomslimeElitePrefab, 1);
-        PoolManager.CreatePool(typeof(GhostJr), booJrPrefab, 30);
         PoolManager.CreatePool(typeof(ZombieThief), zombieThiefPrefab, 30);
+        PoolManager.CreatePool(typeof(StayinUndead), stayinUndeadPrefab, 30);
+        PoolManager.CreatePool(typeof(ZombieBride), zombieBridePrefab, 30);
+        PoolManager.CreatePool(typeof(StayinUndeadElite), stayingUndeadElitePrefab, 1);
+
+        PoolManager.CreatePool(typeof(Onibi), onibiPrefab, 30);
+        PoolManager.CreatePool(typeof(GhostJr), booJrPrefab, 30);
         PoolManager.CreatePool(typeof(GhostJrElite), booJrElitePrefab, 1);
-        PoolManager.CreatePool(typeof(Poisy), poisyPrefab, 30);
-        PoolManager.CreatePool(typeof(Tronco), troncoPrefab, 30);
-        PoolManager.CreatePool(typeof(Dancearune), dancearunePrefab, 30);
-        PoolManager.CreatePool(typeof(PoisyElite), poisyElitePrefab, 1);
+
+        PoolManager.CreatePool(typeof(ClawRiff), clawRiffPrefab, 30);
         PoolManager.CreatePool(typeof(Skeleko), skelekoPrefab, 30);
-        PoolManager.CreatePool(typeof(ZombieBride), zombiebridePrefab, 30);
-        PoolManager.CreatePool(typeof(DancearuneElite), dancearuneElitePrefab, 1);
-        PoolManager.CreatePool(typeof(CarrotFan), carrotfanPrefab, 30);
-        PoolManager.CreatePool(typeof(UsarinRunning), usarinRunningPrefab, 5);
+        PoolManager.CreatePool(typeof(Purrfessor), purrfessorPrefab, 30);
+        PoolManager.CreatePool(typeof(PurrfessorElite), purrfessorElitePrefab, 1);
+
+        PoolManager.CreatePool(typeof(RhythMaiden), rhythMaidenPrefab, 30);
+        PoolManager.CreatePool(typeof(ZippyBat), zippyBatPrefab, 30);
+        PoolManager.CreatePool(typeof(VampiLoliElite), vampiLoliElitePrefab, 1);
+        PoolManager.CreatePool(typeof(OjouGuardian), ojouGuardianPrefab, 30);
+
         PoolManager.CreatePool(typeof(UsarinBoss), usarinBossPrefab, 1);
     }
 
@@ -57,21 +64,26 @@ public class Stage1a : Map
     {
         Debug.Log("removed pools");
         base.RemoveAllPools();
-        PoolManager.RemovePool(typeof(NomSlime));
-        PoolManager.RemovePool(typeof(SlimeDancer));
-        PoolManager.RemovePool(typeof(NomSlimeElite));
-        PoolManager.RemovePool(typeof(GhostJr));
-        PoolManager.RemovePool(typeof(ZombieThief));
-        PoolManager.RemovePool(typeof(GhostJrElite));
-        PoolManager.RemovePool(typeof(Poisy));
-        PoolManager.RemovePool(typeof(Tronco));
-        PoolManager.RemovePool(typeof(Dancearune));
-        PoolManager.RemovePool(typeof(PoisyElite));
-        PoolManager.RemovePool(typeof(Skeleko));
-        PoolManager.RemovePool(typeof(ZombieBride));
-        PoolManager.RemovePool(typeof(DancearuneElite));
-        PoolManager.RemovePool(typeof(CarrotFan));
-        PoolManager.RemovePool(typeof(UsarinRunning));
+        PoolManager.RemovePool(typeof(ZombieThief)); // 0s - 4 min
+        PoolManager.RemovePool(typeof(StayinUndead)); // 30s - 2 min
+        PoolManager.RemovePool(typeof(ZombieBride)); // 1 min - 2:30 min
+        PoolManager.RemovePool(typeof(StayinUndeadElite)); // Minute 2
+
+        PoolManager.RemovePool(typeof(Onibi));
+        PoolManager.RemovePool(typeof(GhostJr)); // Min 2 - min 4:30
+        PoolManager.RemovePool(typeof(GhostJrElite)); // Minute 4
+
+        PoolManager.RemovePool(typeof(ClawRiff));
+        PoolManager.RemovePool(typeof(Skeleko)); // Minute 4:30 - 6:30
+        PoolManager.RemovePool(typeof(Purrfessor)); // Minute 5:00 - 6:00
+        PoolManager.RemovePool(typeof(PurrfessorElite)); // Minute 6
+
+        PoolManager.RemovePool(typeof(RhythMaiden)); // 6:30 - 8
+        PoolManager.RemovePool(typeof(ZippyBat)); // 7:00 - 9:30
+        PoolManager.RemovePool(typeof(VampiLoliElite)); // Minute 8
+        PoolManager.RemovePool(typeof(OjouGuardian)); // Spawn in waves while the miniboss without VampiLoli, use the Usarin method
+        
+
         PoolManager.RemovePool(typeof(UsarinBoss));
     }
 
@@ -160,45 +172,49 @@ public class Stage1a : Map
             new ChangeSpawnRateEvent(6, 570),
             new ChangeSpawnRateEvent(0, 595), // boss
 
-            new ChangeSpawnCooldownEvent(6, 0), // 12
-            new ChangeSpawnCooldownEvent(5, 30), // 10
-            new ChangeSpawnCooldownEvent(6, 120), // 12
+            new ChangeSpawnCooldownEvent(8, 0), // 12
+            new ChangeSpawnCooldownEvent(7, 30), // 10
+            new ChangeSpawnCooldownEvent(7, 120), // 12
+            new ChangeSpawnCooldownEvent(6, 150), // 11
             new ChangeSpawnCooldownEvent(5, 180), // 11
-            new ChangeSpawnCooldownEvent(4, 240), // 11
-            new ChangeSpawnCooldownEvent(3, 360), // 9
+            new ChangeSpawnCooldownEvent(5, 240), // 11
+            new ChangeSpawnCooldownEvent(4, 300), // 11
+            new ChangeSpawnCooldownEvent(5, 360), // 9
             new ChangeSpawnCooldownEvent(4, 480), // 12
-            new ChangeSpawnCooldownEvent(3, 540), // 9
+            new ChangeSpawnCooldownEvent(4, 540), // 9
 
-            new AddEnemyEvent(EnemyType.NomSlime, 5, 0, 0), // nomslime
-            new AddEnemyEvent(EnemyType.SlimeDancer, 1, 0, 30),
-            new AddEnemyEvent(EnemyType.ZombieThief, 6, 0, 150),
-            new AddEnemyEvent(EnemyType.BooJr, 1, 0, 200),
-            new AddEnemyEvent(EnemyType.Poisy, 3, 0, 300),
-            new AddEnemyEvent(EnemyType.Tronco, 4, 0, 330),
-            new AddEnemyEvent(EnemyType.Dancearune, 1, 0, 360),
-            new AddEnemyEvent(EnemyType.Skeleko, 2, 0, 400),
-            new AddEnemyEvent(EnemyType.ZombieBride, 1, 0, 450),
+            new AddEnemyEvent(EnemyType.ZombieThief, 6, 0, 0), // nomslime
+            new AddEnemyEvent(EnemyType.StayinUndead, 4, 0, 30),
+            new AddEnemyEvent(EnemyType.ZombieBride, 2, 0, 60),
 
-            new RemoveEnemyEvent(EnemyType.NomSlime, 0, 180),
-            new RemoveEnemyEvent(EnemyType.SlimeDancer, 0, 300),
-            new RemoveEnemyEvent(EnemyType.ZombieThief, 0, 300),
-            new RemoveEnemyEvent(EnemyType.BooJr, 0, 360),
-            new RemoveEnemyEvent(EnemyType.Poisy, 0, 480),
-            new RemoveEnemyEvent(EnemyType.Tronco, 0, 580),
-            new RemoveEnemyEvent(EnemyType.Dancearune, 0, 580),
-            new RemoveEnemyEvent(EnemyType.Skeleko, 0, 595),
-            new RemoveEnemyEvent(EnemyType.ZombieBride, 0, 595),
-            
-            new SpawnEliteEvent(EnemyType.NomSlimeElite, 120),
-            
+            new AddEnemyEvent(EnemyType.BooJr, 4, 0, 120),
+            new AddEnemyEvent(EnemyType.Onibi, 1, 0, 150),
+ 
+            new AddEnemyEvent(EnemyType.Skeleko, 6, 0, 270),
+            new AddEnemyEvent(EnemyType.ClawRiff, 4, 0, 300),
+            new AddEnemyEvent(EnemyType.Purrfessor, 1, 0, 330),
+
+            new AddEnemyEvent(EnemyType.ZippyBat, 6, 0, 390),
+            new AddEnemyEvent(EnemyType.RhythMaiden, 1, 0, 420),
+
+            new RemoveEnemyEvent(EnemyType.ZombieThief, 0, 220),
+            new RemoveEnemyEvent(EnemyType.StayinUndead, 0, 120),
+            new RemoveEnemyEvent(EnemyType.ZombieBride, 0, 150),
+
+            new RemoveEnemyEvent(EnemyType.BooJr, 0, 270),
+            new RemoveEnemyEvent(EnemyType.Onibi, 0, 330),
+
+            new RemoveEnemyEvent(EnemyType.ClawRiff, 0, 420),
+            new RemoveEnemyEvent(EnemyType.Skeleko, 0, 390),
+            new RemoveEnemyEvent(EnemyType.Purrfessor, 0, 360),
+
+            new RemoveEnemyEvent(EnemyType.ZippyBat, 0, 598),
+            new RemoveEnemyEvent(EnemyType.RhythMaiden, 0, 598),
+
+            new SpawnEliteEvent(EnemyType.StayinUndeadElite, 120),
             new SpawnEliteEvent(EnemyType.BooJrElite, 240), // 240
-            new SpawnEliteEvent(EnemyType.PoisyElite, 360), // 360
-            new SpawnEliteEvent(EnemyType.DancearuneElite, 480), // 480
-            
-            new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 520),
-            new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 560),
-            new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 580),
-            new SpawnUniqueEnemyEvent(EnemyType.UsarinRunning, 595),
+            new SpawnEliteEvent(EnemyType.PurrfessorElite, 360), // 360
+            new SpawnEliteEvent(EnemyType.VampiLoliElite, 480), // 480
             
             new SpawnBossEvent(EnemyType.Usarin, 600), // 600
 

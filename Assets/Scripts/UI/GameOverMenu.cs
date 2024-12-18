@@ -34,14 +34,16 @@ public class GameOverMenu : MonoBehaviour
         Player.instance.ForceDespawnAbilities(false);
         Player.instance.ResetAbilities();
         Player.instance.Despawn();
+        UIManager.Instance.PlayerUI.OnReset();
         GameManager.LoadPlayer(GameManager.runData.characterPrefab);
-        GameManager.LoadMap("Stage1a");
+        GameManager.LoadMap("Stage1b");
     }
 
     public void Open()
     {
-        retryText.text = Localization.GetLocalizedString("gameover.retry");
-        mainmenuText.text = Localization.GetLocalizedString("gameover.mainmenu");
+        UIManager.Instance.PlayerUI.OnOpenMenu();
+        retryText.text = "Retry"; //Localization.GetLocalizedString("gameover.retry");
+        mainmenuText.text = "Main Menu"; //Localization.GetLocalizedString("gameover.mainmenu");
         endText.text = $"{Localization.GetLocalizedString("gameover.time")}{UIManager.Instance.PlayerUI.GetStageTime()}\n{Localization.GetLocalizedString("gameover.enemiesdefeated")}12\n\n{Localization.GetLocalizedString("gameover.laststage")}{UIManager.Instance.PlayerUI.GetStageName()}";
         StartCoroutine(OpenCoroutine());
     }

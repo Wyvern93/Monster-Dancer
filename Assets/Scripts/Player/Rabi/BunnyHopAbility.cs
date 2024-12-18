@@ -5,7 +5,7 @@ public class BunnyHopAbility : PlayerAbility
 {
     public BunnyHopAbility() : base()
     {
-        baseCooldown = 6;
+        baseCooldown = 4;
     }
     public override bool CanCast()
     {

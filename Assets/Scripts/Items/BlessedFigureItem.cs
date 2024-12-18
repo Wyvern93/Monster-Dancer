@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
-using UnityEngine.UIElements.Experimental;
 
 public class BlessedFigureItem : PlayerItem
 {
@@ -24,8 +22,7 @@ public class BlessedFigureItem : PlayerItem
 
     public override string getItemDescription()
     {
-        string description = $"<color=#FFFF88>Increases healing from abilities and allows ability heals to critical strike</color>\n\n";
-        description += AddStat("Healing", 25, true, "%");
+        string description = $"<color=#FFFF88>On critical strike, have a chance to heal by 1.5% of the damage and allows ability heals to critical strike</color>\n\n";
         description += AddStat("Crit Chance", 15, true, "%");
 
         return description;
@@ -53,14 +50,38 @@ public class BlessedFigureItem : PlayerItem
             beat--;
         }
     }
-
+    /*
     public override float OnPreHeal(float heal)
     {
         return heal * 1.25f;
+    }*/
+
+    public override void OnEquip(PlayerAbility ability, int slot)
+    {
+        base.OnEquip(ability, slot);
+        ability.itemValues["critChance"] += 15f;
     }
 
-    public override void OnHit(PlayerAbility source, float damage, Enemy target)
+    public override void OnUnequip(PlayerAbility ability, int originalSlot)
     {
+        base.OnUnequip(ability, originalSlot);
+        ability.itemValues["critChance"] -= 15f;
+    }
+
+    public override void OnHit(PlayerAbility source, float damage, Enemy target, bool isCritical)
+    {
+        if (!isCritical) return;
+        List<BlessedFigureItem> figures = new List<BlessedFigureItem> ();
+        foreach(PlayerItem item in source.equippedItems)
+        {
+            if (item is BlessedFigureItem) figures.Add((BlessedFigureItem)item);
+        }
+
+        if (figures[0] != this) return;
         
+        float heal = figures.Count * 1.5f;
+        bool doHeal = Random.Range(0, 100f) < 10f;
+        if (!doHeal) return;
+        Player.instance.Heal(heal, source);
     }
 }

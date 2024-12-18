@@ -28,9 +28,16 @@ public enum EnemyType
     StayinUndeadElite,
     Purrfessor,
     ZippyBat,
-    VampiLoli,
+    VampiLoliElite,
     OjouGuardian,
     Kappa,
     UsarinRunning,
-    Nebulion
+    Nebulion,
+    Onibi,
+    Karakasa,
+    Tanuki,
+    PurrfessorElite,
+    ClawRiff,
+    RhythMaiden,
+    BuzzBee
 }

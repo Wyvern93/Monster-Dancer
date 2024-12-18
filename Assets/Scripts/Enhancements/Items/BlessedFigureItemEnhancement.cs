@@ -29,7 +29,7 @@ public class BlessedFigureItemEnhancement : Enhancement
 
     public override int getWeight()
     {
-        return 2;
+        return 1;
     }
 
     public override bool isAvailable()
