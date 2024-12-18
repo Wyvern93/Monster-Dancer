@@ -70,7 +70,7 @@ public class Map : MonoBehaviour
     [SerializeField] public Animator CutsceneAnimator;
 
     public Fairy fairyCage;
-    public static int global_enemy_spawn_modifier = 3;
+    public static int global_enemy_spawn_modifier = 1;
 
     public static void ForceDespawnEnemies()
     {

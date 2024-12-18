@@ -77,8 +77,6 @@ public class BlessedFigureItem : PlayerItem
             if (item is BlessedFigureItem) figures.Add((BlessedFigureItem)item);
         }
 
-        Debug.Log(figures.Count);
-        Debug.Log(figures[0] == this);
         if (figures[0] != this) return;
         
         float heal = figures.Count * 1.5f;
