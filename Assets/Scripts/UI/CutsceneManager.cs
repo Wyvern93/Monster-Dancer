@@ -160,7 +160,7 @@ public class CutsceneManager : MonoBehaviour
         // Read events
         if (entries[index].GetType() == typeof(PlayAnimationEvent))
         {
-            Map.Instance.CutsceneAnimator.Play((entries[index] as PlayAnimationEvent).animation);
+            Stage.Instance.CutsceneAnimator.Play((entries[index] as PlayAnimationEvent).animation);
             index++;
         }
         else if (entries[index].GetType() == typeof(DialogueEntry))

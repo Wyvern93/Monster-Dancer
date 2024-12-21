@@ -11,7 +11,7 @@ public class Boss : Enemy
     public override void OnSpawn()
     {
         base.OnSpawn();
-        Map.Instance.enemiesAlive.Add(this);
+        Stage.Instance.enemiesAlive.Add(this);
         CurrentHP = MaxHP;
         emissionColor = new Color(1, 1, 1, 0);
         isMoving = false;
@@ -78,7 +78,7 @@ public class Boss : Enemy
             o.SetActive(true);
 
             AudioController.PlaySound(AudioController.instance.sounds.bossDeath, side: true);
-            Map.Instance.OnBossDeath(this);
+            Stage.Instance.OnBossDeath(this);
         }
         else
         {
@@ -103,7 +103,7 @@ public class Boss : Enemy
         UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stageboss")}");
         BeatManager.SetTrack(bossTrack);
         BeatManager.StartTrack();
-        Map.isBossWave = true;
+        Stage.isBossWave = true;
         Player.instance.canDoAnything = true;
         State = BossState.Phase1;
         //usarinState = UsarinBossState.Dance1;

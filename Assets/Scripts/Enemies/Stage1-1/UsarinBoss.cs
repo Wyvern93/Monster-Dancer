@@ -38,7 +38,7 @@ public class UsarinBoss : Boss
 
         allBullets = new List<Bullet>();
         allEnemies = new List<Enemy>();
-        Map.Instance.enemiesAlive.Add(this);
+        Stage.Instance.enemiesAlive.Add(this);
         CurrentHP = MaxHP;
         emissionColor = new Color(1, 1, 1, 0);
         isMoving = false;
@@ -91,11 +91,11 @@ public class UsarinBoss : Boss
         int tries = 10;
         while (finalPos == Vector3.zero)
         {
-            Vector3 basePos = Map.Instance.bossArea.transform.position;
+            Vector3 basePos = Stage.Instance.bossArea.transform.position;
             basePos = basePos + (Vector3)Random.insideUnitCircle * 5f;
             if (tries <= 0) break;
 
-            if (!Map.isWallAt(basePos))
+            if (!Stage.isWallAt(basePos))
             {
                 finalPos = basePos;
                 targetPos = basePos;
@@ -431,7 +431,7 @@ public class UsarinBoss : Boss
             magicCircleVisible = true;
 
             StartCoroutine(ChargeAttack1Coroutine());
-            targetPos = Map.Instance.bossArea.transform.position + (Vector3.up * 6f);
+            targetPos = Stage.Instance.bossArea.transform.position + (Vector3.up * 6f);
         }
 
         if (transform.position != targetPos)
@@ -510,7 +510,7 @@ public class UsarinBoss : Boss
             time -= Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
-        Vector2 arenaPos = Map.Instance.bossArea.transform.position;
+        Vector2 arenaPos = Stage.Instance.bossArea.transform.position;
         for (int i = 0; i < 21; i++)
         {
             float xoffset = i - 10;
@@ -524,7 +524,7 @@ public class UsarinBoss : Boss
 
     private IEnumerator ShootSideCarrots()
     {
-        Vector2 arenaPos = Map.Instance.bossArea.transform.position;
+        Vector2 arenaPos = Stage.Instance.bossArea.transform.position;
 
         if (attackBeat % 24 == 0)
         {
@@ -741,7 +741,7 @@ public class UsarinBoss : Boss
         UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stageboss")}");
         BeatManager.SetTrack(bossTrack);
         BeatManager.StartTrack();
-        Map.isBossWave = true;
+        Stage.isBossWave = true;
         Player.instance.canDoAnything = true;
         State = BossState.Phase1;
         usarinState = UsarinBossState.Dance1;

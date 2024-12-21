@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public class ChangeSpawnCooldownEvent : StageTimeEvent
+public class ChangeSpawnCooldownEvent : StageEvent
 {
     public int cooldown;
     public ChangeSpawnCooldownEvent(int cooldown,  float time) : base(time) 
@@ -10,6 +10,6 @@ public class ChangeSpawnCooldownEvent : StageTimeEvent
     }
     public override void Trigger()
     {
-        Map.Instance.beatsBeforeWave = cooldown;
+        Stage.Instance.beatsBeforeWave = cooldown;
     }
 }

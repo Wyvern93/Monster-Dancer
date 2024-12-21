@@ -38,6 +38,7 @@ public class MoonlightFlowerAbility : PlayerAbility
         description += AddStat("Shockwave Damage", baseShockwaveDamage, GetShockwaveDamage(), true);
         description += AddStat("Crit Chance", baseCritChance, GetCritChance(), true, "%");
         description += AddStat("Size", baseSize * 3f, GetSize() * 3f, true);
+        description += AddStat("Duration", baseDuration, GetDuration(), true);
         description += $"\nEvolves with: {starColor}{getEvolutionStarType()} Star";
 
         return description;

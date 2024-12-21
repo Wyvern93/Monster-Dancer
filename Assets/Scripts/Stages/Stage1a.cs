@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using static UnityEngine.GraphicsBuffer;
 
-public class Stage1a : Map
+public class Stage1a : Stage
 {
     public GameObject fireflies;
 
@@ -146,7 +146,7 @@ public class Stage1a : Map
     protected override void StartMapEventListA()
     {
         UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stage")} {stageID}-1");
-        stageEvents = new List<StageTimeEvent>()
+        stageEvents = new List<StageEvent>()
         {
             // Spawn Rates
             
@@ -182,7 +182,7 @@ public class Stage1a : Map
             new ChangeSpawnCooldownEvent(5, 360), // 9
             new ChangeSpawnCooldownEvent(4, 480), // 12
             new ChangeSpawnCooldownEvent(4, 540), // 9
-
+            /*
             new AddEnemyEvent(EnemyType.ZombieThief, 6, 0, 0), // nomslime
             new AddEnemyEvent(EnemyType.StayinUndead, 4, 0, 30),
             new AddEnemyEvent(EnemyType.ZombieBride, 2, 0, 60),
@@ -216,7 +216,8 @@ public class Stage1a : Map
             new SpawnEliteEvent(EnemyType.PurrfessorElite, 360), // 360
             new SpawnEliteEvent(EnemyType.VampiLoliElite, 480), // 480
             
-            new SpawnBossEvent(EnemyType.Usarin, 600), // 600
+            new SpawnBossEvent(EnemyType.Usarin, 600), // 600*/
+            new SpawnCircleHordeEvent(new SpawnData() { AItype = EnemyAIType.CircleHorde, enemyType = EnemyType.ZombieThief, spawnType = SpawnType.AROUND_PLAYER }, 15, 5)
 
         };
     }

@@ -5,9 +5,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
-public class Map : MonoBehaviour
+public class Stage : MonoBehaviour
 {
-    public static Map Instance;
+    public static Stage Instance;
     public List<MapTrack> tracks;
     public LayerMask nonPassableMask;
     public GameObject enemyPrefab;
@@ -25,6 +25,7 @@ public class Map : MonoBehaviour
     public GameObject bulletBasePrefab;
     public GameObject foodPrefab;
     public GameObject burningPrefab;
+    public GameObject enemyGroupPrefab;
 
     //public GameObject bossAPrefab;
     public static float StageTime;
@@ -58,7 +59,7 @@ public class Map : MonoBehaviour
 
     public GameObject bossGrid;
     public List<SpawnData> spawnPool;
-    public List<StageTimeEvent> stageEvents;
+    public List<StageEvent> stageEvents;
 
     public static bool isBossWave = false;
     public GameObject mapObjects;
@@ -130,7 +131,7 @@ public class Map : MonoBehaviour
     protected virtual void StartMapEventListA()
     {
         UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stage")} {stageID}-1");
-        stageEvents = new List<StageTimeEvent>()
+        stageEvents = new List<StageEvent>()
         {
             new AddEnemyEvent(EnemyType.TestEnemy, 1, 0, 0),
             new ChangeSpawnRateEvent(2, 0),
@@ -192,7 +193,7 @@ public class Map : MonoBehaviour
         // Spawn boss with animation
         Boss enemy = (Boss)Enemy.GetEnemyOfType(spawnData.enemyType);
         currentBoss = enemy;
-        enemy.AItype = spawnData.AItype;
+        enemy.aiType = spawnData.AItype;
         enemy.SpawnIndex = 0;
         enemy.transform.position = spawnPos;
         enemy.OnSpawn();
@@ -298,6 +299,7 @@ public class Map : MonoBehaviour
         PoolManager.CreatePool(typeof(BulletSpawnEffect), bulletSpawnPrefab, 100);
         PoolManager.CreatePool(typeof(Food), foodPrefab, 50);
         PoolManager.CreatePool(typeof(BurningVisualEffect), burningPrefab, 50);
+        PoolManager.CreatePool(typeof(EnemyGroup), enemyGroupPrefab, 50);
     }
 
     // Update is called once per frame
@@ -318,7 +320,10 @@ public class Map : MonoBehaviour
                 beats = 0;
                 for (int i = 0; i < spawnRate + global_enemy_spawn_modifier; i++)
                 {
-                    SpawnEnemy(GetRandomEnemySpawn());
+                    EnemyGroup group = PoolManager.Get<EnemyGroup>();
+                    group.aIType = EnemyAIType.Spread;
+                    SpawnEnemy(GetRandomEnemySpawn(), group);
+                    group.OnGroupInit();
                 }
             }
         }
@@ -337,9 +342,9 @@ public class Map : MonoBehaviour
 
     private void ReadEvents()
     {
-        List<StageTimeEvent> events = stageEvents.FindAll(x => x.time < stagePartTime);
+        List<StageEvent> events = stageEvents.FindAll(x => x.time < stagePartTime);
 
-        foreach (StageTimeEvent e in events)
+        foreach (StageEvent e in events)
         {
             e.Trigger();
             Debug.Log($"Removing event {e.GetType()}");
@@ -402,11 +407,12 @@ public class Map : MonoBehaviour
         PoolManager.RemovePool(typeof(BulletSpawnEffect));
         PoolManager.RemovePool(typeof(Food));
         PoolManager.RemovePool(typeof(BurningVisualEffect));
+        PoolManager.RemovePool(typeof(EnemyGroup));
     }
 
     public List<int> spawnDirections = new List<int>();
 
-    public static void SpawnEnemy(SpawnData spawnData)
+    public static void SpawnEnemy(SpawnData spawnData, EnemyGroup group)
     {
         if (spawnData == null) return;
 
@@ -440,7 +446,8 @@ public class Map : MonoBehaviour
         }
 
         Enemy enemy = Enemy.GetEnemyOfType(spawnData.enemyType);
-        enemy.AItype = spawnData.AItype;
+        enemy.group = group;
+        enemy.aiType = EnemyAIType.Spread;
         enemy.SpawnIndex = 0;
         enemy.transform.position = spawnPos;
         enemy.OnSpawn();
@@ -473,7 +480,7 @@ public class Map : MonoBehaviour
         yield return new WaitForSeconds(BeatManager.GetBeatDuration() * 2);
 
         Enemy enemy = Enemy.GetEnemyOfType(spawnData.enemyType);
-        enemy.AItype = spawnData.AItype;
+        enemy.aiType = spawnData.AItype;
         enemy.SpawnIndex = 0;
         enemy.transform.position = spawnPos;
         enemy.OnSpawn();
@@ -499,7 +506,7 @@ public class Map : MonoBehaviour
         Vector3 spawnPos = new Vector3(Mathf.RoundToInt(x), Mathf.RoundToInt(y));
 
         Enemy enemy = Enemy.GetEnemyOfType(spawnData.enemyType);
-        enemy.AItype = spawnData.AItype;
+        enemy.aiType = spawnData.AItype;
         enemy.SpawnIndex = 0;
         enemy.transform.position = spawnPos;
         enemy.OnSpawn();
@@ -526,7 +533,7 @@ public class Map : MonoBehaviour
         PoolManager.Return(spawnEffect.gameObject, typeof(SpawnEffect));
 
         Enemy enemy = Enemy.GetEnemyOfType(spawnData.enemyType);
-        enemy.AItype = spawnData.AItype;
+        enemy.aiType = spawnData.AItype;
         enemy.SpawnIndex = index;
         enemy.transform.position = spawnPos;
         enemy.OnSpawn();
@@ -544,7 +551,7 @@ public class Map : MonoBehaviour
         PoolManager.Return(spawnEffect.gameObject, typeof(SpawnEffect));
 
         Enemy enemy = Enemy.GetEnemyOfType(spawnData.enemyType);
-        enemy.AItype = spawnData.AItype;
+        enemy.aiType = spawnData.AItype;
         enemy.SpawnIndex = index;
         enemy.transform.position = spawnPos;
         enemy.OnSpawn();

@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 
-public class AddEnemyEvent : StageTimeEvent
+public class AddEnemyEvent : StageEvent
 {
     public EnemyType enemyType;
     public float weight;
-    public int ai;
-    public AddEnemyEvent(EnemyType enemytype, float weight, int ai, float time) : base(time) 
+    public EnemyAIType ai;
+    public AddEnemyEvent(EnemyType enemytype, float weight, EnemyAIType ai, float time) : base(time) 
     {
         enemyType = enemytype;
         this.weight = weight;
@@ -20,6 +20,6 @@ public class AddEnemyEvent : StageTimeEvent
         spawnData.AItype = ai;
         spawnData.weight = weight;
         
-        Map.Instance.spawnPool.Add(spawnData);
+        Stage.Instance.spawnPool.Add(spawnData);
     }
 }

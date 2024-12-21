@@ -42,11 +42,11 @@ public class PlayerCamera : MonoBehaviour
 
     protected void HandleCamera()
     {
-        if (followPlayer && Player.instance != null && Map.Instance != null)
+        if (followPlayer && Player.instance != null && Stage.Instance != null)
         {
-            if (Map.Instance.currentBoss != null)
+            if (Stage.Instance.currentBoss != null)
             {
-                Vector3 target = (new Vector3(Player.instance.transform.position.x, Player.instance.transform.position.y, -60) + Map.Instance.currentBoss.transform.position) / 2f;
+                Vector3 target = (new Vector3(Player.instance.transform.position.x, Player.instance.transform.position.y, -60) + Stage.Instance.currentBoss.transform.position) / 2f;
                 target.z = -60;
                 targetCameraPos = Vector3.Lerp(targetCameraPos, target, Time.deltaTime * 8f);
             }

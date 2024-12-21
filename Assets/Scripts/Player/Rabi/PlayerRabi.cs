@@ -298,7 +298,7 @@ public class PlayerRabi : Player
             direction = oldDir * 2;
             targetPos = (Vector2)originPos + oldDir;
         }
-        if (Map.isWallAt(targetPos)) targetPos = originPos;
+        if (Stage.isWallAt(targetPos)) targetPos = originPos;
         
         if (fromMove)
         {
@@ -315,7 +315,7 @@ public class PlayerRabi : Player
         while (time <= BeatManager.GetBeatDuration() * 0.8f)
         {
             while (GameManager.isPaused) yield return new WaitForEndOfFrame();
-            if (Map.isWallAt(targetPos)) targetPos = originPos;
+            if (Stage.isWallAt(targetPos)) targetPos = originPos;
             
             float lerpedvalue = Mathf.Lerp(0,1f, time / (BeatManager.GetBeatDuration() * 0.8f));
             transform.position = Vector3.Lerp(originPos, (Vector3)targetPos, lerpedvalue);

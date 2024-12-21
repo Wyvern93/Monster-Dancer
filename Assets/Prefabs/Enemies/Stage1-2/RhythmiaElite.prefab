@@ -251,6 +251,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 760eb1a6e153f0645af8afa250566aaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  idleAnimation: rhythmia_normal
+  moveAnimation: rhythmia_normal
+  shootAnimation: rhythmia_preattack
   beatContact: 0
   isElite: 1
   Sprite: {fileID: 288785147411649963}
@@ -260,13 +263,10 @@ MonoBehaviour:
   CurrentHP: 2100
   SpawnIndex: 0
   AItype: 0
-  experience: 800
-  baseExperience: 0
-  atk: 4
-  speed: 0.75
   eventMove: {x: 0, y: 0, z: 0}
   lifeTime: 0
   slownessStatus: {fileID: 0}
+  enemyType: 0
 --- !u!95 &6593345179753065167
 Animator:
   serializedVersion: 5

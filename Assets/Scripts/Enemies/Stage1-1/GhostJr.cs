@@ -4,43 +4,10 @@ using UnityEngine;
 
 public class GhostJr : Enemy
 {
-    int beatCD;
-    bool isAttacking;
-    public override void OnSpawn()
-    {
-        base.OnSpawn();
-        CurrentHP = MaxHP;
-        emissionColor = new Color(1, 1, 1, 0);
-        isMoving = false;
-        beatCD = Random.Range(1, 16);
-        Sprite.transform.localPosition = Vector3.zero;
-        isAttacking = false;
-        animator.Play("boojr_normal");
-        animator.speed = 1f / BeatManager.GetBeatDuration() * 2f;
-    }
-    protected override void OnBeat()
-    {
-        if (isAttacking) return;
-        if (beatCD == 0)
-        {
-            if (isCloseEnoughToShoot())
-            {
-                isAttacking = true;
-                ShootBullets();
-                AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
-            }
-            beatCD = 16;
-        }
-        if (CanMove())
-        {
-            beatCD--;
-            MoveTowardsPlayer();
-        }
 
-    }
-
-    public void ShootBullets()
+    protected override void Shoot()
     {
+        isAttacking = true;
         StartCoroutine(ShootBulletsCoroutine());
     }
 
@@ -68,6 +35,7 @@ public class GhostJr : Enemy
 
     private void SpawnBullet(Vector2 dir, float speed, float dist)
     {
+        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
         BulletBase bullet = PoolManager.Get<BulletBase>();
 
         bullet.transform.position = transform.position + (Vector3.up * 0.3f);
@@ -107,30 +75,6 @@ public class GhostJr : Enemy
     public void Move()
     {
         StartCoroutine(MoveCoroutine());
-    }
-
-    IEnumerator MoveCoroutine()
-    {
-        isMoving = true;
-
-        float time = 0;
-        Vector3 playerPos = Player.instance.GetClosestPlayer(transform.position);
-        Vector2 dir = (playerPos - transform.position).normalized;
-        facingRight = dir.x > 0;
-        animator.Play("boojr_move");
-        while (time <= BeatManager.GetBeatDuration() / 2f)
-        {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
-            velocity = dir * speed * 6;
-            time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
-        }
-        animator.Play("boojr_normal");
-        velocity = Vector2.zero;
-        Sprite.transform.localPosition = Vector3.zero;
-
-        isMoving = false;
-        yield break;
     }
 
     public override bool CanTakeDamage()

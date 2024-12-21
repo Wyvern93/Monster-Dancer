@@ -266,6 +266,8 @@ MonoBehaviour:
   speed: 1.5
   eventMove: {x: 0, y: 0, z: 0}
   lifeTime: 0
+  slownessStatus: {fileID: 0}
+  enemyType: 15
 --- !u!95 &6924403151353261327
 Animator:
   serializedVersion: 5

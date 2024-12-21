@@ -74,13 +74,9 @@ public class FireworksKitItem : PlayerItem
             explosion.abilitySource = source;
 
             float explosionSize = source.itemValues["explosionSize"];
-            float explosionDamage = source.itemValues["explosionDamage"];
-            if (source.hasItem(typeof(DetonationCatalystItem)))
-            {
-                explosionDamage *= explosionSize;
-            }
-            explosion.dmg = Mathf.Clamp(2f * source.itemValues["damageMultiplier"] * explosionDamage, 1, 10000);
-            explosion.canSpawnMini = true;
+
+            explosion.dmg = source.GetDamage() * 0.5f;
+            explosion.canSpawnMini = false;
             explosion.transform.position = target.transform.position;
             explosion.transform.localScale = Vector3.one * explosionSize * 0.5f;
         }

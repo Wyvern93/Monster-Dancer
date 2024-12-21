@@ -58,10 +58,10 @@ public class NebulionBoss : Boss
         PoolManager.CreatePool(typeof(LongLaser), laserPrefab, 5);
         PoolManager.CreatePool(typeof(SmallMagicCircle), smallCirclePrefab, 50);
         Constellation cons = PoolManager.Get<Constellation>();
-        cons.transform.position = Map.Instance.bossArea.transform.position;
+        cons.transform.position = Stage.Instance.bossArea.transform.position;
         constellation = cons.GetComponent<Animator>();
         allBullets = new List<Bullet>();
-        Map.Instance.enemiesAlive.Add(this);
+        Stage.Instance.enemiesAlive.Add(this);
         CurrentHP = MaxHP;
         emissionColor = new Color(1, 1, 1, 0);
         isMoving = false;
@@ -118,11 +118,11 @@ public class NebulionBoss : Boss
         int tries = 10;
         while (finalPos == Vector3.zero)
         {
-            Vector3 basePos = Map.Instance.bossArea.transform.position;
+            Vector3 basePos = Stage.Instance.bossArea.transform.position;
             basePos = basePos + (Vector3)Random.insideUnitCircle * 5f;
             if (tries <= 0) break;
 
-            if (!Map.isWallAt(basePos))
+            if (!Stage.isWallAt(basePos))
             {
                 finalPos = basePos;
                 targetPos = basePos;
@@ -454,7 +454,7 @@ public class NebulionBoss : Boss
             magicCircleVisible = true;
             targetCloneDistance = 3f;
             StartCoroutine(ChargeAttack1Coroutine());
-            targetPos = Map.Instance.bossArea.transform.position + (Vector3.up * 6f);
+            targetPos = Stage.Instance.bossArea.transform.position + (Vector3.up * 6f);
         }
 
         if (transform.position != targetPos)
@@ -644,7 +644,7 @@ public class NebulionBoss : Boss
         int chances = 25;
         while (finalPos == Vector3.zero)
         {
-            Vector3 circlePos = Map.Instance.bossArea.transform.position + (Vector3)((Random.insideUnitCircle * 8f) * new Vector2(1f, 0.5f));
+            Vector3 circlePos = Stage.Instance.bossArea.transform.position + (Vector3)((Random.insideUnitCircle * 8f) * new Vector2(1f, 0.5f));
             if (other != Vector3.zero) // Beware the other magic circle
             {
                 if (Vector2.Distance(circlePos, other) > magicDis && Vector2.Distance(circlePos, playerPos) > playerDis) finalPos = circlePos;
@@ -657,7 +657,7 @@ public class NebulionBoss : Boss
             }
             if (chances <= 0) return circlePos;
         }
-        return Map.Instance.bossArea.transform.position + (Vector3)((Random.insideUnitCircle * 8f) * new Vector2(1f, 0.5f));
+        return Stage.Instance.bossArea.transform.position + (Vector3)((Random.insideUnitCircle * 8f) * new Vector2(1f, 0.5f));
     }
 
     private void SpawnMagicComet(Vector3 pos)
@@ -759,7 +759,7 @@ public class NebulionBoss : Boss
                 }
                 if (!cometRight) basey += 2;
                 Vector3 pos = new Vector3(basex, basey) - new Vector3(10, -12f);
-                positions.Add(pos + Map.Instance.bossArea.transform.position);
+                positions.Add(pos + Stage.Instance.bossArea.transform.position);
             }
         }
         AudioController.PlaySound(AudioController.instance.sounds.chargeBulletSound);
@@ -997,7 +997,7 @@ public class NebulionBoss : Boss
         UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stageboss")}");
         BeatManager.SetTrack(bossTrack);
         BeatManager.StartTrack();
-        Map.isBossWave = true;
+        Stage.isBossWave = true;
         Player.instance.canDoAnything = true;
         State = BossState.Phase1;
         nebulionState = NebulionBossState.Dance1;

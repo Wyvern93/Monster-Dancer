@@ -5,16 +5,6 @@ public class ZippyBat : Enemy
 {
     Vector2 targetPosition;
     float angle;
-    public override void OnSpawn()
-    {
-        base.OnSpawn();
-        CurrentHP = MaxHP;
-        emissionColor = new Color(1, 1, 1, 0);
-        isMoving = false;
-        Sprite.transform.localPosition = Vector3.zero;
-        animator.Play("zippybat_normal");
-        animator.speed = 1f / BeatManager.GetBeatDuration() * 2;
-    }
     protected override void OnBeat()
     {
         angle += 30f;
@@ -47,7 +37,7 @@ public class ZippyBat : Enemy
         StartCoroutine(MoveCoroutine());
     }
 
-    IEnumerator MoveCoroutine()
+    protected override IEnumerator MoveCoroutine()
     {
         isMoving = true;
 

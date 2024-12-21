@@ -43,19 +43,17 @@ public class CarrotJuice : MonoBehaviour, IDespawneable
         {
             for (int i = 0; i < enemies.Count; i++)
             {
-                float damage = dmg;
                 
                 bool isCritical = abilitySource.GetCritChance() > Random.Range(0f, 100f);
-                if (isCritical) damage = dmg * 2.5f;
-                if (damage < 1) damage = 1;
+                if (dmg < 1) dmg = 1;
 
                 if (enemies[i].CanBeSlowed(false)) enemies[i].OnSlow(1, abilitySource.GetSlow());
-                enemies[i].TakeDamage((int)damage, isCritical);
+                enemies[i].TakeDamage(isCritical ? dmg * 2.5f : dmg, isCritical);
 
                 foreach (PlayerItem item in abilitySource.equippedItems)
                 {
                     if (item == null) continue;
-                    item.OnHit(abilitySource, damage, enemies[i], isCritical);
+                    item.OnHit(abilitySource, dmg, enemies[i], isCritical);
                 }
             }
         }
@@ -66,7 +64,6 @@ public class CarrotJuice : MonoBehaviour, IDespawneable
         if (collision.CompareTag("Enemy"))
         {
             enemies.Add(collision.GetComponent<Enemy>());
-            Enemy enemy = collision.GetComponent<Enemy>();
         }
     }
 

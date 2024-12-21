@@ -356,6 +356,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db75931c988d58d4fb98b2c26336a386, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  idleAnimation: clawriff_normal
+  moveAnimation: clawriff_move
+  shootAnimation: 
   beatContact: 0
   isElite: 0
   Sprite: {fileID: 7142130257799833688}
@@ -365,10 +368,7 @@ MonoBehaviour:
   CurrentHP: 60
   SpawnIndex: 0
   AItype: 0
-  experience: 8
-  baseExperience: 8
-  atk: 4
-  speed: 0.9
   eventMove: {x: 0, y: 0, z: 0}
   lifeTime: 0
   slownessStatus: {fileID: 0}
+  enemyType: 37

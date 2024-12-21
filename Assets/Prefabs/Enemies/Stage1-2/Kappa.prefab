@@ -251,7 +251,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e9d8b03fda3a604e9c7cb961d661e20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  idleAnimation: kappa_normal
+  moveAnimation: kappa_move
+  shootAnimation: 
   beatContact: 0
+  isElite: 0
   Sprite: {fileID: 3268255510499149572}
   rb: {fileID: 5298045705431597249}
   SpriteSize: 1
@@ -259,12 +263,10 @@ MonoBehaviour:
   CurrentHP: 40
   SpawnIndex: 0
   AItype: 0
-  experience: 7
-  baseExperience: 0
-  atk: 4
-  speed: 0.8
   eventMove: {x: 0, y: 0, z: 0}
   lifeTime: 0
+  slownessStatus: {fileID: 0}
+  enemyType: 0
 --- !u!95 &4194463970500611263
 Animator:
   serializedVersion: 5

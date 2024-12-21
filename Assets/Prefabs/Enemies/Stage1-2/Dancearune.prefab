@@ -251,7 +251,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6a72c425bc38b2468a2de2004d41313, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  idleAnimation: dancearune_normal
+  moveAnimation: dancearune_normal
+  shootAnimation: dancearune_preattack
   beatContact: 0
+  isElite: 0
   Sprite: {fileID: 2537348576551353723}
   rb: {fileID: 758988521205969405}
   SpriteSize: 1
@@ -259,10 +263,10 @@ MonoBehaviour:
   CurrentHP: 60
   SpawnIndex: 0
   AItype: 0
-  experience: 13
-  baseExperience: 0
-  atk: 7
-  speed: 0.6
+  eventMove: {x: 0, y: 0, z: 0}
+  lifeTime: 0
+  slownessStatus: {fileID: 0}
+  enemyType: 0
 --- !u!95 &6951541457418316138
 Animator:
   serializedVersion: 5

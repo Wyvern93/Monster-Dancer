@@ -94,15 +94,13 @@ public class MoonlightDaggerWave : MonoBehaviour, IDespawneable, IPlayerProjecti
         {
             Enemy enemy = collision.GetComponent<Enemy>();
 
-            float damage = dmg;
             bool isCritical = abilitySource.GetCritChance() > Random.Range(0f, 100f);
-            if (isCritical) damage *= 2.5f;
-            enemy.TakeDamage((int)damage, isCritical);
+            enemy.TakeDamage(isCritical ? dmg * 2.5f : dmg, isCritical);
 
             foreach (PlayerItem item in abilitySource.equippedItems)
             {
                 if (item == null) continue;
-                item.OnHit(abilitySource, damage, enemy, isCritical);
+                item.OnHit(abilitySource, dmg, enemy, isCritical);
             }
 
             Vector2 dir = enemy.transform.position - Player.instance.transform.position;

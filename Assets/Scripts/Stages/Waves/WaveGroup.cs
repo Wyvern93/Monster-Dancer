@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 
 [Serializable]
@@ -14,11 +13,11 @@ public class WaveGroup
         {
             if (spawns[i].spawnType == SpawnType.AROUND_PLAYER)
             {
-                Map.Instance.StartCoroutine(Map.SpawnEnemyAroundPlayer(spawns[i], i));
+                Stage.Instance.StartCoroutine(Stage.SpawnEnemyAroundPlayer(spawns[i], i));
             }
             else
             {
-                Map.Instance.StartCoroutine(Map.SpawnEnemyAtPos(spawns[i], i));
+                Stage.Instance.StartCoroutine(Stage.SpawnEnemyAtPos(spawns[i], i));
             }
         }
     }

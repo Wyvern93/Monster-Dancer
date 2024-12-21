@@ -1,15 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 public abstract class Enemy : MonoBehaviour
 {
+    [SerializeField] protected string idleAnimation;
+    [SerializeField] protected string moveAnimation;
+    [SerializeField] protected string shootAnimation;
+    protected int beat;
+    protected bool isAttacking;
+
     public bool beatContact;
-    public bool isElite;
-    public bool isMoving { get; protected set; }
+    [SerializeField]protected bool isElite;
+    protected bool isMoving;
 
     protected Vector2 direction;
     public bool facingRight { get; protected set; }
@@ -20,18 +26,16 @@ public abstract class Enemy : MonoBehaviour
     protected float SpriteX = 1f;
 
     public int MaxHP, CurrentHP;
-    private int origHealth;
     public int SpawnIndex;
-    public int AItype;
+    public EnemyAIType aiType;
 
     protected Material spriteRendererMat;
     protected Color emissionColor = new Color(1, 0, 0, 0);
 
-    private bool isDead;
-    public int experience;
-    public int baseExperience;
-    public int atk = 1;
-    public float speed;
+    public bool isDead;
+    protected int experience;
+    protected int atk = 1;
+    protected float speed;
 
     protected Vector3 velocity;
     protected Vector3 knockback;
@@ -46,9 +50,52 @@ public abstract class Enemy : MonoBehaviour
     public SlownessEffect slownessStatus;
     private float oldAnimSpeed;
     private Vector2 deathDir;
+
+    public EnemyType enemyType;
+    public EnemyGroup group;
+
+    public static Dictionary<EnemyType, EnemyData> enemyData = new Dictionary<EnemyType, EnemyData>()
+    {
+        // Stage 1-1
+        {EnemyType.ZombieThief, new EnemyData(EnemyType.ZombieThief, EnemyClass.Runner, EnemyArchetype.AllRounder) },
+        {EnemyType.StayinUndead, new EnemyData(EnemyType.StayinUndead, EnemyClass.Runner, EnemyArchetype.Menacer) },
+        {EnemyType.ZombieBride, new EnemyData(EnemyType.ZombieBride,EnemyClass.Bomber, EnemyArchetype.Rusher) },
+        {EnemyType.StayinUndeadElite, new EnemyData(EnemyType.StayinUndeadElite, EnemyClass.Elite, EnemyArchetype.Elite) },
+        {EnemyType.Skeleko, new EnemyData(EnemyType.Skeleko, EnemyClass.Runner, EnemyArchetype.AllRounder) },
+        {EnemyType.ClawRiff, new EnemyData(EnemyType.ClawRiff, EnemyClass.Runner, EnemyArchetype.Swarm) },
+        {EnemyType.Purrfessor, new EnemyData(EnemyType.Purrfessor, EnemyClass.Shooter, EnemyArchetype.Glasscannon) },
+        {EnemyType.PurrfessorElite, new EnemyData(EnemyType.PurrfessorElite, EnemyClass.Elite, EnemyArchetype.Elite) },
+        {EnemyType.BooJr, new EnemyData(EnemyType.BooJr, EnemyClass.Shooter, EnemyArchetype.Juggernaut) },
+        {EnemyType.Onibi, new EnemyData(EnemyType.Onibi, EnemyClass.Bomber, EnemyArchetype.Rusher) },
+        {EnemyType.BooJrElite, new EnemyData(EnemyType.BooJrElite, EnemyClass.Elite, EnemyArchetype.Elite) },
+        {EnemyType.ZippyBat, new EnemyData(EnemyType.ZippyBat, EnemyClass.Bomber, EnemyArchetype.Swarm) },
+        {EnemyType.RhythMaiden, new EnemyData(EnemyType.RhythMaiden, EnemyClass.Shooter, EnemyArchetype.AllRounder) },
+        {EnemyType.OjouGuardian, new EnemyData(EnemyType.OjouGuardian, EnemyClass.Runner, EnemyArchetype.Menacer) },
+        {EnemyType.VampiLoliElite, new EnemyData(EnemyType.VampiLoliElite, EnemyClass.Elite, EnemyArchetype.Elite) },
+        {EnemyType.Usarin, new EnemyData(EnemyType.Usarin, EnemyClass.Boss, EnemyArchetype.Boss) },
+        // Stage 1-2
+        {EnemyType.NomSlime, new EnemyData(EnemyType.NomSlime, EnemyClass.Runner, EnemyArchetype.Swarm) },
+        {EnemyType.Poisy, new EnemyData(EnemyType.Poisy, EnemyClass.Runner, EnemyArchetype.AllRounder) },
+        {EnemyType.SlimeDancer, new EnemyData(EnemyType.SlimeDancer, EnemyClass.Shooter, EnemyArchetype.Juggernaut) },
+        {EnemyType.NomSlimeElite, new EnemyData(EnemyType.NomSlimeElite, EnemyClass.Elite, EnemyArchetype.Elite) },
+        {EnemyType.Tanuki, new EnemyData(EnemyType.Tanuki, EnemyClass.Runner, EnemyArchetype.Tank) },
+        {EnemyType.Fungoo, new EnemyData(EnemyType.Fungoo, EnemyClass.Runner, EnemyArchetype.AllRounder) },
+        {EnemyType.BuzzBee, new EnemyData(EnemyType.BuzzBee, EnemyClass.Runner, EnemyArchetype.Rusher) },
+        {EnemyType.Tronco, new EnemyData(EnemyType.Tronco, EnemyClass.Runner, EnemyArchetype.Juggernaut) },
+        {EnemyType.Rhytmia, new EnemyData(EnemyType.Rhytmia, EnemyClass.Shooter, EnemyArchetype.Menacer) },
+        {EnemyType.Dancearune, new EnemyData(EnemyType.Dancearune, EnemyClass.Shooter, EnemyArchetype.Juggernaut) },
+        {EnemyType.Kappa, new EnemyData(EnemyType.Kappa, EnemyClass.Runner, EnemyArchetype.AllRounder) },
+        {EnemyType.WiggleViper, new EnemyData(EnemyType.WiggleViper, EnemyClass.Shooter, EnemyArchetype.Swarm) },
+        {EnemyType.Karakasa, new EnemyData(EnemyType.Karakasa, EnemyClass.Shooter, EnemyArchetype.Tank) },
+        {EnemyType.FungooElite, new EnemyData(EnemyType.FungooElite, EnemyClass.Elite, EnemyArchetype.Elite) },
+        {EnemyType.RhytmiaElite, new EnemyData(EnemyType.RhytmiaElite, EnemyClass.Elite, EnemyArchetype.Elite) },
+        {EnemyType.DancearuneElite, new EnemyData(EnemyType.DancearuneElite, EnemyClass.Elite, EnemyArchetype.Elite) },
+        {EnemyType.Nebulion, new EnemyData(EnemyType.Nebulion, EnemyClass.Boss, EnemyArchetype.Boss) },
+    };
     public bool CanMove()
     {
         if (isMoving) return false;
+        if (isAttacking) return false;
         if (GameManager.isPaused) return false;
         else return true;
     }
@@ -177,13 +224,17 @@ public abstract class Enemy : MonoBehaviour
     {
         isDead = false;
         Sprite.color = Color.white;
+        facingRight = Player.instance.transform.position.x > transform.position.x;
     }
 
     public virtual void CalculateHealth()
     {
         if (GameManager.runData == null) return;
+
+
+        /*
         if (origHealth == 0) origHealth = MaxHP;
-        float minutes = (Map.StageTime / 120f) + (6 * GameManager.runData.stageMulti);
+        float minutes = (Stage.StageTime / 120f) + (6 * GameManager.runData.stageMulti);
         float scale = 1 + (Mathf.Clamp(minutes - 1, 0, 10000)/4f);
         // Minute 0 -> 1x
         // Minute 10 -> 10x
@@ -194,8 +245,21 @@ public abstract class Enemy : MonoBehaviour
         experience = baseExperience * (1 + GameManager.runData.stageMulti);
 
         float baseSize = isElite ? 2 : 1;
-        float multi = 1 + (Map.StageTime / 800f);
-        transform.localScale = Vector3.one * baseSize * multi;
+        float multi = 1 + (Stage.StageTime / 800f);*/
+
+        int wave = (int)(Stage.StageTime / 30);
+
+        float baseSize = isElite ? 2 : 1f;
+        EnemyData data = enemyData[enemyType];
+        ArchetypeStats stats = new ArchetypeStats(data.archetype).getStatsAtWave(wave);
+        MaxHP = (int)stats.baseHP;
+        CurrentHP = MaxHP;
+        atk = (int)stats.baseAttack;
+        speed = stats.baseSpeed;
+
+        experience = data.CalculateExperience(wave);
+
+        transform.localScale = Vector3.one * baseSize;
     }
 
     private Color ColorMoveTowards(Color a, Color b, float time)
@@ -203,7 +267,7 @@ public abstract class Enemy : MonoBehaviour
         return new Color(Mathf.MoveTowards(a.r, b.r, time), Mathf.MoveTowards(a.g, b.g, time), Mathf.MoveTowards(a.b, b.b, time), Mathf.MoveTowards(a.a, b.a, time));
     }
 
-    protected abstract void OnInitialize();
+    protected virtual void OnInitialize() { }
 
     // Update is called once per frame
     void Update()
@@ -216,7 +280,7 @@ public abstract class Enemy : MonoBehaviour
             Sprite.color = ColorMoveTowards(Sprite.color, new Color(1, 0, 0, 0), Time.deltaTime * 4f);
             if (Sprite.color.a <= 0f)
             {
-                Map.Instance.enemiesAlive.Remove(this);
+                Stage.Instance.enemiesAlive.Remove(this);
                 PoolManager.Return(gameObject, GetType());
             }
             return;
@@ -263,8 +327,16 @@ public abstract class Enemy : MonoBehaviour
     public virtual void OnSpawn()
     {
         CalculateHealth();
-        if (Map.Instance != null) Map.Instance.enemiesAlive.Add(this);
+        if (Stage.Instance != null) Stage.Instance.enemiesAlive.Add(this);
 
+        CurrentHP = MaxHP;
+        emissionColor = new Color(1, 1, 1, 0);
+        isMoving = false;
+        Sprite.transform.localPosition = Vector3.zero;
+        animator.Play(idleAnimation);
+        animator.speed = 1f / BeatManager.GetBeatDuration() * 2;
+        beat = BeatManager.beats % 8;
+        isAttacking = false;
     }
 
     protected void HandleKnockback()
@@ -279,11 +351,92 @@ public abstract class Enemy : MonoBehaviour
         knockback = pushDir.normalized * force;
     }
 
-    protected abstract void OnBehaviourUpdate();
+    protected virtual void OnBehaviourUpdate() { }
 
-    protected abstract void OnBeat();
+    protected virtual void OnBeat()
+    {
+        switch (enemyData[enemyType].enemyClass)
+        {
+            case EnemyClass.Runner:
+            case EnemyClass.Bomber:
+                if (CanMove()) StartCoroutine(MoveCoroutine());
+                break;
+            case EnemyClass.Shooter:
+                beat--;
+                if (beat > 0)
+                {
+                    if (CanMove()) StartCoroutine(MoveCoroutine());
+                    break;
+                }
+                else if (beat <= 0)
+                {
+                    beat = 8;
+                    Shoot();
+                    break;
+                }
+                break;
+        }
+    }
 
-    public abstract bool CanTakeDamage();
+   protected virtual IEnumerator MoveCoroutine()
+    {
+        isMoving = true;
+
+        
+        //Vector3 playerPos = Player.instance.GetClosestPlayer(transform.position);
+        Vector2 dir = GetDirectionFromAI();// (playerPos - transform.position).normalized;
+
+        facingRight = dir.x > 0;
+        animator.Play(moveAnimation);
+        animator.speed = 1f / BeatManager.GetBeatDuration() * 2f;
+
+        float time = 0;
+
+        float spd = 6;
+        if (aiType == EnemyAIType.CircleHorde) spd += 0.2f;
+        velocity = dir * speed * spd;
+
+        while (time <= BeatManager.GetBeatDuration() / 2f)
+        {
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            velocity = dir * speed * 6;
+            time += Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
+        if (isElite)
+        {
+            AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
+            PlayerCamera.TriggerCameraShake(0.5f, 0.2f);
+        }
+        animator.Play(idleAnimation);
+        animator.speed = 1f / BeatManager.GetBeatDuration();
+        velocity = Vector2.zero;
+        Sprite.transform.localPosition = Vector3.zero;
+
+        isMoving = false;
+        yield break;
+    }
+
+    protected Vector2 GetDirectionFromAI()
+    {
+        switch (aiType)
+        {
+            default:
+            case EnemyAIType.Spread:
+                Vector3 playerPos = Player.instance.GetClosestPlayer(transform.position);
+                return (playerPos - transform.position).normalized;
+            case EnemyAIType.CircleHorde:
+                return group.dirToPlayer; //The direction is assigned on spawn and on reset from the group
+
+        }
+    }
+
+    protected virtual void Shoot() { }
+
+    public virtual bool CanTakeDamage()
+    {
+        return true;
+    }
 
     private void HandleSprite()
     {
@@ -345,6 +498,7 @@ public abstract class Enemy : MonoBehaviour
         stunStatus.duration = 0;
         burnStatus.Clear();
         slownessStatus.duration = 0;
+        group.enemies.Remove(this);
         //KillEffect deathFx = PoolManager.Get<KillEffect>();
         //deathFx.transform.position = transform.position;
         //Map.Instance.enemiesAlive.Remove(this);
@@ -450,12 +604,12 @@ public abstract class Enemy : MonoBehaviour
 
         if (!isElite && Player.instance.hasEvolvableAbility())
         {
-            if (Map.isWallAt(new Vector2(transform.position.x, transform.position.y))) return;
+            if (Stage.isWallAt(new Vector2(transform.position.x, transform.position.y))) return;
             int fairyChance = Random.Range(0, 10);
-            if (fairyChance < 1 && !Map.Instance.fairyCage.gameObject.activeSelf)
+            if (fairyChance < 1 && !Stage.Instance.fairyCage.gameObject.activeSelf)
             {
-                Map.Instance.fairyCage.transform.position = transform.position;
-                Map.Instance.fairyCage.gameObject.SetActive(true);
+                Stage.Instance.fairyCage.transform.position = transform.position;
+                Stage.Instance.fairyCage.gameObject.SetActive(true);
             }
         }
     }

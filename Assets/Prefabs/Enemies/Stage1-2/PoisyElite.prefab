@@ -335,6 +335,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c49118d9aa452c44c9c61a5ed015f8b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  idleAnimation: poisy_normal
+  moveAnimation: poisy_move
+  shootAnimation: poisy_normal
   beatContact: 0
   isElite: 1
   Sprite: {fileID: 4749180817687290756}
@@ -344,12 +347,10 @@ MonoBehaviour:
   CurrentHP: 1600
   SpawnIndex: 0
   AItype: 0
-  experience: 1000
-  baseExperience: 0
-  atk: 10
-  speed: 0.85
   eventMove: {x: 0, y: 0, z: 0}
   lifeTime: 0
+  slownessStatus: {fileID: 0}
+  enemyType: 0
 --- !u!95 &6458465657977353221
 Animator:
   serializedVersion: 5

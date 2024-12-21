@@ -6,19 +6,6 @@ public class NomSlimeElite : Enemy
 {
     [SerializeField] BoxCollider2D bc;
     int beatCD;
-    bool isAttacking;
-    public override void OnSpawn()
-    {
-        base.OnSpawn();
-        CurrentHP = MaxHP;
-        emissionColor = new Color(1, 1, 1, 0);
-        isMoving = false;
-        beatCD = 0;
-        Sprite.transform.localPosition = Vector3.zero;
-        isAttacking = false;
-        animator.Play("nomslime_normal");
-        animator.speed = 1f / BeatManager.GetBeatDuration() * 2f;
-    }
     protected override void OnBeat()
     {
         if (isAttacking) return;
@@ -77,7 +64,7 @@ public class NomSlimeElite : Enemy
         StartCoroutine(MoveCoroutine());
     }
 
-    IEnumerator MoveCoroutine()
+    protected override IEnumerator MoveCoroutine()
     {
         isMoving = true;
 

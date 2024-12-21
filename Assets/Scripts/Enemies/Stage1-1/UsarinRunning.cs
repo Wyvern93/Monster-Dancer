@@ -85,28 +85,6 @@ public class UsarinRunning : Enemy
         StartCoroutine(MoveCoroutine());
     }
 
-    IEnumerator MoveCoroutine()
-    {
-        isMoving = true;
-
-        float time = 0;
-
-        facingRight = direction.x > 0;
-        animator.Play("vampiloli_move");
-        while (time <= BeatManager.GetBeatDuration() / 2f)
-        {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
-            velocity = direction * speed * 6;
-            time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
-        }
-        animator.Play("vampiloli_normal");
-        velocity = Vector2.zero;
-        Sprite.transform.localPosition = Vector3.zero;
-
-        isMoving = false;
-        yield break;
-    }
 
     public override bool CanTakeDamage()
     {

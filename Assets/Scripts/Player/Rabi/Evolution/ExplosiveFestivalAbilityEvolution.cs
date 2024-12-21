@@ -53,7 +53,7 @@ public class ExplosiveFestialAbilityEvolution : PlayerAbility
 
     public void CastCarrot(Vector2 direction, float damage, bool playSound)
     {
-        Enemy enemy = Map.GetRandomEnemy();
+        Enemy enemy = Stage.GetRandomEnemy();
         if (enemy != null)
         {
             Firework carrot = PoolManager.Get<Firework>();

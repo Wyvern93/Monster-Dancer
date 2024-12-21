@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public class ChangeSpawnRateEvent : StageTimeEvent
+public class ChangeSpawnRateEvent : StageEvent
 {
     public int amount;
     public ChangeSpawnRateEvent(int amount,  float time) : base(time) 
@@ -10,6 +10,6 @@ public class ChangeSpawnRateEvent : StageTimeEvent
     }
     public override void Trigger()
     {
-        Map.Instance.spawnRate = amount + (GameManager.runData.stageMulti * 2);
+        Stage.Instance.spawnRate = amount + (GameManager.runData.stageMulti * 2);
     }
 }

@@ -11,7 +11,7 @@ public class UsarinCarrotBullet : Bullet
     public float angle;
     public override void OnSpawn()
     {
-        if (Map.Instance != null) Map.Instance.bulletsSpawned.Add(this);
+        if (Stage.Instance != null) Stage.Instance.bulletsSpawned.Add(this);
 
         beatScale = 1;
         circleCollider.enabled = false;

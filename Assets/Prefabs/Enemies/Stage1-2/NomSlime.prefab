@@ -167,6 +167,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a93306867443c747a3dfc12ff8d02d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  idleAnimation: nomslime_normal
+  moveAnimation: nomslime_move
+  shootAnimation: 
   beatContact: 0
   isElite: 0
   Sprite: {fileID: 4636702812651964760}
@@ -176,13 +179,10 @@ MonoBehaviour:
   CurrentHP: 8
   SpawnIndex: 0
   AItype: 0
-  experience: 5
-  baseExperience: 0
-  atk: 2
-  speed: 0.5
   eventMove: {x: 0, y: 0, z: 0}
   lifeTime: 0
   slownessStatus: {fileID: 0}
+  enemyType: 0
 --- !u!95 &4132264901652552697
 Animator:
   serializedVersion: 5

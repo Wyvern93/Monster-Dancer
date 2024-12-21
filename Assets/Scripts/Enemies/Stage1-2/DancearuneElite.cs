@@ -5,20 +5,11 @@ using UnityEngine;
 public class DancearuneElite : Enemy
 {
     int beatCD;
-    bool isAttacking;
     bool diagonal;
     public override void OnSpawn()
     {
         base.OnSpawn();
-        CurrentHP = MaxHP;
-        emissionColor = new Color(1, 1, 1, 0);
-        isMoving = false;
-        beatCD = Random.Range(1, 6);
-        Sprite.transform.localPosition = Vector3.zero;
         diagonal = true;
-        isAttacking = false;
-        animator.Play("dancearune_normal");
-        animator.speed = 1f / BeatManager.GetBeatDuration() * 2;
     }
     protected override void OnBeat()
     {
@@ -118,32 +109,6 @@ public class DancearuneElite : Enemy
     public void Move()
     {
         StartCoroutine(MoveCoroutine());
-    }
-
-    IEnumerator MoveCoroutine()
-    {
-        isMoving = true;
-
-        float time = 0;
-        Vector3 playerPos = Player.instance.GetClosestPlayer(transform.position);
-        Vector2 dir = (playerPos - transform.position).normalized;
-        facingRight = dir.x > 0;
-        animator.Play("dancearune_move");
-        while (time <= BeatManager.GetBeatDuration() / 2f)
-        {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
-            velocity = dir * speed * 6;
-            time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
-        }
-        animator.Play("dancearune_normal");
-        AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
-        PlayerCamera.TriggerCameraShake(0.5f, 0.2f);
-        velocity = Vector2.zero;
-        Sprite.transform.localPosition = Vector3.zero;
-
-        isMoving = false;
-        yield break;
     }
 
     public override bool CanTakeDamage()

@@ -15,7 +15,7 @@ public class BulletBase : Bullet
     {
         forcedDespawn = false;
         animator.speed = 1f / BeatManager.GetBeatDuration();
-        if (Map.Instance != null) Map.Instance.bulletsSpawned.Add(this);
+        if (Stage.Instance != null) Stage.Instance.bulletsSpawned.Add(this);
 
         angle = Vector2.SignedAngle(Vector2.down, direction) - 90;
         beat = 0;

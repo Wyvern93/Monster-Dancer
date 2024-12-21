@@ -1,56 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class RhythMaiden : Enemy
 {
-    int beatCD;
-    bool isAttacking;
-    public override void OnSpawn()
+    protected override void Shoot()
     {
-        base.OnSpawn();
-        CurrentHP = MaxHP;
-        emissionColor = new Color(1, 1, 1, 0);
-        isMoving = false;
-        Sprite.transform.localPosition = Vector3.zero;
-        beatCD = Random.Range(1,10);
-        animator.Play("rhythmaiden_normal");
-        animator.speed = 1f / BeatManager.GetBeatDuration();
-        isAttacking = false;
-    }
-    protected override void OnBeat()
-    {
-        if (isAttacking) return;
-        if (beatCD == 0)
-        {
-            if (isCloseEnoughToShoot())
-            {
-                isAttacking = true;
-                ShootBullets();
-            }
-            beatCD = 10;
-        }
-        else if(CanMove())
-        {
-            beatCD--;
-            MoveTowardsPlayer();
-        }
-        
-    }
-
-    protected override void OnBehaviourUpdate()
-    {
-
-    }
-
-    protected override void OnInitialize()
-    {
-
-    }
-
-    public void ShootBullets()
-    {
+        isAttacking = true;
         StartCoroutine(ShootBulletsCoroutine());
     }
 
@@ -95,7 +51,7 @@ public class RhythMaiden : Enemy
 
         bullet.transform.position = transform.position + (Vector3)(dir * 0.5f) + (Vector3.one * 0.5f);
         bullet.direction = dir;
-        bullet.speed = 4;
+        bullet.speed = 6;
         bullet.atk = 3;
         bullet.lifetime = 6;
         bullet.transform.localScale = Vector3.one;
@@ -109,43 +65,4 @@ public class RhythMaiden : Enemy
         bullet.OnSpawn();
     }
 
-    void MoveTowardsPlayer()
-    {
-        if (isMoving) return;
-
-        Move();
-
-    }
-
-    public void Move()
-    {
-        StartCoroutine(MoveCoroutine());
-    }
-
-    IEnumerator MoveCoroutine()
-    {
-        isMoving = true;
-
-        float time = 0;
-        Vector3 playerPos = Player.instance.GetClosestPlayer(transform.position);
-        Vector2 dir = (playerPos - transform.position).normalized;
-        facingRight = dir.x > 0;
-        while (time <= BeatManager.GetBeatDuration() / 3f)
-        {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
-            velocity = dir * speed * 8;
-            time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
-        }
-        velocity = Vector2.zero;
-        Sprite.transform.localPosition = Vector3.zero;
-
-        isMoving = false;
-        yield break;
-    }
-
-    public override bool CanTakeDamage()
-    {
-        return true;
-    }
 }

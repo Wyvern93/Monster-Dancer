@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using static UnityEngine.GraphicsBuffer;
 
-public class Stage1b : Map
+public class Stage1b : Stage
 {
     public GameObject fireflies;
 
@@ -140,7 +140,7 @@ public class Stage1b : Map
     protected override void StartMapEventListA()
     {
         UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stage")} {stageID}-2");
-        stageEvents = new List<StageTimeEvent>()
+        stageEvents = new List<StageEvent>()
         {
             // Spawn Rates
             

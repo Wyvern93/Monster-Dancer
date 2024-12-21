@@ -103,7 +103,7 @@ public class LunarRainAbility : PlayerAbility
     {
         List<Enemy> enemies = new List<Enemy>();
         Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
-        foreach (Enemy enemy in Map.Instance.enemiesAlive)
+        foreach (Enemy enemy in Stage.Instance.enemiesAlive)
         {
             if (enemy == null) continue;
             if (enemies.Count >= numEnemies) return enemies;
@@ -122,9 +122,8 @@ public class LunarRainAbility : PlayerAbility
 
         float damage = GetDamage();
         bool isCritical = GetCritChance() > Random.Range(0f, 100f);
-        if (isCritical) damage *= 2.5f;
 
-        e.TakeDamage((int)damage, isCritical);
+        e.TakeDamage(isCritical ? damage * 2.5f : damage, isCritical);
         foreach (PlayerItem item in equippedItems)
         {
             if (item == null) continue;

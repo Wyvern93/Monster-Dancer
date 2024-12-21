@@ -5,19 +5,6 @@ using UnityEngine;
 public class GhostJrElite : Enemy
 {
     int beatCD;
-    bool isAttacking;
-    public override void OnSpawn()
-    {
-        base.OnSpawn();
-        CurrentHP = MaxHP;
-        emissionColor = new Color(1, 1, 1, 0);
-        isMoving = false;
-        beatCD = Random.Range(1, 10);
-        Sprite.transform.localPosition = Vector3.zero;
-        isAttacking = false;
-        animator.Play("boojr_normal");
-        animator.speed = 1f / BeatManager.GetBeatDuration() * 2f;
-    }
     protected override void OnBeat()
     {
         if (isAttacking) return;
@@ -131,28 +118,6 @@ public class GhostJrElite : Enemy
     public void Move()
     {
         StartCoroutine(MoveCoroutine());
-    }
-
-    IEnumerator MoveCoroutine()
-    {
-        isMoving = true;
-        animator.Play("boojr_move");
-        float time = 0;
-        Vector3 playerPos = Player.instance.GetClosestPlayer(transform.position);
-        Vector2 dir = (playerPos - transform.position).normalized;
-        facingRight = dir.x > 0;
-        while (time <= BeatManager.GetBeatDuration() / 2f)
-        {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
-            velocity = dir * speed * 6;
-            time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
-        }
-        velocity = Vector2.zero;
-        Sprite.transform.localPosition = Vector3.zero;
-        animator.Play("boojr_normal");
-        isMoving = false;
-        yield break;
     }
 
     public override bool CanTakeDamage()

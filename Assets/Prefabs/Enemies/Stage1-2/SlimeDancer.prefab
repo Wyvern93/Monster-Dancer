@@ -356,7 +356,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cab18d01a8b425046921188ff24667f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  idleAnimation: slimedancer_normal
+  moveAnimation: slimedancer_normal
+  shootAnimation: slimedancer_preattack
   beatContact: 0
+  isElite: 0
   Sprite: {fileID: 8626814897227013347}
   rb: {fileID: 1362446459166522815}
   SpriteSize: 1
@@ -364,7 +368,7 @@ MonoBehaviour:
   CurrentHP: 40
   SpawnIndex: 0
   AItype: 0
-  experience: 8
-  baseExperience: 0
-  atk: 4
-  speed: 0.4
+  eventMove: {x: 0, y: 0, z: 0}
+  lifeTime: 0
+  slownessStatus: {fileID: 0}
+  enemyType: 0

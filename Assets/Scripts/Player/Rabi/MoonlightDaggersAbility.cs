@@ -10,7 +10,7 @@ public class MoonlightDaggersAbility : PlayerAbility, IPlayerProjectile
         baseAttackSpeed = 0.25f;
         baseCooldown = 2;
         baseDamage = 12;
-        baseDuration = 2;
+        baseDuration = 0.5f;
         baseSpeed = 10;
         baseKnockback = 2;
         baseCritChance = 0;

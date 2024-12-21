@@ -251,7 +251,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d73517651be7844382d2ad85a743ce3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  idleAnimation: stayinundead_normal
+  moveAnimation: stayinundead_move
+  shootAnimation: stayinundead_normal
   beatContact: 0
+  isElite: 0
   Sprite: {fileID: 2261582255316173668}
   rb: {fileID: 6008386327285451691}
   SpriteSize: 1
@@ -259,12 +263,10 @@ MonoBehaviour:
   CurrentHP: 60
   SpawnIndex: 0
   AItype: 0
-  experience: 11
-  baseExperience: 0
-  atk: 4
-  speed: 0.5
   eventMove: {x: 0, y: 0, z: 0}
   lifeTime: 0
+  slownessStatus: {fileID: 0}
+  enemyType: 24
 --- !u!95 &167652406736001774
 Animator:
   serializedVersion: 5

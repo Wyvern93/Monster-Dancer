@@ -60,10 +60,8 @@ public class MoonlightFlower : MonoBehaviour, IDespawneable
         {
             for (int i = 0; i < enemies.Count; i++)
             {
-                float damage = dmg;
                 bool isCritical = abilitySource.GetCritChance() > Random.Range(0f, 100f);
-                if (isCritical) damage *= 2.5f;
-                enemies[i].TakeDamage((int)damage, isCritical);
+                enemies[i].TakeDamage(isCritical ? dmg * 2.5f : dmg, isCritical);
                 foreach (PlayerItem item in abilitySource.equippedItems)
                 {
                     if (item == null) continue;

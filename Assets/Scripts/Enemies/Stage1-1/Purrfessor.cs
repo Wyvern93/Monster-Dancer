@@ -4,57 +4,17 @@ using UnityEngine;
 
 public class Purrfessor : Enemy
 {
-    int beatCD;
-    bool isAttacking;
     bool horizontal;
     public override void OnSpawn()
     {
         base.OnSpawn();
-        CurrentHP = MaxHP;
-        emissionColor = new Color(1, 1, 1, 0);
-        isMoving = false;
-        beatCD = Random.Range(1, 10);
-        Sprite.transform.localPosition = Vector3.zero;
-        isAttacking = false;
         horizontal = true;
-        animator.Play("purrfessor_normal");
-        animator.speed = 1f / BeatManager.GetBeatDuration() * 2;
-    }
-    protected override void OnBeat()
-    {
-        if (isAttacking) return;
-        if (beatCD == 0)
-        {
-            if (isCloseEnoughToShoot())
-            {
-                isAttacking = true;
-                ShootBullets();
-            }
-            beatCD = 10;
-        }
-        else if (CanMove())
-        {
-            beatCD--;
-            MoveTowardsPlayer();
-        }
     }
 
-    void MoveTowardsPlayer()
+    protected override void Shoot()
     {
-        if (isMoving) return;
-
-        Move();
-
-    }
-
-    protected override void OnBehaviourUpdate()
-    {
-
-    }
-
-    protected override void OnInitialize()
-    {
-
+        isAttacking = true;
+        StartCoroutine(ShootBulletsCoroutine());
     }
 
     private IEnumerator ShootBulletsCoroutine()
@@ -119,45 +79,5 @@ public class Purrfessor : Enemy
             };
         bullet.animator.Play("starbullet");
         bullet.OnSpawn();
-    }
-
-    public void ShootBullets()
-    {
-        StartCoroutine(ShootBulletsCoroutine());
-    }
-
-    public void Move()
-    {
-        StartCoroutine(MoveCoroutine());
-    }
-
-    IEnumerator MoveCoroutine()
-    {
-        isMoving = true;
-
-        float time = 0;
-        Vector3 playerPos = Player.instance.GetClosestPlayer(transform.position);
-        Vector2 dir = (playerPos - transform.position).normalized;
-
-        facingRight = dir.x > 0;
-
-        animator.Play("purrfessor_move");
-        while (time <= BeatManager.GetBeatDuration() / 2f)
-        {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
-            velocity = dir * speed * 6;
-            time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
-        }
-        velocity = Vector2.zero;
-        Sprite.transform.localPosition = Vector3.zero;
-        animator.Play("purrfessor_normal");
-        isMoving = false;
-        yield break;
-    }
-
-    public override bool CanTakeDamage()
-    {
-        return true;
     }
 }

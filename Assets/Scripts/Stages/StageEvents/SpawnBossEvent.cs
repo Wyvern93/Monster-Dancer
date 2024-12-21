@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public class SpawnBossEvent : StageTimeEvent
+public class SpawnBossEvent : StageEvent
 {
     public EnemyType enemyType;
     public SpawnBossEvent(EnemyType enemytype, float time) : base(time) 
@@ -14,6 +14,6 @@ public class SpawnBossEvent : StageTimeEvent
         spawnData.spawnType = SpawnType.AROUND_PLAYER;
         spawnData.enemyType = enemyType;
         
-        Map.Instance.SpawnBoss(spawnData);
+        Stage.Instance.SpawnBoss(spawnData);
     }
 }

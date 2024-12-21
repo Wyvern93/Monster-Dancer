@@ -238,7 +238,7 @@ public class Player : MonoBehaviour
         UIManager.Instance.PlayerUI.coinText.text = "0";
     }
 
-    public int CalculateExpCurve(int lv)
+    public static int CalculateExpCurve(int lv)
     {
         if (lv == 1) return 80;
 
@@ -247,11 +247,16 @@ public class Player : MonoBehaviour
         int exp = (int)(Mathf.Round(a) - Mathf.Round(b));
 
         return exp;
+    }
 
-        //Mathf.Round((4*(lv + 1)))
-        //int nextLevel = (int)Mathf.Pow(lv, 2);
-        //int lastLevel = (int)Mathf.Pow(lv - 1, 2);
-        //return (nextLevel - lastLevel) + 50;
+    public static int TotalExpForLevelRange(int startLevel, int endLevel)
+    {
+        int totalExp = 0;
+        for (int lv = startLevel; lv < endLevel; lv++)
+        {
+            totalExp += CalculateExpCurve(lv);
+        }
+        return totalExp;
     }
 
     public bool hasEvolvableAbility()
@@ -684,11 +689,11 @@ public class Player : MonoBehaviour
             direction = oldDir;
             targetPos = (Vector2)originalPos + oldDir;
         }
-        if (Map.isWallAt(targetPos)) targetPos = originalPos;
+        if (Stage.isWallAt(targetPos)) targetPos = originalPos;
 
         while (time <= 0.125f)
         {
-            if (Map.isWallAt(targetPos)) targetPos = originalPos;
+            if (Stage.isWallAt(targetPos)) targetPos = originalPos;
 
             if (time < 0.0625f)
             {

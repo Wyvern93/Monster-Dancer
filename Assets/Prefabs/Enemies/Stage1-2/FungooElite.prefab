@@ -335,6 +335,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24c147695db8e444da1fc09f09b372e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  idleAnimation: fungoo_normal
+  moveAnimation: fungoo_move
+  shootAnimation: fungoo_normal
   beatContact: 0
   isElite: 1
   Sprite: {fileID: 4911427253464554768}
@@ -344,12 +347,10 @@ MonoBehaviour:
   CurrentHP: 1200
   SpawnIndex: 0
   AItype: 0
-  experience: 300
-  baseExperience: 0
-  atk: 4
-  speed: 0.5
   eventMove: {x: 0, y: 0, z: 0}
   lifeTime: 0
+  slownessStatus: {fileID: 0}
+  enemyType: 0
 --- !u!95 &7993796681507109811
 Animator:
   serializedVersion: 5

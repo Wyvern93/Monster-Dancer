@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 
-public class SpawnUniqueEnemyEvent : StageTimeEvent
+public class SpawnEliteEvent : StageEvent
 {
     public EnemyType enemyType;
-    public SpawnUniqueEnemyEvent(EnemyType enemytype, float time) : base(time) 
+    public SpawnEliteEvent(EnemyType enemytype, float time) : base(time) 
     {
         enemyType = enemytype;
     }
@@ -14,6 +14,6 @@ public class SpawnUniqueEnemyEvent : StageTimeEvent
         spawnData.spawnType = SpawnType.AROUND_PLAYER;
         spawnData.enemyType = enemyType;
         
-        Map.SpawnUniqueEnemy(spawnData);
+        Stage.SpawnElite(spawnData);
     }
 }

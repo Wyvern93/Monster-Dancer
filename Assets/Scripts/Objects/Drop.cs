@@ -12,7 +12,7 @@ public class Drop : MonoBehaviour
     }
     public void OnEnable()
     {
-        Map.Instance.dropsSpawned.Add(this);
+        Stage.Instance.dropsSpawned.Add(this);
         followPlayer = false;
         speed = 0;
     }

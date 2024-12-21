@@ -130,7 +130,7 @@ public class GameManager : MonoBehaviour
         UIManager.Instance.PlayerUI.HideUI();
         UIManager.Fade(false);
         yield return new WaitForSeconds(0.5f); //UIManager.WaitForFade();
-        if (Map.Instance) Map.StopMap();
+        if (Stage.Instance) Stage.StopMap();
 
         if (currentScene != "")
         {
@@ -154,7 +154,7 @@ public class GameManager : MonoBehaviour
         UIManager.Instance.PlayerUI.HideUI();
         UIManager.Fade(false);
         yield return new WaitForSeconds(0.5f); //UIManager.WaitForFade();
-        if (Map.Instance) Map.StopMap();
+        if (Stage.Instance) Stage.StopMap();
 
         if (currentScene != "")
         {
@@ -170,8 +170,8 @@ public class GameManager : MonoBehaviour
         UIManager.Instance.PlayerUI.ShowUI();
         isLoading = false;
         Player.ResetPosition();
-        Player.instance.transform.position = Map.Instance.startPosition.position;
-        Camera.main.transform.position = new Vector3(Map.Instance.startPosition.position.x, Map.Instance.startPosition.position.y, Camera.main.transform.position.z);
+        Player.instance.transform.position = Stage.Instance.startPosition.position;
+        Camera.main.transform.position = new Vector3(Stage.Instance.startPosition.position.x, Stage.Instance.startPosition.position.y, Camera.main.transform.position.z);
         Player.instance.canDoAnything = true;
 
         PlayerCamera.instance.SetOnPlayer();

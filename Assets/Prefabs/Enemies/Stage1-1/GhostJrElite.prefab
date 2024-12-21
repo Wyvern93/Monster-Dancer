@@ -251,6 +251,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6acfc0f5ef71dc74b88141b2d945dc7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  idleAnimation: boojr_normal
+  moveAnimation: boojr_move
+  shootAnimation: boojr_preattack
   beatContact: 0
   isElite: 1
   Sprite: {fileID: 6395615806549453988}
@@ -260,12 +263,10 @@ MonoBehaviour:
   CurrentHP: 1200
   SpawnIndex: 0
   AItype: 0
-  experience: 600
-  baseExperience: 0
-  atk: 10
-  speed: 0.75
   eventMove: {x: 0, y: 0, z: 0}
   lifeTime: 0
+  slownessStatus: {fileID: 0}
+  enemyType: 5
 --- !u!95 &1552738515932654621
 Animator:
   serializedVersion: 5

@@ -10,19 +10,12 @@ public class VampiLoliElite : Enemy
     public override void OnSpawn()
     {
         base.OnSpawn();
-        CurrentHP = MaxHP;
-        emissionColor = new Color(1, 1, 1, 0);
-        isMoving = false;
-        Sprite.transform.localPosition = Vector3.zero;
-
         Vector3 playerPos = Player.instance.GetClosestPlayer(transform.position) + (Vector3)Random.insideUnitCircle * 2;
         Vector2 dir = playerPos - transform.position;
         dir.Normalize();
         beats = 0;
         dirToPlayer = dir;
         direction = dirToPlayer;
-        animator.Play("vampiloli_normal");
-        animator.speed = 1f / BeatManager.GetBeatDuration() * 2;
     }
 
     public void SpawnGuards()
@@ -135,7 +128,7 @@ public class VampiLoliElite : Enemy
         StartCoroutine(MoveCoroutine());
     }
 
-    IEnumerator MoveCoroutine()
+    protected override IEnumerator MoveCoroutine()
     {
         isMoving = true;
 

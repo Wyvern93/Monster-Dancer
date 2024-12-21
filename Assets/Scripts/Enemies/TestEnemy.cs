@@ -20,7 +20,7 @@ public class TestEnemy : Enemy
 
     public override void OnSpawn()
     {
-        Map.Instance.enemiesAlive.Add(this);
+        Stage.Instance.enemiesAlive.Add(this);
         CurrentHP = MaxHP;
         emissionColor = new Color(1, 1, 1, 0);
         isMoving = false;

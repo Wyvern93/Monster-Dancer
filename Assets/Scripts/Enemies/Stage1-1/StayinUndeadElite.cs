@@ -6,20 +6,6 @@ using UnityEngine.UIElements;
 public class StayinUndeadElite : Enemy
 {
     int beatCD;
-    bool isAttacking;
-    public override void OnSpawn()
-    {
-        base.OnSpawn();
-        CurrentHP = MaxHP;
-        emissionColor = new Color(1, 1, 1, 0);
-        isMoving = false;
-        Sprite.transform.localPosition = Vector3.zero;
-        beatCD = 2;
-        AItype = 0;
-        isAttacking = false;
-        animator.Play("stayinundead_normal");
-        animator.speed = 1f / BeatManager.GetBeatDuration();
-    }
     protected override void OnBeat()
     {
         if (isAttacking) return;
@@ -97,8 +83,7 @@ public class StayinUndeadElite : Enemy
         while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
 
         bulletSpawnEffect.Despawn();
-        if (AItype >= 2) AItype = 0;
-        else AItype++;
+
         //animator.Play("dancearune_normal");
         isAttacking = false;
     }
@@ -196,31 +181,6 @@ public class StayinUndeadElite : Enemy
     {
         StartCoroutine(MoveCoroutine());
     }
-
-    IEnumerator MoveCoroutine()
-    {
-        isMoving = true;
-
-        float time = 0;
-        Vector3 playerPos = Player.instance.GetClosestPlayer(transform.position);
-        Vector2 dir = (playerPos - transform.position).normalized;
-        facingRight = dir.x > 0;
-        animator.Play("stayinundead_move");
-        while (time <= BeatManager.GetBeatDuration() / 2f)
-        {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
-            velocity = dir * speed * 6;
-            time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
-        }
-        animator.Play("stayinundead_normal");
-        velocity = Vector2.zero;
-        Sprite.transform.localPosition = Vector3.zero;
-
-        isMoving = false;
-        yield break;
-    }
-
     public override bool CanTakeDamage()
     {
         return true;

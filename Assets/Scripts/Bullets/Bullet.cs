@@ -104,11 +104,11 @@ public class Bullet : MonoBehaviour
 
     public void OnEnable()
     {
-        if (Map.Instance != null) SceneManager.MoveGameObjectToScene(gameObject, Map.Instance.gameObject.scene);
+        if (Stage.Instance != null) SceneManager.MoveGameObjectToScene(gameObject, Stage.Instance.gameObject.scene);
     }
     public virtual void OnSpawn()
     {
-        if (Map.Instance != null) Map.Instance.bulletsSpawned.Add(this);
+        if (Stage.Instance != null) Stage.Instance.bulletsSpawned.Add(this);
 
         beat = 0;
         beatScale = 1;
@@ -186,7 +186,7 @@ public class Bullet : MonoBehaviour
         grazePulse = null;
         grazed = false;
 
-        if (!forced && Map.Instance != null) Map.Instance.bulletsSpawned.Remove(this);
+        if (!forced && Stage.Instance != null) Stage.Instance.bulletsSpawned.Remove(this);
         transform.parent = null;
         PoolManager.Return(gameObject, GetType());
     }

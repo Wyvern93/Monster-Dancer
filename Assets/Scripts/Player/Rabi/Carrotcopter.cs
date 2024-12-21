@@ -48,7 +48,7 @@ public class CarrotCopter : MonoBehaviour, IDespawneable
 
     public bool CanShoot()
     {
-        Enemy e = Map.GetClosestEnemyTo(transform.position, reach);
+        Enemy e = Stage.GetClosestEnemyTo(transform.position, reach);
         currentTarget = e;
         if (e == null) return false;
         return true;

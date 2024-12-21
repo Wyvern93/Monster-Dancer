@@ -54,7 +54,7 @@ public class CarrotFan : Enemy
         StartCoroutine(MoveCoroutine());
     }
 
-    IEnumerator MoveCoroutine()
+    protected override IEnumerator MoveCoroutine()
     {
         isMoving = true;
 

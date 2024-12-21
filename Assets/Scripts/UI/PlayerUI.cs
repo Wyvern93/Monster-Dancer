@@ -208,10 +208,10 @@ public class PlayerUI : MonoBehaviour
             crosshair_transform.localPosition = Vector3.MoveTowards(crosshair_transform.localPosition, offset, Time.unscaledDeltaTime * 1280f); //Mouse.current.position.value / new Vector2(Screen.width, Screen.height) * new Vector2(640, 360) - new Vector2(320, 180);
         }
         
-        if (Map.Instance != null) 
+        if (Stage.Instance != null) 
         {
             UpdateStageTime();
-            bossBarGroup.alpha = Mathf.MoveTowards(bossBarGroup.alpha, Map.isBossWave ? 1 : 0, Time.deltaTime);
+            bossBarGroup.alpha = Mathf.MoveTowards(bossBarGroup.alpha, Stage.isBossWave ? 1 : 0, Time.deltaTime);
         }
         if (Player.instance == null)
         {
@@ -343,8 +343,8 @@ public class PlayerUI : MonoBehaviour
     {
         DamageText damageText = PoolManager.Get<DamageText>();
         damageText.transform.SetParent(damageTextParent, true);
-        damageText.transform.localScale = Vector3.one;
-        damageText.transform.position = position;
+        damageText.transform.localScale = Vector3.one * 1.5f;
+        damageText.transform.position = position + (Random.insideUnitCircle * 0.4f);
         damageText.text.text = number.ToString();
 
         switch (textType)
@@ -416,7 +416,7 @@ public class PlayerUI : MonoBehaviour
 
     public string GetStageTime()
     {
-        int totalSeconds = (int)Map.StageTime;
+        int totalSeconds = (int)Stage.StageTime;
         int minutes = totalSeconds / 60;
         int seconds = totalSeconds % 60;
         return string.Format("{0:00}:{1:00}", minutes, seconds);

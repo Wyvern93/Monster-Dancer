@@ -183,12 +183,13 @@ MonoBehaviour:
   speed: 1.1
   eventMove: {x: 0, y: 0, z: 0}
   lifeTime: 0
+  slownessStatus: {fileID: 0}
+  enemyType: 16
   State: 0
   bossTrack: {fileID: 11400000, guid: 5f7a898fdf9a4a24b8325a9b191abf25, type: 2}
   defeatEffect: {fileID: 5748955037701923418, guid: b4f414eef991b904c9caf749c4ee0a1e, type: 3}
   allBullets: []
   allEnemies: []
-  baseBulletPrefab: {fileID: 1992495900768505411, guid: e795107e4bb1a7c49a994d557da02879, type: 3}
   magicCircle: {fileID: 412132086061709858}
   rabiDialogue: {fileID: 11400000, guid: 49dce5d759178864fa79b5d951b1f8a3, type: 2}
 --- !u!95 &8898053680327511531

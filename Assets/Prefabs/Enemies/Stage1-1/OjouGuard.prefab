@@ -335,6 +335,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82f53322c9dd0944994c4ab57a9d1447, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  idleAnimation: ojouguard_normal
+  moveAnimation: ojouguard_move
+  shootAnimation: 
   beatContact: 0
   isElite: 0
   Sprite: {fileID: 4977498180393348215}
@@ -344,12 +347,10 @@ MonoBehaviour:
   CurrentHP: 50
   SpawnIndex: 0
   AItype: 0
-  experience: 10
-  baseExperience: 0
-  atk: 4
-  speed: 1.5
   eventMove: {x: 0, y: 0, z: 0}
   lifeTime: 0
+  slownessStatus: {fileID: 0}
+  enemyType: 29
 --- !u!95 &1909167052486913919
 Animator:
   serializedVersion: 5

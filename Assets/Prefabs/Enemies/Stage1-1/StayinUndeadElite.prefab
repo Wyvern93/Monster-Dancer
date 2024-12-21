@@ -251,6 +251,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2fd76a5e3c2c6b45922435b568296de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  idleAnimation: stayinundead_normal
+  moveAnimation: stayinundead_move
+  shootAnimation: stayinundead_normal
   beatContact: 0
   isElite: 1
   Sprite: {fileID: 7639349529833091205}
@@ -260,13 +263,10 @@ MonoBehaviour:
   CurrentHP: 800
   SpawnIndex: 0
   AItype: 0
-  experience: 150
-  baseExperience: 0
-  atk: 4
-  speed: 0.6
   eventMove: {x: 0, y: 0, z: 0}
   lifeTime: 0
   slownessStatus: {fileID: 0}
+  enemyType: 25
 --- !u!95 &5479493279689626071
 Animator:
   serializedVersion: 5
