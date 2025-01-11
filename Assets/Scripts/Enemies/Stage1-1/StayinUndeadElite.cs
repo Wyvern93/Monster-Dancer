@@ -6,6 +6,7 @@ using UnityEngine.UIElements;
 public class StayinUndeadElite : Enemy
 {
     int beatCD;
+    private Vector3 targetPos;
     protected override void OnBeat()
     {
         if (isAttacking) return;
@@ -181,6 +182,50 @@ public class StayinUndeadElite : Enemy
     {
         StartCoroutine(MoveCoroutine());
     }
+
+    protected override IEnumerator MoveCoroutine()
+    {
+        isMoving = true;
+
+        Vector3 playerPos = Player.instance.GetClosestPlayer(transform.position);
+        Vector2 dir = (playerPos - transform.position).normalized;
+
+        facingRight = dir.x > 0;
+        animator.Play(moveAnimation);
+        animator.speed = 1f / BeatManager.GetBeatDuration() * 1.5f;
+        //animator.speed *= 2;
+
+        float time = 0;
+        float spd = 6;
+
+        if (dir.x > 0) speed += (dir.x * Time.deltaTime);
+        velocity = dir * speed * spd;
+
+        float beatDuration = BeatManager.GetBeatDuration() / 1.5f;
+        float beatTime = 1;
+
+        while (time <= BeatManager.GetBeatDuration() / 1.5f)
+        {
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+
+            float beatProgress = time / beatDuration;
+            beatTime = Mathf.SmoothStep(1, 0f, beatProgress);
+            velocity = dir * speed * spd * beatTime;
+            time += Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
+        AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
+        PlayerCamera.TriggerCameraShake(0.5f, 0.2f);
+
+        animator.Play(idleAnimation);
+        animator.speed = 1f / BeatManager.GetBeatDuration();
+        velocity = Vector2.zero;
+        Sprite.transform.localPosition = Vector3.zero;
+
+        isMoving = false;
+        yield break;
+    }
+
     public override bool CanTakeDamage()
     {
         return true;

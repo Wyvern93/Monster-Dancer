@@ -97,6 +97,7 @@ GameObject:
   - component: {fileID: 6915472006047351383}
   - component: {fileID: 3703127185056220239}
   - component: {fileID: 3398356773717718008}
+  - component: {fileID: 1204062773225537592}
   m_Layer: 8
   m_Name: NomSlimeElite
   m_TagString: Enemy
@@ -205,6 +206,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb078411167a3bc4e9c59ce45a5db35d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  circleCollider: {fileID: 1204062773225537592}
   idleAnimation: nomslime_normal
   moveAnimation: nomslime_elite_move
   shootAnimation: nomslime_normal
@@ -216,11 +218,16 @@ MonoBehaviour:
   MaxHP: 800
   CurrentHP: 800
   SpawnIndex: 0
-  AItype: 0
+  aiType: 0
+  isDead: 0
+  experience: 0
+  atk: 1
+  speed: 0
   eventMove: {x: 0, y: 0, z: 0}
   lifeTime: 0
   slownessStatus: {fileID: 0}
-  enemyType: 0
+  enemyType: 3
+  group: {fileID: 0}
   bc: {fileID: 6915472006047351383}
 --- !u!95 &3398356773717718008
 Animator:
@@ -243,6 +250,41 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!58 &1204062773225537592
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8419750651125171150}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 256
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 3712
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0.38}
+  serializedVersion: 2
+  m_Radius: 0.5
 --- !u!1 &8833687079476357513
 GameObject:
   m_ObjectHideFlags: 0

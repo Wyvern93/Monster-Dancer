@@ -95,9 +95,9 @@ GameObject:
   - component: {fileID: 1416260490434876236}
   - component: {fileID: 5747214853616300344}
   - component: {fileID: 4226089749421728471}
-  - component: {fileID: 2415154089174388960}
   - component: {fileID: 1265426044555927476}
   - component: {fileID: 1552738515932654621}
+  - component: {fileID: 123988865397547279}
   m_Layer: 8
   m_Name: GhostJrElite
   m_TagString: Enemy
@@ -194,8 +194,63 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.4, y: 0.8}
   m_EdgeRadius: 0
---- !u!61 &2415154089174388960
-BoxCollider2D:
+--- !u!114 &1265426044555927476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5891256842746546261}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6acfc0f5ef71dc74b88141b2d945dc7d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  circleCollider: {fileID: 123988865397547279}
+  idleAnimation: boojr_normal
+  moveAnimation: boojr_move
+  shootAnimation: boojr_preattack
+  beatContact: 0
+  isElite: 1
+  Sprite: {fileID: 6395615806549453988}
+  rb: {fileID: 5747214853616300344}
+  SpriteSize: 1
+  MaxHP: 1200
+  CurrentHP: 1200
+  SpawnIndex: 0
+  aiType: 0
+  isDead: 0
+  experience: 0
+  atk: 1
+  speed: 0
+  eventMove: {x: 0, y: 0, z: 0}
+  lifeTime: 0
+  slownessStatus: {fileID: 0}
+  enemyType: 6
+  group: {fileID: 0}
+--- !u!95 &1552738515932654621
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5891256842746546261}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 35dfa6aa17ab7e141a12026f04e1de64, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!58 &123988865397547279
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -226,68 +281,9 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.4}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
+  m_Offset: {x: 0, y: 0.45}
   serializedVersion: 2
-  m_Size: {x: 0.4, y: 0.8}
-  m_EdgeRadius: 0
---- !u!114 &1265426044555927476
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5891256842746546261}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6acfc0f5ef71dc74b88141b2d945dc7d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  idleAnimation: boojr_normal
-  moveAnimation: boojr_move
-  shootAnimation: boojr_preattack
-  beatContact: 0
-  isElite: 1
-  Sprite: {fileID: 6395615806549453988}
-  rb: {fileID: 5747214853616300344}
-  SpriteSize: 1
-  MaxHP: 1200
-  CurrentHP: 1200
-  SpawnIndex: 0
-  AItype: 0
-  eventMove: {x: 0, y: 0, z: 0}
-  lifeTime: 0
-  slownessStatus: {fileID: 0}
-  enemyType: 5
---- !u!95 &1552738515932654621
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5891256842746546261}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 35dfa6aa17ab7e141a12026f04e1de64, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_Radius: 0.5
 --- !u!1 &8106842810094555445
 GameObject:
   m_ObjectHideFlags: 0

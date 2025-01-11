@@ -143,8 +143,25 @@ public class Stage1a : Stage
         GameManager.LoadNextStage("Stage1b");
         yield break;
     }
-    protected override void StartMapEventListA()
+    protected override void StartMapWaveList()
     {
+        possibleEventTypes = new List<StageEventType>()
+        {
+            StageEventType.SpawnSpreadGroup,
+            StageEventType.SpawnCircleHordeGroup,
+            StageEventType.SpawnElite,
+            StageEventType.SpawnBoss,
+            StageEventType.Wait
+        };
+
+        patternNumber = 1;
+        /*
+        foreach (StageWave wave in Instance.waves)
+        {
+            wave.Initialize();
+        }
+        */
+        /*
         UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stage")} {stageID}-1");
         stageEvents = new List<StageEvent>()
         {
@@ -216,9 +233,11 @@ public class Stage1a : Stage
             new SpawnEliteEvent(EnemyType.PurrfessorElite, 360), // 360
             new SpawnEliteEvent(EnemyType.VampiLoliElite, 480), // 480
             
-            new SpawnBossEvent(EnemyType.Usarin, 600), // 600*/
+            new SpawnBossEvent(EnemyType.Usarin, 600), // 600
             new SpawnCircleHordeEvent(new SpawnData() { AItype = EnemyAIType.CircleHorde, enemyType = EnemyType.ZombieThief, spawnType = SpawnType.AROUND_PLAYER }, 15, 5)
 
-        };
+        };*/
+
+
     }
 }

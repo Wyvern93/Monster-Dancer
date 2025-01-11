@@ -3,7 +3,7 @@ using UnityEditor;
 
 [CustomEditor(typeof(Wave))]
 public class WaveEditor : Editor
-{
+{/*
     float StartingLevel, EndLevel;
     public override void OnInspectorGUI()
     {
@@ -22,5 +22,5 @@ public class WaveEditor : Editor
         }
         EndLevel = wave.LevelFromExp(exp);
         EditorGUILayout.LabelField($"Starting Level: {StartingLevel} | End Level: {EndLevel}");
-    }
+    }*/
 }

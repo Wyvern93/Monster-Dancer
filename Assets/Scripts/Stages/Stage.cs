@@ -1,9 +1,7 @@
-using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class Stage : MonoBehaviour
 {
@@ -12,8 +10,6 @@ public class Stage : MonoBehaviour
     public LayerMask nonPassableMask;
     public GameObject enemyPrefab;
     protected float SpawnRadius = 8f;
-
-    public Transform startPosition;
 
     public GameObject gemPrefab;
     public GameObject bulletgemPrefab;
@@ -36,14 +32,12 @@ public class Stage : MonoBehaviour
 
     public int beats = 0;
 
-    private int waves = 0;
+    [HideInInspector] public StageWave playingWave;
+    public int currentWave = 0;
+    public int patternNumber;
+    public List<WavePreset> wavePresetsAvailable;
 
-    public List<Wave> partAWaves;
-    public List<Wave> partBWaves;
     public int CurrentDifficultyPoints = 0;
-    public int part; // 0 = partA, 1 = BossA, 2 = partB, 3 = BossB
-
-    public int WaveNumberOfEnemies;
 
     public string stageID;
 
@@ -72,6 +66,21 @@ public class Stage : MonoBehaviour
 
     public Fairy fairyCage;
     public static int global_enemy_spawn_modifier = 1;
+
+    public List<StageEventType> possibleEventTypes;
+
+    public List<StageWaveEnemyData> waveEnemyData;
+    public int elitesDefeated;
+    public bool nextWaveIsElite;
+    public bool nextWaveIsBoss;
+    public int currentOrbitalEvents;
+
+    public float additionalRunners = 0;
+    public float additionalBombers = 0;
+    public float additionalShooters = 0;
+
+    public StageCameraPoint startingStagePoint;
+    public StageCameraPoint currentStagePoint;
 
     public static void ForceDespawnEnemies()
     {
@@ -103,16 +112,17 @@ public class Stage : MonoBehaviour
     {
         Instance = this;
         isBossWave = false;
+        playingWave = null;
         SetPools();
         BeatManager.SetTrack(tracks[0]);
         Player.ResetPosition();
-        
-        WaveNumberOfEnemies = 0;
-        waves = 0;
+
+        currentStagePoint = startingStagePoint;
+        PlayerCamera.instance.SetCameraPos(currentStagePoint.transform.position);
+
+        currentWave = 0;
         StageTime = 0;
-        part = 0;
         beats = beatsBeforeWave - 1;
-        WaveNumberOfEnemies = 0;
         bossArea.gameObject.SetActive(false);
         stageGridObjects = new List<GameObject> { stageGrid };
         for (int i = 0; i < 8; i++)
@@ -122,15 +132,16 @@ public class Stage : MonoBehaviour
             stageGridObjects.Add(g);
         }
 
-        Player.instance.transform.position = startPosition.position;
-        Camera.main.transform.position = new Vector3(startPosition.position.x, startPosition.position.y, -60);
-        StartMapEventListA();
+        Player.instance.transform.position = startingStagePoint.transform.position;
+        Camera.main.transform.position = new Vector3(startingStagePoint.transform.position.x, startingStagePoint.transform.position.y, -60);
+        StartMapWaveList();
         UIManager.Instance.PlayerUI.OnCloseMenu();
     }
 
-    protected virtual void StartMapEventListA()
+    protected virtual void StartMapWaveList()
     {
-        UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stage")} {stageID}-1");
+        //UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stage")} {stageID}-1");
+        /*
         stageEvents = new List<StageEvent>()
         {
             new AddEnemyEvent(EnemyType.TestEnemy, 1, 0, 0),
@@ -138,8 +149,14 @@ public class Stage : MonoBehaviour
             new ChangeSpawnRateEvent(3, 20),
             new ChangeSpawnRateEvent(4, 40),
             new ChangeSpawnRateEvent(5, 60),
-        };
+        };*/
+        //foreach (StageWave wave in Instance.waves)
+        //{
+        //    wave.Initialize();
+        //}
+       
     }
+
     public virtual void Start()
     {
         
@@ -308,13 +325,16 @@ public class Stage : MonoBehaviour
         if (!GameManager.isPaused) spawnAngle += Time.deltaTime * 30;
 
         HandleStageLoop();
+
+        HandleStageMovement();
         
         if (BeatManager.isGameBeat && BeatManager.isPlaying)
         {
             if (GameManager.isPaused) return;
 
-            ReadEvents();
+            //ReadEvents();
             beats++;
+            /*
             if (beats >= beatsBeforeWave)
             {
                 beats = 0;
@@ -326,6 +346,8 @@ public class Stage : MonoBehaviour
                     group.OnGroupInit();
                 }
             }
+            */
+            TryToSpawnNextWave();
         }
         
         StageTime += Time.deltaTime;
@@ -334,12 +356,20 @@ public class Stage : MonoBehaviour
         
         if (Keyboard.current.f4Key.wasPressedThisFrame)
         {
-            StageTime += 30;
-            stagePartTime += 30;
+            ForceDespawnEnemies();
         }
         
     }
 
+    protected void HandleStageMovement()
+    {
+        if (currentStagePoint == null) return;
+
+        if (currentStagePoint.CanTrigger()) currentStagePoint.Trigger();
+        if (currentStagePoint.CanMoveToNext()) currentStagePoint = currentStagePoint.next;
+    }
+
+    /*
     private void ReadEvents()
     {
         List<StageEvent> events = stageEvents.FindAll(x => x.time < stagePartTime);
@@ -349,6 +379,84 @@ public class Stage : MonoBehaviour
             e.Trigger();
             Debug.Log($"Removing event {e.GetType()}");
             stageEvents.Remove(e);
+        }
+    }*/
+
+    public void TryToSpawnNextWave()
+    {
+        
+        if (enemiesAlive.Count > 0) return;
+        //{
+            //if (!enemiesAlive[0].isElite) return;
+            //if (enemiesAlive.Count > 1) return;
+        //}
+
+
+        //Debug.Log("No enemies");
+        if (playingWave == null) // First Wave
+        {
+            currentOrbitalEvents = 0;
+            additionalRunners = 0;
+            additionalBombers = 0;
+            additionalShooters = 0;
+            playingWave = new StageWave();
+            playingWave.waveData = waveEnemyData[elitesDefeated];
+            playingWave.Initialize();
+            StartCoroutine(playingWave.Start());
+            UIManager.Instance.PlayerUI.SetStageText($"Wave {currentWave + 1}");
+            currentWave++;
+            return;
+        }
+
+        if (!playingWave.isFinalized) return;
+
+        UIManager.Instance.PlayerUI.SetStageText($"Wave {currentWave + 1}");
+        if (nextWaveIsBoss)
+        {
+            currentOrbitalEvents = 0;
+            additionalRunners = 0;
+            additionalBombers = 0;
+            additionalShooters = 0;
+            playingWave = new StageWave();
+            playingWave.waveData = waveEnemyData[elitesDefeated];
+            //playingWave.choosenPreset = new WavePreset() { events = new List<StageEvent> { new SpawnBossEvent() { enemySpawnType = EnemySpawnType.BOSS } } };
+            //playingWave.Initialize();
+            SpawnBoss(new SpawnData() { enemyType = waveEnemyData[elitesDefeated].specialSpawnEnemy });
+            playingWave.isInitialized = true;
+            playingWave.choosenPreset = new WavePreset();
+            playingWave.choosenPreset.events = new List<StageEvent>();
+            nextWaveIsBoss = false;
+            //StartCoroutine(playingWave.Start());
+            playingWave.isFinalized = false;
+            currentWave++;
+        }
+        else
+        {
+            currentOrbitalEvents = 0;
+            playingWave = new StageWave();
+            playingWave.waveData = waveEnemyData[elitesDefeated];
+            if (nextWaveIsElite)
+            {
+                additionalRunners = 0;
+                additionalBombers = 0;
+                additionalShooters = 0;
+                SpawnElite(new SpawnData() { enemyType = waveEnemyData[elitesDefeated].specialSpawnEnemy });
+                playingWave.isInitialized = true;
+                playingWave.choosenPreset = new WavePreset();
+                playingWave.choosenPreset.events = new List<StageEvent>();
+                nextWaveIsElite = false;
+                //StartCoroutine(playingWave.Start());
+                playingWave.isFinalized = false;
+            }
+            else
+            {
+                additionalRunners += 0.25f;
+                additionalBombers += 0.135f;
+                additionalShooters += 0.25f;
+                playingWave.Initialize();
+                StartCoroutine(playingWave.Start());
+            }
+            currentWave++;
         }
     }
 
@@ -412,11 +520,9 @@ public class Stage : MonoBehaviour
 
     public List<int> spawnDirections = new List<int>();
 
-    public static void SpawnEnemy(SpawnData spawnData, EnemyGroup group)
+    public static void SpawnSpreadEnemy(EnemyType enemyType, EnemyGroup group)
     {
-        if (spawnData == null) return;
 
-        float x, y;
         if (Instance.spawnDirections.Count == 0)
         {
             Instance.spawnDirections = new List<int> { 0,1,2,3 };
@@ -435,7 +541,7 @@ public class Stage : MonoBehaviour
                 spawnPos = new Vector2(cam.transform.position.x + (camWidth / 2) + Random.Range(1, 4), Random.Range(cam.transform.position.y - (camHeight / 2), cam.transform.position.y + (camHeight / 2)));
                 break;
             case 1: // Top
-                spawnPos = new Vector2(Random.Range(cam.transform.position.x - (camWidth / 2), cam.transform.position.x + (camWidth / 2)), cam.transform.position.y + (camHeight / 2) + Random.Range(1, 43));
+                spawnPos = new Vector2(Random.Range(cam.transform.position.x - (camWidth / 2), cam.transform.position.x + (camWidth / 2)), cam.transform.position.y + (camHeight / 2) + Random.Range(1, 4));
                 break;
             case 2: // Left
                 spawnPos = new Vector2(cam.transform.position.x - (camWidth / 2) - Random.Range(1, 4), Random.Range(cam.transform.position.y - (camHeight / 2), cam.transform.position.y + (camHeight / 2)));
@@ -445,13 +551,106 @@ public class Stage : MonoBehaviour
                 break;
         }
 
-        Enemy enemy = Enemy.GetEnemyOfType(spawnData.enemyType);
+        Enemy enemy = Enemy.GetEnemyOfType(enemyType);
         enemy.group = group;
         enemy.aiType = EnemyAIType.Spread;
         enemy.SpawnIndex = 0;
         enemy.transform.position = spawnPos;
+        enemy.circleCollider.enabled = true;
         enemy.OnSpawn();
         Instance.spawnDirections.Remove(spawnDir);
+    }
+
+    public static void SpawnCircleHorde(EnemyType enemyType, EnemyGroup group, int number, bool chase)
+    {
+        if (Instance.spawnDirections.Count == 0)
+        {
+            Instance.spawnDirections = new List<int> { 0, 1, 2, 3 };
+        }
+        Vector3 spawnPos = Vector3.zero;
+        int spawnDir = Instance.spawnDirections[Random.Range(0, Instance.spawnDirections.Count - 1)];
+
+        Camera cam = Camera.main;
+        float camHeight = 2f * cam.orthographicSize;
+        float camWidth = camHeight * cam.aspect;
+
+        switch (spawnDir)
+        {
+            default:
+            case 0: // Right
+                spawnPos = new Vector2(cam.transform.position.x + (camWidth / 2) + 4, Random.Range(cam.transform.position.y - (camHeight / 2), cam.transform.position.y + (camHeight / 2)));
+                break;
+            case 1: // Top
+                spawnPos = new Vector2(Random.Range(cam.transform.position.x - (camWidth / 2), cam.transform.position.x + (camWidth / 2)), cam.transform.position.y + (camHeight / 2) + 4);
+                break;
+            case 2: // Left
+                spawnPos = new Vector2(cam.transform.position.x - (camWidth / 2) - 4, Random.Range(cam.transform.position.y - (camHeight / 2), cam.transform.position.y + (camHeight / 2)));
+                break;
+            case 3: // Bottom
+                spawnPos = new Vector2(Random.Range(cam.transform.position.x - (camWidth / 2), cam.transform.position.x + (camWidth / 2)), cam.transform.position.y - (camHeight / 2) - 4);
+                break;
+        }
+
+        Vector3 playerPos = Player.instance.GetClosestPlayer(spawnPos) + (Vector3)UnityEngine.Random.insideUnitCircle * 2;
+        Vector2 dir = playerPos - spawnPos;
+        dir.Normalize();
+
+        for (int i = 0; i < number; i++)
+        {
+            Vector3 random = spawnPos + (Vector3)(UnityEngine.Random.insideUnitCircle * 0.05f); //(Vector3)(UnityEngine.Random.insideUnitCircle * size) + spawnPos;
+            Enemy e = Enemy.GetEnemyOfType(enemyType);
+            e.aiType = chase ? EnemyAIType.HordeChase : EnemyAIType.CircleHorde;
+            e.transform.position = random;
+            e.eventMove = dir;
+            e.group = group;
+            group.enemies.Add(e);
+            e.OnSpawn();
+            if (!chase) e.speed += 1.6f;
+        }
+    }
+
+    public static void RespawnHorde(EnemyGroup enemyGroup)
+    {
+        if (Instance.spawnDirections.Count == 0)
+        {
+            Instance.spawnDirections = new List<int> { 0, 1, 2, 3 };
+        }
+        Vector3 spawnPos = Vector3.zero;
+        int spawnDir = Instance.spawnDirections[Random.Range(0, Instance.spawnDirections.Count - 1)];
+
+        Camera cam = Camera.main;
+        float camHeight = 2f * cam.orthographicSize;
+        float camWidth = camHeight * cam.aspect;
+
+        switch (spawnDir)
+        {
+            default:
+            case 0: // Right
+                spawnPos = new Vector2(cam.transform.position.x + (camWidth / 2) + 4, Random.Range(cam.transform.position.y - (camHeight / 2), cam.transform.position.y + (camHeight / 2)));
+                break;
+            case 1: // Top
+                spawnPos = new Vector2(Random.Range(cam.transform.position.x - (camWidth / 2), cam.transform.position.x + (camWidth / 2)), cam.transform.position.y + (camHeight / 2) + 4);
+                break;
+            case 2: // Left
+                spawnPos = new Vector2(cam.transform.position.x - (camWidth / 2) - 4, Random.Range(cam.transform.position.y - (camHeight / 2), cam.transform.position.y + (camHeight / 2)));
+                break;
+            case 3: // Bottom
+                spawnPos = new Vector2(Random.Range(cam.transform.position.x - (camWidth / 2), cam.transform.position.x + (camWidth / 2)), cam.transform.position.y - (camHeight / 2) - 4);
+                break;
+        }
+
+        Vector3 playerPos = Player.instance.GetClosestPlayer(spawnPos) + (Vector3)UnityEngine.Random.insideUnitCircle * 2;
+        Vector2 dir = playerPos - spawnPos;
+        dir.Normalize();
+
+        foreach (Enemy e in enemyGroup.enemies)
+        {
+            if (e.isDead || !e.gameObject.activeSelf) continue;
+
+            Vector3 random = spawnPos + (Vector3)(UnityEngine.Random.insideUnitCircle * 0.05f); //(Vector3)(UnityEngine.Random.insideUnitCircle * size) + spawnPos;
+            e.transform.position = random;
+            e.eventMove = dir;
+        }
     }
 
     public static void SpawnElite(SpawnData spawnData)
@@ -465,15 +664,10 @@ public class Stage : MonoBehaviour
 
         AudioController.PlaySound(AudioController.instance.sounds.warningWaveSound);
         SpawnEffect spawnEffect = PoolManager.Get<SpawnEffect>();
-        float angle, x, y;
-        while (true)
-        {
-            angle = Random.Range(0, 360f);
-            x = Player.instance.transform.position.x + (3 * Mathf.Cos(angle));
-            y = Player.instance.transform.position.y + (3 * Mathf.Sin(angle));
-            if (!isWallAt(new Vector2(Mathf.RoundToInt(x), Mathf.RoundToInt(y)))) break;
-        }
-        Vector3 spawnPos = new Vector3(Mathf.RoundToInt(x), Mathf.RoundToInt(y));
+        spawnEffect.animator.Play("EliteSummon");
+
+        Vector3 spawnPos = PlayerCamera.instance.transform.position;
+        spawnPos.z = 0;
         spawnEffect.transform.position = spawnPos;
         yield return new WaitForSeconds(BeatManager.GetBeatDuration() * 2);
         AudioController.PlaySound(AudioController.instance.sounds.warningWaveSound);
@@ -484,32 +678,66 @@ public class Stage : MonoBehaviour
         enemy.SpawnIndex = 0;
         enemy.transform.position = spawnPos;
         enemy.OnSpawn();
+        nextWaveIsElite = false;
     }
 
-    public static void SpawnUniqueEnemy(SpawnData spawnData)
+    public static void SpawnUniqueEnemy(SpawnData spawnData, EnemyGroup group)
     {
-        Instance.StartCoroutine(Instance.SpawnUniqueEnemyCoroutine(spawnData));
+        Instance.StartCoroutine(Instance.SpawnUniqueEnemyCoroutine(spawnData, group));
     }
 
-    private IEnumerator SpawnUniqueEnemyCoroutine(SpawnData spawnData)
+    private IEnumerator SpawnUniqueEnemyCoroutine(SpawnData spawnData, EnemyGroup group)
     {
         if (spawnData == null) yield break;
 
-        float angle, x, y;
-        while (true)
-        {
-            angle = Random.Range(0, 360f);
-            x = Player.instance.transform.position.x + (Instance.SpawnRadius * Mathf.Cos(angle));
-            y = Player.instance.transform.position.y + (Instance.SpawnRadius * Mathf.Sin(angle));
-            if (!isWallAt(new Vector2(Mathf.RoundToInt(x), Mathf.RoundToInt(y)))) break;
-        }
-        Vector3 spawnPos = new Vector3(Mathf.RoundToInt(x), Mathf.RoundToInt(y));
+        SpawnEffect spawnEffect = PoolManager.Get<SpawnEffect>();
+        spawnEffect.transform.position = spawnData.spawnPosition;
+        spawnEffect.animator.Play("EnemySummon");
+        yield return new WaitForSeconds(BeatManager.GetBeatDuration() * 2);
 
         Enemy enemy = Enemy.GetEnemyOfType(spawnData.enemyType);
-        enemy.aiType = spawnData.AItype;
+        enemy.aiType = group.aIType;
         enemy.SpawnIndex = 0;
-        enemy.transform.position = spawnPos;
+        enemy.transform.position = spawnData.spawnPosition;
+        enemy.group = group;
         enemy.OnSpawn();
+    }
+
+    public static IEnumerator SpawnEnemiesGeometric(EnemyType enemyType, EnemyGroup group, int number)
+    {
+        int orbitDistance = Instance.currentOrbitalEvents + 4;
+        orbitDistance = Mathf.Clamp(orbitDistance, 2, 8);
+        Vector3 spawnPos = PlayerCamera.instance.transform.position;
+        spawnPos.z = 0;
+
+        for (int i = 0; i < number; i++)
+        {
+            Vector3 enemyPos = spawnPos + ((Vector3)(BulletBase.angleToVector((360f / number) * i)) * orbitDistance);
+            SpawnEffect spawnEffect = PoolManager.Get<SpawnEffect>();
+            spawnEffect.transform.position = enemyPos;
+            spawnEffect.animator.Play("EnemySummon");
+        }
+        yield return new WaitForSeconds(BeatManager.GetBeatDuration() * 2);
+
+        group.totalEnemies = 0;
+        for (int i = 0; i < number; i++)
+        {
+            Vector3 enemyPos = spawnPos + ((Vector3)(BulletBase.angleToVector((360f / number) * i)) * orbitDistance);
+            Enemy enemy = Enemy.GetEnemyOfType(enemyType);
+            enemy.aiType = group.aIType;
+            enemy.SpawnIndex = i;
+            enemy.transform.position = enemyPos;
+            enemy.group = group;           
+            group.enemies.Add(enemy);
+            group.totalEnemies++;
+            enemy.OnSpawn();
+            enemy.speed += 1.6f;
+
+        }
+        group.orbitDistance = orbitDistance;
+        Instance.currentOrbitalEvents++;
+        group.OnGroupInit();
+        yield break;
     }
 
     public static IEnumerator SpawnEnemyAroundPlayer(SpawnData spawnData, int index)
@@ -572,7 +800,7 @@ public class Stage : MonoBehaviour
         yield return new WaitForSeconds(2f);
 
         SpawnEffect spawnEffect = PoolManager.Get<SpawnEffect>();
-
+        spawnEffect.animator.Play("EliteSummon");
         Vector3 spawnPos = Vector3.zero;
         spawnEffect.transform.position = spawnPos;
 
@@ -675,22 +903,6 @@ public class Stage : MonoBehaviour
         }
         GameManager.runData.stageMulti++;
         GameManager.LoadNextStage("Stage1-2");
-        yield break;
-    }
-
-    public virtual IEnumerator BossADeathCoroutine()
-    {
-        UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stage")} {stageID}-2");
-        BeatManager.FadeOut(Time.deltaTime / 2f);
-        yield return new WaitForSeconds(2f);
-
-        BeatManager.SetTrack(tracks[2]);
-        BeatManager.StartTrack();
-        part = 2;
-        waves++;
-
-        Debug.Log(waves);
-        beats = 0;
         yield break;
     }
 

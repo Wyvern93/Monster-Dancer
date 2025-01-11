@@ -7,6 +7,7 @@ public class VampiLoliElite : Enemy
 {
     Vector3 dirToPlayer;
     int beats;
+    private Vector3 targetPos;
     public override void OnSpawn()
     {
         base.OnSpawn();
@@ -128,23 +129,53 @@ public class VampiLoliElite : Enemy
         StartCoroutine(MoveCoroutine());
     }
 
+    IEnumerator MoveToTarget()
+    {
+        isMoving = true;
+
+        float time = 0;
+        Vector2 dir = (targetPos - transform.position).normalized;
+        facingRight = dir.x > 0;
+        animator.Play(moveAnimation);
+        while (time <= BeatManager.GetBeatDuration() / 2)
+        {
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+
+            velocity = Vector2.zero;
+            transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * speed * 6);
+            if (transform.position == targetPos) break;
+            time += Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
+        animator.Play(idleAnimation);
+        AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
+        PlayerCamera.TriggerCameraShake(0.5f, 0.2f);
+
+        velocity = Vector2.zero;
+        Sprite.transform.localPosition = Vector3.zero;
+
+        isMoving = false;
+        yield break;
+    }
+
     protected override IEnumerator MoveCoroutine()
     {
         isMoving = true;
 
         float time = 0;
-        Vector3 playerPos = Player.instance.GetClosestPlayer(transform.position);
-        Vector2 dir = (playerPos - transform.position).normalized;
+        targetPos = Player.instance.transform.position;
+        Vector2 dir = (targetPos - transform.position).normalized;
         facingRight = dir.x > 0;
-        animator.Play("vampiloli_move");
-        while (time <= BeatManager.GetBeatDuration() / 2f)
+        animator.Play(moveAnimation);
+        while (time <= BeatManager.GetBeatDuration() / 2)
         {
             while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+
             velocity = dir * speed * 6;
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
-        animator.Play("vampiloli_normal");
+        animator.Play(idleAnimation);
         AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
         PlayerCamera.TriggerCameraShake(0.5f, 0.2f);
         velocity = Vector2.zero;

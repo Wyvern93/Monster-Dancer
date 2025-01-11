@@ -1,4 +1,5 @@
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class PlayerCamera : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class PlayerCamera : MonoBehaviour
     protected Vector2 ScreenShakeDir;
     protected Vector3 CameraOffset;
     public bool followPlayer = true;
+    public Vector2 camDir;
 
     public static PlayerCamera instance;
     public void Awake()
@@ -46,15 +48,15 @@ public class PlayerCamera : MonoBehaviour
         {
             if (Stage.Instance.currentBoss != null)
             {
-                Vector3 target = (new Vector3(Player.instance.transform.position.x, Player.instance.transform.position.y, -60) + Stage.Instance.currentBoss.transform.position) / 2f;
-                target.z = -60;
+                Vector3 target = (new Vector3(Player.instance.transform.position.x, Player.instance.transform.position.y, -60) + Stage.Instance.currentBoss.transform.position) / 2f;//(new Vector3(Player.instance.transform.position.x, Player.instance.transform.position.y, -60) + Stage.Instance.currentBoss.transform.position) / 2f;
                 targetCameraPos = Vector3.Lerp(targetCameraPos, target, Time.deltaTime * 8f);
             }
-            else
+            else if (Stage.Instance.currentStagePoint != null)
             {
-                targetCameraPos = Vector3.Lerp(targetCameraPos, new Vector3(Player.instance.transform.position.x, Player.instance.transform.position.y, -60), Time.deltaTime * 8f);
+                targetCameraPos = Vector2.MoveTowards(targetCameraPos, Stage.Instance.currentStagePoint.transform.position, Time.deltaTime * 0.1f * 6f * 3);
             }
         }
+        targetCameraPos.z = -60;
 
         // Camera ScreenShake
         if (ScreenShakeTime > 0)

@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   music: {fileID: 8300000, guid: c88a3aa7433004a45adc009b1de05505, type: 3}
   tempo: 141.15
-  offset: 0.23
+  offset: 0.25
   loopStart: 27.23
   loopEnd: 68.078

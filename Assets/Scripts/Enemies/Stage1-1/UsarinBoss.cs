@@ -662,7 +662,7 @@ public class UsarinBoss : Boss
         yield break;
     }
 
-    IEnumerator MoveCoroutine()
+    protected override IEnumerator MoveCoroutine()
     {
         isMoving = true;
 
@@ -738,7 +738,7 @@ public class UsarinBoss : Boss
         PlayerCamera.instance.followPlayer = true;
         UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
         UIManager.Instance.PlayerUI.SetBossBarName(GetName());
-        UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stageboss")}");
+        UIManager.Instance.PlayerUI.SetStageText($"BOSS WAVE");
         BeatManager.SetTrack(bossTrack);
         BeatManager.StartTrack();
         Stage.isBossWave = true;

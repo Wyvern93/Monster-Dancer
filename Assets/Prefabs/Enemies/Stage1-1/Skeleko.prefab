@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 7433631493249385710}
   - component: {fileID: 7964887354816485065}
   - component: {fileID: 6401808591102249790}
-  - component: {fileID: 8729825249044455484}
   - component: {fileID: 6800802573328958817}
   - component: {fileID: 7868305416208311360}
+  - component: {fileID: 4276574352747304972}
   m_Layer: 8
   m_Name: Skeleko
   m_TagString: Enemy
@@ -110,8 +110,63 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.4, y: 0.4}
   m_EdgeRadius: 0
---- !u!61 &8729825249044455484
-BoxCollider2D:
+--- !u!114 &6800802573328958817
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2923011707065763519}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63dd433c96771cf46bbffcdfbacfb108, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  circleCollider: {fileID: 4276574352747304972}
+  idleAnimation: skeleko_normal
+  moveAnimation: skeleko_move
+  shootAnimation: 
+  beatContact: 0
+  isElite: 0
+  Sprite: {fileID: 8926938699364407547}
+  rb: {fileID: 7964887354816485065}
+  SpriteSize: 1
+  MaxHP: 40
+  CurrentHP: 40
+  SpawnIndex: 0
+  aiType: 0
+  isDead: 0
+  experience: 0
+  atk: 1
+  speed: 0
+  eventMove: {x: 0, y: 0, z: 0}
+  lifeTime: 0
+  slownessStatus: {fileID: 0}
+  enemyType: 14
+  group: {fileID: 0}
+--- !u!95 &7868305416208311360
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2923011707065763519}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: bad1a23da4eb4c24fa5788c26a2a55f5, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!58 &4276574352747304972
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -142,68 +197,9 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.1}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
+  m_Offset: {x: 0, y: 0.38}
   serializedVersion: 2
-  m_Size: {x: 0.4, y: 0.4}
-  m_EdgeRadius: 0
---- !u!114 &6800802573328958817
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2923011707065763519}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63dd433c96771cf46bbffcdfbacfb108, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  idleAnimation: skeleko_normal
-  moveAnimation: skeleko_move
-  shootAnimation: 
-  beatContact: 0
-  isElite: 0
-  Sprite: {fileID: 8926938699364407547}
-  rb: {fileID: 7964887354816485065}
-  SpriteSize: 1
-  MaxHP: 40
-  CurrentHP: 40
-  SpawnIndex: 0
-  AItype: 0
-  eventMove: {x: 0, y: 0, z: 0}
-  lifeTime: 0
-  slownessStatus: {fileID: 0}
-  enemyType: 13
---- !u!95 &7868305416208311360
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2923011707065763519}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: bad1a23da4eb4c24fa5788c26a2a55f5, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_Radius: 0.5
 --- !u!1 &5706223581364554695
 GameObject:
   m_ObjectHideFlags: 0

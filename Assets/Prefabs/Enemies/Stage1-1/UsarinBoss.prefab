@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 4331260047074159078}
   - component: {fileID: 1334540373579798779}
   - component: {fileID: 5228376689145762123}
-  - component: {fileID: 8620500665191925345}
   - component: {fileID: 4728397638894176488}
   - component: {fileID: 8898053680327511531}
+  - component: {fileID: 3165580469630152380}
   m_Layer: 8
   m_Name: UsarinBoss
   m_TagString: Enemy
@@ -111,51 +111,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.4, y: 0.4}
   m_EdgeRadius: 0
---- !u!61 &8620500665191925345
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1590443579089726816}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 3968
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.2}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 0.4, y: 0.4}
-  m_EdgeRadius: 0
 --- !u!114 &4728397638894176488
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -168,6 +123,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ff1438a9ae200f4f877e68ed4caae7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  circleCollider: {fileID: 3165580469630152380}
+  idleAnimation: 
+  moveAnimation: 
+  shootAnimation: 
   beatContact: 0
   isElite: 0
   Sprite: {fileID: 8386087377965295929}
@@ -176,15 +135,16 @@ MonoBehaviour:
   MaxHP: 6100
   CurrentHP: 6100
   SpawnIndex: 0
-  AItype: 0
+  aiType: 0
+  isDead: 0
   experience: 0
-  baseExperience: 0
   atk: 1
-  speed: 1.1
+  speed: 0
   eventMove: {x: 0, y: 0, z: 0}
   lifeTime: 0
   slownessStatus: {fileID: 0}
-  enemyType: 16
+  enemyType: 17
+  group: {fileID: 0}
   State: 0
   bossTrack: {fileID: 11400000, guid: 5f7a898fdf9a4a24b8325a9b191abf25, type: 2}
   defeatEffect: {fileID: 5748955037701923418, guid: b4f414eef991b904c9caf749c4ee0a1e, type: 3}
@@ -213,6 +173,41 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!58 &3165580469630152380
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1590443579089726816}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 256
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 3712
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0.38}
+  serializedVersion: 2
+  m_Radius: 0.5
 --- !u!1 &3959147112735897374
 GameObject:
   m_ObjectHideFlags: 0

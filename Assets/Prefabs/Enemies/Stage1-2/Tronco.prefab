@@ -179,9 +179,9 @@ GameObject:
   - component: {fileID: 88245750141490298}
   - component: {fileID: 4483918820315295808}
   - component: {fileID: 5474127870319293322}
-  - component: {fileID: 1406733944278375889}
   - component: {fileID: 4130921839785619717}
   - component: {fileID: 4814067484147859147}
+  - component: {fileID: 2638633156127995147}
   m_Layer: 8
   m_Name: Tronco
   m_TagString: Enemy
@@ -278,8 +278,63 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.4, y: 0.4}
   m_EdgeRadius: 0
---- !u!61 &1406733944278375889
-BoxCollider2D:
+--- !u!114 &4130921839785619717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9021181315923229963}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cf521ce794c88047b5ddc3dfb4f79e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  circleCollider: {fileID: 2638633156127995147}
+  idleAnimation: tronco_normal
+  moveAnimation: tronco_move
+  shootAnimation: tronco_normal
+  beatContact: 0
+  isElite: 0
+  Sprite: {fileID: 5338283674250872097}
+  rb: {fileID: 4483918820315295808}
+  SpriteSize: 1
+  MaxHP: 100
+  CurrentHP: 100
+  SpawnIndex: 0
+  aiType: 0
+  isDead: 0
+  experience: 0
+  atk: 1
+  speed: 0
+  eventMove: {x: 0, y: 0, z: 0}
+  lifeTime: 0
+  slownessStatus: {fileID: 0}
+  enemyType: 15
+  group: {fileID: 0}
+--- !u!95 &4814067484147859147
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9021181315923229963}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 01a827647a76d02489f48e4a7b22e428, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!58 &2638633156127995147
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -310,65 +365,6 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.1}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
+  m_Offset: {x: 0, y: 0.38}
   serializedVersion: 2
-  m_Size: {x: 0.4, y: 0.4}
-  m_EdgeRadius: 0
---- !u!114 &4130921839785619717
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9021181315923229963}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2cf521ce794c88047b5ddc3dfb4f79e1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  idleAnimation: tronco_normal
-  moveAnimation: tronco_move
-  shootAnimation: tronco_normal
-  beatContact: 0
-  isElite: 0
-  Sprite: {fileID: 5338283674250872097}
-  rb: {fileID: 4483918820315295808}
-  SpriteSize: 1
-  MaxHP: 100
-  CurrentHP: 100
-  SpawnIndex: 0
-  AItype: 0
-  eventMove: {x: 0, y: 0, z: 0}
-  lifeTime: 0
-  slownessStatus: {fileID: 0}
-  enemyType: 0
---- !u!95 &4814067484147859147
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9021181315923229963}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 01a827647a76d02489f48e4a7b22e428, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_Radius: 0.5

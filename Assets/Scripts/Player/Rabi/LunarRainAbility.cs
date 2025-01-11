@@ -6,11 +6,11 @@ public class LunarRainAbility : PlayerAbility
     int numEnemies = 50;
     public LunarRainAbility() : base()
     {
-        baseAmmo = 3;
-        baseAttackSpeed = 2f;
-        baseCooldown = 8;
+        baseAmmo = 4;
+        baseAttackSpeed = 1f;
+        baseCooldown = 6;
 
-        baseDamage = 20;
+        baseDamage = 25;
         baseKnockback = 0;
         baseCritChance = 0;
         baseDuration = 0;

@@ -9,6 +9,7 @@ TagManager:
   - Bullet
   - Fairy
   - FairyCage
+  - CameraWall
   layers:
   - Default
   - TransparentFX
@@ -23,8 +24,8 @@ TagManager:
   - Object
   - Bullet
   - Hideable
-  - 
-  - 
+  - UnavoidableWall
+  - Trigger
   - 
   - 
   - 

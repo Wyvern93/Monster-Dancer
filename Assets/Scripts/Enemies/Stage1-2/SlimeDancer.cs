@@ -9,7 +9,7 @@ public class SlimeDancer : Enemy
   
     protected override void Shoot()
     {
-        isAttacking = true;
+        //isAttacking = true;
         StartCoroutine(ShootBulletsCoroutine());
     }
 
@@ -19,21 +19,22 @@ public class SlimeDancer : Enemy
         BulletSpawnEffect bulletSpawnEffect = PoolManager.Get<BulletSpawnEffect>();
         bulletSpawnEffect.source = this;
         bulletSpawnEffect.transform.position = transform.position;
+        bulletSpawnEffect.transform.parent = transform;
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
         while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
 
         Vector2 dir = Player.instance.GetClosestPlayer(transform.position) - transform.position;
         dir.Normalize();
 
-        SpawnBullet(dir, 10f, 0f);
+        SpawnBullet(dir, 10f, 0.5f);
         AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
         while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
 
-        SpawnBullet(dir, 10f, 0f);
+        SpawnBullet(dir, 10f, 0.5f);
         AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
         bulletSpawnEffect.Despawn();
-        isAttacking = false;
+        //isAttacking = false;
         animator.Play("slimedancer_normal");
         yield break;
         
@@ -43,7 +44,7 @@ public class SlimeDancer : Enemy
     {
         BulletBase bullet = PoolManager.Get<BulletBase>();
 
-        bullet.transform.position = transform.position + (Vector3)(dir * dist) + (Vector3.one * 0.5f);
+        bullet.transform.position = transform.position + (Vector3)(dir * dist) + (Vector3.up * 0.25f);
         bullet.direction = dir;
         bullet.speed = 6;
         bullet.atk = 3;

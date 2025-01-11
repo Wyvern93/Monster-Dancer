@@ -95,9 +95,9 @@ GameObject:
   - component: {fileID: 2701738363123249926}
   - component: {fileID: 9170932065982545913}
   - component: {fileID: 399358665348142243}
-  - component: {fileID: 5227351745919166824}
   - component: {fileID: 5200024767817535123}
   - component: {fileID: 5479493279689626071}
+  - component: {fileID: 8671096683785225421}
   m_Layer: 8
   m_Name: StayinUndeadElite
   m_TagString: Enemy
@@ -194,8 +194,63 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.4, y: 0.4}
   m_EdgeRadius: 0
---- !u!61 &5227351745919166824
-BoxCollider2D:
+--- !u!114 &5200024767817535123
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4087775823064112258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2fd76a5e3c2c6b45922435b568296de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  circleCollider: {fileID: 8671096683785225421}
+  idleAnimation: stayinundead_normal
+  moveAnimation: stayinundead_move
+  shootAnimation: stayinundead_normal
+  beatContact: 0
+  isElite: 1
+  Sprite: {fileID: 7639349529833091205}
+  rb: {fileID: 9170932065982545913}
+  SpriteSize: 1
+  MaxHP: 800
+  CurrentHP: 800
+  SpawnIndex: 0
+  aiType: 0
+  isDead: 0
+  experience: 0
+  atk: 1
+  speed: 0
+  eventMove: {x: 0, y: 0, z: 0}
+  lifeTime: 0
+  slownessStatus: {fileID: 0}
+  enemyType: 26
+  group: {fileID: 0}
+--- !u!95 &5479493279689626071
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4087775823064112258}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 1382ed7b1590a4142a99f20e3e7d6dee, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!58 &8671096683785225421
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -226,68 +281,9 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.15}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
+  m_Offset: {x: 0, y: 0.38}
   serializedVersion: 2
-  m_Size: {x: 0.4, y: 0.4}
-  m_EdgeRadius: 0
---- !u!114 &5200024767817535123
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4087775823064112258}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2fd76a5e3c2c6b45922435b568296de, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  idleAnimation: stayinundead_normal
-  moveAnimation: stayinundead_move
-  shootAnimation: stayinundead_normal
-  beatContact: 0
-  isElite: 1
-  Sprite: {fileID: 7639349529833091205}
-  rb: {fileID: 9170932065982545913}
-  SpriteSize: 1
-  MaxHP: 800
-  CurrentHP: 800
-  SpawnIndex: 0
-  AItype: 0
-  eventMove: {x: 0, y: 0, z: 0}
-  lifeTime: 0
-  slownessStatus: {fileID: 0}
-  enemyType: 25
---- !u!95 &5479493279689626071
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4087775823064112258}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 1382ed7b1590a4142a99f20e3e7d6dee, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_Radius: 0.5
 --- !u!1 &5882661701109487296
 GameObject:
   m_ObjectHideFlags: 0

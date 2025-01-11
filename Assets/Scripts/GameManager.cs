@@ -170,8 +170,8 @@ public class GameManager : MonoBehaviour
         UIManager.Instance.PlayerUI.ShowUI();
         isLoading = false;
         Player.ResetPosition();
-        Player.instance.transform.position = Stage.Instance.startPosition.position;
-        Camera.main.transform.position = new Vector3(Stage.Instance.startPosition.position.x, Stage.Instance.startPosition.position.y, Camera.main.transform.position.z);
+        Player.instance.transform.position = Stage.Instance.startingStagePoint.transform.position;
+        Camera.main.transform.position = new Vector3(Stage.Instance.startingStagePoint.transform.position.x, Stage.Instance.startingStagePoint.transform.position.y, Camera.main.transform.position.z);
         Player.instance.canDoAnything = true;
 
         PlayerCamera.instance.SetOnPlayer();

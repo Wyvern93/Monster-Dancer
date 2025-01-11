@@ -95,9 +95,9 @@ GameObject:
   - component: {fileID: 6743466992341866636}
   - component: {fileID: 758988521205969405}
   - component: {fileID: 1922050248761678565}
-  - component: {fileID: 4928472223560284488}
   - component: {fileID: 8327646938733195617}
   - component: {fileID: 6951541457418316138}
+  - component: {fileID: 2707074174691148441}
   m_Layer: 8
   m_Name: Dancearune
   m_TagString: Enemy
@@ -194,8 +194,63 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.4, y: 0.4}
   m_EdgeRadius: 0
---- !u!61 &4928472223560284488
-BoxCollider2D:
+--- !u!114 &8327646938733195617
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1394428546064131456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6a72c425bc38b2468a2de2004d41313, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  circleCollider: {fileID: 2707074174691148441}
+  idleAnimation: dancearune_normal
+  moveAnimation: dancearune_normal
+  shootAnimation: dancearune_preattack
+  beatContact: 0
+  isElite: 0
+  Sprite: {fileID: 2537348576551353723}
+  rb: {fileID: 758988521205969405}
+  SpriteSize: 1
+  MaxHP: 60
+  CurrentHP: 60
+  SpawnIndex: 0
+  aiType: 0
+  isDead: 0
+  experience: 0
+  atk: 1
+  speed: 0
+  eventMove: {x: 0, y: 0, z: 0}
+  lifeTime: 0
+  slownessStatus: {fileID: 0}
+  enemyType: 12
+  group: {fileID: 0}
+--- !u!95 &6951541457418316138
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1394428546064131456}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: bb1abc1701140504aba9cbacc9e6ca00, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!58 &2707074174691148441
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -226,68 +281,9 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.1}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
+  m_Offset: {x: 0, y: 0.38}
   serializedVersion: 2
-  m_Size: {x: 0.4, y: 0.4}
-  m_EdgeRadius: 0
---- !u!114 &8327646938733195617
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1394428546064131456}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a6a72c425bc38b2468a2de2004d41313, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  idleAnimation: dancearune_normal
-  moveAnimation: dancearune_normal
-  shootAnimation: dancearune_preattack
-  beatContact: 0
-  isElite: 0
-  Sprite: {fileID: 2537348576551353723}
-  rb: {fileID: 758988521205969405}
-  SpriteSize: 1
-  MaxHP: 60
-  CurrentHP: 60
-  SpawnIndex: 0
-  AItype: 0
-  eventMove: {x: 0, y: 0, z: 0}
-  lifeTime: 0
-  slownessStatus: {fileID: 0}
-  enemyType: 0
---- !u!95 &6951541457418316138
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1394428546064131456}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: bb1abc1701140504aba9cbacc9e6ca00, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_Radius: 0.5
 --- !u!1 &3575338804978627121
 GameObject:
   m_ObjectHideFlags: 0

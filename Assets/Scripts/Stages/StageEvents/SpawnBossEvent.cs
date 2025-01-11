@@ -1,19 +1,25 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 public class SpawnBossEvent : StageEvent
 {
-    public EnemyType enemyType;
-    public SpawnBossEvent(EnemyType enemytype, float time) : base(time) 
+    public SpawnBossEvent()
     {
-        enemyType = enemytype;
     }
-    public override void Trigger()
+
+    public override StageEventType getStageEventType()
+    {
+        return StageEventType.SpawnBoss;
+    }
+
+    public override IEnumerator Trigger(StageWave sourceWave)
     {
         SpawnData spawnData = new SpawnData();
         spawnData.spawnType = SpawnType.AROUND_PLAYER;
-        spawnData.enemyType = enemyType;
+        spawnData.enemyType = sourceWave.waveData.specialSpawnEnemy;
         
         Stage.Instance.SpawnBoss(spawnData);
+        yield break;
     }
 }

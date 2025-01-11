@@ -137,8 +137,8 @@ public class Stage1b : Stage
         GameManager.LoadNextStage("Stage1a");
         yield break;
     }
-    protected override void StartMapEventListA()
-    {
+    protected override void StartMapWaveList()
+    {/*
         UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stage")} {stageID}-2");
         stageEvents = new List<StageEvent>()
         {
@@ -216,5 +216,5 @@ public class Stage1b : Stage
             
             new SpawnBossEvent(EnemyType.Nebulion, 600)
         };
-    }
+    */}
 }

@@ -1,18 +1,11 @@
+using System.Collections;
 using System.Collections.Generic;
 
 public abstract class StageEvent
 {
-    public float time;
+    public EnemySpawnType enemySpawnType;
+    public abstract StageEventType getStageEventType();
 
-    public StageEvent(float time)
-    {
-        this.time = time;
-    }
+    public abstract IEnumerator Trigger(StageWave sourceWave);
 
-    public abstract void Trigger();
-
-    public virtual List<EnemyType> GetEnemiesInWave()
-    {
-        return new List<EnemyType>();
-    }
 }

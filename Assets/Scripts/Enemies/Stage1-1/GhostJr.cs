@@ -7,7 +7,7 @@ public class GhostJr : Enemy
 
     protected override void Shoot()
     {
-        isAttacking = true;
+        //isAttacking = true;
         StartCoroutine(ShootBulletsCoroutine());
     }
 
@@ -26,7 +26,7 @@ public class GhostJr : Enemy
 
         SpawnBullet(dir, 16f, 0f);
         bulletSpawnEffect.Despawn();
-        isAttacking = false;
+        //isAttacking = false;
         animator.speed = 1f / BeatManager.GetBeatDuration() * 2f;
         animator.Play("boojr_normal");
         yield break;
@@ -52,33 +52,5 @@ public class GhostJr : Enemy
             };
         bullet.animator.Play("ghostbullet");
         bullet.OnSpawn();
-    }
-
-    protected override void OnBehaviourUpdate()
-    {
-
-    }
-
-    protected override void OnInitialize()
-    {
-
-    }
-
-    void MoveTowardsPlayer()
-    {
-        if (isMoving) return;
-
-        Move();
-
-    }
-
-    public void Move()
-    {
-        StartCoroutine(MoveCoroutine());
-    }
-
-    public override bool CanTakeDamage()
-    {
-        return true;
     }
 }

@@ -201,8 +201,8 @@ GameObject:
   - component: {fileID: 1058114657622472707}
   - component: {fileID: 1362446459166522815}
   - component: {fileID: 9200417933935256587}
-  - component: {fileID: 2337118786971171472}
   - component: {fileID: 8896398993232122022}
+  - component: {fileID: 8036671093737067652}
   m_Layer: 8
   m_Name: SlimeDancer
   m_TagString: Enemy
@@ -299,8 +299,42 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.4, y: 0.4}
   m_EdgeRadius: 0
---- !u!61 &2337118786971171472
-BoxCollider2D:
+--- !u!114 &8896398993232122022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7856127107780804563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cab18d01a8b425046921188ff24667f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  circleCollider: {fileID: 8036671093737067652}
+  idleAnimation: slimedancer_normal
+  moveAnimation: slimedancer_normal
+  shootAnimation: slimedancer_preattack
+  beatContact: 0
+  isElite: 0
+  Sprite: {fileID: 8626814897227013347}
+  rb: {fileID: 1362446459166522815}
+  SpriteSize: 1
+  MaxHP: 40
+  CurrentHP: 40
+  SpawnIndex: 0
+  aiType: 0
+  isDead: 0
+  experience: 0
+  atk: 1
+  speed: 0
+  eventMove: {x: 0, y: 0, z: 0}
+  lifeTime: 0
+  slownessStatus: {fileID: 0}
+  enemyType: 4
+  group: {fileID: 0}
+--- !u!58 &8036671093737067652
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -331,44 +365,6 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.2}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
+  m_Offset: {x: 0, y: 0.38}
   serializedVersion: 2
-  m_Size: {x: 0.4, y: 0.4}
-  m_EdgeRadius: 0
---- !u!114 &8896398993232122022
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7856127107780804563}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cab18d01a8b425046921188ff24667f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  idleAnimation: slimedancer_normal
-  moveAnimation: slimedancer_normal
-  shootAnimation: slimedancer_preattack
-  beatContact: 0
-  isElite: 0
-  Sprite: {fileID: 8626814897227013347}
-  rb: {fileID: 1362446459166522815}
-  SpriteSize: 1
-  MaxHP: 40
-  CurrentHP: 40
-  SpawnIndex: 0
-  AItype: 0
-  eventMove: {x: 0, y: 0, z: 0}
-  lifeTime: 0
-  slownessStatus: {fileID: 0}
-  enemyType: 0
+  m_Radius: 0.5

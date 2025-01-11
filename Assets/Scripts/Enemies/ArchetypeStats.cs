@@ -3,9 +3,11 @@ public class ArchetypeStats
     public float baseHP;
     public float baseSpeed;
     public float baseAttack;
+    public EnemyArchetype archetypeType;
 
     public ArchetypeStats(EnemyArchetype archetype)
     {
+        this.archetypeType = archetype;
         float defaultHP = 30;
         switch (archetype)
         {
@@ -51,12 +53,12 @@ public class ArchetypeStats
                 baseAttack = 8f;
                 break;
             case EnemyArchetype.Elite:
-                baseHP = 600f;
+                baseHP = 300f;
                 baseSpeed = 1f;
                 baseAttack = 10f;
                 break;
             case EnemyArchetype.Boss:
-                baseHP = 6000f;
+                baseHP = 5000f;
                 baseSpeed = 1f;
                 baseAttack = 12f;
                 break;
@@ -65,12 +67,21 @@ public class ArchetypeStats
 
     public ArchetypeStats getStatsAtWave(int wave)
     {
-        ArchetypeStats finalStats = new ArchetypeStats(EnemyArchetype.AllRounder);
+        ArchetypeStats finalStats = new ArchetypeStats(this.archetypeType);
         finalStats.baseHP = baseHP;
         finalStats.baseSpeed = baseSpeed;
         finalStats.baseAttack = baseAttack;
 
-        finalStats.baseHP += baseHP * (wave * 0.2f);
+        if (archetypeType == EnemyArchetype.Elite)
+        {
+            finalStats.baseHP += (baseHP * (wave * 0.15f)) * (Stage.Instance.elitesDefeated + 1);
+        }
+        else
+        {
+            finalStats.baseHP += baseHP * (wave * 0.15f);
+        }
+
+        
         finalStats.baseSpeed += baseSpeed * (wave * 0.003f);
         finalStats.baseAttack += baseAttack * (wave * 0.04f);
 

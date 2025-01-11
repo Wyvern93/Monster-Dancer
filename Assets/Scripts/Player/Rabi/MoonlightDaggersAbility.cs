@@ -11,8 +11,8 @@ public class MoonlightDaggersAbility : PlayerAbility, IPlayerProjectile
         baseCooldown = 2;
         baseDamage = 12;
         baseDuration = 0.5f;
-        baseSpeed = 10;
-        baseKnockback = 2;
+        baseSpeed = 12;
+        baseKnockback = 1;
         baseCritChance = 0;
 
         currentAmmo = GetMaxAmmo();

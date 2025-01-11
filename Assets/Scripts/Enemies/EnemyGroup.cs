@@ -1,5 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using System.Linq;
 using UnityEngine;
 
 public class EnemyGroup : MonoBehaviour
@@ -10,6 +11,11 @@ public class EnemyGroup : MonoBehaviour
     public List<Enemy> enemies;
     public Vector2 dirToPlayer;
     bool isInitialized;
+    public float orbitDistance;
+    public bool clockwise;
+    public float orbitAngle;
+    public float orbitSpeed;
+    public int totalEnemies;
 
     private void OnEnable()
     {
@@ -19,36 +25,64 @@ public class EnemyGroup : MonoBehaviour
     {
         switch (aIType)
         {
+            case EnemyAIType.HordeChase:
             case EnemyAIType.CircleHorde:
                 Vector3 playerPos = Player.instance.GetClosestPlayer(transform.position);
                 dirToPlayer = ((Vector2)playerPos - GetCenter()).normalized;
                 break;
+            case EnemyAIType.Orbital:
+                clockwise = true;
+                break;
+
         }
         isInitialized = true;
+        StartCoroutine(handlePhysics());
+    }
+
+    private IEnumerator handlePhysics()
+    {
+        switch (aIType)
+        {
+            case EnemyAIType.Spread:
+                foreach (Enemy enemy in enemies)
+                {
+                    enemy.circleCollider.enabled = true;
+                }
+                break;
+            case EnemyAIType.Orbital:
+                foreach (Enemy enemy in enemies)
+                {
+                    enemy.circleCollider.enabled = false;
+                }
+                break;
+            case EnemyAIType.CircleHorde:
+            case EnemyAIType.HordeChase:
+            case EnemyAIType.FullHorizontalWall:
+            case EnemyAIType.FullVerticalWall:
+            case EnemyAIType.HorizontalWall:
+            case EnemyAIType.VerticalWall:
+                foreach (Enemy enemy in enemies)
+                {
+                    enemy.circleCollider.enabled = true;
+                }
+                yield return new WaitForSeconds(0.3f);
+                foreach (Enemy enemy in enemies)
+                {
+                    enemy.circleCollider.enabled = false;
+                }
+                break;
+        }
+        yield break;
     }
 
     void Respawn()
     {
+        StartCoroutine(handlePhysics());
         switch (aIType)
         {
             case EnemyAIType.CircleHorde:
-                float angle, x, y;
-                angle = Random.Range(0, 360f);
-                
-                Vector3 playerPos = Player.instance.GetClosestPlayer(transform.position);
-                x = playerPos.x + (14 * Mathf.Cos(angle));
-                y = playerPos.y + (14 * Mathf.Sin(angle));
-
-                Vector3 spawnPos = new Vector3(Mathf.RoundToInt(x), Mathf.RoundToInt(y));
-
-                float size = 1.5f;
-                foreach (Enemy e in enemies)
-                {
-                    if (e.isDead || !e.gameObject.activeSelf) continue;
-
-                    Vector3 random = spawnPos + (Vector3)(Random.insideUnitCircle * 0.05f);//(Vector3)(Random.insideUnitCircle * size) + spawnPos;
-                    e.transform.position = random;
-                }
+                Stage.RespawnHorde(this);
+                Vector3 playerPos = Player.instance.transform.position;
                 dirToPlayer = ((Vector2)playerPos - GetCenter()).normalized;
                 break;
         }
@@ -58,23 +92,59 @@ public class EnemyGroup : MonoBehaviour
         if (!isInitialized) return;
         if (enemies.Count == 0)
         {
+            if (aIType == EnemyAIType.Orbital) Stage.Instance.currentOrbitalEvents--;
             PoolManager.Return(gameObject, GetType());
             return;
         }
+
+        Vector3 playerPos = Player.instance.GetClosestPlayer(transform.position);
+
         switch (aIType)
         {
             case EnemyAIType.Spread:
-                Vector3 playerPos = Player.instance.GetClosestPlayer(transform.position);
                 dirToPlayer = ((Vector2)playerPos - GetCenter()).normalized;
                 break;
+            case EnemyAIType.HordeChase:
+                dirToPlayer = ((Vector2)playerPos - GetCenter()).normalized;
+                break;
+            case EnemyAIType.Orbital:
+                dirToPlayer = ((Vector2)playerPos - GetCenter()).normalized;
+                if (BeatManager.isBeat) StartCoroutine(OrbitalUpdate());
+                break;
             case EnemyAIType.CircleHorde:
-                if (Vector2.Distance(GetCenter(), Player.instance.transform.position) > 15) Respawn();        // Out of Screen
+                if (Mathf.Abs(GetCenter().x - PlayerCamera.instance.transform.position.x) > 15) Respawn();
+                if (Mathf.Abs(GetCenter().y - PlayerCamera.instance.transform.position.y) > 10) Respawn();// Out of Screen
                 break;
         }
     }
 
+    private IEnumerator OrbitalUpdate()
+    {
+        float beatDuration = BeatManager.GetBeatDuration() / 1.5f;
+        float beatTime = 1;
+        float time = 0;
+        while (time <= BeatManager.GetBeatDuration() / 1.5f)
+        {
+            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            float beatProgress = time / beatDuration;
+            beatTime = Mathf.SmoothStep(1, 0f, beatProgress);
+
+            if (clockwise) orbitAngle += 90f * (orbitSpeed / orbitDistance) * Time.deltaTime;
+            else orbitAngle -= 90f * (orbitSpeed / orbitDistance) * Time.deltaTime;
+
+            dirToPlayer = (Player.instance.transform.position - transform.position).normalized;
+
+            transform.position = Vector3.MoveTowards(transform.position, Player.instance.transform.position, 5f * orbitSpeed * Time.deltaTime);
+            time += Time.deltaTime;
+
+            yield return new WaitForEndOfFrame();
+        }
+        yield break;
+    }
+
     public Vector2 GetCenter()
     {
+        if (aIType == EnemyAIType.Orbital) return transform.position;
         if (!centerIsLead)
         {
             foreach (Enemy enemy in enemies)
