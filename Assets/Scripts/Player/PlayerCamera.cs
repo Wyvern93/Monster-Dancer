@@ -53,7 +53,7 @@ public class PlayerCamera : MonoBehaviour
             }
             else if (Stage.Instance.currentStagePoint != null)
             {
-                targetCameraPos = Vector2.MoveTowards(targetCameraPos, Stage.Instance.currentStagePoint.transform.position, Time.deltaTime * 0.1f * 6f * 3);
+                targetCameraPos = Vector2.MoveTowards(targetCameraPos, Stage.Instance.currentStagePoint.transform.position, Time.deltaTime * 0.1f * 6f);
             }
         }
         targetCameraPos.z = -60;

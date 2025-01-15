@@ -49,7 +49,7 @@ public class StageCameraPointRender : MonoBehaviour
             Vector3 rectPosition = point.transform.position;
 
             Vector3[] corners = GetRectangleCorners(rectPosition, cameraSize);
-            DrawRectangleEdges(corners);
+            
 
             // Use GUI to draw the label
             //Handles.BeginGUI();
@@ -67,6 +67,7 @@ public class StageCameraPointRender : MonoBehaviour
                 // Draw only the outer connections
                 DrawPathBetweenRectangles(corners, nextCorners, point.transform.position, point.next.transform.position);
             }
+            DrawRectangleEdges(corners, point);
         }
 
     }
@@ -91,8 +92,11 @@ public class StageCameraPointRender : MonoBehaviour
         return corners;
     }
 
-    private void DrawRectangleEdges(Vector3[] corners)
+    private void DrawRectangleEdges(Vector3[] corners, StageCameraPoint point)
     {
+        if (point.pointType == StagePointType.Anchor) Gizmos.color = Color.green;
+        else if (point.pointType == StagePointType.Elite) Gizmos.color = Color.blue;
+        else Gizmos.color = Color.red;
         // Only draw the outer edges of the rectangle
         Gizmos.DrawLine(corners[0], corners[1]); // Top-left to Top-right
         Gizmos.DrawLine(corners[1], corners[2]); // Top-right to Bottom-right
@@ -102,6 +106,7 @@ public class StageCameraPointRender : MonoBehaviour
 
     private void DrawPathBetweenRectangles(Vector3[] rectA, Vector3[] rectB, Vector2 from, Vector2 to)
     {
+        Gizmos.color = Color.green;
         // Connect outer edges (Top, Right, Bottom, Left) between rectangles
         // Avoid drawing lines across the internal diagonal area.
 

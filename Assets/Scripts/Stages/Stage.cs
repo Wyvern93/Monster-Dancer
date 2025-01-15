@@ -81,6 +81,9 @@ public class Stage : MonoBehaviour
 
     public StageCameraPoint startingStagePoint;
     public StageCameraPoint currentStagePoint;
+    public static float remainingWaveTime;
+
+    public bool showWaveTimer;
 
     public static void ForceDespawnEnemies()
     {
@@ -184,17 +187,17 @@ public class Stage : MonoBehaviour
         AudioController.PlaySound(AudioController.instance.sounds.surpriseSfx);
         yield return new WaitForSeconds(1f);
 
-        UIManager.Fade(false);
-        yield return new WaitForSeconds(1f);
-        mapObjects.SetActive(false);
-        bossGrid.SetActive(true);
-        Player.instance.transform.position = PlayerPositionOnBoss.position;
-        PlayerCamera.instance.SetCameraPos(PlayerPositionOnBoss.position);
+        //UIManager.Fade(false);
+        //yield return new WaitForSeconds(1f);
+        //mapObjects.SetActive(false);
+        //bossGrid.SetActive(true);
+        //Player.instance.transform.position = PlayerPositionOnBoss.position;
+        //PlayerCamera.instance.SetCameraPos(PlayerPositionOnBoss.position);
 
-        Vector3 spawnPos = BossPosition.position; //new Vector3(Mathf.RoundToInt(x), Mathf.RoundToInt(y));
+        Vector3 spawnPos = BossPosition.position; 
 
-        UIManager.Fade(true);
-        yield return new WaitForSeconds(1f);
+        //UIManager.Fade(true);
+        //yield return new WaitForSeconds(1f);
 
         float time = 2;
         Vector3 c = PlayerCamera.instance.transform.position;
@@ -352,6 +355,7 @@ public class Stage : MonoBehaviour
         
         StageTime += Time.deltaTime;
         stagePartTime += Time.deltaTime;
+        remainingWaveTime -= Time.deltaTime;
 
         
         if (Keyboard.current.f4Key.wasPressedThisFrame)
@@ -384,8 +388,8 @@ public class Stage : MonoBehaviour
 
     public void TryToSpawnNextWave()
     {
-        
-        if (enemiesAlive.Count > 0) return;
+        if (!showWaveTimer && enemiesAlive.Count > 0) return; // Elites need to be defeated first
+        else if (enemiesAlive.Count > 0 && remainingWaveTime > 0) return;
         //{
             //if (!enemiesAlive[0].isElite) return;
             //if (enemiesAlive.Count > 1) return;
@@ -395,6 +399,8 @@ public class Stage : MonoBehaviour
         //Debug.Log("No enemies");
         if (playingWave == null) // First Wave
         {
+            remainingWaveTime = 30;
+            showWaveTimer = true;
             currentOrbitalEvents = 0;
             additionalRunners = 0;
             additionalBombers = 0;
@@ -413,6 +419,8 @@ public class Stage : MonoBehaviour
         UIManager.Instance.PlayerUI.SetStageText($"Wave {currentWave + 1}");
         if (nextWaveIsBoss)
         {
+            remainingWaveTime = 30;
+            showWaveTimer = false;
             currentOrbitalEvents = 0;
             additionalRunners = 0;
             additionalBombers = 0;
@@ -437,6 +445,8 @@ public class Stage : MonoBehaviour
             playingWave.waveData = waveEnemyData[elitesDefeated];
             if (nextWaveIsElite)
             {
+                remainingWaveTime = 30;
+                showWaveTimer = false;
                 additionalRunners = 0;
                 additionalBombers = 0;
                 additionalShooters = 0;
@@ -450,6 +460,8 @@ public class Stage : MonoBehaviour
             }
             else
             {
+                remainingWaveTime = 30;
+                showWaveTimer = true;
                 additionalRunners += 0.25f;
                 additionalBombers += 0.135f;
                 additionalShooters += 0.25f;

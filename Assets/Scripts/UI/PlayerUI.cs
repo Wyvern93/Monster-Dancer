@@ -411,7 +411,7 @@ public class PlayerUI : MonoBehaviour
 
     public void UpdateStageTime()
     {
-        MapTimeText.text = GetStageTime();
+        MapTimeText.text = Stage.Instance.showWaveTimer ? GetRemainingStageTime() : "";
     }
 
     public string GetStageTime()
@@ -420,6 +420,14 @@ public class PlayerUI : MonoBehaviour
         int minutes = totalSeconds / 60;
         int seconds = totalSeconds % 60;
         return string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
+
+    private string GetRemainingStageTime()
+    {
+        int totalSeconds = (int)Stage.remainingWaveTime;
+        totalSeconds = Mathf.Clamp(totalSeconds, 0, 60);
+        return totalSeconds.ToString();
+        return string.Format("{000}", totalSeconds);
     }
 
     public string GetStageName()
