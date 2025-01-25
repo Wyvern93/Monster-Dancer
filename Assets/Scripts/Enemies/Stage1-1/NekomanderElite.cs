@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PurrfessorElite : Enemy
+public class NekomanderElite : Enemy
 {
     int beatCD;
     private Vector3 targetPos;
@@ -28,9 +28,12 @@ public class PurrfessorElite : Enemy
 
     }
 
-    protected override void OnInitialize()
+    public override void OnSpawn()
     {
-
+        base.OnSpawn();
+        UIManager.Instance.PlayerUI.SetBossBarName("Nekomander");
+        UIManager.Instance.PlayerUI.ShowBossBar(true);
+        UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
     }
 
     public void ShootBullets()
@@ -40,7 +43,7 @@ public class PurrfessorElite : Enemy
 
     private IEnumerator ShootBulletsCoroutine()
     {
-        animator.Play("purrfessor_normal");
+        animator.Play("nekomander_preattack");
         BulletSpawnEffect bulletSpawnEffect = PoolManager.Get<BulletSpawnEffect>();
         bulletSpawnEffect.source = this;
         bulletSpawnEffect.transform.position = transform.position;
@@ -61,6 +64,7 @@ public class PurrfessorElite : Enemy
 
         bulletSpawnEffect.Despawn();
         isAttacking = false;
+        animator.Play("nekomander_normal");
         yield break;
 
     }
@@ -107,7 +111,7 @@ public class PurrfessorElite : Enemy
                 new SpriteSpinBehaviour() { start = 0, end = -1 },
             };
         bullet.OnSpawn();
-        bullet.animator.Play("bluestarbullet");
+        bullet.animator.Play("redbullet");
     }
 
     void MoveTowardsPlayer()

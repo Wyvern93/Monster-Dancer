@@ -738,9 +738,11 @@ public class UsarinBoss : Boss
         PlayerCamera.instance.followPlayer = true;
         UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
         UIManager.Instance.PlayerUI.SetBossBarName(GetName());
+        UIManager.Instance.PlayerUI.ShowBossBar(true);
         UIManager.Instance.PlayerUI.SetStageText($"BOSS WAVE");
         BeatManager.SetTrack(bossTrack);
         BeatManager.StartTrack();
+        Stage.Instance.OnBossFightStart(this);
         Stage.isBossWave = true;
         Player.instance.canDoAnything = true;
         State = BossState.Phase1;

@@ -18,6 +18,7 @@ public class SpawnHordeChaseEvent : StageEvent
         EnemyGroup group = PoolManager.Get<EnemyGroup>();
         group.aIType = EnemyAIType.HordeChase;
         group.centerIsLead = true;
+        group.enemies.Clear();
 
         EnemyType enemyType = sourceWave.getEnemyFromSpawnType(enemySpawnType);
 

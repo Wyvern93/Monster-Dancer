@@ -27,7 +27,7 @@ public enum EnemyType
     FungooElite,
     StayinUndead,
     StayinUndeadElite,
-    Purrfessor,
+    Nekomander,
     ZippyBat,
     VampiLoliElite,
     OjouGuardian,
@@ -37,7 +37,7 @@ public enum EnemyType
     Onibi,
     Karakasa,
     Tanuki,
-    PurrfessorElite,
+    NekomanderElite,
     ClawRiff,
     RhythMaiden,
     BuzzBee

@@ -30,6 +30,7 @@ public class SpawnGeometricEvent : StageEvent
         enemyGroup.aIType = EnemyAIType.Orbital;
         enemyGroup.centerIsLead = true;
         enemyGroup.transform.position = spawnPos;
+        enemyGroup.enemies.Clear();
 
         ArchetypeStats stats = new ArchetypeStats(Enemy.enemyData[enemyType].archetype).getStatsAtWave(Stage.Instance.currentWave);
         enemyGroup.orbitSpeed = stats.baseSpeed;
@@ -41,6 +42,7 @@ public class SpawnGeometricEvent : StageEvent
         
 
         yield return Stage.SpawnEnemiesGeometric(enemyType, enemyGroup, number);
+
         
         //for (int i = 0; i < number; i++)
         //{

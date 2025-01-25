@@ -40,7 +40,7 @@ public class GhostJr : Enemy
 
         bullet.transform.position = transform.position + (Vector3.up * 0.3f);
         bullet.direction = dir;
-        bullet.speed = 3;
+        bullet.speed = 5;
         bullet.atk = 5;
         bullet.lifetime = 12;
         bullet.transform.localScale = Vector3.one;

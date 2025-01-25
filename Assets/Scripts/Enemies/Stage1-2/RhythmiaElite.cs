@@ -12,6 +12,9 @@ public class RhythmiaElite : Enemy
     {
         base.OnSpawn();
         clockwise = true;
+        UIManager.Instance.PlayerUI.SetBossBarName("Rhythmia");
+        UIManager.Instance.PlayerUI.ShowBossBar(true);
+        UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
     }
     protected override void OnBeat()
     {
@@ -97,12 +100,8 @@ public class RhythmiaElite : Enemy
     protected override void OnBehaviourUpdate()
     {
 
-    }
-
-    protected override void OnInitialize()
-    {
-
-    }
+    } 
+    
 
     void MoveTowardsPlayer()
     {

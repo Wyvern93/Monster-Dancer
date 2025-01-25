@@ -7,6 +7,12 @@ public class BunnyHopAbility : PlayerAbility
     {
         baseCooldown = 4;
     }
+
+    public override float GetMaxCooldown()
+    {
+        return baseCooldown;
+    }
+
     public override bool CanCast()
     {
         if (((PlayerRabi)Player.instance).isCastingBunnyHop) return false;

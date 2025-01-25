@@ -46,7 +46,7 @@ public class RabiEclipse : MonoBehaviour, IDespawneable
             bool isCritical = Player.instance.currentStats.CritChance > Random.Range(0f, 100f);
             if (isCritical) damage *= Player.instance.currentStats.CritDmg;
             damage += (enemy.MaxHP * 0.05f);
-
+            damage = 0;
             enemy.TakeDamage((int)damage, isCritical);
         }
         if (collision.CompareTag("Bullet"))

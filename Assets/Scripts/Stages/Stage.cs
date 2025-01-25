@@ -8,6 +8,7 @@ public class Stage : MonoBehaviour
     public static Stage Instance;
     public List<MapTrack> tracks;
     public LayerMask nonPassableMask;
+    public LayerMask waterMask;
     public GameObject enemyPrefab;
     protected float SpawnRadius = 8f;
 
@@ -85,6 +86,11 @@ public class Stage : MonoBehaviour
 
     public bool showWaveTimer;
 
+    public virtual void OnBossFightStart(Boss boss)
+    {
+
+    }
+
     public static void ForceDespawnEnemies()
     {
         foreach (Enemy e in Instance.enemiesAlive)
@@ -128,12 +134,13 @@ public class Stage : MonoBehaviour
         beats = beatsBeforeWave - 1;
         bossArea.gameObject.SetActive(false);
         stageGridObjects = new List<GameObject> { stageGrid };
+        /*
         for (int i = 0; i < 8; i++)
         {
             GameObject g = Instantiate(stageGrid);
             g.transform.parent = mapObjects.transform;
             stageGridObjects.Add(g);
-        }
+        }*/
 
         Player.instance.transform.position = startingStagePoint.transform.position;
         Camera.main.transform.position = new Vector3(startingStagePoint.transform.position.x, startingStagePoint.transform.position.y, -60);
@@ -464,7 +471,7 @@ public class Stage : MonoBehaviour
                 showWaveTimer = true;
                 additionalRunners += 0.25f;
                 additionalBombers += 0.135f;
-                additionalShooters += 0.25f;
+                additionalShooters += 0.125f;
                 playingWave.Initialize();
                 StartCoroutine(playingWave.Start());
             }
@@ -473,7 +480,7 @@ public class Stage : MonoBehaviour
     }
 
     protected virtual void HandleStageLoop()
-    {
+    {/*
         int loopX = Mathf.FloorToInt(Player.instance.transform.position.x / mapSize.x);
         int loopY = Mathf.FloorToInt(Player.instance.transform.position.y / mapSize.y);
 
@@ -491,7 +498,7 @@ public class Stage : MonoBehaviour
         stageGridObjects[6].transform.position = new Vector2(gridX - mapSize.x, gridY + mapSize.y);
         stageGridObjects[7].transform.position = new Vector2(gridX, gridY + mapSize.y);
         stageGridObjects[8].transform.position = new Vector2(gridX + mapSize.x, gridY + mapSize.y);
-
+        */
     }
 
     void OnDrawGizmos()
@@ -803,68 +810,9 @@ public class Stage : MonoBehaviour
         return Physics2D.OverlapBox(position, Vector2.one / 2f, 0, Instance.nonPassableMask);
     }
 
-    public IEnumerator StartBossASequence()
+    public static bool isWaterAt(Vector2 position)
     {
-        UIManager.Instance.PlayerUI.UpdateBossBar(2000, 2000);
-        UIManager.Instance.PlayerUI.SetBossBarName("TestBoss Name");
-        UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stageboss")}");
-        BeatManager.FadeOut(Time.deltaTime / 2f);
-        yield return new WaitForSeconds(2f);
-
-        SpawnEffect spawnEffect = PoolManager.Get<SpawnEffect>();
-        spawnEffect.animator.Play("EliteSummon");
-        Vector3 spawnPos = Vector3.zero;
-        spawnEffect.transform.position = spawnPos;
-
-        AudioController.PlaySound(AudioController.instance.sounds.warningBossWaveSound);
-        yield return new WaitForSeconds(1f);
-        AudioController.PlaySound(AudioController.instance.sounds.warningBossWaveSound);
-        yield return new WaitForSeconds(1f);
-        AudioController.PlaySound(AudioController.instance.sounds.warningBossWaveSound);
-        yield return new WaitForSeconds(1f);
-        while (!BeatManager.isGameBeat) yield return new WaitForEndOfFrame();
-
-        PoolManager.Return(spawnEffect.gameObject, typeof(SpawnEffect));
-
-        TestBoss boss = PoolManager.Get<TestBoss>();
-        boss.transform.position = spawnPos;
-        boss.OnSpawn();
-
-        BeatManager.SetTrack(tracks[1]);
-        BeatManager.StartTrack();
-        yield break;
-    }
-
-    public IEnumerator StartBossBSequence()
-    {
-        UIManager.Instance.PlayerUI.UpdateBossBar(2000, 2000);
-        UIManager.Instance.PlayerUI.SetBossBarName("TestBoss Name");
-        UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stageboss")}-2");
-        BeatManager.FadeOut(Time.deltaTime / 2f);
-        yield return new WaitForSeconds(2f);
-
-        SpawnEffect spawnEffect = PoolManager.Get<SpawnEffect>();
-
-        Vector3 spawnPos = Vector3.zero;
-        spawnEffect.transform.position = spawnPos;
-
-        AudioController.PlaySound(AudioController.instance.sounds.warningBossWaveSound);
-        yield return new WaitForSeconds(1f);
-        AudioController.PlaySound(AudioController.instance.sounds.warningBossWaveSound);
-        yield return new WaitForSeconds(1f);
-        AudioController.PlaySound(AudioController.instance.sounds.warningBossWaveSound);
-        yield return new WaitForSeconds(1f);
-        while (!BeatManager.isGameBeat) yield return new WaitForEndOfFrame();
-
-        PoolManager.Return(spawnEffect.gameObject, typeof(SpawnEffect));
-
-        TestBoss boss = PoolManager.Get<TestBoss>();
-        boss.transform.position = spawnPos;
-        boss.OnSpawn();
-
-        BeatManager.SetTrack(tracks[3]);
-        BeatManager.StartTrack();
-        yield break;
+        return Physics2D.OverlapBox(position, Vector2.one / 2f, 0, Instance.waterMask);
     }
 
     public void OnBossDeath(Boss boss)
@@ -875,6 +823,7 @@ public class Stage : MonoBehaviour
 
     protected virtual IEnumerator BossDefeatCoroutine(Boss boss)
     {
+        UIManager.Instance.PlayerUI.ShowBossBar(false);
         // This is supposed to be an animation
         ForceDespawnBullets();
         PlayerCamera.TriggerCameraShake(2f, 0.45f);

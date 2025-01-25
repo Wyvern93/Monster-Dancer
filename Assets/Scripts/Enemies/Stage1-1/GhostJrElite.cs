@@ -6,6 +6,15 @@ public class GhostJrElite : Enemy
 {
     int beatCD;
     private Vector3 targetPos;
+
+    public override void OnSpawn()
+    {
+        base.OnSpawn();
+        UIManager.Instance.PlayerUI.SetBossBarName("Mega Boo");
+        UIManager.Instance.PlayerUI.ShowBossBar(true);
+        UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
+    }
+
     protected override void OnBeat()
     {
         if (isAttacking) return;
@@ -105,7 +114,6 @@ public class GhostJrElite : Enemy
 
     protected override void OnInitialize()
     {
-
     }
 
     void MoveTowardsPlayer()

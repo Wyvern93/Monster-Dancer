@@ -29,12 +29,13 @@ public class SpawnSpreadEvent : StageEvent
         EnemyGroup group = PoolManager.Get<EnemyGroup>();
         group.aIType = EnemyAIType.Spread;
         group.centerIsLead = true;
+        group.enemies.Clear();
 
         EnemyType enemyType = sourceWave.getEnemyFromSpawnType(enemySpawnType);
 
         int n = 0;
         EnemyClass enemyClass = Enemy.enemyClassFromSpawnType(enemySpawnType);
-        int wait = (enemyClass == EnemyClass.Runner ? 3 : enemyClass == EnemyClass.Bomber ? 8 : 6);
+        int wait = (enemyClass == EnemyClass.Runner ? 4 : enemyClass == EnemyClass.Bomber ? 8 : 6);
         int spread = (int)(number / 4f);
         if (spread < 1) spread = 1;
         for (int i = 0; i < number; i++)

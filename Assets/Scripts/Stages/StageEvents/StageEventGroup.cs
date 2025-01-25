@@ -20,7 +20,7 @@ public class StageEventGroup
         new StageEventGroup() { minEvents = 1, maxEvents = 5, StageEventType = StageEventType.SpawnHordeChaseEvent, defaultRunnerNumber = 6, defaultBomberNumber = 3, defaultShooterNumber = 4 },
 
         // Spread
-        new StageEventGroup() { minEvents = 1, maxEvents = 5, StageEventType = StageEventType.SpawnSpreadGroup, defaultRunnerNumber = 8, defaultBomberNumber = 3, defaultShooterNumber = 4 },
+        new StageEventGroup() { minEvents = 1, maxEvents = 5, StageEventType = StageEventType.SpawnSpreadGroup, defaultRunnerNumber = 6, defaultBomberNumber = 3, defaultShooterNumber = 4 },
 
         // Geometric
         new StageEventGroup() { minEvents = 1, maxEvents = 1, StageEventType = StageEventType.SpawnGeometricEvent, defaultRunnerNumber = 8, defaultBomberNumber = 3, defaultShooterNumber = 3 }

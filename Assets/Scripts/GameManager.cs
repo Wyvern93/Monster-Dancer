@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
     public IconList iconList;
     public GameObject spriteTrailPrefab;
     public static bool isDebugMode = true;
+    public static bool infiniteHP = false;
 
     private void Awake()
     {
@@ -86,6 +87,11 @@ public class GameManager : MonoBehaviour
         {
             BeatManager.compassless = !BeatManager.compassless;
             BeatManager.UpdatePulseAnimator();
+        }
+
+        if (Keyboard.current.f6Key.wasPressedThisFrame)
+        {
+            infiniteHP = !infiniteHP;
         }
     }
 

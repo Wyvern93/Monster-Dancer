@@ -994,6 +994,7 @@ public class NebulionBoss : Boss
         PlayerCamera.instance.followPlayer = true;
         UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
         UIManager.Instance.PlayerUI.SetBossBarName(GetName());
+        UIManager.Instance.PlayerUI.ShowBossBar(true);
         UIManager.Instance.PlayerUI.SetStageText($"BOSS WAVE");
         BeatManager.SetTrack(bossTrack);
         BeatManager.StartTrack();

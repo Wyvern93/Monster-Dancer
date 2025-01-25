@@ -11,6 +11,7 @@ public class PlayerCamera : MonoBehaviour
     protected Vector3 CameraOffset;
     public bool followPlayer = true;
     public Vector2 camDir;
+    public Vector2 camVelocity;
 
     public static PlayerCamera instance;
     public void Awake()
@@ -50,10 +51,12 @@ public class PlayerCamera : MonoBehaviour
             {
                 Vector3 target = (new Vector3(Player.instance.transform.position.x, Player.instance.transform.position.y, -60) + Stage.Instance.currentBoss.transform.position) / 2f;//(new Vector3(Player.instance.transform.position.x, Player.instance.transform.position.y, -60) + Stage.Instance.currentBoss.transform.position) / 2f;
                 targetCameraPos = Vector3.Lerp(targetCameraPos, target, Time.deltaTime * 8f);
+                camVelocity = Vector2.zero;
             }
             else if (Stage.Instance.currentStagePoint != null)
             {
                 targetCameraPos = Vector2.MoveTowards(targetCameraPos, Stage.Instance.currentStagePoint.transform.position, Time.deltaTime * 0.1f * 6f);
+                camVelocity = camDir * (0.6f * Time.deltaTime);
             }
         }
         targetCameraPos.z = -60;

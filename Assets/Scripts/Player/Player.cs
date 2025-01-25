@@ -637,6 +637,7 @@ public class Player : MonoBehaviour
         }
         else
         {
+            StopMovementCoroutines();
             Move((Vector2)transform.position + direction);
         }
         action = PlayerAction.None;
@@ -653,6 +654,9 @@ public class Player : MonoBehaviour
 
         BeatManager.OnPlayerAction();
     }
+
+    protected virtual void StopMovementCoroutines()
+    { }
 
     public virtual void Move(Vector2 targetPos)
     {
@@ -734,6 +738,7 @@ public class Player : MonoBehaviour
 
     public virtual void TakeDamage(int damage)
     {
+        if (GameManager.infiniteHP) return;
         if (isInvulnerable) return;
         if (isDead) return;
 

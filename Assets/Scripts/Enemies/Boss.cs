@@ -100,6 +100,7 @@ public class Boss : Enemy
         yield return new WaitForSeconds(1f);
         UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
         UIManager.Instance.PlayerUI.SetBossBarName(GetName());
+        UIManager.Instance.PlayerUI.ShowBossBar(true);
         UIManager.Instance.PlayerUI.SetStageText("BOSS WAVE");
         BeatManager.SetTrack(bossTrack);
         BeatManager.StartTrack();

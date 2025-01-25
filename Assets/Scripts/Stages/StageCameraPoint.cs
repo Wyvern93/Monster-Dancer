@@ -32,11 +32,13 @@ public class StageCameraPoint : MonoBehaviour
         else if (pointType == StagePointType.Elite && !triggered)
         {
             Stage.Instance.nextWaveIsElite = true;
+            Stage.Instance.showWaveTimer = false;
             triggered = true;
         }
         else if (pointType == StagePointType.Boss && !triggered)
         {
             Stage.Instance.nextWaveIsBoss = true;
+            Stage.Instance.showWaveTimer = false;
             triggered = true;
         }   
     }

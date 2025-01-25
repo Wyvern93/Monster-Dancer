@@ -17,6 +17,9 @@ public class VampiLoliElite : Enemy
         beats = 0;
         dirToPlayer = dir;
         direction = dirToPlayer;
+        UIManager.Instance.PlayerUI.SetBossBarName("Ruri Fang");
+        UIManager.Instance.PlayerUI.ShowBossBar(true);
+        UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
     }
 
     public void SpawnGuards()
@@ -50,7 +53,6 @@ public class VampiLoliElite : Enemy
         {
             beats = 12;
             StartCoroutine(ShootBulletsCoroutine());
-            SpawnGuards();
         }
 
         if (Vector2.Distance(transform.position, Player.instance.transform.position) > 15)
@@ -107,11 +109,6 @@ public class VampiLoliElite : Enemy
     }
 
     protected override void OnBehaviourUpdate()
-    {
-
-    }
-
-    protected override void OnInitialize()
     {
 
     }

@@ -49,9 +49,12 @@ public class NomSlimeElite : Enemy
 
     }
 
-    protected override void OnInitialize()
+    public override void OnSpawn()
     {
-
+        base.OnSpawn();
+        UIManager.Instance.PlayerUI.SetBossBarName("Nomslime King");
+        UIManager.Instance.PlayerUI.ShowBossBar(true);
+        UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
     }
 
     void MoveTowardsPlayer()

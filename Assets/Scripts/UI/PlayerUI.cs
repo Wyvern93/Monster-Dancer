@@ -12,6 +12,9 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] TextMeshProUGUI hpText;
     [SerializeField] Image hurtEffect;
 
+    [SerializeField] Image hpBar_mini;
+    private RectTransform hpBar_mini_Transform;
+
     [SerializeField] GameObject spHud;
     [SerializeField] Image spBar;
     private RectTransform spTransform;
@@ -54,10 +57,15 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] CombatCursorHandler combatcursor1, combatcursor2, combatcursor3;
     [SerializeField] TextMeshProUGUI cursorAmmoText;
 
+    private bool bossBarActive;
+
     // Start is called before the first frame update
     void Awake()
     {
+        bossBarActive = false;
         hpTransform = hpBar.GetComponent<RectTransform>();
+        hpBar_mini_Transform = hpBar_mini.transform.parent.GetComponent<RectTransform>();
+        hpBar_mini_Transform.gameObject.SetActive(false);
         spTransform = spBar.GetComponent<RectTransform>();
         expTransform = expBar.GetComponent<RectTransform>();
         crosshair_transform = crosshair.GetComponent<RectTransform>();
@@ -193,6 +201,11 @@ public class PlayerUI : MonoBehaviour
         bossBarGroup.alpha = 0;
     }
 
+    public void ShowBossBar(bool value)
+    {
+        bossBarActive = value;
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -211,13 +224,14 @@ public class PlayerUI : MonoBehaviour
         if (Stage.Instance != null) 
         {
             UpdateStageTime();
-            bossBarGroup.alpha = Mathf.MoveTowards(bossBarGroup.alpha, Stage.isBossWave ? 1 : 0, Time.deltaTime);
+            bossBarGroup.alpha = Mathf.MoveTowards(bossBarGroup.alpha, bossBarActive ? 1 : 0, Time.deltaTime);
         }
         if (Player.instance == null)
         {
             // Put here a normal cursor instead
             return;
         }
+        hpBar_mini_Transform.position = Player.instance.transform.position - new Vector3(0, 0.2f, 0);
         UpdateAbilityUI();
     }
 
@@ -391,6 +405,9 @@ public class PlayerUI : MonoBehaviour
         float width = (int)(87f * health);
         hpTransform.sizeDelta = new Vector2(width, hpTransform.sizeDelta.y);
         hpText.text = $"{Player.instance.CurrentHP}/{Player.instance.currentStats.MaxHP}";
+        if (health < 1f) hpBar_mini_Transform.gameObject.SetActive(true);
+        else hpBar_mini_Transform.gameObject.SetActive(false);
+        hpBar_mini.fillAmount = health;
     }
 
     public void UpdateSpecial(float current, float max)
@@ -425,9 +442,9 @@ public class PlayerUI : MonoBehaviour
     private string GetRemainingStageTime()
     {
         int totalSeconds = (int)Stage.remainingWaveTime;
-        totalSeconds = Mathf.Clamp(totalSeconds, 0, 60);
-        return totalSeconds.ToString();
-        return string.Format("{000}", totalSeconds);
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        return string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 
     public string GetStageName()

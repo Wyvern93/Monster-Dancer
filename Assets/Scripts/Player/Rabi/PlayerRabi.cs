@@ -283,12 +283,15 @@ public class PlayerRabi : Player
         dir *= currentStats.Speed * 2.5f;
         isCastingBunnyHop = true;
         direction = dir;
+        activeAbility.currentCooldown = activeAbility.GetMaxCooldown();
+        rb.velocity = Vector2.zero;
         StartCoroutine(BunnyHopCoroutine((Vector2)transform.position + dir, fromMove));
 
     }
 
     private IEnumerator BunnyHopCoroutine(Vector2 targetPos, bool fromMove)
     {
+        rb.velocity = Vector2.zero;
         isMoving = true;
         SpriteSize = 1.2f;
         originPos = transform.position;
@@ -315,7 +318,7 @@ public class PlayerRabi : Player
         while (time <= BeatManager.GetBeatDuration() * 0.8f)
         {
             while (GameManager.isPaused) yield return new WaitForEndOfFrame();
-            if (Stage.isWallAt(targetPos)) targetPos = originPos;
+            if (Stage.isWallAt(targetPos) || Stage.isWaterAt(targetPos)) targetPos = originPos;
             
             float lerpedvalue = Mathf.Lerp(0,1f, time / (BeatManager.GetBeatDuration() * 0.8f));
             transform.position = Vector3.Lerp(originPos, (Vector3)targetPos, lerpedvalue);
@@ -333,6 +336,19 @@ public class PlayerRabi : Player
         isCastingBunnyHop = false;
         isMoving = false;
         yield break;
+    }
+
+    protected override void StopMovementCoroutines()
+    {
+        StopCoroutine(nameof(MoveCoroutine));
+        StopCoroutine(nameof(BunnyHopCoroutine));
+        rb.velocity = Vector2.zero;
+        isMoving = false;
+        spriteTrail.Stop();
+        animator.Play("Rabi_Idle");
+        animator.speed = 1f / BeatManager.GetBeatDuration();
+        Sprite.transform.localPosition = Vector3.zero;
+        isCastingBunnyHop = false;
     }
 
     public override void OnPassiveAbilityUse()
@@ -359,6 +375,7 @@ public class PlayerRabi : Player
 
     public override void TakeDamage(int damage)
     {
+        if (GameManager.infiniteHP) return;
         if (isCastingBunnyHop) return;
         if (isInvulnerable) return;
         if (isDead) return;

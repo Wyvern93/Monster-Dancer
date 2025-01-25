@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static UnityEngine.GraphicsBuffer;
 
 public class Stage1a : Stage
 {
@@ -30,9 +29,12 @@ public class Stage1a : Stage
 
     public GameObject usarinBossPrefab;
 
+    [SerializeField] List<Animator> stageLights;
+
     public override void Start()
     {
         fireflies.transform.parent = Camera.main.transform;
+        fireflies.transform.localPosition = new Vector3(0, 0, 30);
     }
 
     public override void SetPools()
@@ -49,8 +51,8 @@ public class Stage1a : Stage
 
         PoolManager.CreatePool(typeof(ClawRiff), clawRiffPrefab, 30);
         PoolManager.CreatePool(typeof(Skeleko), skelekoPrefab, 30);
-        PoolManager.CreatePool(typeof(Purrfessor), purrfessorPrefab, 30);
-        PoolManager.CreatePool(typeof(PurrfessorElite), purrfessorElitePrefab, 1);
+        PoolManager.CreatePool(typeof(Nekomander), purrfessorPrefab, 30);
+        PoolManager.CreatePool(typeof(NekomanderElite), purrfessorElitePrefab, 1);
 
         PoolManager.CreatePool(typeof(RhythMaiden), rhythMaidenPrefab, 30);
         PoolManager.CreatePool(typeof(ZippyBat), zippyBatPrefab, 30);
@@ -75,8 +77,8 @@ public class Stage1a : Stage
 
         PoolManager.RemovePool(typeof(ClawRiff));
         PoolManager.RemovePool(typeof(Skeleko)); // Minute 4:30 - 6:30
-        PoolManager.RemovePool(typeof(Purrfessor)); // Minute 5:00 - 6:00
-        PoolManager.RemovePool(typeof(PurrfessorElite)); // Minute 6
+        PoolManager.RemovePool(typeof(Nekomander)); // Minute 5:00 - 6:00
+        PoolManager.RemovePool(typeof(NekomanderElite)); // Minute 6
 
         PoolManager.RemovePool(typeof(RhythMaiden)); // 6:30 - 8
         PoolManager.RemovePool(typeof(ZippyBat)); // 7:00 - 9:30
@@ -92,9 +94,19 @@ public class Stage1a : Stage
         fireflies.transform.parent = null;
         SceneManager.MoveGameObjectToScene(fireflies, gameObject.scene);
     }
-
+    public override void OnBossFightStart(Boss boss)
+    {
+        foreach (Animator anim in stageLights)
+        {
+            anim.Play("stagelight_usarin");
+        }
+    }
     protected override IEnumerator BossDefeatCoroutine(Boss boss)
     {
+        foreach (Animator anim in stageLights)
+        {
+            anim.Play("stagelight_off");
+        }
         Player.instance.StopAllCoroutines();
         // This is supposed to be an animation
         ForceDespawnBullets();

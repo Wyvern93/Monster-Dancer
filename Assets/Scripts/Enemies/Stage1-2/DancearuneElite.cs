@@ -11,6 +11,9 @@ public class DancearuneElite : Enemy
     {
         base.OnSpawn();
         diagonal = true;
+        UIManager.Instance.PlayerUI.SetBossBarName("Dancearune");
+        UIManager.Instance.PlayerUI.ShowBossBar(true);
+        UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
     }
     protected override void OnBeat()
     {
@@ -90,11 +93,6 @@ public class DancearuneElite : Enemy
     }
 
     protected override void OnBehaviourUpdate()
-    {
-
-    }
-
-    protected override void OnInitialize()
     {
 
     }

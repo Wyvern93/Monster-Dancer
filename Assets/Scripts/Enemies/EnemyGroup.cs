@@ -25,6 +25,9 @@ public class EnemyGroup : MonoBehaviour
     {
         switch (aIType)
         {
+            case EnemyAIType.Spread:
+                dirToPlayer = Vector2.zero;
+                break;
             case EnemyAIType.HordeChase:
             case EnemyAIType.CircleHorde:
                 Vector3 playerPos = Player.instance.GetClosestPlayer(transform.position);

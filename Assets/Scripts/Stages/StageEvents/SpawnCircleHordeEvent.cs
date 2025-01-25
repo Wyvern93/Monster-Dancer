@@ -19,6 +19,7 @@ public class SpawnCircleHordeEvent : StageEvent
         EnemyGroup group = PoolManager.Get<EnemyGroup>();
         group.aIType = EnemyAIType.CircleHorde;
         group.centerIsLead = true;
+        group.enemies.Clear();
 
         EnemyType enemyType = sourceWave.getEnemyFromSpawnType(enemySpawnType);
 
