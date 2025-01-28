@@ -65,7 +65,7 @@ public abstract class Enemy : MonoBehaviour
         {EnemyType.StayinUndeadElite, new EnemyData(EnemyType.StayinUndeadElite, EnemyClass.Elite, EnemyArchetype.Elite, new List<StageEventType>() { StageEventType.SpawnElite}) },
         {EnemyType.Skeleko, new EnemyData(EnemyType.Skeleko, EnemyClass.Runner, EnemyArchetype.AllRounder, new List<StageEventType>() { StageEventType.SpawnSpreadGroup, StageEventType.SpawnCircleHordeGroup}) },
         {EnemyType.ClawRiff, new EnemyData(EnemyType.ClawRiff, EnemyClass.Runner, EnemyArchetype.Swarm, new List<StageEventType>() { StageEventType.SpawnSpreadGroup, StageEventType.SpawnHordeChaseEvent}) },
-        {EnemyType.Nekomander, new EnemyData(EnemyType.Nekomander, EnemyClass.Shooter, EnemyArchetype.Glasscannon, new List<StageEventType>() { StageEventType.SpawnGeometricEvent, StageEventType.SpawnSpreadGroup, StageEventType.SpawnCircleHordeGroup}) },
+        {EnemyType.Nekomander, new EnemyData(EnemyType.Nekomander, EnemyClass.Shooter, EnemyArchetype.Dangerous, new List<StageEventType>() { StageEventType.SpawnGeometricEvent, StageEventType.SpawnSpreadGroup, StageEventType.SpawnCircleHordeGroup}) },
         {EnemyType.NekomanderElite, new EnemyData(EnemyType.NekomanderElite, EnemyClass.Elite, EnemyArchetype.Elite, new List<StageEventType>() { StageEventType.SpawnElite}) },
         {EnemyType.BooJr, new EnemyData(EnemyType.BooJr, EnemyClass.Shooter, EnemyArchetype.AllRounder, new List<StageEventType>() { StageEventType.SpawnSpreadGroup, StageEventType.SpawnGeometricEvent}) },
         {EnemyType.Onibi, new EnemyData(EnemyType.Onibi, EnemyClass.Bomber, EnemyArchetype.Rusher, new List<StageEventType>() { StageEventType.SpawnSpreadGroup, StageEventType.SpawnHordeChaseEvent}) },
@@ -448,10 +448,10 @@ public abstract class Enemy : MonoBehaviour
         velocity = dir * speed * spd;
         velocity = WithStageVelocity(velocity);
 
-        float beatDuration = BeatManager.GetBeatDuration() / 1.5f;
+        float beatDuration = BeatManager.GetBeatDuration() * 0.5f;
         float beatTime = 1;
 
-        while (time <= BeatManager.GetBeatDuration() / 1.5f)
+        while (time <= BeatManager.GetBeatDuration() * 0.5f)
         {
             while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
 
@@ -472,7 +472,7 @@ public abstract class Enemy : MonoBehaviour
             {
                 //dir += group.dirToPlayer;
                 //dir.Normalize();
-                velocity = dir * speed * spd * beatTime;
+                velocity = dir * speed * spd * beatTime * 1.3f;
             }
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();

@@ -184,6 +184,12 @@ public class StageWave
         }
     }
 
+    public void ForceStop()
+    {
+        Stage.Instance.StopCoroutine(Start());
+        isFinalized = true;
+    }
+
     public EnemyType getEnemyFromSpawnType(EnemySpawnType spawnType)
     {
         switch (spawnType)

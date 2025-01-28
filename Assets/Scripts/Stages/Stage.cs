@@ -49,7 +49,7 @@ public class Stage : MonoBehaviour
     // NEW SPAWN SYSTEM
     public Vector2Int mapSize;
     public GameObject stageGrid;
-    public Transform BossPosition, PlayerPositionOnBoss;
+    public Transform BossPosition, PlayerPositionOnBoss, PlayerCutsceneStartPosition;
     protected List<GameObject> stageGridObjects;
 
     public GameObject bossGrid;
@@ -93,6 +93,8 @@ public class Stage : MonoBehaviour
 
     public static void ForceDespawnEnemies()
     {
+        if (Instance.playingWave != null) Instance.playingWave.ForceStop();
+
         foreach (Enemy e in Instance.enemiesAlive)
         {
             e.ForceDespawn();
@@ -180,9 +182,9 @@ public class Stage : MonoBehaviour
     protected IEnumerator SpawnBossCoroutine(SpawnData spawnData)
     {
         // Despawn
-        ForceDespawnEnemies();
-        ForceDespawnBullets();
-        ForceDespawnDrops();
+        //ForceDespawnEnemies();
+        //ForceDespawnBullets();
+        //ForceDespawnDrops();
 
         // Player can't move
         Player.instance.canDoAnything = false;
@@ -194,6 +196,7 @@ public class Stage : MonoBehaviour
         AudioController.PlaySound(AudioController.instance.sounds.surpriseSfx);
         yield return new WaitForSeconds(1f);
 
+        // Originally a Fade
         //UIManager.Fade(false);
         //yield return new WaitForSeconds(1f);
         //mapObjects.SetActive(false);
@@ -201,35 +204,63 @@ public class Stage : MonoBehaviour
         //Player.instance.transform.position = PlayerPositionOnBoss.position;
         //PlayerCamera.instance.SetCameraPos(PlayerPositionOnBoss.position);
 
-        Vector3 spawnPos = BossPosition.position; 
+        PlayerCamera.instance.SetCameraBoundaries(false);
+
+        // Move Camera to the boss trigger
+        currentStagePoint = currentStagePoint.next;
+        PlayerCamera.instance.followPlayer = false;
+        while ((Vector2)PlayerCamera.instance.transform.position != (Vector2)currentStagePoint.transform.position)
+        {
+            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            PlayerCamera.instance.SetCameraPos(Vector2.MoveTowards(PlayerCamera.instance.transform.position, currentStagePoint.transform.position, Time.deltaTime * 20f));
+            yield return new WaitForEndOfFrame();
+        }
+
+        Vector3 bossSpawnPos = BossPosition.position;
+        Vector3 playerStartPos = PlayerCutsceneStartPosition.position;
+        Vector3 targetPos = PlayerPositionOnBoss.position;
+
+        Player.instance.transform.position = playerStartPos;
+
+        while ((Vector2)Player.instance.transform.position != (Vector2)targetPos)
+        {
+            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            if (BeatManager.isBeat) Player.instance.MoveTowards(targetPos);
+            yield return new WaitForEndOfFrame();
+        }
+
+        PlayerCamera.instance.SetCameraBoundaries(true);
+
+        yield return new WaitForSeconds(1f);
 
         //UIManager.Fade(true);
         //yield return new WaitForSeconds(1f);
 
-        float time = 2;
-        Vector3 c = PlayerCamera.instance.transform.position;
-        while (time > 0)
-        {
-            c = Vector3.MoveTowards(c, new Vector3(spawnPos.x, spawnPos.y, -60), Time.deltaTime * 2f);
-            PlayerCamera.instance.SetCameraPos(c);
-            time -= Time.deltaTime;
-            yield return new WaitForEndOfFrame();
-        }
-        time = 2;
+        // Boss Camera
+        //float time = 2;
+        //Vector3 c = PlayerCamera.instance.transform.position;
+        //while (time > 0)
+        //{
+        //    c = Vector3.MoveTowards(c, new Vector3(bossSpawnPos.x, bossSpawnPos.y, -60), Time.deltaTime * 2f);
+        //    PlayerCamera.instance.SetCameraPos(c);
+        //    time -= Time.deltaTime;
+        //    yield return new WaitForEndOfFrame();
+        //}
+        //time = 2;
         
         // Spawn boss with animation
         Boss enemy = (Boss)Enemy.GetEnemyOfType(spawnData.enemyType);
         currentBoss = enemy;
         enemy.aiType = spawnData.AItype;
         enemy.SpawnIndex = 0;
-        enemy.transform.position = spawnPos;
+        enemy.transform.position = bossSpawnPos;
         enemy.OnSpawn();
         Player.instance.Exclamation.SetActive(false);
         // 2 seconds
         bossArea.gameObject.SetActive(true);
         bossArea.color = new Color(1, 1, 1, 0);
         bossArea.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
-        bossArea.transform.position = enemy.transform.position;
+        //bossArea.transform.position = enemy.transform.position;
         while (bossArea.transform.localScale.x > 1.005f)
         {
             bossArea.color = new Color(1, 1, 1, Mathf.MoveTowards(bossArea.color.a, 0.8f, Time.deltaTime * 2.5f));
@@ -367,7 +398,16 @@ public class Stage : MonoBehaviour
         
         if (Keyboard.current.f4Key.wasPressedThisFrame)
         {
+            //ForceDespawnEnemies();
             ForceDespawnEnemies();
+            currentStagePoint = currentStagePoint.next;
+            while (currentStagePoint.pointType == StagePointType.Anchor)
+            {
+                currentStagePoint = currentStagePoint.next;
+                if (currentStagePoint == null) break;
+            }
+            Player.instance.transform.position = currentStagePoint.transform.position;
+            PlayerCamera.instance.SetCameraPos(Player.instance.transform.position);
         }
         
     }

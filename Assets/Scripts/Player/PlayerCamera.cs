@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
 
@@ -12,12 +13,19 @@ public class PlayerCamera : MonoBehaviour
     public bool followPlayer = true;
     public Vector2 camDir;
     public Vector2 camVelocity;
+    [SerializeField] private GameObject cameraBoundaries;
 
     public static PlayerCamera instance;
     public void Awake()
     {
         instance = this;
     }
+
+    public void SetCameraBoundaries(bool value)
+    {
+        cameraBoundaries.SetActive(value);
+    }
+
     public void SetOnPlayer()
     {
         targetCameraPos = new Vector3(transform.position.x, transform.position.y, -60);

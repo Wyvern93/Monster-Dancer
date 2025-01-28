@@ -190,6 +190,27 @@ public class PlayerRabi : Player
         yield break;
     }
 
+    protected override IEnumerator MoveTowardsCoroutine(Vector2 targetPos)
+    {
+        animator.Play("Rabi_Move");
+        animator.speed = 1f / BeatManager.GetBeatDuration() / 0.5f;
+        float duration = BeatManager.GetBeatDuration() * 0.5f;
+        float time = 0;
+
+        while (time <= duration)
+        {
+            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            time += Time.deltaTime;
+            transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * 1.3f);
+            yield return new WaitForEndOfFrame();
+        }
+
+        animator.speed = 1f / BeatManager.GetBeatDuration();
+        animator.Play("Rabi_Idle");
+        yield return new WaitForEndOfFrame();
+        Sprite.transform.localPosition = Vector3.zero;
+    }
+
     protected override IEnumerator MoveCoroutine(Vector2 targetPos)
     {
         isMoving = true;
@@ -210,8 +231,8 @@ public class PlayerRabi : Player
         }
 
         animator.Play("Rabi_Move");
-        animator.speed = 1f / BeatManager.GetBeatDuration() / 0.8f;
-        float duration = BeatManager.GetBeatDuration() * 0.8f;
+        animator.speed = 1f / BeatManager.GetBeatDuration() / 0.5f;
+        float duration = BeatManager.GetBeatDuration() * 0.5f;
         while (time <= duration)
         {
             while (GameManager.isPaused) yield return new WaitForEndOfFrame();
@@ -244,7 +265,7 @@ public class PlayerRabi : Player
                 yield break;
             }
             
-            rb.velocity = dir * currentStats.Speed * (isCrouching ? 2f : 4);
+            rb.velocity = dir * currentStats.Speed * (isCrouching ? 2f : 4) * 1.3f;
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }

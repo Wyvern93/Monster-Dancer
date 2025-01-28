@@ -663,6 +663,16 @@ public class Player : MonoBehaviour
         StartCoroutine(MoveCoroutine(targetPos));
     }
 
+    public void MoveTowards(Vector2 targetPos)
+    {
+        StartCoroutine(MoveTowardsCoroutine(targetPos));
+    }
+
+    protected virtual IEnumerator MoveTowardsCoroutine(Vector2 targetPos)
+    {
+        yield break;
+    }
+
     protected virtual IEnumerator MoveCoroutine(Vector2 targetPos)
     {
         SpriteSize = 1.2f;

@@ -35,11 +35,14 @@ public class StageCameraPoint : MonoBehaviour
             Stage.Instance.showWaveTimer = false;
             triggered = true;
         }
-        else if (pointType == StagePointType.Boss && !triggered)
+        else if (pointType == StagePointType.PreBoss && !triggered)
         {
             Stage.Instance.nextWaveIsBoss = true;
             Stage.Instance.showWaveTimer = false;
             triggered = true;
+            Stage.ForceDespawnBullets();
+            Stage.ForceDespawnEnemies();
+            Stage.ForceDespawnDrops();
         }   
     }
 
@@ -61,10 +64,11 @@ public class StageCameraPoint : MonoBehaviour
             if (actionFinished && camera) return true;
             else return false;
         }
-        else
+        else if (pointType == StagePointType.PreBoss)
         {
             return false;
         }
+        else return false;
     }
 
     public bool CanTrigger()
@@ -85,5 +89,5 @@ public class StageCameraPoint : MonoBehaviour
 
 public enum StagePointType
 {
-    Anchor, Elite, Boss
+    Anchor, Elite, PreBoss, Boss
 }
