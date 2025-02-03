@@ -658,6 +658,14 @@ public class Player : MonoBehaviour
     protected virtual void StopMovementCoroutines()
     { }
 
+    public void SetVisible(bool visible)
+    {
+        foreach (SpriteRenderer rend in transform.GetComponentsInChildren<SpriteRenderer>())
+        {
+            rend.enabled = visible;
+        }
+    }
+
     public virtual void Move(Vector2 targetPos)
     {
         StartCoroutine(MoveCoroutine(targetPos));

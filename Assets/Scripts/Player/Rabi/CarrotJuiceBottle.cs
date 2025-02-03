@@ -67,7 +67,7 @@ public class CarrotJuiceBottle : MonoBehaviour, IDespawneable
 
         Player.instance.despawneables.Remove(this);
         PoolManager.Return(gameObject, GetType());
-        yield return null;
+        yield break;
     }
 
     public void ForceDespawn(bool instant = false)

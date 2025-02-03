@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Boss : Enemy
@@ -18,6 +19,14 @@ public class Boss : Enemy
         Sprite.transform.localPosition = Vector3.zero;
         State = BossState.Introduction;// FALTA LA ANIMACION DE INTRODUCCION DEL JEFE
         Player.instance.facingRight = transform.position.x > Player.instance.transform.position.x;
+    }
+
+    public void SetVisible(bool visible)
+    {
+        foreach (SpriteRenderer rend in transform.GetComponentsInChildren<SpriteRenderer>())
+        {
+            rend.enabled = visible;
+        }
     }
 
     protected override void OnBeat()
@@ -40,11 +49,6 @@ public class Boss : Enemy
                 OnBattleStart();
                 break;
         }
-    }
-
-    public virtual void OnIntroductionFinish()
-    {
-
     }
 
     protected override void OnInitialize()

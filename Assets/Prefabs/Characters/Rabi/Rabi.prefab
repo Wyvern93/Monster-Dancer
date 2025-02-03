@@ -281,8 +281,6 @@ MonoBehaviour:
   onbeat: 0
   waitForNextBeat: 0
   CurrentHP: 14
-  MaxSP: 250
-  CurrentSP: 0
   MaxExp: 0
   CurrentExp: 0
   Level: 0

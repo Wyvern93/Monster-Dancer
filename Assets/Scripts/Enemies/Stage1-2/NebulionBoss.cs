@@ -1,10 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Net.Http.Headers;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.UIElements;
 
 public class NebulionBoss : Boss
 {
@@ -32,7 +28,7 @@ public class NebulionBoss : Boss
 
     List<BulletBase> sideBullets;
 
-    [SerializeField] Dialogue rabiDialogue;
+    [SerializeField] Cutscene rabiDialogue;
     [SerializeField] GameObject background;
 
     // Pattern 1
@@ -94,20 +90,10 @@ public class NebulionBoss : Boss
             facingRight = false;
         }
 
-        animator.Play("nebulion_intro");
-        animator.speed = 1;
-        transform.localScale = Vector3.one * 2f;
-    }
-
-    public override void OnIntroductionFinish()
-    {
-        base.OnIntroductionFinish();
         animator.Play("nebulion_normal");
         animator.speed = 1f / BeatManager.GetBeatDuration();
-        
-        Dialogue dialogue = Player.instance is PlayerRabi ? rabiDialogue : rabiDialogue;
-        UIManager.Instance.dialogueMenu.StartCutscene(dialogue.entries);
-
+        transform.localScale = Vector3.one * 2f;
+        UIManager.Instance.cutsceneManager.StartCutscene(CutsceneType.Boss);
         State = BossState.Dialogue;
     }
 
@@ -155,12 +141,12 @@ public class NebulionBoss : Boss
         switch (State)
         {
             case BossState.Dialogue:
-                if (UIManager.Instance.dialogueMenu.hasFinished)
+                if (UIManager.Instance.cutsceneManager.hasFinished)
                 {
                     Debug.Log("it was finished");
                     State = BossState.Phase4;
                     StartCoroutine(OnBattleStart());
-                    UIManager.Instance.dialogueMenu.hasFinished = false;
+                    UIManager.Instance.cutsceneManager.hasFinished = false;
                 }
                 break;
         }

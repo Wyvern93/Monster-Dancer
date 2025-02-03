@@ -80,9 +80,6 @@ public class CarrotJuice : MonoBehaviour, IDespawneable
 
     public void ForceDespawn(bool instant = false)
     {
-        StopAllCoroutines();
-        if (instant) PoolManager.Return(gameObject, GetType());
-        else OnDespawn();
-
+        PoolManager.Return(gameObject, GetType());
     }
 }

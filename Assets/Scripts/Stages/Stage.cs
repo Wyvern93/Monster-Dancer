@@ -23,6 +23,7 @@ public class Stage : MonoBehaviour
     public GameObject foodPrefab;
     public GameObject burningPrefab;
     public GameObject enemyGroupPrefab;
+    public bool canSpawnEnemies;
 
     //public GameObject bossAPrefab;
     public static float StageTime;
@@ -62,8 +63,15 @@ public class Stage : MonoBehaviour
     public SpriteRenderer bossArea;
 
     private float spawnAngle;
-    [SerializeField]protected Dialogue rabiEndDialogue;
     [SerializeField] public Animator CutsceneAnimator;
+
+    public GameObject actors;
+
+    [Header("Boss Cutscenes")]
+    public Cutscene RabiBoss;
+
+    [Header("Stage End Cutscenes")]
+    public Cutscene RabiEnd;
 
     public Fairy fairyCage;
     public static int global_enemy_spawn_modifier = 1;
@@ -85,6 +93,7 @@ public class Stage : MonoBehaviour
     public static float remainingWaveTime;
 
     public bool showWaveTimer;
+    public bool bossDefeated;
 
     public virtual void OnBossFightStart(Boss boss)
     {
@@ -146,6 +155,7 @@ public class Stage : MonoBehaviour
 
         Player.instance.transform.position = startingStagePoint.transform.position;
         Camera.main.transform.position = new Vector3(startingStagePoint.transform.position.x, startingStagePoint.transform.position.y, -60);
+        canSpawnEnemies = true;
         StartMapWaveList();
         UIManager.Instance.PlayerUI.OnCloseMenu();
     }
@@ -194,6 +204,7 @@ public class Stage : MonoBehaviour
 
         Player.instance.Exclamation.SetActive(true);
         AudioController.PlaySound(AudioController.instance.sounds.surpriseSfx);
+        canSpawnEnemies = false;
         yield return new WaitForSeconds(1f);
 
         // Originally a Fade
@@ -236,18 +247,6 @@ public class Stage : MonoBehaviour
         //UIManager.Fade(true);
         //yield return new WaitForSeconds(1f);
 
-        // Boss Camera
-        //float time = 2;
-        //Vector3 c = PlayerCamera.instance.transform.position;
-        //while (time > 0)
-        //{
-        //    c = Vector3.MoveTowards(c, new Vector3(bossSpawnPos.x, bossSpawnPos.y, -60), Time.deltaTime * 2f);
-        //    PlayerCamera.instance.SetCameraPos(c);
-        //    time -= Time.deltaTime;
-        //    yield return new WaitForEndOfFrame();
-        //}
-        //time = 2;
-        
         // Spawn boss with animation
         Boss enemy = (Boss)Enemy.GetEnemyOfType(spawnData.enemyType);
         currentBoss = enemy;
@@ -269,6 +268,19 @@ public class Stage : MonoBehaviour
         }
         bossArea.color = new Color(1, 1, 1, 0.8f);
         bossArea.transform.localScale = Vector3.one;
+
+        // Boss Camera
+        float time = 2;
+        Vector3 c = PlayerCamera.instance.transform.position;
+        Vector2 c2 = new Vector3(bossSpawnPos.x, bossSpawnPos.y, -60);
+        Vector2 camTarget = new Vector2((c.x + c2.x) / 2f, (c.y + c2.y) / 2f);
+        while (time > 0)
+        {
+            c = Vector3.MoveTowards(c, camTarget, Time.deltaTime * 2f);
+            PlayerCamera.instance.SetCameraPos(c);
+            time -= Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
 
         enemy.OnStart();
         yield break;
@@ -368,7 +380,7 @@ public class Stage : MonoBehaviour
         HandleStageLoop();
 
         HandleStageMovement();
-        
+
         if (BeatManager.isGameBeat && BeatManager.isPlaying)
         {
             if (GameManager.isPaused) return;
@@ -390,12 +402,12 @@ public class Stage : MonoBehaviour
             */
             TryToSpawnNextWave();
         }
-        
+
         StageTime += Time.deltaTime;
         stagePartTime += Time.deltaTime;
         remainingWaveTime -= Time.deltaTime;
 
-        
+
         if (Keyboard.current.f4Key.wasPressedThisFrame)
         {
             //ForceDespawnEnemies();
@@ -409,7 +421,10 @@ public class Stage : MonoBehaviour
             Player.instance.transform.position = currentStagePoint.transform.position;
             PlayerCamera.instance.SetCameraPos(Player.instance.transform.position);
         }
-        
+        if (Keyboard.current.f6Key.wasPressedThisFrame)
+        {
+            ForceDespawnEnemies();
+        }
     }
 
     protected void HandleStageMovement()
@@ -435,8 +450,11 @@ public class Stage : MonoBehaviour
 
     public void TryToSpawnNextWave()
     {
+        if (bossDefeated) return;
+        if (UIManager.Instance.cutsceneManager.isInCutscene()) return;
         if (!showWaveTimer && enemiesAlive.Count > 0) return; // Elites need to be defeated first
         else if (enemiesAlive.Count > 0 && remainingWaveTime > 0) return;
+        if (currentBoss != null) return;
         //{
             //if (!enemiesAlive[0].isElite) return;
             //if (enemiesAlive.Count > 1) return;
@@ -475,12 +493,11 @@ public class Stage : MonoBehaviour
             playingWave = new StageWave();
             playingWave.waveData = waveEnemyData[elitesDefeated];
             //playingWave.choosenPreset = new WavePreset() { events = new List<StageEvent> { new SpawnBossEvent() { enemySpawnType = EnemySpawnType.BOSS } } };
-            //playingWave.Initialize();
+            //playingWave.Initialize
             SpawnBoss(new SpawnData() { enemyType = waveEnemyData[elitesDefeated].specialSpawnEnemy });
             playingWave.isInitialized = true;
             playingWave.choosenPreset = new WavePreset();
             playingWave.choosenPreset.events = new List<StageEvent>();
-            nextWaveIsBoss = false;
             //StartCoroutine(playingWave.Start());
             playingWave.isFinalized = false;
             currentWave++;
@@ -581,7 +598,8 @@ public class Stage : MonoBehaviour
 
     public static void SpawnSpreadEnemy(EnemyType enemyType, EnemyGroup group)
     {
-
+        if (!Instance.canSpawnEnemies) return;
+        if (Instance.currentBoss != null) return;
         if (Instance.spawnDirections.Count == 0)
         {
             Instance.spawnDirections = new List<int> { 0,1,2,3 };
@@ -622,6 +640,8 @@ public class Stage : MonoBehaviour
 
     public static void SpawnCircleHorde(EnemyType enemyType, EnemyGroup group, int number, bool chase)
     {
+        if (!Instance.canSpawnEnemies) return;
+        if (Instance.currentBoss != null) return;
         if (Instance.spawnDirections.Count == 0)
         {
             Instance.spawnDirections = new List<int> { 0, 1, 2, 3 };
@@ -670,6 +690,7 @@ public class Stage : MonoBehaviour
 
     public static void RespawnHorde(EnemyGroup enemyGroup)
     {
+        if (Instance.currentBoss != null) return;
         if (Instance.spawnDirections.Count == 0)
         {
             Instance.spawnDirections = new List<int> { 0, 1, 2, 3 };
@@ -714,6 +735,7 @@ public class Stage : MonoBehaviour
 
     public static void SpawnElite(SpawnData spawnData)
     {
+        if (Instance.currentBoss != null) return;
         Instance.StartCoroutine(Instance.SpawnEliteCoroutine(spawnData));
     }
 
@@ -731,7 +753,7 @@ public class Stage : MonoBehaviour
         yield return new WaitForSeconds(BeatManager.GetBeatDuration() * 2);
         AudioController.PlaySound(AudioController.instance.sounds.warningWaveSound);
         yield return new WaitForSeconds(BeatManager.GetBeatDuration() * 2);
-
+        if (Instance.currentBoss != null) yield break;
         Enemy enemy = Enemy.GetEnemyOfType(spawnData.enemyType);
         enemy.aiType = spawnData.AItype;
         enemy.SpawnIndex = 0;
@@ -742,6 +764,7 @@ public class Stage : MonoBehaviour
 
     public static void SpawnUniqueEnemy(SpawnData spawnData, EnemyGroup group)
     {
+        if (Instance.currentBoss != null) return;
         Instance.StartCoroutine(Instance.SpawnUniqueEnemyCoroutine(spawnData, group));
     }
 
@@ -753,7 +776,7 @@ public class Stage : MonoBehaviour
         spawnEffect.transform.position = spawnData.spawnPosition;
         spawnEffect.animator.Play("EnemySummon");
         yield return new WaitForSeconds(BeatManager.GetBeatDuration() * 2);
-
+        if (Instance.currentBoss != null) yield break;
         Enemy enemy = Enemy.GetEnemyOfType(spawnData.enemyType);
         enemy.aiType = group.aIType;
         enemy.SpawnIndex = 0;
@@ -764,6 +787,8 @@ public class Stage : MonoBehaviour
 
     public static IEnumerator SpawnEnemiesGeometric(EnemyType enemyType, EnemyGroup group, int number)
     {
+        if (!Instance.canSpawnEnemies) yield break;
+        if (Instance.currentBoss != null) yield break;
         int orbitDistance = Instance.currentOrbitalEvents + 4;
         orbitDistance = Mathf.Clamp(orbitDistance, 2, 8);
         Vector3 spawnPos = PlayerCamera.instance.transform.position;
@@ -777,7 +802,8 @@ public class Stage : MonoBehaviour
             spawnEffect.animator.Play("EnemySummon");
         }
         yield return new WaitForSeconds(BeatManager.GetBeatDuration() * 2);
-
+        if (Instance.currentBoss != null) yield break;
+        if (!Instance.canSpawnEnemies) yield break;
         group.totalEnemies = 0;
         for (int i = 0; i < number; i++)
         {
@@ -801,7 +827,8 @@ public class Stage : MonoBehaviour
 
     public static IEnumerator SpawnEnemyAroundPlayer(SpawnData spawnData, int index)
     {
-        
+        if (Instance.currentBoss != null) yield break;
+        if (!Instance.canSpawnEnemies) yield break;
         SpawnEffect spawnEffect = PoolManager.Get<SpawnEffect>();
         float angle, x, y;
         while (true)
@@ -816,9 +843,11 @@ public class Stage : MonoBehaviour
         Vector3 spawnPos = new Vector3(Mathf.RoundToInt(x), Mathf.RoundToInt(y));
         spawnEffect.transform.position = spawnPos;
         yield return new WaitForSeconds(BeatManager.GetBeatDuration() * 2);
+        if (!Instance.canSpawnEnemies) yield break;
+        if (Instance.currentBoss != null) yield break;
 
         PoolManager.Return(spawnEffect.gameObject, typeof(SpawnEffect));
-
+        if (Instance.currentBoss != null) yield break;
         Enemy enemy = Enemy.GetEnemyOfType(spawnData.enemyType);
         enemy.aiType = spawnData.AItype;
         enemy.SpawnIndex = index;
@@ -829,6 +858,8 @@ public class Stage : MonoBehaviour
 
     public static IEnumerator SpawnEnemyAtPos(SpawnData spawnData, int index)
     {
+        if (Instance.currentBoss != null) yield break;
+        if (!Instance.canSpawnEnemies) yield break;
         SpawnEffect spawnEffect = PoolManager.Get<SpawnEffect>();
         
         Vector3 spawnPos = new Vector3(Mathf.RoundToInt(spawnData.spawnPosition.x), Mathf.RoundToInt(spawnData.spawnPosition.y));
@@ -836,7 +867,8 @@ public class Stage : MonoBehaviour
         yield return new WaitForSeconds(BeatManager.GetBeatDuration() * 2);
 
         PoolManager.Return(spawnEffect.gameObject, typeof(SpawnEffect));
-
+        if (Instance.currentBoss != null) yield break;
+        if (!Instance.canSpawnEnemies) yield break;
         Enemy enemy = Enemy.GetEnemyOfType(spawnData.enemyType);
         enemy.aiType = spawnData.AItype;
         enemy.SpawnIndex = index;
@@ -858,11 +890,14 @@ public class Stage : MonoBehaviour
     public void OnBossDeath(Boss boss)
     {
         isBossWave = false;
+        bossDefeated = true;
+        UIManager.Instance.PlayerUI.ShowBossBar(false);
         StartCoroutine(BossDefeatCoroutine(boss));
     }
 
     protected virtual IEnumerator BossDefeatCoroutine(Boss boss)
     {
+        bossDefeated = true;
         UIManager.Instance.PlayerUI.ShowBossBar(false);
         // This is supposed to be an animation
         ForceDespawnBullets();
@@ -880,15 +915,9 @@ public class Stage : MonoBehaviour
         Player.instance.Sprite.transform.localScale = Vector3.one;
         PlayerCamera.instance.SetOnPlayer();
 
-        foreach (GameObject g in stageGridObjects)
-        {
-            g.SetActive(false);
-        }
-        bossGrid.SetActive(false);
-        Dialogue dialogue = Player.instance is PlayerRabi ? rabiEndDialogue : rabiEndDialogue;
-        UIManager.Instance.dialogueMenu.StartCutscene(dialogue.entries);
-        while (!UIManager.Instance.dialogueMenu.hasFinished) yield return new WaitForEndOfFrame();
-        yield return new WaitForSeconds(1f);
+        UIManager.Instance.cutsceneManager.StartCutscene(CutsceneType.StageEnd);
+        while (!UIManager.Instance.cutsceneManager.hasFinished) yield return new WaitForEndOfFrame();
+        yield return new WaitForSeconds(2f);
 
         UIManager.Instance.StageFinish.SetActive(true);
         AudioController.PlayMusic(AudioController.instance.sounds.stageComplete, false);

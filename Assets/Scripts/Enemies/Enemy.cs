@@ -547,7 +547,7 @@ public abstract class Enemy : MonoBehaviour
         SpriteX = Mathf.MoveTowards(SpriteX, facingRight ? 1 : -1, Time.deltaTime * 24f);
         Sprite.transform.localScale = new Vector3(SpriteX, 1, 1) * SpriteSize;
 
-        emissionColor = Color.Lerp(emissionColor, new Color(1, 1, 1, 0), Time.deltaTime * 16f);
+        emissionColor = Color.Lerp(emissionColor, new Color(1, 1, 1, 0), Time.deltaTime * 24f);
         spriteRendererMat.SetColor("_EmissionColor", emissionColor);
     }
 
@@ -563,7 +563,7 @@ public abstract class Enemy : MonoBehaviour
         CurrentHP = Mathf.Clamp(CurrentHP - Mathf.RoundToInt(damage), 0, MaxHP);
         //Player.TriggerCameraShake(0.4f, 0.2f);
         AudioController.PlaySound(AudioController.instance.sounds.enemyHurtSound, Random.Range(0.95f, 1.05f));
-        emissionColor = new Color(1, 1, 1, 0.5f);
+        emissionColor = new Color(1, 1, 1, 1f);
         UIManager.Instance.PlayerUI.SpawnDamageText(transform.position, Mathf.RoundToInt(damage), isCritical ? DamageTextType.Critical : DamageTextType.Normal);
 
         if (isElite)

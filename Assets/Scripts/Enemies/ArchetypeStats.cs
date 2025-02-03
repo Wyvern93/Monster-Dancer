@@ -58,7 +58,7 @@ public class ArchetypeStats
                 baseAttack = 10f;
                 break;
             case EnemyArchetype.Boss:
-                baseHP = 5000f;
+                baseHP = 2000f;
                 baseSpeed = 1f;
                 baseAttack = 12f;
                 break;

@@ -114,14 +114,13 @@ public class Stage1b : Stage
 
         yield return new WaitForSeconds(1f);
 
-        Dialogue dialogue = Player.instance is PlayerRabi ? rabiEndDialogue : rabiEndDialogue;
-        UIManager.Instance.dialogueMenu.StartCutscene(dialogue.entries);
+        UIManager.Instance.cutsceneManager.StartCutscene(CutsceneType.StageEnd);
         yield return new WaitForEndOfFrame();
         PlayerCamera.instance.SetCameraPos(CutsceneAnimator.transform.position);
         PoolManager.Return(boss.gameObject, boss.GetType());
-        while (!UIManager.Instance.dialogueMenu.hasFinished) yield return new WaitForEndOfFrame();
+        while (!UIManager.Instance.cutsceneManager.hasFinished) yield return new WaitForEndOfFrame();
         yield return new WaitForSeconds(1f);
-        UIManager.Instance.dialogueMenu.hasFinished = false;
+        UIManager.Instance.cutsceneManager.hasFinished = false;
 
         UIManager.Instance.StageFinish.SetActive(true);
         AudioController.PlayMusic(AudioController.instance.sounds.stageComplete, false);

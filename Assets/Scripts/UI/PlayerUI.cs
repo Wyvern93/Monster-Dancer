@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
+public enum CursorState { Menu, Crosshair }
+
 public class PlayerUI : MonoBehaviour
 {
     [SerializeField] Image hpBar;
@@ -28,9 +30,11 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] GameObject damageText;
     [SerializeField] Transform damageTextParent;
 
-    public Image normalCursor;
+    [SerializeField] Image normalCursor;
     public Image crosshair;
     RectTransform crosshair_transform;
+    public CursorState cursorState;
+    public GameObject menuCursorObj, crosshairCursorObj;
 
     [SerializeField] CanvasGroup canvasGroup;
     [SerializeField] SpriteRenderer beatIndicatorSpr;
@@ -103,7 +107,7 @@ public class PlayerUI : MonoBehaviour
 
     public void OnOpenMenu()
     {
-        normalCursor.enabled = true;
+        SetCursorState(CursorState.Menu);
         combatcursor1.SetVisibility(false);
         combatcursor2.SetVisibility(false);
         combatcursor3.SetVisibility(false);
@@ -112,9 +116,23 @@ public class PlayerUI : MonoBehaviour
 
     public void OnCloseMenu()
     {
-        normalCursor.enabled = false;
-        cursorAmmoText.enabled = true;
+        if (!UIManager.Instance.cutsceneManager.isInCutscene()) SetCursorState(CursorState.Crosshair);
         UpdateAbilityUI();
+    }
+
+    public void SetCursorState(CursorState state)
+    {
+        cursorState = state;
+        if (state == CursorState.Menu)
+        {
+            crosshairCursorObj.SetActive(false);
+            menuCursorObj.SetActive(true);
+        }
+        else
+        {
+            crosshairCursorObj.SetActive(true);
+            menuCursorObj.SetActive(false);
+        }
     }
 
     public void OnReset()
@@ -405,8 +423,8 @@ public class PlayerUI : MonoBehaviour
         float width = (int)(87f * health);
         hpTransform.sizeDelta = new Vector2(width, hpTransform.sizeDelta.y);
         hpText.text = $"{Player.instance.CurrentHP}/{Player.instance.currentStats.MaxHP}";
-        if (health < 1f) hpBar_mini_Transform.gameObject.SetActive(true);
-        else hpBar_mini_Transform.gameObject.SetActive(false);
+        if (UIManager.Instance.cutsceneManager.isInCutscene() || health >= 1f) hpBar_mini_Transform.gameObject.SetActive(false);
+        else hpBar_mini_Transform.gameObject.SetActive(true);
         hpBar_mini.fillAmount = health;
     }
 

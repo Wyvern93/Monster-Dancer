@@ -197,11 +197,15 @@ public class PlayerRabi : Player
         float duration = BeatManager.GetBeatDuration() * 0.5f;
         float time = 0;
 
+        if (transform.position.x < targetPos.x) facingRight = true;
+        else facingRight = false;
+
         while (time <= duration)
         {
             while (GameManager.isPaused) yield return new WaitForEndOfFrame();
             time += Time.deltaTime;
-            transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * 1.3f);
+            
+            transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * 4f);
             yield return new WaitForEndOfFrame();
         }
 

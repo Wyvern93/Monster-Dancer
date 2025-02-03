@@ -30,7 +30,7 @@ public class UsarinBoss : Boss
 
     List<BulletBase> sideBullets;
 
-    [SerializeField] Dialogue rabiDialogue;
+    [SerializeField] Cutscene rabiDialogue;
 
     public override void OnSpawn()
     {
@@ -55,40 +55,18 @@ public class UsarinBoss : Boss
         orbitRight = true;
         sideBullets = new List<BulletBase>();
 
-        if (transform.position.x < Player.instance.transform.position.x)
-        {
-            facingRight = true;
-            animator.Play("usarin_intro");
-            animator.speed = 1;
-        }
-        else
-        {
-            facingRight = false;
-            animator.Play("usarin_intro2");
-            animator.speed = 1;
-        }
-        
-        animator.speed = 1f;
-        transform.localScale = Vector3.one * 2f;
-    }
-
-    public override void OnIntroductionFinish()
-    {
-        base.OnIntroductionFinish();
         animator.Play("usarin_normal");
         animator.speed = 1f / BeatManager.GetBeatDuration();
-        
-        Dialogue dialogue = Player.instance is PlayerRabi ? rabiDialogue : rabiDialogue;
-        UIManager.Instance.dialogueMenu.StartCutscene(dialogue.entries);
-
+        UIManager.Instance.cutsceneManager.StartCutscene(CutsceneType.Boss);
         State = BossState.Dialogue;
+        transform.localScale = Vector3.one * 2f;
     }
 
     private void FindTargetPositionAroundPlayer()
     {
         Vector3 finalPos = Vector3.zero;
 
-        int tries = 10;
+        int tries = 20;
         while (finalPos == Vector3.zero)
         {
             Vector3 basePos = Stage.Instance.bossArea.transform.position;
@@ -125,11 +103,11 @@ public class UsarinBoss : Boss
         switch (State)
         {
             case BossState.Dialogue:
-                if (UIManager.Instance.dialogueMenu.hasFinished)
+                if (UIManager.Instance.cutsceneManager.hasFinished)
                 {
                     State = BossState.Phase4;
                     StartCoroutine(OnBattleStart());
-                    UIManager.Instance.dialogueMenu.hasFinished = false;
+                    UIManager.Instance.cutsceneManager.hasFinished = false;
                 }
                 break;
             case BossState.Phase1:
@@ -431,7 +409,7 @@ public class UsarinBoss : Boss
             magicCircleVisible = true;
 
             StartCoroutine(ChargeAttack1Coroutine());
-            targetPos = Stage.Instance.bossArea.transform.position + (Vector3.up * 6f);
+            targetPos = Stage.Instance.bossArea.transform.position + (Vector3.up * 2.75f);
         }
 
         if (transform.position != targetPos)

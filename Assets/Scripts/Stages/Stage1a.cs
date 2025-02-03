@@ -124,22 +124,20 @@ public class Stage1a : Stage
         Player.instance.facingRight = true;
         Player.instance.Sprite.transform.localScale = Vector3.one;
         
-        mapObjects.SetActive(false);
-        bossGrid.SetActive(false);
+        //bossGrid.SetActive(false);
         bossArea.color = new Color(0, 0, 0, 0);
         bossArea.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
         bossArea.gameObject.SetActive(false);
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(2f);
 
-        Dialogue dialogue = Player.instance is PlayerRabi ? rabiEndDialogue : rabiEndDialogue;
-        UIManager.Instance.dialogueMenu.StartCutscene(dialogue.entries);
+        UIManager.Instance.cutsceneManager.StartCutscene(CutsceneType.StageEnd);
         yield return new WaitForEndOfFrame();
-        PlayerCamera.instance.SetCameraPos(CutsceneAnimator.transform.position);
+        PlayerCamera.instance.SetCameraPos(bossArea.transform.position);
         PoolManager.Return(boss.gameObject, boss.GetType());
-        while (!UIManager.Instance.dialogueMenu.hasFinished) yield return new WaitForEndOfFrame();
+        while (!UIManager.Instance.cutsceneManager.hasFinished) yield return new WaitForEndOfFrame();
         yield return new WaitForSeconds(1f);
-        UIManager.Instance.dialogueMenu.hasFinished = false;
+        UIManager.Instance.cutsceneManager.hasFinished = false;
 
         UIManager.Instance.StageFinish.SetActive(true);
         AudioController.PlayMusic(AudioController.instance.sounds.stageComplete, false);

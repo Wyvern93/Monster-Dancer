@@ -12,6 +12,8 @@ public class WavePreset
     {
         foreach (StageEvent stage in events)
         {
+            if (Stage.Instance.currentBoss != null) yield break;
+            if (!Stage.Instance.canSpawnEnemies) yield break;
             yield return stage.Trigger(sourceWave);
         }
     }
