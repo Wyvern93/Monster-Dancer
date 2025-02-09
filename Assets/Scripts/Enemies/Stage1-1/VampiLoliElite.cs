@@ -62,8 +62,8 @@ public class VampiLoliElite : Enemy
         }
         else
         {
-            FindFurtherAnchor();
-            if (CanMove() && !isAttacking) StartCoroutine(MoveToTarget());
+            bool shouldMove = FindFurtherAnchor();
+            if (CanMove() && shouldMove && !isAttacking) StartCoroutine(MoveToTarget());
         }
         if (beatCD >= 12)
         {
@@ -161,7 +161,6 @@ public class VampiLoliElite : Enemy
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
-        AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
         PlayerCamera.TriggerCameraShake(0.5f, 0.2f);
 
         velocity = Vector2.zero;
@@ -208,8 +207,15 @@ public class VampiLoliElite : Enemy
         bulletSpawnEffect.transform.position = transform.position;
         bulletSpawnEffect.finalScale = 1f;
         AudioController.PlaySound(AudioController.instance.sounds.chargeBulletSound);
-        yield return new WaitForSeconds(BeatManager.GetBeatDuration());
-        while (!BeatManager.isBeat) yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+
+        float time = 0;
+        yield return new WaitForEndOfFrame();
+        while (!BeatManager.isBeat)
+        {
+            while (GameManager.isPaused) yield return new WaitForEndOfFrame(); // isStunned!
+            time += Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
         float spearOffset = 2.75f;
         for (int i = -2; i < 3; i++)
         {
@@ -232,7 +238,7 @@ public class VampiLoliElite : Enemy
             bullet.OnSpawn();
         }
 
-        float time = 0;
+        time = 0;
         while (time <= BeatManager.GetBeatDuration())
         {
             while (GameManager.isPaused) yield return new WaitForEndOfFrame(); // isStunned!
@@ -319,7 +325,7 @@ public class VampiLoliElite : Enemy
     }
 
 
-    private void FindFurtherAnchor()
+    private bool FindFurtherAnchor()
     {
         Vector2 playerPos = Camera.main.transform.position - Player.instance.transform.position;
 
@@ -339,6 +345,8 @@ public class VampiLoliElite : Enemy
             }
         }
         targetPos = (Vector2)Camera.main.transform.position + anchors[index];
+        if (transform.position == targetPos) return false;
+        else return true;
     }
 
     protected override void OnBehaviourUpdate()

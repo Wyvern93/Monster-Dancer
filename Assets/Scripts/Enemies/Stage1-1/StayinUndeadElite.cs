@@ -71,7 +71,13 @@ public class StayinUndeadElite : Enemy
         bulletSpawnEffect.source = this;
         bulletSpawnEffect.transform.position = transform.position;
         bulletSpawnEffect.finalScale = 1f;
-        yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        float time = 0;
+        while (time <= BeatManager.GetBeatDuration())
+        {
+            while (GameManager.isPaused) yield return new WaitForEndOfFrame(); // isStunned!
+            time += Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
         while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
         while (!BeatManager.isBeat) yield return new WaitForSeconds(BeatManager.GetBeatDuration());
         ShootCircle(0);
@@ -79,7 +85,7 @@ public class StayinUndeadElite : Enemy
         ShootCircle(-2f);
 
 
-        float time = 0;
+        time = 0;
         while (time <= BeatManager.GetBeatDuration())
         {
             while (GameManager.isPaused) yield return new WaitForEndOfFrame(); // isStunned!
