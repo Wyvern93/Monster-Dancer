@@ -53,6 +53,7 @@ public class CarrotJuice : MonoBehaviour, IDespawneable
                 foreach (PlayerItem item in abilitySource.equippedItems)
                 {
                     if (item == null) continue;
+                    if (i >= enemies.Count) break;
                     item.OnHit(abilitySource, dmg, enemies[i], isCritical);
                 }
             }

@@ -64,10 +64,10 @@ public class NomSlimeElite : Enemy
 
     public void Move()
     {
-        StartCoroutine(MoveCoroutine());
+        StartCoroutine(JumpCoroutine());
     }
 
-    protected override IEnumerator MoveCoroutine()
+    protected override IEnumerator JumpCoroutine()
     {
         isMoving = true;
 

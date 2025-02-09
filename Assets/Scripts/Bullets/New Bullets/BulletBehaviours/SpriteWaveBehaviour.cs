@@ -6,12 +6,12 @@ public class SpriteWaveBehaviour : BulletBehaviour
     float sin;
     public override void TriggerBehaviour(BulletBase bullet)
     {
-        bullet.spriteRenderer.transform.localEulerAngles = Vector3.zero;
+        bullet.transform.localEulerAngles = Vector3.zero;
     }
     public override void UpdateBehaviour(BulletBase bullet, float beatTime)
     {
         sin += Time.deltaTime * 360f * beatTime;
         float cos = Mathf.Cos(sin * Mathf.Deg2Rad) * angleDiff;
-        bullet.spriteRenderer.transform.localEulerAngles = new Vector3(0, 0, cos);
+        bullet.transform.localEulerAngles = new Vector3(0, 0, cos);
     }
 }

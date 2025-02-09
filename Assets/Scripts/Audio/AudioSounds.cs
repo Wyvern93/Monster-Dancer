@@ -33,6 +33,7 @@ public class AudioSounds
     public AudioClip bulletwaveShootSound;
     public AudioClip chargeBulletSound;
     public AudioClip bossPhaseEnd;
+    public AudioClip spawn;
 
     [Header("Object Sounds")]
     public AudioClip gemSound;

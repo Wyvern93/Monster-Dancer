@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 88e97188f9ae6b34eb57671700aa2a38, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.5019608}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -165,6 +165,7 @@ MonoBehaviour:
   idleAnimation: nekomander_normal
   moveAnimation: nekomander_move
   shootAnimation: nekomander_preattack
+  canBeKnocked: 1
   beatContact: 0
   isElite: 1
   Sprite: {fileID: 8389304836028055446}
@@ -183,6 +184,7 @@ MonoBehaviour:
   slownessStatus: {fileID: 0}
   enemyType: 37
   group: {fileID: 0}
+  boxCollider: {fileID: 7351202717007107798}
 --- !u!95 &6914396188996239605
 Animator:
   serializedVersion: 5
@@ -256,7 +258,7 @@ CircleCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3320024654688553797}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:

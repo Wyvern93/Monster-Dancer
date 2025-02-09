@@ -8,6 +8,8 @@ public class Bullet : MonoBehaviour
 {
     [SerializeField] public SpriteRenderer spriteRenderer;
     [SerializeField] protected CircleCollider2D circleCollider;
+    [SerializeField] protected BoxCollider2D boxCollider;
+    public bool boxHitbox;
     public Vector2 direction;
     public int lifetime;
     public float speed;
@@ -23,6 +25,7 @@ public class Bullet : MonoBehaviour
     public int beat;
     public StunEffect stunStatus;
     public bool forcedDespawn;
+    protected bool isInitialized;
     private void Awake()
     {
         stunStatus = new StunEffect();
@@ -112,10 +115,15 @@ public class Bullet : MonoBehaviour
 
         beat = 0;
         beatScale = 1;
-        circleCollider.enabled = true;
+        circleCollider.enabled = false;
+        boxCollider.enabled = false;
         spriteRenderer.color = Color.clear;
+
+        isInitialized = true;
         StartCoroutine(BulletSpawnCoroutine());
         if (BeatManager.isGameBeat) OnBeat();
+        
+        
     }
 
     protected IEnumerator BulletSpawnCoroutine()
@@ -132,12 +140,14 @@ public class Bullet : MonoBehaviour
         }
         transform.localScale = Vector3.one * finalSize;
         spriteRenderer.color = Color.white;
-        circleCollider.enabled = true;
+        if (boxHitbox) boxCollider.enabled = true;
+        else circleCollider.enabled = true;
         yield break;
     }
 
     public virtual void Despawn()
     {
+        StopAllCoroutines();
         forcedDespawn = true;
         if (lifetime > 0)
         {
@@ -149,6 +159,7 @@ public class Bullet : MonoBehaviour
 
     public virtual void ForceDespawn()
     {
+        StopAllCoroutines();
         lifetime = 0;
         if (!gameObject.activeSelf) return;
         StartCoroutine(DespawnCoroutine(true));
@@ -169,6 +180,7 @@ public class Bullet : MonoBehaviour
 
     protected IEnumerator DespawnCoroutine(bool forced)
     {
+        boxCollider.enabled = false;
         circleCollider.enabled = false;
         float time = 0;
         while (time <= BeatManager.GetBeatDuration() / 2f)
@@ -185,6 +197,8 @@ public class Bullet : MonoBehaviour
         superGrazed = false;
         grazePulse = null;
         grazed = false;
+        speed = 0;
+        isInitialized = false;
 
         if (!forced && Stage.Instance != null) Stage.Instance.bulletsSpawned.Remove(this);
         transform.parent = null;
@@ -193,8 +207,8 @@ public class Bullet : MonoBehaviour
 
     public void SpawnDrop()
     {
-        BulletGem gem = PoolManager.Get<BulletGem>();
-        gem.transform.position = (Vector2)transform.position + (Random.insideUnitCircle * 0.2f);
+        //BulletGem gem = PoolManager.Get<BulletGem>();
+        //gem.transform.position = (Vector2)transform.position + (Random.insideUnitCircle * 0.2f);
     }
 
     protected virtual IEnumerator MoveInDirection(Vector2 direction)

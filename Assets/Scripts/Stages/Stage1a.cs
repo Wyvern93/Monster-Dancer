@@ -26,8 +26,12 @@ public class Stage1a : Stage
     public GameObject zippyBatPrefab;
     public GameObject vampiLoliElitePrefab;
     public GameObject ojouGuardianPrefab;
+    public GameObject vampiloliTransform;
 
     public GameObject usarinBossPrefab;
+
+    [Header("Other Prefabs")]
+    public GameObject lightAttackPrefab;
 
     [SerializeField] List<Animator> stageLights;
 
@@ -46,8 +50,8 @@ public class Stage1a : Stage
         PoolManager.CreatePool(typeof(StayinUndeadElite), stayingUndeadElitePrefab, 1);
 
         PoolManager.CreatePool(typeof(Onibi), onibiPrefab, 30);
-        PoolManager.CreatePool(typeof(GhostJr), booJrPrefab, 30);
-        PoolManager.CreatePool(typeof(GhostJrElite), booJrElitePrefab, 1);
+        PoolManager.CreatePool(typeof(JackO), booJrPrefab, 30);
+        PoolManager.CreatePool(typeof(JackOElite), booJrElitePrefab, 1);
 
         PoolManager.CreatePool(typeof(ClawRiff), clawRiffPrefab, 30);
         PoolManager.CreatePool(typeof(Skeleko), skelekoPrefab, 30);
@@ -60,6 +64,8 @@ public class Stage1a : Stage
         PoolManager.CreatePool(typeof(OjouGuardian), ojouGuardianPrefab, 30);
 
         PoolManager.CreatePool(typeof(UsarinBoss), usarinBossPrefab, 1);
+        PoolManager.CreatePool(typeof(LightAttack), lightAttackPrefab, 30);
+        PoolManager.CreatePool(typeof(SmokeExplosion), vampiloliTransform, 1);
     }
 
     public override void RemoveAllPools()
@@ -72,8 +78,8 @@ public class Stage1a : Stage
         PoolManager.RemovePool(typeof(StayinUndeadElite)); // Minute 2
 
         PoolManager.RemovePool(typeof(Onibi));
-        PoolManager.RemovePool(typeof(GhostJr)); // Min 2 - min 4:30
-        PoolManager.RemovePool(typeof(GhostJrElite)); // Minute 4
+        PoolManager.RemovePool(typeof(JackO)); // Min 2 - min 4:30
+        PoolManager.RemovePool(typeof(JackOElite)); // Minute 4
 
         PoolManager.RemovePool(typeof(ClawRiff));
         PoolManager.RemovePool(typeof(Skeleko)); // Minute 4:30 - 6:30
@@ -85,8 +91,9 @@ public class Stage1a : Stage
         PoolManager.RemovePool(typeof(VampiLoliElite)); // Minute 8
         PoolManager.RemovePool(typeof(OjouGuardian)); // Spawn in waves while the miniboss without VampiLoli, use the Usarin method
         
-
         PoolManager.RemovePool(typeof(UsarinBoss));
+        PoolManager.RemovePool(typeof(LightAttack));
+        PoolManager.RemovePool(typeof(SmokeExplosion));
     }
 
     public override void OnStopMap()

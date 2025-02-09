@@ -11,8 +11,10 @@ public class BulletBase : Bullet
     protected float beatTime;
     public List<BulletBehaviour> behaviours;
     public bool startOnBeat;
+
     public override void OnSpawn()
     {
+        StopAllCoroutines();
         forcedDespawn = false;
         animator.speed = 1f / BeatManager.GetBeatDuration();
         if (Stage.Instance != null) Stage.Instance.bulletsSpawned.Add(this);
@@ -20,10 +22,16 @@ public class BulletBase : Bullet
         angle = Vector2.SignedAngle(Vector2.down, direction) - 90;
         beat = 0;
         beatScale = 1;
-        circleCollider.enabled = true;
+        circleCollider.enabled = false;
+        boxCollider.enabled = false;
         spriteRenderer.color = Color.clear;
+        isInitialized = true;
         StartCoroutine(BulletSpawnCoroutine());
         if (startOnBeat) OnBeat();
+        foreach (BulletBehaviour behaviour in behaviours)
+        {
+            behaviour.OnSpawn(this);
+        }
     }
 
     public static Vector2 angleToVector(float degrees)
@@ -51,6 +59,7 @@ public class BulletBase : Bullet
 
     public IEnumerator BeatCoroutine()
     {
+        if (!isInitialized) yield break;
         float beatDuration = BeatManager.GetBeatDuration();
         beatTime = 1;
 
@@ -61,6 +70,7 @@ public class BulletBase : Bullet
         float time = 0;
         while (time <= beatDuration)
         {
+            if (!isInitialized) yield break;
             while (GameManager.isPaused || stunStatus.isStunned())
             {
                 yield return new WaitForEndOfFrame();
@@ -111,5 +121,14 @@ public class BulletBase : Bullet
             }
             if (atk > 0) Player.instance.TakeDamage(atk);
         }
+    }
+
+    public override void Despawn()
+    {
+        foreach (BulletBehaviour behaviour in behaviours)
+        {
+            behaviour.OnDespawn(this);
+        }
+        base.Despawn();
     }
 }

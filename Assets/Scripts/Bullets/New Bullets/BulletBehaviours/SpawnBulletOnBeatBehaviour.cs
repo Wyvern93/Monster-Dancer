@@ -7,9 +7,9 @@ public class SpawnBulletOnBeatBehaviour : BulletBehaviour
     public System.Action<BulletBase> baseBullet;
     public float delay;
     private float currentDelay;
-    public SpawnBulletOnBeatBehaviour(System.Action<BulletBase> baseBullet)
+    public SpawnBulletOnBeatBehaviour(System.Action<BulletBase> baseBullet, float delay)
     {
-        delay = BeatManager.GetBeatDuration() / 3;
+        this.delay = delay;//BeatManager.GetBeatDuration() / 3;
         this.baseBullet = baseBullet;
     }
     public override void TriggerBehaviour(BulletBase bullet)

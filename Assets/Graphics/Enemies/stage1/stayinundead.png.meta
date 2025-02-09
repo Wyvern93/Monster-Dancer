@@ -114,7 +114,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 96
+        y: 192
         width: 96
         height: 96
       alignment: 9
@@ -135,7 +135,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 96
-        y: 96
+        y: 192
         width: 96
         height: 96
       alignment: 9
@@ -156,7 +156,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 192
-        y: 96
+        y: 192
         width: 96
         height: 96
       alignment: 9
@@ -177,7 +177,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
+        y: 96
         width: 96
         height: 96
       alignment: 9
@@ -198,7 +198,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 96
-        y: 0
+        y: 96
         width: 96
         height: 96
       alignment: 9
@@ -219,7 +219,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 192
-        y: 0
+        y: 96
         width: 96
         height: 96
       alignment: 9
@@ -231,6 +231,27 @@ TextureImporter:
       bones: []
       spriteID: c7e9f7134f906af4e970137f52333fa2
       internalID: -121529045
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: stayinundead_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 96
+        height: 96
+      alignment: 9
+      pivot: {x: 0.5, y: 0.1875}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 942f24a42b4db474aa0fa3763d7c0f52
+      internalID: -963940754
       vertices: []
       indices: 
       edges: []
@@ -252,6 +273,7 @@ TextureImporter:
       stayinundead_3: 222200002
       stayinundead_4: 1669287654
       stayinundead_5: -121529045
+      stayinundead_6: -963940754
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

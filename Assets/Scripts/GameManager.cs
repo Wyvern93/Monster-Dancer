@@ -89,7 +89,7 @@ public class GameManager : MonoBehaviour
             BeatManager.UpdatePulseAnimator();
         }
 
-        if (Keyboard.current.f6Key.wasPressedThisFrame)
+        if (Keyboard.current.f7Key.wasPressedThisFrame)
         {
             infiniteHP = !infiniteHP;
         }

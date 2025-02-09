@@ -5,7 +5,7 @@ using UnityEngine;
 public class Karakasa : Enemy
 {
 
-    protected override IEnumerator MoveCoroutine()
+    protected override IEnumerator JumpCoroutine()
     {
         SpawnBullet(0);
         SpawnBullet(120);

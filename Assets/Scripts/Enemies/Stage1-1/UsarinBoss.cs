@@ -608,7 +608,7 @@ public class UsarinBoss : Boss
 
     public void Move()
     {
-        StartCoroutine(MoveCoroutine());
+        StartCoroutine(JumpCoroutine());
     }
     IEnumerator MoveToTarget()
     {
@@ -640,7 +640,7 @@ public class UsarinBoss : Boss
         yield break;
     }
 
-    protected override IEnumerator MoveCoroutine()
+    protected override IEnumerator JumpCoroutine()
     {
         isMoving = true;
 

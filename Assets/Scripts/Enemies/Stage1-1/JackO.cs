@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GhostJr : Enemy
+public class JackO : Enemy
 {
 
     protected override void Shoot()
@@ -40,9 +40,9 @@ public class GhostJr : Enemy
 
         bullet.transform.position = transform.position + (Vector3.up * 0.3f);
         bullet.direction = dir;
-        bullet.speed = 5;
-        bullet.atk = 5;
-        bullet.lifetime = 12;
+        bullet.speed = 6;
+        bullet.atk = 4;
+        bullet.lifetime = 8;
         bullet.transform.localScale = Vector3.one;
         bullet.startOnBeat = true;
         bullet.enemySource = this;

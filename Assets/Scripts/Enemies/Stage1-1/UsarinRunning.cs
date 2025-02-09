@@ -82,7 +82,7 @@ public class UsarinRunning : Enemy
 
     public void Move()
     {
-        StartCoroutine(MoveCoroutine());
+        StartCoroutine(JumpCoroutine());
     }
 
 

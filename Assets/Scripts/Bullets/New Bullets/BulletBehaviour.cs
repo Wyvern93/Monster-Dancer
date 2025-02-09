@@ -10,6 +10,13 @@ public class BulletBehaviour
         TriggerBehaviour(bullet);
     }
 
+    public virtual void OnSpawn(BulletBase bullet)
+    {
+
+    }
+
+    public virtual void OnDespawn(BulletBase bullet) { }
+
     public virtual void TriggerBehaviour(BulletBase bullet)
     { }
 

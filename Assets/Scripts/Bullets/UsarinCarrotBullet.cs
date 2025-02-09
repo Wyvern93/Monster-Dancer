@@ -15,6 +15,7 @@ public class UsarinCarrotBullet : Bullet
 
         beatScale = 1;
         circleCollider.enabled = false;
+        boxCollider.enabled = false;
         spriteRenderer.color = Color.clear;
         StartCoroutine(BulletSpawnCoroutine());
 

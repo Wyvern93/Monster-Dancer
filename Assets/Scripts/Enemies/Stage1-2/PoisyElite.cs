@@ -110,7 +110,7 @@ public class PoisyElite : Enemy
 
     public void Move()
     {
-        StartCoroutine(MoveCoroutine());
+        StartCoroutine(JumpCoroutine());
     }
 
     public override bool CanTakeDamage()
@@ -147,7 +147,7 @@ public class PoisyElite : Enemy
         yield break;
     }
 
-    protected override IEnumerator MoveCoroutine()
+    protected override IEnumerator JumpCoroutine()
     {
         isMoving = true;
 

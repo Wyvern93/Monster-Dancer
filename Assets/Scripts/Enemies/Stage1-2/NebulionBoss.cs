@@ -52,7 +52,6 @@ public class NebulionBoss : Boss
         background.transform.localPosition = Vector3.zero;
         PoolManager.CreatePool(typeof(Constellation), constellationPrefab, 1);
         PoolManager.CreatePool(typeof(LongLaser), laserPrefab, 5);
-        PoolManager.CreatePool(typeof(SmallMagicCircle), smallCirclePrefab, 50);
         Constellation cons = PoolManager.Get<Constellation>();
         cons.transform.position = Stage.Instance.bossArea.transform.position;
         constellation = cons.GetComponent<Animator>();
@@ -335,7 +334,7 @@ public class NebulionBoss : Boss
         bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteLookAngleBehaviour() { start = 0, end = -1 },
-                new SpawnBulletOnBeatBehaviour(SpawnCometStar) { start = 0, end = -1}
+                new SpawnBulletOnBeatBehaviour(SpawnCometStar, BeatManager.GetBeatDuration() / 3) { start = 0, end = -1}
             };
         bullet.OnSpawn();
         allBullets.Add(bullet);
@@ -665,7 +664,7 @@ public class NebulionBoss : Boss
         bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteLookAngleBehaviour() { start = 0, end = -1 },
-                new SpawnBulletOnBeatBehaviour(SpawnCometStar) { start = 0, end = -1}
+                new SpawnBulletOnBeatBehaviour(SpawnCometStar, BeatManager.GetBeatDuration() / 3) { start = 0, end = -1}
             };
         bullet.OnSpawn();
         allBullets.Add(bullet);
@@ -861,7 +860,6 @@ public class NebulionBoss : Boss
             State = BossState.Defeat;
             PoolManager.RemovePool(typeof(Constellation));
             PoolManager.RemovePool(typeof(LongLaser));
-            PoolManager.RemovePool(typeof(SmallMagicCircle));
         }
     }
 

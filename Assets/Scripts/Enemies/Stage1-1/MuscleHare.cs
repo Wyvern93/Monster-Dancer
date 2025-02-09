@@ -41,7 +41,7 @@ public class MuscleHare : Enemy
 
     public void Move()
     {
-        StartCoroutine(MoveCoroutine());
+        StartCoroutine(JumpCoroutine());
     }
 
     public override bool CanTakeDamage()

@@ -113,7 +113,7 @@ public class RhythmiaElite : Enemy
 
     public void Move()
     {
-        StartCoroutine(MoveCoroutine());
+        StartCoroutine(JumpCoroutine());
     }
 
     public override bool CanTakeDamage()
@@ -150,7 +150,7 @@ public class RhythmiaElite : Enemy
         yield break;
     }
 
-    protected override IEnumerator MoveCoroutine()
+    protected override IEnumerator JumpCoroutine()
     {
         isMoving = true;
 

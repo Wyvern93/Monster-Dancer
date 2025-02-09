@@ -23,6 +23,7 @@ public class Stage : MonoBehaviour
     public GameObject foodPrefab;
     public GameObject burningPrefab;
     public GameObject enemyGroupPrefab;
+    public GameObject smallCirclePrefab;
     public bool canSpawnEnemies;
 
     //public GameObject bossAPrefab;
@@ -31,6 +32,7 @@ public class Stage : MonoBehaviour
 
     public int beatsBeforeWave = 8;
     public int spawnRate = 3;
+    public bool isEliteAlive;
 
     public int beats = 0;
 
@@ -370,6 +372,7 @@ public class Stage : MonoBehaviour
         PoolManager.CreatePool(typeof(Food), foodPrefab, 50);
         PoolManager.CreatePool(typeof(BurningVisualEffect), burningPrefab, 50);
         PoolManager.CreatePool(typeof(EnemyGroup), enemyGroupPrefab, 50);
+        PoolManager.CreatePool(typeof(SmallMagicCircle), smallCirclePrefab, 50);
     }
 
     // Update is called once per frame
@@ -450,6 +453,7 @@ public class Stage : MonoBehaviour
 
     public void TryToSpawnNextWave()
     {
+        if (isEliteAlive) return;
         if (bossDefeated) return;
         if (UIManager.Instance.cutsceneManager.isInCutscene()) return;
         if (!showWaveTimer && enemiesAlive.Count > 0) return; // Elites need to be defeated first
@@ -514,6 +518,7 @@ public class Stage : MonoBehaviour
                 additionalRunners = 0;
                 additionalBombers = 0;
                 additionalShooters = 0;
+                isEliteAlive = true;
                 SpawnElite(new SpawnData() { enemyType = waveEnemyData[elitesDefeated].specialSpawnEnemy });
                 playingWave.isInitialized = true;
                 playingWave.choosenPreset = new WavePreset();
@@ -592,6 +597,7 @@ public class Stage : MonoBehaviour
         PoolManager.RemovePool(typeof(Food));
         PoolManager.RemovePool(typeof(BurningVisualEffect));
         PoolManager.RemovePool(typeof(EnemyGroup));
+        PoolManager.RemovePool(typeof(SmallMagicCircle));
     }
 
     public List<int> spawnDirections = new List<int>();
@@ -736,6 +742,7 @@ public class Stage : MonoBehaviour
     public static void SpawnElite(SpawnData spawnData)
     {
         if (Instance.currentBoss != null) return;
+        Instance.canSpawnEnemies = false;
         Instance.StartCoroutine(Instance.SpawnEliteCoroutine(spawnData));
     }
 
@@ -759,6 +766,10 @@ public class Stage : MonoBehaviour
         enemy.SpawnIndex = 0;
         enemy.transform.position = spawnPos;
         enemy.OnSpawn();
+        /*
+        SmokeExplosion summonEffect = PoolManager.Get<SmokeExplosion>();
+        summonEffect.transform.position = enemy.transform.position;
+        summonEffect.transform.localScale = Vector3.one;*/
         nextWaveIsElite = false;
     }
 
@@ -817,7 +828,10 @@ public class Stage : MonoBehaviour
             group.totalEnemies++;
             enemy.OnSpawn();
             enemy.speed += 1.6f;
-
+            /*
+            SmokeExplosion summonEffect = PoolManager.Get<SmokeExplosion>();
+            summonEffect.transform.position = enemy.transform.position;
+            summonEffect.transform.localScale = Vector3.one;*/
         }
         group.orbitDistance = orbitDistance;
         Instance.currentOrbitalEvents++;
