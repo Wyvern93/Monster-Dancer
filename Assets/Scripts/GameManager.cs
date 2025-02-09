@@ -141,10 +141,10 @@ public class GameManager : MonoBehaviour
         if (currentScene != "")
         {
             AsyncOperation unload = SceneManager.UnloadSceneAsync(currentScene);
-            while (!unload.isDone) yield return new WaitForEndOfFrame();
+            while (!unload.isDone) yield return null;
         }
         AsyncOperation load = SceneManager.LoadSceneAsync(map, LoadSceneMode.Additive);
-        while (!load.isDone) yield return new WaitForEndOfFrame();
+        while (!load.isDone) yield return null;
         UIManager.Fade(true);
         UIManager.Instance.PlayerUI.CreatePools();
         currentScene = map;
@@ -165,10 +165,10 @@ public class GameManager : MonoBehaviour
         if (currentScene != "")
         {
             AsyncOperation unload = SceneManager.UnloadSceneAsync(currentScene);
-            while (!unload.isDone) yield return new WaitForEndOfFrame();
+            while (!unload.isDone) yield return null;
         }
         AsyncOperation load = SceneManager.LoadSceneAsync(map, LoadSceneMode.Additive);
-        while (!load.isDone) yield return new WaitForEndOfFrame();
+        while (!load.isDone) yield return null;
         UIManager.Fade(true);
         UIManager.Instance.PlayerUI.CreatePools();
         currentScene = map;

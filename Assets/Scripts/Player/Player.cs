@@ -372,7 +372,7 @@ public class Player : MonoBehaviour
             OnLevelUp();
         }
 
-        if (BeatManager.isGameBeat)
+        if (BeatManager.isBeat)
         {
             animator.updateMode = AnimatorUpdateMode.Normal;
             if (poisonStatus > 5) poisonStatus = 5;
@@ -611,7 +611,7 @@ public class Player : MonoBehaviour
         }
 
         // Handle Movement
-        if (action != PlayerAction.None && BeatManager.isGameBeat)
+        if (action != PlayerAction.None && BeatManager.isBeat)
         {
             PerformAction(action);
         }
@@ -729,7 +729,7 @@ public class Player : MonoBehaviour
             transform.position = Vector3.Lerp(originalPos, (Vector3)targetPos, time * 8f);
             time += Time.deltaTime;
             Sprite.transform.localPosition = new Vector3(0, height, 0);
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         Sprite.transform.localPosition = Vector3.zero;
         transform.position = targetPos;
@@ -744,10 +744,10 @@ public class Player : MonoBehaviour
 
     protected void HandleSprite()
     {
-        SpriteSize = Mathf.MoveTowards(SpriteSize, 1f, Time.deltaTime * 4f);
-        SpriteX = Mathf.MoveTowards(SpriteX, facingRight ? 1 : -1, Time.deltaTime * 24f);
-        Sprite.transform.localScale = new Vector3(SpriteX, 1, 1) * SpriteSize;
-        
+        //SpriteSize = Mathf.MoveTowards(SpriteSize, 1f, Time.deltaTime * 4f);
+        //SpriteX = Mathf.MoveTowards(SpriteX, facingRight ? 1 : -1, Time.deltaTime * 24f);
+        //Sprite.transform.localScale = new Vector3(SpriteX, 1, 1) * SpriteSize;
+        Sprite.flipX = !facingRight;
         emissionColor = Color.Lerp(emissionColor, new Color(1, 0, 0, 0), Time.deltaTime * 16f);
         spriteRendererMat.SetColor("_EmissionColor", emissionColor);
     }
@@ -826,8 +826,8 @@ public class Player : MonoBehaviour
 
     protected IEnumerator OpenEnhancementMenuCoroutine()
     {
-        while (!BeatManager.isGameBeat) yield return new WaitForEndOfFrame();
-        BeatManager.isGameBeat = false;
+        while (!BeatManager.isBeat) yield return null;
+        BeatManager.isBeat = false;
         EnhancementMenu.instance.Open();
     }
 
@@ -837,8 +837,8 @@ public class Player : MonoBehaviour
     }
     protected IEnumerator OpenEvolutionMenuCoroutine()
     {
-        while (!BeatManager.isGameBeat) yield return new WaitForEndOfFrame();
-        BeatManager.isGameBeat = false;
+        while (!BeatManager.isBeat) yield return null;
+        BeatManager.isBeat = false;
         EvolutionUI.instance.Open();
     }
 
@@ -862,7 +862,7 @@ public class Player : MonoBehaviour
         animator.Play("PlayerDev_Dead");
 
         UIManager.Instance.PlayerUI.HideUI();
-        yield return new WaitForEndOfFrame();
+        yield return null;
         Time.timeScale = 0.01f;
 
         UIManager.Instance.SetGameOverBG(true);

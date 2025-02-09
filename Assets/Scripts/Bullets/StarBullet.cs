@@ -22,7 +22,7 @@ public class StarBullet : Bullet
             spriteRenderer.transform.localEulerAngles = new Vector3(0, 0, spriteRenderer.transform.localEulerAngles.z + (sprvelocity * speed * Time.deltaTime));
             transform.position += ((Vector3)direction * speed * Time.deltaTime);
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         yield break;

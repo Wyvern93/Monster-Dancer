@@ -62,7 +62,7 @@ public class BigUsarinCarrotBullet : Bullet
 
             // Increment time
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         beatTime = 0;
         yield break;
@@ -131,7 +131,7 @@ public class BigUsarinCarrotBullet : Bullet
             }
             
 
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         yield break;

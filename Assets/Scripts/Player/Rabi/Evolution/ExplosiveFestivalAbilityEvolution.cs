@@ -74,7 +74,7 @@ public class ExplosiveFestialAbilityEvolution : PlayerAbility
 
     public override void OnUpdate()
     {
-        if (BeatManager.isGameBeat && currentCooldown > 0) currentCooldown--;
+        if (BeatManager.isBeat && currentCooldown > 0) currentCooldown--;
     }
 
     public override bool isEvolved()

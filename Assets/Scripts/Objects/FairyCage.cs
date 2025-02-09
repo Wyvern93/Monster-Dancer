@@ -49,7 +49,7 @@ public class FairyCage : MonoBehaviour
         {
             transform.position = position + ((Vector2)Random.insideUnitCircle * 0.03f);
             shake--;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         yield break;
     }

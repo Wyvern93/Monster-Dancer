@@ -128,7 +128,7 @@ public class EnemyGroup : MonoBehaviour
         float time = 0;
         while (time <= BeatManager.GetBeatDuration() / 1.5f)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused) yield return null;
             float beatProgress = time / beatDuration;
             beatTime = Mathf.SmoothStep(1, 0f, beatProgress);
 
@@ -140,7 +140,7 @@ public class EnemyGroup : MonoBehaviour
             transform.position = Vector3.MoveTowards(transform.position, Player.instance.transform.position, 5f * orbitSpeed * Time.deltaTime);
             time += Time.deltaTime;
 
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         yield break;
     }

@@ -63,7 +63,7 @@ public class CutsceneActor : MonoBehaviour
         Debug.Log("Asked to move");
         while ((Vector2)transform.position != target)
         {
-            while (!BeatManager.isBeat) yield return new WaitForEndOfFrame();
+            while (!BeatManager.isBeat) yield return null;
 
             animator.Play(moveAnim);
             animator.speed = 1f / BeatManager.GetBeatDuration() * 2f;
@@ -73,15 +73,15 @@ public class CutsceneActor : MonoBehaviour
 
             while (time <= duration)
             {
-                while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+                while (GameManager.isPaused) yield return null;
                 time += Time.deltaTime;
                 transform.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime * speed * 6);
-                yield return new WaitForEndOfFrame();
+                yield return null;
             }
 
             animator.speed = 1f / BeatManager.GetBeatDuration();
             animator.Play(idleAnim);
-            yield return new WaitForEndOfFrame();
+            yield return null;
             sprite.transform.localPosition = Vector3.zero;
         }
         isActionFinished = true;
@@ -91,7 +91,7 @@ public class CutsceneActor : MonoBehaviour
     {
         while ((Vector2)transform.position != target)
         {
-            while (!BeatManager.isBeat) yield return new WaitForEndOfFrame();
+            while (!BeatManager.isBeat) yield return null;
 
             animator.Play(jumpAnim);
             animator.speed = 1f / BeatManager.GetBeatDuration() * 2f;
@@ -102,19 +102,19 @@ public class CutsceneActor : MonoBehaviour
 
             while (time <= duration)
             {
-                while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+                while (GameManager.isPaused) yield return null;
 
                 float beatProgress = time / duration;
                 beatTime = Mathf.Lerp(1, 0f, beatProgress);
 
                 time += Time.deltaTime;
                 transform.position = Vector3.Lerp(transform.position, target, beatTime);
-                yield return new WaitForEndOfFrame();
+                yield return null;
             }
 
             animator.speed = 1f / BeatManager.GetBeatDuration();
             animator.Play(idleAnim);
-            yield return new WaitForEndOfFrame();
+            yield return null;
             sprite.transform.localPosition = Vector3.zero;
         }
         isActionFinished = true;

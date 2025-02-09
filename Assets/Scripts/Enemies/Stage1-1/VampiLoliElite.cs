@@ -153,13 +153,13 @@ public class VampiLoliElite : Enemy
         facingRight = dir.x > 0;
         while (time <= BeatManager.GetBeatDuration() / 2)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
             velocity = Vector2.zero;
             transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * speed * 6);
             if (transform.position == targetPos) break;
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         PlayerCamera.TriggerCameraShake(0.5f, 0.2f);
 
@@ -209,12 +209,12 @@ public class VampiLoliElite : Enemy
         AudioController.PlaySound(AudioController.instance.sounds.chargeBulletSound);
 
         float time = 0;
-        yield return new WaitForEndOfFrame();
+        yield return null;
         while (!BeatManager.isBeat)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame(); // isStunned!
+            while (GameManager.isPaused) yield return null; // isStunned!
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         float spearOffset = 2.75f;
         for (int i = -2; i < 3; i++)
@@ -241,9 +241,9 @@ public class VampiLoliElite : Enemy
         time = 0;
         while (time <= BeatManager.GetBeatDuration())
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame(); // isStunned!
+            while (GameManager.isPaused) yield return null; // isStunned!
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         bulletSpawnEffect.Despawn();
@@ -377,13 +377,13 @@ public class VampiLoliElite : Enemy
         if (!isBat) animator.Play(moveAnimation);
         while (time <= BeatManager.GetBeatDuration() / 2)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
             velocity = Vector2.zero;
             transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * speed * 6);
             if (transform.position == targetPos) break;
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         if (!isBat) animator.Play(idleAnimation);
         AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
@@ -407,11 +407,11 @@ public class VampiLoliElite : Enemy
         animator.Play(moveAnimation);
         while (time <= BeatManager.GetBeatDuration() / 2)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
             velocity = dir * speed * 6;
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         animator.Play(idleAnimation);
         AudioController.PlaySound(AudioController.instance.sounds.bossWalk);

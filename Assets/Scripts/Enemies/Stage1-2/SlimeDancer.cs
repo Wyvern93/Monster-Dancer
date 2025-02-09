@@ -21,7 +21,7 @@ public class SlimeDancer : Enemy
         bulletSpawnEffect.transform.position = transform.position;
         bulletSpawnEffect.transform.parent = transform;
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
-        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
         Vector2 dir = Player.instance.GetClosestPlayer(transform.position) - transform.position;
         dir.Normalize();
@@ -29,7 +29,7 @@ public class SlimeDancer : Enemy
         SpawnBullet(dir, 10f, 0.5f);
         AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
-        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
         SpawnBullet(dir, 10f, 0.5f);
         AudioController.PlaySound(AudioController.instance.sounds.shootBullet);

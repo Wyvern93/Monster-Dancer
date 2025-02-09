@@ -27,7 +27,7 @@ public class PoisonBullet : Bullet
             //transform.position = Vector3.Lerp(transform.position, (Vector3)targetPos, time / 1.5f);
             time += Time.deltaTime;
             transform.localScale *= (1 + (1 * speed * 0.5f) * Time.deltaTime);
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         yield break;

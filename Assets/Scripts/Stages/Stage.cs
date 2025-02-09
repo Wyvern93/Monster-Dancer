@@ -224,9 +224,9 @@ public class Stage : MonoBehaviour
         PlayerCamera.instance.followPlayer = false;
         while ((Vector2)PlayerCamera.instance.transform.position != (Vector2)currentStagePoint.transform.position)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused) yield return null;
             PlayerCamera.instance.SetCameraPos(Vector2.MoveTowards(PlayerCamera.instance.transform.position, currentStagePoint.transform.position, Time.deltaTime * 20f));
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         Vector3 bossSpawnPos = BossPosition.position;
@@ -237,9 +237,9 @@ public class Stage : MonoBehaviour
 
         while ((Vector2)Player.instance.transform.position != (Vector2)targetPos)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused) yield return null;
             if (BeatManager.isBeat) Player.instance.MoveTowards(targetPos);
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         PlayerCamera.instance.SetCameraBoundaries(true);
@@ -266,7 +266,7 @@ public class Stage : MonoBehaviour
         {
             bossArea.color = new Color(1, 1, 1, Mathf.MoveTowards(bossArea.color.a, 0.8f, Time.deltaTime * 2.5f));
             bossArea.transform.localScale = Vector3.Lerp(bossArea.transform.localScale, Vector3.one, Time.deltaTime * 2.5f);
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         bossArea.color = new Color(1, 1, 1, 0.8f);
         bossArea.transform.localScale = Vector3.one;
@@ -281,7 +281,7 @@ public class Stage : MonoBehaviour
             c = Vector3.MoveTowards(c, camTarget, Time.deltaTime * 2f);
             PlayerCamera.instance.SetCameraPos(c);
             time -= Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         enemy.OnStart();
@@ -384,7 +384,7 @@ public class Stage : MonoBehaviour
 
         HandleStageMovement();
 
-        if (BeatManager.isGameBeat && BeatManager.isPlaying)
+        if (BeatManager.isBeat && BeatManager.isPlaying)
         {
             if (GameManager.isPaused) return;
 
@@ -930,7 +930,7 @@ public class Stage : MonoBehaviour
         PlayerCamera.instance.SetOnPlayer();
 
         UIManager.Instance.cutsceneManager.StartCutscene(CutsceneType.StageEnd);
-        while (!UIManager.Instance.cutsceneManager.hasFinished) yield return new WaitForEndOfFrame();
+        while (!UIManager.Instance.cutsceneManager.hasFinished) yield return null;
         yield return new WaitForSeconds(2f);
 
         UIManager.Instance.StageFinish.SetActive(true);
@@ -943,7 +943,7 @@ public class Stage : MonoBehaviour
         while (Player.instance.transform.position.x < goalPos)
         {
             Player.instance.transform.position += (Vector3.right * 4f * Time.deltaTime);
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         GameManager.runData.stageMulti++;
         GameManager.LoadNextStage("Stage1-2");

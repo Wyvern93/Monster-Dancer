@@ -368,7 +368,7 @@ public class InputManager : MonoBehaviour
         while (time > 0)
         {
             time -= Time.unscaledDeltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         pGamepad.SetMotorSpeeds(0f, 0f);
         yield break;

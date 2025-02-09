@@ -66,10 +66,10 @@ public class CarrotFan : Enemy
         animator.Play("carrotfan_move");
         while (time <= BeatManager.GetBeatDuration() / 2)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
             velocity = dir * speed * 6;
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         animator.Play("carrotfan_normal");
         velocity = Vector2.zero;

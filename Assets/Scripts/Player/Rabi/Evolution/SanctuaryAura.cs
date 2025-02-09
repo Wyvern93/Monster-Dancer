@@ -58,7 +58,7 @@ public class SanctuaryAura : MonoBehaviour, IDespawneable
         sprite.color = color;
         cross.color = color;
 
-        if (!GameManager.isPaused && BeatManager.isGameBeat)
+        if (!GameManager.isPaused && BeatManager.isBeat)
         {
             holybeats--;
             if (holybeats == 0)

@@ -7,7 +7,7 @@ public class ConstellationLaser : MonoBehaviour
     {
         if (!BeatManager.isPlaying) return;
         if (GameManager.isPaused) return;
-        if (!BeatManager.isGameBeat) return;
+        if (!BeatManager.isBeat) return;
 
         if (collision.CompareTag("Player") && collision.name == "Player")
         {

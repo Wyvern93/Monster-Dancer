@@ -45,7 +45,7 @@ public class BlessedFigureItem : PlayerItem
 
     public override void OnUpdate()
     {
-        if (BeatManager.isGameBeat)
+        if (BeatManager.isBeat)
         {
             beat--;
         }

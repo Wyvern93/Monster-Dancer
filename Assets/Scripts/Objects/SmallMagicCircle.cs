@@ -29,7 +29,7 @@ public class SmallMagicCircle : MonoBehaviour
     {
         transform.localEulerAngles = new Vector3(0, 0, transform.localEulerAngles.z + (90f * Time.deltaTime));
         spriteRenderer.color = Color.Lerp(spriteRenderer.color, color, Time.deltaTime * 8f);
-        if (BeatManager.isGameBeat && !GameManager.isPaused) beat++;
+        if (BeatManager.isBeat && !GameManager.isPaused) beat++;
         if (beat >= despawnTime && !despawning) Despawn();
 
         if (despawning && spriteRenderer.color.a <= 0.01f) PoolManager.Return(gameObject, typeof(SmallMagicCircle));

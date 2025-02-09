@@ -114,11 +114,11 @@ public class CutsceneManager : MonoBehaviour
     IEnumerator DialogueOpen(DialogueEntry entry)
     {
         StartCoroutine(DisplayDialogue(entry));
-        yield return new WaitForEndOfFrame();
+        yield return null;
         while (group.alpha < 1)
         {
             group.alpha = Mathf.MoveTowards(group.alpha, 1, Time.deltaTime * 4f);
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         isOpen = true;
         isOpening = false;
@@ -131,7 +131,7 @@ public class CutsceneManager : MonoBehaviour
         while (group.alpha > 0)
         {
             group.alpha = Mathf.MoveTowards(group.alpha, 0, Time.deltaTime * 4f);
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         isOpen = false;
         yield break;
@@ -206,10 +206,10 @@ public class CutsceneManager : MonoBehaviour
         dialogueText.text = dialogue;
         for (int i = 0; i < dialogue.Length; i++)
         {
-            yield return new WaitForEndOfFrame();
+            yield return null;
             dialogueText.maxVisibleCharacters++;
             if (i % 3 == 0) AudioController.PlaySoundWithoutCooldown(AudioController.instance.sounds.ui_dialogue_char, Random.Range(0.8f, 1.2f));
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         dialogueText.maxVisibleCharacters = dialogue.Length;
         isWriting = false;

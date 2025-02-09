@@ -79,14 +79,14 @@ public class Bullet : MonoBehaviour
     {
         if (!BeatManager.isPlaying) return;
         if (GameManager.isPaused) return;
-        if (BeatManager.isGameBeat)
+        if (BeatManager.isBeat)
         {
             if (!stunStatus.isStunned()) OnBeat();
 
             beatScale = 1.25f;
         }
 
-        if (BeatManager.isGameBeat && stunStatus.duration > 0)
+        if (BeatManager.isBeat && stunStatus.duration > 0)
         {
             if (stunStatus.duration == 1) OnStunEnd();
             stunStatus.duration--;
@@ -121,7 +121,7 @@ public class Bullet : MonoBehaviour
 
         isInitialized = true;
         StartCoroutine(BulletSpawnCoroutine());
-        if (BeatManager.isGameBeat) OnBeat();
+        if (BeatManager.isBeat) OnBeat();
         
         
     }
@@ -136,7 +136,7 @@ public class Bullet : MonoBehaviour
         {
             spriteRenderer.color = Color.Lerp(spriteRenderer.color, Color.white, Time.deltaTime * 16f);
             transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * finalSize, Time.deltaTime * 8f);
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         transform.localScale = Vector3.one * finalSize;
         spriteRenderer.color = Color.white;
@@ -188,7 +188,7 @@ public class Bullet : MonoBehaviour
             spriteRenderer.transform.localScale = Vector3.Lerp(spriteRenderer.transform.localScale, Vector3.one * 1.5f, Time.deltaTime * 8f);
             spriteRenderer.color = Color.Lerp(spriteRenderer.color, new Color(1, 0, 0, 0), Time.deltaTime * 8f);
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         spriteRenderer.transform.localScale = Vector3.one;
 
@@ -222,7 +222,7 @@ public class Bullet : MonoBehaviour
         {
             transform.position = Vector3.Lerp(transform.position, (Vector3)targetPos, time / 1.5f);
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         transform.position = targetPos;
         yield break;
@@ -273,7 +273,7 @@ public class Bullet : MonoBehaviour
     {
         if (!BeatManager.isPlaying) return;
         if (GameManager.isPaused) return;
-        if (!BeatManager.isGameBeat) return;
+        if (!BeatManager.isBeat) return;
 
         if (collision.CompareTag("Player") && collision.name == "Player")
         {

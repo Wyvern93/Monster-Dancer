@@ -50,7 +50,7 @@ public class NomEliteBullet : Bullet
             transform.position = new Vector3(enemySource.transform.position.x + (Mathf.Cos(orbitAngle * Mathf.Deg2Rad) * distance), enemySource.transform.position.y + 0.3f + (Mathf.Sin(orbitAngle * Mathf.Deg2Rad) * distance), 0);
             //transform.position = Vector3.Lerp(transform.position, (Vector3)targetPos, time / 1.5f);
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         yield break;
@@ -69,7 +69,7 @@ public class NomEliteBullet : Bullet
             transform.position += ((Vector3)direction * speed * Time.deltaTime);
             //transform.position = Vector3.Lerp(transform.position, (Vector3)targetPos, time / 1.5f);
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         yield break;

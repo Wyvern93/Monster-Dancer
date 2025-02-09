@@ -220,7 +220,7 @@ public class NebulionBoss : Boss
         {
             while (GameManager.isPaused || stunStatus.isStunned())//|| stunStatus.isStunned())
             {
-                yield return new WaitForEndOfFrame();
+                yield return null;
             }
             float beatProgress = time / beatDuration;
             beatTime = Mathf.Lerp(1, 0f, beatProgress);
@@ -231,7 +231,7 @@ public class NebulionBoss : Boss
             clone2.transform.position = new Vector3(transform.position.x + ((cloneDistance * 2f) * Mathf.Cos(clone2Angle * Mathf.Deg2Rad)), transform.position.y + ((cloneDistance) * Mathf.Sin(clone2Angle * Mathf.Deg2Rad)), 10);
             //transform.position += ((Vector3)direction * speed * beatTime * Time.deltaTime);
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         yield break;
@@ -244,11 +244,11 @@ public class NebulionBoss : Boss
         float time = BeatManager.GetBeatDuration() * (reset ? 3f : 2f);
         while (time > 0)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused) yield return null;
             time -= Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
-        while (!BeatManager.isGameBeat) yield return new WaitForEndOfFrame();
+        while (!BeatManager.isBeat) yield return null;
 
         isPreparingAttack = false;
         if (reset) attackBeat = 0;
@@ -584,10 +584,10 @@ public class NebulionBoss : Boss
         float time = 0;
         while (time <= BeatManager.GetBeatDuration() * 2f)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame(); // isStunned!
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null; // isStunned!
             time += Time.deltaTime;
             constellation.transform.localEulerAngles = new Vector3(0, 0, constellation.transform.localEulerAngles.z + (3f * Time.deltaTime));
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
     }
     private IEnumerator MagicCometCoroutine()
@@ -608,11 +608,11 @@ public class NebulionBoss : Boss
         float time = 0;
         while (time <= BeatManager.GetBeatDuration() * 4f)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame(); // isStunned!
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null; // isStunned!
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
-        while (!BeatManager.isGameBeat) yield return new WaitForEndOfFrame();
+        while (!BeatManager.isBeat) yield return null;
 
         AudioController.PlaySound(AudioController.instance.sounds.bulletwaveShootSound);
         SpawnMagicComet(circlePos);
@@ -886,11 +886,11 @@ public class NebulionBoss : Boss
         animator.Play("nebulion_move");
         while (time <= BeatManager.GetBeatDuration() / 2)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
             
             velocity = dir * speed * 6;
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         animator.Play("nebulion_move");
         velocity = Vector2.zero;
@@ -913,12 +913,12 @@ public class NebulionBoss : Boss
         animator.Play("nebulion_move");
         while (time <= BeatManager.GetBeatDuration() / 2)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
             velocity = Vector2.zero;
             transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * speed * 6);
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         if (transform.position == targetPos) animator.Play("nebulion_dance");
         else animator.Play("nebulion_move");
@@ -969,10 +969,10 @@ public class NebulionBoss : Boss
         float time = 2f;
         while (time > 0)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused) yield return null;
             Camera.main.transform.position = Vector3.MoveTowards(Camera.main.transform.position, target, Time.deltaTime * 2f);
             time -= Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         PlayerCamera.instance.SetCameraPos(target);
         PlayerCamera.instance.followPlayer = true;

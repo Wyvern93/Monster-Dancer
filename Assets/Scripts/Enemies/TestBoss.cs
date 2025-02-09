@@ -122,7 +122,7 @@ public class TestBoss : Boss
             transform.position = Vector3.Lerp(originalPos, (Vector3)targetPos, time * 8f);
             time += Time.deltaTime;
             Sprite.transform.localPosition = new Vector3(0, height, 0);
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
         PlayerCamera.TriggerCameraShake(0.5f, 0.2f);
@@ -136,15 +136,15 @@ public class TestBoss : Boss
     private IEnumerator SpawnBullet(Vector2 direction)
     {
         // Sync with next beat
-        while (!BeatManager.isGameBeat) yield return new WaitForEndOfFrame();
+        while (!BeatManager.isBeat) yield return null;
 
         BulletSpawnEffect spawnEffect = PoolManager.Get<BulletSpawnEffect>();
         spawnEffect.source = this;
         spawnEffect.transform.position = new Vector3(transform.position.x + direction.x, transform.position.y + direction.y);
-        yield return new WaitForEndOfFrame();
+        yield return null;
 
         // The spawnEffect lasts a beat long
-        while (spawnEffect.gameObject.activeSelf) yield return new WaitForEndOfFrame();
+        while (spawnEffect.gameObject.activeSelf) yield return null;
 
         Bullet bullet = PoolManager.Get<Bullet>();
         bullet.transform.position = new Vector3(spawnEffect.transform.position.x, spawnEffect.transform.position.y);
@@ -161,13 +161,13 @@ public class TestBoss : Boss
         while (Sprite.transform.localPosition.y < 12)
         {
             Sprite.transform.localPosition = Vector3.MoveTowards(Sprite.transform.localPosition, new Vector3(Sprite.transform.localPosition.x, 12, Sprite.transform.localPosition.z), Time.deltaTime * 32f);
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         Vector2 position = Player.instance.transform.position;
         transform.position = position;
 
-        yield return new WaitForEndOfFrame();
-        while (!BeatManager.isGameBeat)
+        yield return null;
+        while (!BeatManager.isBeat)
         {
             yield return null;
         }
@@ -187,7 +187,7 @@ public class TestBoss : Boss
         while (Sprite.transform.localPosition.y > 0)
         {
             Sprite.transform.localPosition = Vector3.MoveTowards(Sprite.transform.localPosition, Vector3.zero, Time.deltaTime * 32f);
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
         PlayerCamera.TriggerCameraShake(1.5f, 0.3f);

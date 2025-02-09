@@ -20,7 +20,7 @@ public class BuzzBee : Enemy
         bulletSpawnEffect.source = this;
         bulletSpawnEffect.transform.position = transform.position;
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
-        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
         Vector2 dir = Player.instance.GetClosestPlayer(transform.position) - transform.position;
         dir.Normalize();
@@ -28,7 +28,7 @@ public class BuzzBee : Enemy
         SpawnBullet(dir, 10f, 0f);
         AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
-        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
         SpawnBullet(dir, 10f, 0f);
         AudioController.PlaySound(AudioController.instance.sounds.shootBullet);

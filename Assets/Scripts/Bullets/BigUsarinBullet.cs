@@ -53,7 +53,7 @@ public class BigUsarinBullet : Bullet
             {
                 phase++;
             }
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         yield break;

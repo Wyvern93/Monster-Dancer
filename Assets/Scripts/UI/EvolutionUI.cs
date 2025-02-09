@@ -103,7 +103,7 @@ public class EvolutionUI : MonoBehaviour
 
     protected IEnumerator CloseMenuCoroutine()
     {
-        while (!BeatManager.menuGameBeat) yield return new WaitForEndOfFrame();
+        while (!BeatManager.menuGameBeat) yield return null;
         GameManager.isPaused = false;
         Time.timeScale = 1.0f;
     }
