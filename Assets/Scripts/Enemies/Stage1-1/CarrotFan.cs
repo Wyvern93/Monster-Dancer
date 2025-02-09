@@ -51,10 +51,10 @@ public class CarrotFan : Enemy
 
     public void Move()
     {
-        StartCoroutine(MoveCoroutine());
+        StartCoroutine(JumpCoroutine());
     }
 
-    IEnumerator MoveCoroutine()
+    protected override IEnumerator JumpCoroutine()
     {
         isMoving = true;
 

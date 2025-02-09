@@ -1,14 +1,32 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Audio;
+
+public class BeatSound
+{
+    public AudioClip clip;
+    public float volume;
+    public float pitch;
+    public bool side;
+
+    public BeatSound(AudioClip clip, float volume, float pitch, bool side)
+    {
+        this.clip = clip;
+        this.volume = volume;
+        this.pitch = pitch;
+        this.side = side;
+    }
+}
 
 public class AudioController : MonoBehaviour
 {
     public static AudioController instance;
     public AudioSounds sounds;
     private List<AudioClip> clipsPlaying;
+
+    private List<BeatSound> clipsOnBeatQueue;
 
     [SerializeField] private AudioSource sfx;
     [SerializeField] private AudioSource music;
@@ -26,6 +44,7 @@ public class AudioController : MonoBehaviour
     {
         instance = this;
         clipsPlaying = new List<AudioClip>();
+        clipsOnBeatQueue = new List<BeatSound>();
         audioMixer.updateMode = AudioMixerUpdateMode.UnscaledTime;
         sfxCooldowns = new Dictionary<string, float>();
     }
@@ -49,6 +68,7 @@ public class AudioController : MonoBehaviour
     void Update()
     {
         clipsPlaying.Clear();
+        if (BeatManager.isQuarterBeat) PlayBeatSounds();
 
         // Create a list to store keys that need updating
         List<string> keysToUpdate = new List<string>();
@@ -142,6 +162,42 @@ public class AudioController : MonoBehaviour
             Destroy(sfxObj, 3f);
         }
     }
+
+    private void PlayBeatSounds()
+    {
+        foreach (BeatSound sound in clipsOnBeatQueue)
+        {
+            if (sound.pitch == 1 && !sound.side)
+            {
+                instance.sfx.pitch = sound.pitch;
+                instance.sfx.PlayOneShot(sound.clip);
+            }
+            else
+            {
+                GameObject sfxObj = new GameObject(sound.clip.name);
+                AudioSource currentSfx = sfxObj.AddComponent<AudioSource>();
+                currentSfx.pitch = sound.pitch;
+                if (sound.side)
+                {
+                    currentSfx.outputAudioMixerGroup = instance.sfxSideMixerGroup;
+                }
+                else
+                {
+                    currentSfx.outputAudioMixerGroup = instance.sfxMixerGroup;
+                }
+                currentSfx.PlayOneShot(sound.clip);
+                Destroy(sfxObj, 3f);
+            }
+        }
+        clipsOnBeatQueue.Clear();
+    }
+
+    public static void PlaySoundOnBeat(AudioClip sound, float pitch = 1f, bool side = false)
+    {
+        if (instance.clipsOnBeatQueue.FirstOrDefault(x=> x.clip == sound) != null) return;
+        instance.clipsOnBeatQueue.Add(new BeatSound(sound, 1f, pitch, side));
+    }
+
     public static void PlayMusic(AudioClip music, bool loop = true)
     {
         instance.music.clip = music;

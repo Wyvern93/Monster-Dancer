@@ -190,6 +190,31 @@ public class PlayerRabi : Player
         yield break;
     }
 
+    protected override IEnumerator MoveTowardsCoroutine(Vector2 targetPos)
+    {
+        animator.Play("Rabi_Move");
+        animator.speed = 1f / BeatManager.GetBeatDuration() / 0.5f;
+        float duration = BeatManager.GetBeatDuration() * 0.5f;
+        float time = 0;
+
+        if (transform.position.x < targetPos.x) facingRight = true;
+        else facingRight = false;
+
+        while (time <= duration)
+        {
+            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            time += Time.deltaTime;
+            
+            transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * 4f);
+            yield return new WaitForEndOfFrame();
+        }
+
+        animator.speed = 1f / BeatManager.GetBeatDuration();
+        animator.Play("Rabi_Idle");
+        yield return new WaitForEndOfFrame();
+        Sprite.transform.localPosition = Vector3.zero;
+    }
+
     protected override IEnumerator MoveCoroutine(Vector2 targetPos)
     {
         isMoving = true;
@@ -210,8 +235,8 @@ public class PlayerRabi : Player
         }
 
         animator.Play("Rabi_Move");
-        animator.speed = 1f / BeatManager.GetBeatDuration() / 0.8f;
-        float duration = BeatManager.GetBeatDuration() * 0.8f;
+        animator.speed = 1f / BeatManager.GetBeatDuration() / 0.5f;
+        float duration = BeatManager.GetBeatDuration() * 0.5f;
         while (time <= duration)
         {
             while (GameManager.isPaused) yield return new WaitForEndOfFrame();
@@ -244,7 +269,7 @@ public class PlayerRabi : Player
                 yield break;
             }
             
-            rb.velocity = dir * currentStats.Speed * (isCrouching ? 2f : 4);
+            rb.velocity = dir * currentStats.Speed * (isCrouching ? 2f : 4) * 1.3f;
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
@@ -283,12 +308,15 @@ public class PlayerRabi : Player
         dir *= currentStats.Speed * 2.5f;
         isCastingBunnyHop = true;
         direction = dir;
+        activeAbility.currentCooldown = activeAbility.GetMaxCooldown();
+        rb.velocity = Vector2.zero;
         StartCoroutine(BunnyHopCoroutine((Vector2)transform.position + dir, fromMove));
 
     }
 
     private IEnumerator BunnyHopCoroutine(Vector2 targetPos, bool fromMove)
     {
+        rb.velocity = Vector2.zero;
         isMoving = true;
         SpriteSize = 1.2f;
         originPos = transform.position;
@@ -298,7 +326,7 @@ public class PlayerRabi : Player
             direction = oldDir * 2;
             targetPos = (Vector2)originPos + oldDir;
         }
-        if (Map.isWallAt(targetPos)) targetPos = originPos;
+        if (Stage.isWallAt(targetPos)) targetPos = originPos;
         
         if (fromMove)
         {
@@ -315,7 +343,7 @@ public class PlayerRabi : Player
         while (time <= BeatManager.GetBeatDuration() * 0.8f)
         {
             while (GameManager.isPaused) yield return new WaitForEndOfFrame();
-            if (Map.isWallAt(targetPos)) targetPos = originPos;
+            if (Stage.isWallAt(targetPos) || Stage.isWaterAt(targetPos)) targetPos = originPos;
             
             float lerpedvalue = Mathf.Lerp(0,1f, time / (BeatManager.GetBeatDuration() * 0.8f));
             transform.position = Vector3.Lerp(originPos, (Vector3)targetPos, lerpedvalue);
@@ -333,6 +361,19 @@ public class PlayerRabi : Player
         isCastingBunnyHop = false;
         isMoving = false;
         yield break;
+    }
+
+    protected override void StopMovementCoroutines()
+    {
+        StopCoroutine(nameof(MoveCoroutine));
+        StopCoroutine(nameof(BunnyHopCoroutine));
+        rb.velocity = Vector2.zero;
+        isMoving = false;
+        spriteTrail.Stop();
+        animator.Play("Rabi_Idle");
+        animator.speed = 1f / BeatManager.GetBeatDuration();
+        Sprite.transform.localPosition = Vector3.zero;
+        isCastingBunnyHop = false;
     }
 
     public override void OnPassiveAbilityUse()
@@ -359,6 +400,7 @@ public class PlayerRabi : Player
 
     public override void TakeDamage(int damage)
     {
+        if (GameManager.infiniteHP) return;
         if (isCastingBunnyHop) return;
         if (isInvulnerable) return;
         if (isDead) return;

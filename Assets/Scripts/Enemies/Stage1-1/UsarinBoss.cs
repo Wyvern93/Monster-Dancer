@@ -30,7 +30,7 @@ public class UsarinBoss : Boss
 
     List<BulletBase> sideBullets;
 
-    [SerializeField] Dialogue rabiDialogue;
+    [SerializeField] Cutscene rabiDialogue;
 
     public override void OnSpawn()
     {
@@ -38,7 +38,7 @@ public class UsarinBoss : Boss
 
         allBullets = new List<Bullet>();
         allEnemies = new List<Enemy>();
-        Map.Instance.enemiesAlive.Add(this);
+        Stage.Instance.enemiesAlive.Add(this);
         CurrentHP = MaxHP;
         emissionColor = new Color(1, 1, 1, 0);
         isMoving = false;
@@ -55,47 +55,25 @@ public class UsarinBoss : Boss
         orbitRight = true;
         sideBullets = new List<BulletBase>();
 
-        if (transform.position.x < Player.instance.transform.position.x)
-        {
-            facingRight = true;
-            animator.Play("usarin_intro");
-            animator.speed = 1;
-        }
-        else
-        {
-            facingRight = false;
-            animator.Play("usarin_intro2");
-            animator.speed = 1;
-        }
-        
-        animator.speed = 1f;
-        transform.localScale = Vector3.one * 2f;
-    }
-
-    public override void OnIntroductionFinish()
-    {
-        base.OnIntroductionFinish();
         animator.Play("usarin_normal");
         animator.speed = 1f / BeatManager.GetBeatDuration();
-        
-        Dialogue dialogue = Player.instance is PlayerRabi ? rabiDialogue : rabiDialogue;
-        UIManager.Instance.dialogueMenu.StartCutscene(dialogue.entries);
-
+        UIManager.Instance.cutsceneManager.StartCutscene(CutsceneType.Boss);
         State = BossState.Dialogue;
+        transform.localScale = Vector3.one * 2f;
     }
 
     private void FindTargetPositionAroundPlayer()
     {
         Vector3 finalPos = Vector3.zero;
 
-        int tries = 10;
+        int tries = 20;
         while (finalPos == Vector3.zero)
         {
-            Vector3 basePos = Map.Instance.bossArea.transform.position;
+            Vector3 basePos = Stage.Instance.bossArea.transform.position;
             basePos = basePos + (Vector3)Random.insideUnitCircle * 5f;
             if (tries <= 0) break;
 
-            if (!Map.isWallAt(basePos))
+            if (!Stage.isWallAt(basePos))
             {
                 finalPos = basePos;
                 targetPos = basePos;
@@ -125,11 +103,11 @@ public class UsarinBoss : Boss
         switch (State)
         {
             case BossState.Dialogue:
-                if (UIManager.Instance.dialogueMenu.hasFinished)
+                if (UIManager.Instance.cutsceneManager.hasFinished)
                 {
                     State = BossState.Phase4;
                     StartCoroutine(OnBattleStart());
-                    UIManager.Instance.dialogueMenu.hasFinished = false;
+                    UIManager.Instance.cutsceneManager.hasFinished = false;
                 }
                 break;
             case BossState.Phase1:
@@ -431,7 +409,7 @@ public class UsarinBoss : Boss
             magicCircleVisible = true;
 
             StartCoroutine(ChargeAttack1Coroutine());
-            targetPos = Map.Instance.bossArea.transform.position + (Vector3.up * 6f);
+            targetPos = Stage.Instance.bossArea.transform.position + (Vector3.up * 2.75f);
         }
 
         if (transform.position != targetPos)
@@ -510,7 +488,7 @@ public class UsarinBoss : Boss
             time -= Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
-        Vector2 arenaPos = Map.Instance.bossArea.transform.position;
+        Vector2 arenaPos = Stage.Instance.bossArea.transform.position;
         for (int i = 0; i < 21; i++)
         {
             float xoffset = i - 10;
@@ -524,7 +502,7 @@ public class UsarinBoss : Boss
 
     private IEnumerator ShootSideCarrots()
     {
-        Vector2 arenaPos = Map.Instance.bossArea.transform.position;
+        Vector2 arenaPos = Stage.Instance.bossArea.transform.position;
 
         if (attackBeat % 24 == 0)
         {
@@ -630,7 +608,7 @@ public class UsarinBoss : Boss
 
     public void Move()
     {
-        StartCoroutine(MoveCoroutine());
+        StartCoroutine(JumpCoroutine());
     }
     IEnumerator MoveToTarget()
     {
@@ -662,7 +640,7 @@ public class UsarinBoss : Boss
         yield break;
     }
 
-    IEnumerator MoveCoroutine()
+    protected override IEnumerator JumpCoroutine()
     {
         isMoving = true;
 
@@ -738,10 +716,12 @@ public class UsarinBoss : Boss
         PlayerCamera.instance.followPlayer = true;
         UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
         UIManager.Instance.PlayerUI.SetBossBarName(GetName());
-        UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stageboss")}");
+        UIManager.Instance.PlayerUI.ShowBossBar(true);
+        UIManager.Instance.PlayerUI.SetStageText($"BOSS WAVE");
         BeatManager.SetTrack(bossTrack);
         BeatManager.StartTrack();
-        Map.isBossWave = true;
+        Stage.Instance.OnBossFightStart(this);
+        Stage.isBossWave = true;
         Player.instance.canDoAnything = true;
         State = BossState.Phase1;
         usarinState = UsarinBossState.Dance1;

@@ -4,48 +4,8 @@ using UnityEngine;
 
 public class Karakasa : Enemy
 {
-    public override void OnSpawn()
-    {
-        base.OnSpawn();
-        CurrentHP = MaxHP;
-        emissionColor = new Color(1, 1, 1, 0);
-        isMoving = false;
-        Sprite.transform.localPosition = Vector3.zero;
-        animator.Play("karakasa_normal");
-        animator.speed = 1f / BeatManager.GetBeatDuration() * 2f;
-    }
-    protected override void OnBeat()
-    {
-        if (CanMove())
-        {
-            MoveTowardsPlayer();
-        }
-    }
 
-    protected override void OnBehaviourUpdate()
-    {
-
-    }
-
-    protected override void OnInitialize()
-    {
-
-    }
-
-    void MoveTowardsPlayer()
-    {
-        if (isMoving) return;
-
-        Move();
-
-    }
-
-    public void Move()
-    {
-        StartCoroutine(MoveCoroutine());
-    }
-
-    IEnumerator MoveCoroutine()
+    protected override IEnumerator JumpCoroutine()
     {
         SpawnBullet(0);
         SpawnBullet(120);

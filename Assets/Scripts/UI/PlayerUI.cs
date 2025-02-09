@@ -5,12 +5,17 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
+public enum CursorState { Menu, Crosshair }
+
 public class PlayerUI : MonoBehaviour
 {
     [SerializeField] Image hpBar;
     private RectTransform hpTransform;
     [SerializeField] TextMeshProUGUI hpText;
     [SerializeField] Image hurtEffect;
+
+    [SerializeField] Image hpBar_mini;
+    private RectTransform hpBar_mini_Transform;
 
     [SerializeField] GameObject spHud;
     [SerializeField] Image spBar;
@@ -25,9 +30,11 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] GameObject damageText;
     [SerializeField] Transform damageTextParent;
 
-    public Image normalCursor;
+    [SerializeField] Image normalCursor;
     public Image crosshair;
     RectTransform crosshair_transform;
+    public CursorState cursorState;
+    public GameObject menuCursorObj, crosshairCursorObj;
 
     [SerializeField] CanvasGroup canvasGroup;
     [SerializeField] SpriteRenderer beatIndicatorSpr;
@@ -54,10 +61,15 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] CombatCursorHandler combatcursor1, combatcursor2, combatcursor3;
     [SerializeField] TextMeshProUGUI cursorAmmoText;
 
+    private bool bossBarActive;
+
     // Start is called before the first frame update
     void Awake()
     {
+        bossBarActive = false;
         hpTransform = hpBar.GetComponent<RectTransform>();
+        hpBar_mini_Transform = hpBar_mini.transform.parent.GetComponent<RectTransform>();
+        hpBar_mini_Transform.gameObject.SetActive(false);
         spTransform = spBar.GetComponent<RectTransform>();
         expTransform = expBar.GetComponent<RectTransform>();
         crosshair_transform = crosshair.GetComponent<RectTransform>();
@@ -95,7 +107,7 @@ public class PlayerUI : MonoBehaviour
 
     public void OnOpenMenu()
     {
-        normalCursor.enabled = true;
+        SetCursorState(CursorState.Menu);
         combatcursor1.SetVisibility(false);
         combatcursor2.SetVisibility(false);
         combatcursor3.SetVisibility(false);
@@ -104,9 +116,23 @@ public class PlayerUI : MonoBehaviour
 
     public void OnCloseMenu()
     {
-        normalCursor.enabled = false;
-        cursorAmmoText.enabled = true;
+        if (!UIManager.Instance.cutsceneManager.isInCutscene()) SetCursorState(CursorState.Crosshair);
         UpdateAbilityUI();
+    }
+
+    public void SetCursorState(CursorState state)
+    {
+        cursorState = state;
+        if (state == CursorState.Menu)
+        {
+            crosshairCursorObj.SetActive(false);
+            menuCursorObj.SetActive(true);
+        }
+        else
+        {
+            crosshairCursorObj.SetActive(true);
+            menuCursorObj.SetActive(false);
+        }
     }
 
     public void OnReset()
@@ -193,6 +219,11 @@ public class PlayerUI : MonoBehaviour
         bossBarGroup.alpha = 0;
     }
 
+    public void ShowBossBar(bool value)
+    {
+        bossBarActive = value;
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -208,16 +239,17 @@ public class PlayerUI : MonoBehaviour
             crosshair_transform.localPosition = Vector3.MoveTowards(crosshair_transform.localPosition, offset, Time.unscaledDeltaTime * 1280f); //Mouse.current.position.value / new Vector2(Screen.width, Screen.height) * new Vector2(640, 360) - new Vector2(320, 180);
         }
         
-        if (Map.Instance != null) 
+        if (Stage.Instance != null) 
         {
             UpdateStageTime();
-            bossBarGroup.alpha = Mathf.MoveTowards(bossBarGroup.alpha, Map.isBossWave ? 1 : 0, Time.deltaTime);
+            bossBarGroup.alpha = Mathf.MoveTowards(bossBarGroup.alpha, bossBarActive ? 1 : 0, Time.deltaTime);
         }
         if (Player.instance == null)
         {
             // Put here a normal cursor instead
             return;
         }
+        hpBar_mini_Transform.position = Player.instance.transform.position - new Vector3(0, 0.2f, 0);
         UpdateAbilityUI();
     }
 
@@ -343,8 +375,8 @@ public class PlayerUI : MonoBehaviour
     {
         DamageText damageText = PoolManager.Get<DamageText>();
         damageText.transform.SetParent(damageTextParent, true);
-        damageText.transform.localScale = Vector3.one;
-        damageText.transform.position = position;
+        damageText.transform.localScale = Vector3.one * 1.5f;
+        damageText.transform.position = position + (Random.insideUnitCircle * 0.4f);
         damageText.text.text = number.ToString();
 
         switch (textType)
@@ -391,6 +423,9 @@ public class PlayerUI : MonoBehaviour
         float width = (int)(87f * health);
         hpTransform.sizeDelta = new Vector2(width, hpTransform.sizeDelta.y);
         hpText.text = $"{Player.instance.CurrentHP}/{Player.instance.currentStats.MaxHP}";
+        if (UIManager.Instance.cutsceneManager.isInCutscene() || health >= 1f) hpBar_mini_Transform.gameObject.SetActive(false);
+        else hpBar_mini_Transform.gameObject.SetActive(true);
+        hpBar_mini.fillAmount = health;
     }
 
     public void UpdateSpecial(float current, float max)
@@ -411,12 +446,20 @@ public class PlayerUI : MonoBehaviour
 
     public void UpdateStageTime()
     {
-        MapTimeText.text = GetStageTime();
+        MapTimeText.text = Stage.Instance.showWaveTimer ? GetRemainingStageTime() : "";
     }
 
     public string GetStageTime()
     {
-        int totalSeconds = (int)Map.StageTime;
+        int totalSeconds = (int)Stage.StageTime;
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        return string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
+
+    private string GetRemainingStageTime()
+    {
+        int totalSeconds = (int)Stage.remainingWaveTime;
         int minutes = totalSeconds / 60;
         int seconds = totalSeconds % 60;
         return string.Format("{0:00}:{1:00}", minutes, seconds);

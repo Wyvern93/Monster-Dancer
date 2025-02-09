@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Boss : Enemy
@@ -11,13 +12,21 @@ public class Boss : Enemy
     public override void OnSpawn()
     {
         base.OnSpawn();
-        Map.Instance.enemiesAlive.Add(this);
+        Stage.Instance.enemiesAlive.Add(this);
         CurrentHP = MaxHP;
         emissionColor = new Color(1, 1, 1, 0);
         isMoving = false;
         Sprite.transform.localPosition = Vector3.zero;
         State = BossState.Introduction;// FALTA LA ANIMACION DE INTRODUCCION DEL JEFE
         Player.instance.facingRight = transform.position.x > Player.instance.transform.position.x;
+    }
+
+    public void SetVisible(bool visible)
+    {
+        foreach (SpriteRenderer rend in transform.GetComponentsInChildren<SpriteRenderer>())
+        {
+            rend.enabled = visible;
+        }
     }
 
     protected override void OnBeat()
@@ -40,11 +49,6 @@ public class Boss : Enemy
                 OnBattleStart();
                 break;
         }
-    }
-
-    public virtual void OnIntroductionFinish()
-    {
-
     }
 
     protected override void OnInitialize()
@@ -78,7 +82,7 @@ public class Boss : Enemy
             o.SetActive(true);
 
             AudioController.PlaySound(AudioController.instance.sounds.bossDeath, side: true);
-            Map.Instance.OnBossDeath(this);
+            Stage.Instance.OnBossDeath(this);
         }
         else
         {
@@ -100,10 +104,11 @@ public class Boss : Enemy
         yield return new WaitForSeconds(1f);
         UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
         UIManager.Instance.PlayerUI.SetBossBarName(GetName());
-        UIManager.Instance.PlayerUI.SetStageText($"{Localization.GetLocalizedString("playerui.stageboss")}");
+        UIManager.Instance.PlayerUI.ShowBossBar(true);
+        UIManager.Instance.PlayerUI.SetStageText("BOSS WAVE");
         BeatManager.SetTrack(bossTrack);
         BeatManager.StartTrack();
-        Map.isBossWave = true;
+        Stage.isBossWave = true;
         Player.instance.canDoAnything = true;
         State = BossState.Phase1;
         //usarinState = UsarinBossState.Dance1;

@@ -20,9 +20,8 @@ public class JuiceExplosion : MonoBehaviour
             float damage = abilitySource.GetSplashDamage();
 
             bool isCritical = abilitySource.GetCritChance() > Random.Range(0f, 100f);
-            if (isCritical) damage *= 2.5f;
 
-            enemy.TakeDamage(damage, isCritical);
+            enemy.TakeDamage(isCritical ? damage * 2.5f : damage, isCritical);
             foreach (PlayerItem item in abilitySource.equippedItems)
             {
                 if (item == null) continue;

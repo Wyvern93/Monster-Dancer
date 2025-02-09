@@ -153,12 +153,7 @@ public class BeatManager : MonoBehaviour
             menuGameBeat = true;
             return;
         }
-
-        //if (compassless) return;
         return;
-        instance.canCastGameBeat = false;
-        isGameBeat = true;
-        lastBeatTime = Time.time;
     }
 
     public static bool closestIsNextBeat()
@@ -171,11 +166,6 @@ public class BeatManager : MonoBehaviour
     public static float GetTempo()
     {
         return instance.tempo;
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
     }
 
     // Update is called once per frame
@@ -252,29 +242,7 @@ public class BeatManager : MonoBehaviour
         currentFrameState = GetBeatSuccess();
         isGameBeat = false;
         menuGameBeat = false;
-        /*
-        if (!compassless)
-        {
-            if (lastFrameState == BeatTrigger.FAIL && currentFrameState != BeatTrigger.FAIL) // First Frame of Input
-            {
-                canCastGameBeat = true;
-            }
-            if (lastFrameState != BeatTrigger.FAIL && currentFrameState == BeatTrigger.FAIL) // After last Frame of Input
-            {
-                if (canCastGameBeat)
-                {
-                    lastBeatTime = Time.time;
-                    if (!GameManager.isPaused) isGameBeat = true;
-                    menuGameBeat = true;
-                }
-                canCastGameBeat = false;
-            }
-        }
-        else
-        {
-            canCastGameBeat = true;
-        }
-        */
+       
         canCastGameBeat = true;
         lastFrameState = currentFrameState;
     }

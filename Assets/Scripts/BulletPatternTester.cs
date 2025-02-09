@@ -242,7 +242,7 @@ public class BulletPatternTester : MonoBehaviour
         bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteLookAngleBehaviour() { start = 0, end = -1 },
-                new SpawnBulletOnBeatBehaviour(SpawnCometStar) { start = 0, end = -1}
+                new SpawnBulletOnBeatBehaviour(SpawnCometStar, BeatManager.GetBeatDuration() / 3) { start = 0, end = -1}
             };
         bullet.OnSpawn();
         allBullets.Add(bullet);
@@ -502,7 +502,7 @@ public class BulletPatternTester : MonoBehaviour
         bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteLookAngleBehaviour() { start = 0, end = -1 },
-                new SpawnBulletOnBeatBehaviour(SpawnCometStar) { start = 0, end = -1}
+                new SpawnBulletOnBeatBehaviour(SpawnCometStar, BeatManager.GetBeatDuration() / 3) { start = 0, end = -1}
             };
         bullet.OnSpawn();
         allBullets.Add(bullet);

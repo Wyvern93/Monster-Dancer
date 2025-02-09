@@ -23,9 +23,8 @@ public class CarrotExplosion : MonoBehaviour, IPlayerExplosion
             Enemy enemy = collision.GetComponent<Enemy>();
 
             bool isCritical = abilitySource.GetCritChance() > Random.Range(0f, 100f);
-            if (isCritical) dmg *= 2.5f;
 
-            enemy.TakeDamage(dmg, isCritical);
+            enemy.TakeDamage(isCritical ? dmg * 2.5f : dmg, isCritical);
             foreach (PlayerItem item in abilitySource.equippedItems)
             {
                 if (item == null) continue;

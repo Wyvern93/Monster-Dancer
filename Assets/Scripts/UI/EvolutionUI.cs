@@ -98,7 +98,7 @@ public class EvolutionUI : MonoBehaviour
         canvasGroup.blocksRaycasts = false;
         EventSystem.current.SetSelectedGameObject(null);
         StartCoroutine(CloseMenuCoroutine());
-        if (evolutionDone) Map.Instance.fairyCage.gameObject.SetActive(false);
+        if (evolutionDone) Stage.Instance.fairyCage.gameObject.SetActive(false);
     }
 
     protected IEnumerator CloseMenuCoroutine()

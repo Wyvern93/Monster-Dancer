@@ -38,12 +38,10 @@ public class MoonlightShockwave : MonoBehaviour
         {
             Enemy enemy = collision.GetComponent<Enemy>();
 
-            dmg = 8;
-            float damage = dmg;
+            dmg = abilitySource.GetShockwaveDamage();
             bool isCritical = abilitySource.GetCritChance() > Random.Range(0f, 100f);
-            if (isCritical) damage *= 2.5f;
 
-            enemy.TakeDamage((int)damage, isCritical);
+            enemy.TakeDamage(isCritical ? dmg * 2.5f : dmg, isCritical);
         }
 
         if (collision.CompareTag("FairyCage"))

@@ -6,20 +6,15 @@ using UnityEngine.UIElements;
 public class RhythmiaElite : Enemy
 {
     int beatCD;
-    bool isAttacking;
     bool clockwise = true;
+    private Vector3 targetPos;
     public override void OnSpawn()
     {
         base.OnSpawn();
-        CurrentHP = MaxHP;
-        emissionColor = new Color(1, 1, 1, 0);
-        isMoving = false;
-        beatCD = Random.Range(1, 6);
-        Sprite.transform.localPosition = Vector3.zero;
-        isAttacking = false;
         clockwise = true;
-        animator.Play("rhythmia_normal");
-        animator.speed = 1f / BeatManager.GetBeatDuration() * 2;
+        UIManager.Instance.PlayerUI.SetBossBarName("Rhythmia");
+        UIManager.Instance.PlayerUI.ShowBossBar(true);
+        UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
     }
     protected override void OnBeat()
     {
@@ -105,12 +100,8 @@ public class RhythmiaElite : Enemy
     protected override void OnBehaviourUpdate()
     {
 
-    }
-
-    protected override void OnInitialize()
-    {
-
-    }
+    } 
+    
 
     void MoveTowardsPlayer()
     {
@@ -122,24 +113,36 @@ public class RhythmiaElite : Enemy
 
     public void Move()
     {
-        StartCoroutine(MoveCoroutine());
+        StartCoroutine(JumpCoroutine());
     }
 
-    IEnumerator MoveCoroutine()
+    public override bool CanTakeDamage()
+    {
+        return true;
+    }
+
+    IEnumerator MoveToTarget()
     {
         isMoving = true;
 
         float time = 0;
-        Vector3 playerPos = Player.instance.GetClosestPlayer(transform.position);
-        Vector2 dir = (playerPos - transform.position).normalized;
+        Vector2 dir = (targetPos - transform.position).normalized;
         facingRight = dir.x > 0;
-        while (time <= BeatManager.GetBeatDuration() / 3f)
+        animator.Play(moveAnimation);
+        while (time <= BeatManager.GetBeatDuration() / 2)
         {
             while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
-            velocity = dir * speed * 8;
+
+            velocity = Vector2.zero;
+            transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * speed * 6);
+            if (transform.position == targetPos) break;
             time += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
+        animator.Play(idleAnimation);
+        AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
+        PlayerCamera.TriggerCameraShake(0.5f, 0.2f);
+
         velocity = Vector2.zero;
         Sprite.transform.localPosition = Vector3.zero;
 
@@ -147,8 +150,30 @@ public class RhythmiaElite : Enemy
         yield break;
     }
 
-    public override bool CanTakeDamage()
+    protected override IEnumerator JumpCoroutine()
     {
-        return true;
+        isMoving = true;
+
+        float time = 0;
+        targetPos = Player.instance.transform.position;
+        Vector2 dir = (targetPos - transform.position).normalized;
+        facingRight = dir.x > 0;
+        animator.Play(moveAnimation);
+        while (time <= BeatManager.GetBeatDuration() / 2)
+        {
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+
+            velocity = dir * speed * 6;
+            time += Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
+        animator.Play(idleAnimation);
+        AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
+        PlayerCamera.TriggerCameraShake(0.5f, 0.2f);
+        velocity = Vector2.zero;
+        Sprite.transform.localPosition = Vector3.zero;
+
+        isMoving = false;
+        yield break;
     }
 }

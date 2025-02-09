@@ -6,11 +6,11 @@ public class LunarRainAbility : PlayerAbility
     int numEnemies = 50;
     public LunarRainAbility() : base()
     {
-        baseAmmo = 3;
-        baseAttackSpeed = 2f;
-        baseCooldown = 8;
+        baseAmmo = 4;
+        baseAttackSpeed = 1f;
+        baseCooldown = 6;
 
-        baseDamage = 20;
+        baseDamage = 25;
         baseKnockback = 0;
         baseCritChance = 0;
         baseDuration = 0;
@@ -103,7 +103,7 @@ public class LunarRainAbility : PlayerAbility
     {
         List<Enemy> enemies = new List<Enemy>();
         Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
-        foreach (Enemy enemy in Map.Instance.enemiesAlive)
+        foreach (Enemy enemy in Stage.Instance.enemiesAlive)
         {
             if (enemy == null) continue;
             if (enemies.Count >= numEnemies) return enemies;
@@ -122,9 +122,8 @@ public class LunarRainAbility : PlayerAbility
 
         float damage = GetDamage();
         bool isCritical = GetCritChance() > Random.Range(0f, 100f);
-        if (isCritical) damage *= 2.5f;
 
-        e.TakeDamage((int)damage, isCritical);
+        e.TakeDamage(isCritical ? damage * 2.5f : damage, isCritical);
         foreach (PlayerItem item in equippedItems)
         {
             if (item == null) continue;

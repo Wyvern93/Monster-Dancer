@@ -81,11 +81,11 @@ public class CarrotDeliveryTruck : MonoBehaviour, IDespawneable
         carrot.isPiercing = false;
         Player.instance.despawneables.Add(carrot.GetComponent<IDespawneable>());
 
-        Enemy e = Map.GetRandomEnemy();
+        Enemy e = Stage.GetRandomEnemy();
         int attempts = 5;
         while (e == null && attempts > 0)
         {
-            e = Map.GetRandomEnemy();
+            e = Stage.GetRandomEnemy();
             attempts--;
         }
         if (e == null) return;

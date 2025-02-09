@@ -51,7 +51,7 @@ public class SpinDiscItem : PlayerItem
         base.OnEquip(ability, slot);
         ability.itemValues["damageMultiplier"] -= 0.12f;
         ability.itemValues["bonusCooldown"] -= 0.5f;
-        ability.itemValues["bonusAtkSpeed"] -= 0.25f;
+        ability.itemValues["bonusAtkSpeed"] -= 0.5f;
     }
 
     public override void OnUnequip(PlayerAbility ability, int originalSlot)
@@ -59,7 +59,7 @@ public class SpinDiscItem : PlayerItem
         base.OnUnequip(ability, originalSlot);
         ability.itemValues["damageMultiplier"] += 0.12f;
         ability.itemValues["bonusCooldown"] += 0.5f;
-        ability.itemValues["bonusAtkSpeed"] += 0.25f;
+        ability.itemValues["bonusAtkSpeed"] += 0.5f;
     }
 
     public override void OnUpdate()

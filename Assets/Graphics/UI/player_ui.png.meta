@@ -277,6 +277,48 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: player_ui_0
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 277
+        width: 30
+        height: 2
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a891c71fd1c55db47a6a3273f038ea11
+      internalID: 1265083079
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: player_ui_9
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 272
+        width: 32
+        height: 4
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b145322fa1789e24cb6b24c8da2be1aa
+      internalID: 753438004
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -297,6 +339,7 @@ TextureImporter:
       player_ui_6: -722206405
       player_ui_7: 1116075849
       player_ui_8: 872427966
+      player_ui_9: 753438004
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

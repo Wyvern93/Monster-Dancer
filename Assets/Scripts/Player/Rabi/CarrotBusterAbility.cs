@@ -89,7 +89,7 @@ public class CarrotBusterAbility : PlayerAbility
         carrotBuster.abilitySource = this;
         carrotBuster.damage = GetDamage();
         carrotBuster.transform.localScale = Vector3.one * GetSize();
-        PlayerCamera.TriggerCameraShake(0.4f, 0.4f);
+        PlayerCamera.TriggerCameraShake(0.2f, 0.2f);
     }
 
     public override Sprite GetReloadIcon()

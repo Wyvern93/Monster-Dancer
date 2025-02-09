@@ -24,7 +24,7 @@ public class CatEyeMedalionItem : PlayerItem
     {
         string description = $"<color=#FFFF88>Increases ability reach range and reduces cooldown</color>\n\n";
         description += AddStat("Reach", 25f, true, "%");
-        description += AddStat("Cooldown", -15f, false, "%");
+        description += AddStat("Cooldown", -20f, false, "%");
 
         return description;
     }
@@ -48,14 +48,14 @@ public class CatEyeMedalionItem : PlayerItem
     {
         base.OnEquip(ability, slot);
         ability.itemValues["reachMultiplier"] += 0.25f;
-        ability.itemValues["cooldownMultiplier"] -= 0.15f;
+        ability.itemValues["cooldownMultiplier"] -= 0.20f;
     }
 
     public override void OnUnequip(PlayerAbility ability, int originalSlot)
     {
         base.OnUnequip(ability, originalSlot);
         ability.itemValues["reachMultiplier"] -= 0.25f;
-        ability.itemValues["cooldownMultiplier"] += 0.15f;
+        ability.itemValues["cooldownMultiplier"] += 0.20f;
     }
 
     public override void OnUpdate()

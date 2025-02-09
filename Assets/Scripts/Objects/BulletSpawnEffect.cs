@@ -40,6 +40,15 @@ public class BulletSpawnEffect : MonoBehaviour
         {
             isDespawning = true;
         }
+
+        if (source != null)
+        {
+            if (source.gameObject.activeSelf)
+            {
+                transform.position = source.transform.position;
+            }
+        }
+        
         spriteRenderer.color = new Color(1, 1, 1, Mathf.MoveTowards(spriteRenderer.color.a, isDespawning ? 0f : 1f, Time.deltaTime * 2f));
 
         if (spriteRenderer.color.a <= 0 && isDespawning)

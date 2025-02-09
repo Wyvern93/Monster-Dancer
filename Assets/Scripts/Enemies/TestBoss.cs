@@ -20,7 +20,7 @@ public class TestBoss : Boss
     [SerializeField] BoxCollider2D boxCollider;
     public override void OnSpawn()
     {
-        Map.Instance.enemiesAlive.Add(this);
+        Stage.Instance.enemiesAlive.Add(this);
         CurrentHP = MaxHP;
         emissionColor = new Color(1, 1, 1, 0);
         isMoving = false;
@@ -105,7 +105,7 @@ public class TestBoss : Boss
 
         SpriteSize = 1.2f;
         Vector3 originalPos = transform.position;
-        if (Map.isWallAt(targetPos)) targetPos = transform.position;
+        if (Stage.isWallAt(targetPos)) targetPos = transform.position;
         float height = 0;
         float time = 0;
         while (time <= 0.125)

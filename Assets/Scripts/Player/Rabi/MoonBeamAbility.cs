@@ -12,7 +12,7 @@ public class MoonBeamAbility : PlayerAbility
         baseAttackSpeed = 0.5f;
         baseCooldown = 6;
 
-        baseDamage = 40;
+        baseDamage = 60;
         baseCritChance = 0;
         baseDuration = 0.25f;
         baseSize = 1f;

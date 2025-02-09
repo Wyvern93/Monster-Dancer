@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class SpawnEffect : MonoBehaviour
 {
+    public Animator animator;
     void OnEnable()
     {
-        GetComponent<Animator>().speed = 1f / BeatManager.GetBeatDuration();
+        animator.speed = 1f / BeatManager.GetBeatDuration();
     }
     public void AnimationFinish()
     {

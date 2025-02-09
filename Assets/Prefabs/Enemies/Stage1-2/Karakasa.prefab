@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 5577677253062218048}
   - component: {fileID: 8259608911893835709}
   - component: {fileID: 4260402862469885222}
-  - component: {fileID: 4897085983809164997}
   - component: {fileID: 2525831349719216096}
   - component: {fileID: 9154465391233992209}
+  - component: {fileID: -1345727054960532107}
   m_Layer: 8
   m_Name: Karakasa
   m_TagString: Enemy
@@ -110,51 +110,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.4, y: 0.4}
   m_EdgeRadius: 0
---- !u!61 &4897085983809164997
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2411651910580101467}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 256
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 3712
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.15}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 0.4, y: 0.4}
-  m_EdgeRadius: 0
 --- !u!95 &2525831349719216096
 Animator:
   serializedVersion: 5
@@ -188,6 +143,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f1206f7e8da2af4bb4d3aa8ce0abd78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  circleCollider: {fileID: -1345727054960532107}
+  idleAnimation: karakasa_normal
+  moveAnimation: karakasa_move
+  shootAnimation: karakasa_move
   beatContact: 0
   isElite: 0
   Sprite: {fileID: 8389248997151294920}
@@ -196,14 +155,51 @@ MonoBehaviour:
   MaxHP: 80
   CurrentHP: 80
   SpawnIndex: 0
-  AItype: 0
-  experience: 8
-  baseExperience: 0
-  atk: 4
-  speed: 0.7
+  aiType: 0
+  isDead: 0
+  experience: 0
+  atk: 1
+  speed: 0
   eventMove: {x: 0, y: 0, z: 0}
   lifeTime: 0
   slownessStatus: {fileID: 0}
+  enemyType: 35
+  group: {fileID: 0}
+--- !u!58 &-1345727054960532107
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2411651910580101467}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 256
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 3712
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0.38}
+  serializedVersion: 2
+  m_Radius: 0.5
 --- !u!1 &2508446294369624659
 GameObject:
   m_ObjectHideFlags: 0
@@ -278,7 +274,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 88e97188f9ae6b34eb57671700aa2a38, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.5019608}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
