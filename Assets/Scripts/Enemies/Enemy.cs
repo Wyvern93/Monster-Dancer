@@ -58,7 +58,7 @@ public abstract class Enemy : MonoBehaviour
         // Stage 1-1
         {EnemyType.ZombieThief, new EnemyData(EnemyType.ZombieThief, EnemyClass.Runner, EnemyArchetype.AllRounder, new List<StageEventType>() { StageEventType.SpawnSpreadGroup, StageEventType.SpawnCircleHordeGroup, StageEventType.SpawnHordeChaseEvent }) },
         {EnemyType.StayinUndead, new EnemyData(EnemyType.StayinUndead, EnemyClass.Runner, EnemyArchetype.Menacer, new List<StageEventType>() { StageEventType.SpawnSpreadGroup}) },
-        {EnemyType.ZombieBride, new EnemyData(EnemyType.ZombieBride,EnemyClass.Bomber, EnemyArchetype.Rusher, new List<StageEventType>() { StageEventType.SpawnSpreadGroup, StageEventType.SpawnHordeChaseEvent}) },
+        {EnemyType.ZombieBride, new EnemyData(EnemyType.ZombieBride,EnemyClass.Shooter, EnemyArchetype.Rusher, new List<StageEventType>() { StageEventType.SpawnSpreadGroup, StageEventType.SpawnHordeChaseEvent}) },
         {EnemyType.StayinUndeadElite, new EnemyData(EnemyType.StayinUndeadElite, EnemyClass.Elite, EnemyArchetype.Elite, new List<StageEventType>() { StageEventType.SpawnElite}) },
         {EnemyType.Skeleko, new EnemyData(EnemyType.Skeleko, EnemyClass.Runner, EnemyArchetype.AllRounder, new List<StageEventType>() { StageEventType.SpawnSpreadGroup, StageEventType.SpawnCircleHordeGroup}) },
         {EnemyType.ClawRiff, new EnemyData(EnemyType.ClawRiff, EnemyClass.Runner, EnemyArchetype.Swarm, new List<StageEventType>() { StageEventType.SpawnSpreadGroup, StageEventType.SpawnHordeChaseEvent}) },

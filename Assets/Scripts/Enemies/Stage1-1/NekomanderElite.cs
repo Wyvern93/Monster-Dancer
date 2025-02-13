@@ -47,7 +47,7 @@ public class NekomanderElite : Enemy
         animator.Play("nekomander_preattack");
 
         float angleDiff = 360f / 5f;
-        float dist = 1.3f;
+        float dist = 1.5f;
         List<SmallMagicCircle> list = new List<SmallMagicCircle>();
         for (int i = 0; i < 5; i++)
         {
