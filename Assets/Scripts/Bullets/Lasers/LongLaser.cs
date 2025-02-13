@@ -54,7 +54,7 @@ public class LongLaser : MonoBehaviour
         bc.enabled = false;
         if (!BeatManager.isPlaying) return;
         if (GameManager.isPaused) return;
-        if (!BeatManager.isGameBeat) return;
+        if (!BeatManager.isBeat) return;
 
         if (collision.CompareTag("Player") && collision.name == "Player")
         {

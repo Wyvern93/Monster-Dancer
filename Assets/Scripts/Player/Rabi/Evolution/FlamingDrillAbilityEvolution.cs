@@ -46,9 +46,9 @@ public class FlamingDrillAbilityEvolution : PlayerAbility, IPlayerProjectile
 
         while (time > 0)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused) yield return null;
             time -= Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
@@ -75,7 +75,7 @@ public class FlamingDrillAbilityEvolution : PlayerAbility, IPlayerProjectile
 
     public override void OnUpdate()
     {
-        if (BeatManager.isGameBeat && currentCooldown > 0) currentCooldown--;
+        if (BeatManager.isBeat && currentCooldown > 0) currentCooldown--;
     }
 
     public override bool isEvolved()

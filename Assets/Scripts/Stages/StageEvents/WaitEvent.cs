@@ -23,7 +23,7 @@ public class WaitEvent : StageEvent
         {
             if (BeatManager.isBeat) beatsPast++;
             if (beatsPast >= beats) break;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         yield break;
     }

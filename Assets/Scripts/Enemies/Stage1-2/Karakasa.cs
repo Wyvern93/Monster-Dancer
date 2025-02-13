@@ -18,10 +18,10 @@ public class Karakasa : Enemy
         facingRight = dir.x > 0;
         while (time <= BeatManager.GetBeatDuration() / 2f)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
             velocity = dir * speed * 6;
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         velocity = Vector2.zero;
         Sprite.transform.localPosition = Vector3.zero;

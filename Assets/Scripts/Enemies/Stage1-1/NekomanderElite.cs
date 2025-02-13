@@ -47,7 +47,7 @@ public class NekomanderElite : Enemy
         animator.Play("nekomander_preattack");
 
         float angleDiff = 360f / 5f;
-        float dist = 1.3f;
+        float dist = 1.5f;
         List<SmallMagicCircle> list = new List<SmallMagicCircle>();
         for (int i = 0; i < 5; i++)
         {
@@ -61,9 +61,9 @@ public class NekomanderElite : Enemy
         float time = 0;
         while (time <= BeatManager.GetBeatDuration() * 2)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame(); // isStunned!
+            while (GameManager.isPaused) yield return null; // isStunned!
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         facingRight = transform.position.x < Player.instance.transform.position.x;
         EnemyGroup enemyGroup = PoolManager.Get<EnemyGroup>();
@@ -90,9 +90,9 @@ public class NekomanderElite : Enemy
         time = 0;
         while (time <= BeatManager.GetBeatDuration())
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame(); // isStunned!
+            while (GameManager.isPaused) yield return null; // isStunned!
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         animator.Play("nekomander_normal");
         yield break;
@@ -118,10 +118,10 @@ public class NekomanderElite : Enemy
         velocity = Vector3.zero;
         while (time <= BeatManager.GetBeatDuration() * 2)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
             transform.position = Vector3.MoveTowards(transform.position, targetPos, speed * 6 * Time.deltaTime);
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
         PlayerCamera.TriggerCameraShake(1f, 0.3f);
@@ -135,9 +135,9 @@ public class NekomanderElite : Enemy
         time = 0;
         while (time <= BeatManager.GetBeatDuration() * 2f)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame(); // isStunned!
+            while (GameManager.isPaused) yield return null; // isStunned!
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         beatCD = -1;
@@ -286,13 +286,13 @@ public class NekomanderElite : Enemy
         animator.Play(moveAnimation);
         while (time <= BeatManager.GetBeatDuration() / 2)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
             velocity = Vector2.zero;
             transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * speed * 6);
             if (transform.position == targetPos) break;
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         animator.Play(idleAnimation);
         AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
@@ -317,12 +317,12 @@ public class NekomanderElite : Enemy
         velocity = Vector3.zero;
         while (time <= BeatManager.GetBeatDuration() / 2)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
             transform.position = Vector3.MoveTowards(transform.position, targetPos, speed * 6 * Time.deltaTime);
             //velocity = dir * speed * 6;
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         animator.Play(idleAnimation);
         AudioController.PlaySound(AudioController.instance.sounds.bossWalk);

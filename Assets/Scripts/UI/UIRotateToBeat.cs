@@ -33,7 +33,7 @@ public class UIRotateToBeat : MonoBehaviour
             if (angle > 360) angle -= 360;
 
             time += Time.unscaledDeltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         yield break;
     }

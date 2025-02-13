@@ -74,11 +74,11 @@ public class StayinUndeadElite : Enemy
         float time = 0;
         while (time <= BeatManager.GetBeatDuration())
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame(); // isStunned!
+            while (GameManager.isPaused) yield return null; // isStunned!
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
-        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
         while (!BeatManager.isBeat) yield return new WaitForSeconds(BeatManager.GetBeatDuration());
         ShootCircle(0);
         ShootCircle(-1f);
@@ -88,17 +88,17 @@ public class StayinUndeadElite : Enemy
         time = 0;
         while (time <= BeatManager.GetBeatDuration())
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame(); // isStunned!
+            while (GameManager.isPaused) yield return null; // isStunned!
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         AudioController.PlaySound(AudioController.instance.sounds.chargeBulletSound);
         time = 0;
         while (time <= BeatManager.GetBeatDuration())
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame(); // isStunned!
+            while (GameManager.isPaused) yield return null; // isStunned!
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         ShootCircle(0);
@@ -107,9 +107,9 @@ public class StayinUndeadElite : Enemy
 
         while (beatCD <= 4)
         {
-            while (!BeatManager.isBeat) yield return new WaitForEndOfFrame();
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
-            yield return new WaitForEndOfFrame();
+            while (!BeatManager.isBeat) yield return null;
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
+            yield return null;
         }
         bulletSpawnEffect.Despawn();
         animator.Play("stayinundead_normal");
@@ -156,7 +156,7 @@ public class StayinUndeadElite : Enemy
         while ((Vector2)transform.position != (Vector2)targetPos)
         {
             if (BeatManager.isBeat && CanMove()) StartCoroutine(MoveToTarget());
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         // Charge it
         AudioController.PlaySound(AudioController.instance.sounds.chargeBulletSound);
@@ -167,9 +167,9 @@ public class StayinUndeadElite : Enemy
         float time = 0;
         while (time <= BeatManager.GetBeatDuration() * 2f)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame(); // isStunned!
+            while (GameManager.isPaused) yield return null; // isStunned!
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         // Shoot it
@@ -179,9 +179,9 @@ public class StayinUndeadElite : Enemy
         time = 0;
         while (time <= BeatManager.GetBeatDuration())
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame(); // isStunned!
+            while (GameManager.isPaused) yield return null; // isStunned!
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         // Dance left
@@ -190,9 +190,9 @@ public class StayinUndeadElite : Enemy
         time = 0;
         while (time <= BeatManager.GetBeatDuration())
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame(); // isStunned!
+            while (GameManager.isPaused) yield return null; // isStunned!
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         // Dance right
@@ -201,9 +201,9 @@ public class StayinUndeadElite : Enemy
         time = 0;
         while (time <= BeatManager.GetBeatDuration())
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame(); // isStunned!
+            while (GameManager.isPaused) yield return null; // isStunned!
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         // Dance left
         targetPos = transform.position - Vector3.left * 2f;
@@ -211,9 +211,9 @@ public class StayinUndeadElite : Enemy
         time = 0;
         while (time <= BeatManager.GetBeatDuration())
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame(); // isStunned!
+            while (GameManager.isPaused) yield return null; // isStunned!
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         // Dance right
@@ -222,9 +222,9 @@ public class StayinUndeadElite : Enemy
         time = 0;
         while (time <= BeatManager.GetBeatDuration())
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame(); // isStunned!
+            while (GameManager.isPaused) yield return null; // isStunned!
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         // Finish
@@ -257,13 +257,13 @@ public class StayinUndeadElite : Enemy
         animator.Play(moveAnimation);
         while (time <= BeatManager.GetBeatDuration() / 2)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
             velocity = Vector2.zero;
             transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * speed * 6);
             if (transform.position == targetPos) break;
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         animator.Play(idleAnimation);
 
@@ -398,13 +398,13 @@ public class StayinUndeadElite : Enemy
 
         while (time <= BeatManager.GetBeatDuration() / 1.5f)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
             float beatProgress = time / beatDuration;
             beatTime = Mathf.SmoothStep(1, 0f, beatProgress);
             velocity = dir * speed * spd * beatTime;
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
         PlayerCamera.TriggerCameraShake(0.5f, 0.2f);

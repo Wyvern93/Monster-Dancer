@@ -53,7 +53,7 @@ public class UsarinCarrotBullet : Bullet
             time += Time.deltaTime;
             spriteRenderer.transform.localEulerAngles = new Vector3(0, 0, Mathf.MoveTowardsAngle(spriteRenderer.transform.localEulerAngles.z, angle, Time.deltaTime * 320f));
 
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         if (speedChange <= 0)
         {

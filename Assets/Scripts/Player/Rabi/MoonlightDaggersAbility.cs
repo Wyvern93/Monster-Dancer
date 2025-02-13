@@ -97,9 +97,9 @@ public class MoonlightDaggersAbility : PlayerAbility, IPlayerProjectile
 
         while (time > 0)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused) yield return null;
             time -= Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         ShootWave();
         yield break;

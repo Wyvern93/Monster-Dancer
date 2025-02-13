@@ -11,7 +11,7 @@ public class WiggleViper : Enemy
         bulletSpawnEffect.transform.position = transform.position;
         bulletSpawnEffect.source = this;
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
-        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
         Vector2 dir = Player.instance.GetClosestPlayer(transform.position) - transform.position;
         dir.Normalize();

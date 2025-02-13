@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,8 +11,12 @@ public class BeatManager : MonoBehaviour
     [SerializeField] private float offset, tempo;
     public static float audio_offset;
 
-    public float secondsPerBeat, nextBeat, lastBeat;
-    public float currentTime;
+    // secondsPerBeat remains the same
+    public float secondsPerBeat;
+
+    // These variables now represent times relative to “music time”
+    public float nextBeat, lastBeat;
+    public float currentTime;  // currentTime = (AudioSettings.dspTime - dspStartTime) + audio_offset
 
     public float nextMidBeat, lastMidBeat;
     public float nextQuarterBeat, lastQuarterBeat;
@@ -26,7 +30,6 @@ public class BeatManager : MonoBehaviour
     public static bool isBeat;
     public static int beats;
 
-    
     [Header("UI")]
     [SerializeField] public Animator beatPulseAnimator;
     SpriteRenderer beatPulseSprite;
@@ -39,9 +42,8 @@ public class BeatManager : MonoBehaviour
     [SerializeField] Sprite successSprite;
     [SerializeField] Sprite perfectSprite;
 
-    public static bool isGameBeat; // If this is active, all monsters, attacks and entities not controlled by player input trigger
     public static bool menuGameBeat;
-    private BeatTrigger lastFrameState, currentFrameState; // These are used to check when we enter the first frame of input and first frame after input
+    private BeatTrigger lastFrameState, currentFrameState; // For checking beat timing of player input
     private bool canCastGameBeat;
     public static float lastBeatTime;
 
@@ -52,11 +54,16 @@ public class BeatManager : MonoBehaviour
     public static bool compassless;
     private float targetBeatPulseAlpha;
 
+    // NEW: Store the dsp time at which the music starts playing.
+    private double dspStartTime;
+
     public static void UpdatePulseAnimator()
     {
-        //instance.beatPulseAnimator.gameObject.SetActive(!compassless);
+        // instance.beatPulseAnimator.gameObject.SetActive(!compassless);
     }
 
+    // SetTrack is called before starting the music.
+    // We set our tempo, offsets, and also (for now) schedule the first beats relative to “music time.”
     public static void SetTrack(MapTrack track)
     {
         instance.music.Stop();
@@ -67,22 +74,25 @@ public class BeatManager : MonoBehaviour
         instance.secondsPerBeat = 60f / track.tempo;
         instance.music.clip = track.music;
         instance.offset = track.offset;
-        instance.nextBeat = track.offset + audio_offset;
-        instance.nextMidBeat = track.offset + audio_offset;
-        instance.nextQuarterBeat = track.offset + audio_offset;
+        // In your original code you add audio_offset in both currentTime and nextBeat.
+        // Here we define “music time” as:
+        //    currentTime = (AudioSettings.dspTime - dspStartTime) + audio_offset
+        // and we set nextBeat relative to that music time.
+        instance.nextBeat = instance.offset + audio_offset;
+        instance.nextMidBeat = instance.offset + audio_offset;
+        instance.nextQuarterBeat = instance.offset + audio_offset;
         instance.lastBeat = 0;
         instance.lastMidBeat = 0;
         instance.lastQuarterBeat = 0;
         instance.loopStartOffset = track.loopStart;
         instance.loopTriggerOffset = track.loopEnd;
-        instance.currentTime = instance.music.time + audio_offset;
+        instance.currentTime = 0;
     }
 
     public static void Stop()
     {
         isPlaying = false;
         instance.beatPulseSprite.color = Color.clear;
-        instance.music.time = 0;
         instance.music.Stop();
         beats = 0;
         instance.quarterBeats = 0;
@@ -90,14 +100,21 @@ public class BeatManager : MonoBehaviour
         instance.targetBeatPulseAlpha = 0;
     }
 
+    // Instead of a simple Play(), we now schedule the music to start at a known DSP time.
+    // That start time becomes our “zero” (or reference) for all beat calculations.
     public static void StartTrack()
     {
         instance.beatPulseSprite.color = Color.white;
         instance.music.volume = 1f;
-        instance.music.Play();
-        instance.targetBeatPulseAlpha = 1;
 
+        // Give the system a tiny delay so we can schedule the start.
+        double startDelay = 0.1;
+        instance.dspStartTime = AudioSettings.dspTime + startDelay;
+        instance.music.PlayScheduled(instance.dspStartTime);
+
+        instance.targetBeatPulseAlpha = 1;
         isPlaying = true;
+        // (nextBeat, etc., were set already in SetTrack.)
     }
 
     public static void FadeOut(float speed)
@@ -115,7 +132,7 @@ public class BeatManager : MonoBehaviour
         while (music.volume > 0)
         {
             music.volume = Mathf.MoveTowards(music.volume, 0f, speed * Time.deltaTime);
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         yield break;
     }
@@ -125,7 +142,7 @@ public class BeatManager : MonoBehaviour
         while (music.volume < 1)
         {
             music.volume = Mathf.MoveTowards(music.volume, 1f, speed * Time.deltaTime);
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         yield break;
     }
@@ -156,11 +173,18 @@ public class BeatManager : MonoBehaviour
         return;
     }
 
+    public static double GetNextBeatDSPTime()
+    {
+        // Convert the nextBeat (which is in "music time") to DSP time.
+        // Using: musicTime = (AudioSettings.dspTime - dspStartTime) + audio_offset,
+        // we have dspTime = dspStartTime + (musicTime - audio_offset)
+        return instance.dspStartTime + (instance.nextBeat - audio_offset);
+    }
+
     public static bool closestIsNextBeat()
     {
         float difftolast = Mathf.Abs(instance.currentTime - instance.lastBeat);
         float difftonext = Mathf.Abs(instance.nextBeat - instance.currentTime);
-
         return difftonext < difftolast;
     }
     public static float GetTempo()
@@ -168,9 +192,19 @@ public class BeatManager : MonoBehaviour
         return instance.tempo;
     }
 
-    // Update is called once per frame
+    // Update is now driven by DSP time.
+    // We compute “music time” as the elapsed dsp time since music start plus audio_offset.
     void Update()
     {
+        if (isPlaying)
+        {
+            currentTime = (float)(AudioSettings.dspTime - dspStartTime) + audio_offset;
+        }
+        else
+        {
+            currentTime = 0;
+        }
+
         beatPulseSprite.color = new Color(1, 1, 1, Mathf.MoveTowards(beatPulseSprite.color.a, targetBeatPulseAlpha, Time.deltaTime * 4f));
         if (!isBeat)
         {
@@ -179,22 +213,24 @@ public class BeatManager : MonoBehaviour
         if (isBeat) isBeat = false;
         if (isQuarterBeat) isQuarterBeat = false;
         if (isMidBeat) isMidBeat = false;
-        
+
         if (currentTime < 1 && beats > 20)
         {
             beats = 1;
             lastBeat = 0;
-            nextBeat = offset + audio_offset + (secondsPerBeat * beats);
+            nextBeat = offset + audio_offset;
         }
-        currentTime = music.time + audio_offset;
-        
-        if (music.time >= loopTriggerOffset)
+
+        // Looping now checks against our DSP-based currentTime.
+        if (currentTime >= loopTriggerOffset)
         {
             JumpToLoop();
         }
 
         CheckForGameBeat();
-        if (music.time >= nextBeat)
+
+        // Trigger the beat when our calculated “music time” passes nextBeat.
+        if (currentTime >= nextBeat)
         {
             beats++;
             lastBeat = nextBeat;
@@ -202,7 +238,7 @@ public class BeatManager : MonoBehaviour
             OnBeat();
         }
 
-        if (music.time >= nextMidBeat)
+        if (currentTime >= nextMidBeat)
         {
             midbeats++;
             lastMidBeat = nextMidBeat;
@@ -210,7 +246,7 @@ public class BeatManager : MonoBehaviour
             isMidBeat = true;
         }
 
-        if (music.time >= nextQuarterBeat)
+        if (currentTime >= nextQuarterBeat)
         {
             quarterBeats++;
             lastQuarterBeat = nextQuarterBeat;
@@ -219,9 +255,9 @@ public class BeatManager : MonoBehaviour
         }
 
         UpdateUI();
-        //if (!compassless) CheckForGameBeat();
     }
 
+    // Recalculate beat times from a given “music time” (this is unchanged aside from the fact that “time” here is DSP‐based music time).
     private void CalculateNextBeat(float time)
     {
         beats = (int)((time - offset - audio_offset) / secondsPerBeat);
@@ -240,17 +276,20 @@ public class BeatManager : MonoBehaviour
     private void CheckForGameBeat()
     {
         currentFrameState = GetBeatSuccess();
-        isGameBeat = false;
+        isBeat = false;
         menuGameBeat = false;
-       
+
         canCastGameBeat = true;
         lastFrameState = currentFrameState;
     }
 
+    // When looping, we adjust dspStartTime so that our “music time” resets to loopStartOffset.
     private void JumpToLoop()
     {
-        music.time = loopStartOffset;
-        currentTime = music.time + audio_offset;
+        // We want: currentTime = (AudioSettings.dspTime - dspStartTime) + audio_offset == loopStartOffset.
+        // Solve for dspStartTime:
+        dspStartTime = AudioSettings.dspTime + audio_offset - loopStartOffset;
+        currentTime = (float)(AudioSettings.dspTime - dspStartTime) + audio_offset;
         CalculateNextBeat(loopStartOffset);
     }
 
@@ -259,15 +298,12 @@ public class BeatManager : MonoBehaviour
         instance.playerRing.transform.position = position;
     }
 
+    // When the beat occurs, trigger your UI and play the test sound.
+    // (You could also use PlayScheduled here if you’d like to schedule the sound ahead—but that would mean knowing the DSP time
+    // a frame in advance. In this example, we assume OnBeat is called as close as possible to the desired moment.)
     private void OnBeat()
     {
         beatPulseAnimator.SetTrigger("OnBeat");
-        //beatPulseAnimator.speed = 1 / secondsPerBeat;
-        if (compassless)
-        {
-            
-        }
-        isGameBeat = true;
         menuGameBeat = true;
         isBeat = true;
         beatTest.Play();
@@ -300,12 +336,9 @@ public class BeatManager : MonoBehaviour
 
     public static bool isBeatAfter()
     {
-        
-        instance.currentTime = instance.music.time + audio_offset;
-
+        instance.currentTime = (float)(AudioSettings.dspTime - instance.dspStartTime) + audio_offset;
         float difftolast = Mathf.Abs(instance.currentTime - instance.lastBeat);
         float difftonext = Mathf.Abs(instance.nextBeat - instance.currentTime);
-
         return difftolast < difftonext;
     }
 
@@ -315,11 +348,11 @@ public class BeatManager : MonoBehaviour
         float successRange = instance.secondsPerBeat / 3f;
         float perfectRange = instance.secondsPerBeat / 12f;
 
-        instance.currentTime = instance.music.time + audio_offset;
+        instance.currentTime = (float)(AudioSettings.dspTime - instance.dspStartTime) + audio_offset;
 
         float difftolast = Mathf.Abs(instance.currentTime - instance.lastBeat);
         float difftonext = Mathf.Abs(instance.nextBeat - instance.currentTime);
-        
+
         float diff = difftolast < difftonext ? difftolast : difftonext;
 
         if (diff <= perfectRange) return BeatTrigger.PERFECT;
@@ -335,6 +368,6 @@ public class BeatManager : MonoBehaviour
         else instance.beatScore.sprite = instance.perfectSprite;
 
         instance.beatScoreAlpha = 2.0f;
-        instance.beatScore.transform.localPosition = new Vector3(0,0.5f, 0f);
+        instance.beatScore.transform.localPosition = new Vector3(0, 0.5f, 0f);
     }
 }

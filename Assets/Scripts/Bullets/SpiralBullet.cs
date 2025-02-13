@@ -54,7 +54,7 @@ public class SpiralBullet : Bullet
             Debug.Log(speed);
             
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         yield break;
@@ -73,7 +73,7 @@ public class SpiralBullet : Bullet
             transform.position += ((Vector3)direction * speed * Time.deltaTime);
             //transform.position = Vector3.Lerp(transform.position, (Vector3)targetPos, time / 1.5f);
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         yield break;

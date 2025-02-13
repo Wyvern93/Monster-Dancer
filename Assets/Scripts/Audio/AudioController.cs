@@ -36,6 +36,8 @@ public class AudioController : MonoBehaviour
     private float sfxVolume = 1f;
     private float mainVolume = 1f;
 
+    [SerializeField] GameObject audioObjectPrefab;
+
     public AudioClip gameOverFanfare;
     private static Dictionary<string, float> sfxCooldowns;
     public float sfxCooldown = 0.01f;
@@ -47,6 +49,7 @@ public class AudioController : MonoBehaviour
         clipsOnBeatQueue = new List<BeatSound>();
         audioMixer.updateMode = AudioMixerUpdateMode.UnscaledTime;
         sfxCooldowns = new Dictionary<string, float>();
+        PoolManager.CreatePool(typeof(AudioObject), audioObjectPrefab, 100);
     }
     void Start()
     {
@@ -92,7 +95,7 @@ public class AudioController : MonoBehaviour
     public static void PlaySound(AudioClip sound, float pitch = 1f, bool side = false)
     {
         if (instance.clipsPlaying.Contains(sound)) return;
-        // Cooldown
+
         bool play = true;
         if (sfxCooldowns.ContainsKey(sound.name))
         {
@@ -109,7 +112,6 @@ public class AudioController : MonoBehaviour
         sfxCooldowns[sound.name] = instance.sfxCooldown;
         instance.clipsPlaying.Add(sound);
 
-        //if (sound.name == instance.sounds.enemyHurtSound.name || sound.name == "rabi_attack") return;
         if (pitch == 1 && !side)
         {
             instance.sfx.pitch = pitch;
@@ -117,20 +119,18 @@ public class AudioController : MonoBehaviour
         }
         else
         {
-            GameObject sfxObj = new GameObject(sound.name);
-            AudioSource currentSfx = sfxObj.AddComponent<AudioSource>();
-            currentSfx.pitch = pitch;
+            AudioObject sfxObj = PoolManager.Get<AudioObject>();
+            sfxObj.source.pitch = pitch;
             if (side)
             {
-                currentSfx.outputAudioMixerGroup = instance.sfxSideMixerGroup;
+                sfxObj.source.outputAudioMixerGroup = instance.sfxSideMixerGroup;
             }
             else
             {
-                currentSfx.outputAudioMixerGroup = instance.sfxMixerGroup;
+                sfxObj.source.outputAudioMixerGroup = instance.sfxMixerGroup;
             }
-            
-            currentSfx.PlayOneShot(sound);
-            Destroy(sfxObj, 3f);
+
+            sfxObj.source.PlayOneShot(sound);
         }
     }
 
@@ -139,7 +139,6 @@ public class AudioController : MonoBehaviour
         if (instance.clipsPlaying.Contains(sound)) return;
         instance.clipsPlaying.Add(sound);
         
-        //if (sound.name == instance.sounds.enemyHurtSound.name || sound.name == "rabi_attack") return;
         if (pitch == 1 && !side)
         {
             instance.sfx.pitch = pitch;
@@ -147,19 +146,18 @@ public class AudioController : MonoBehaviour
         }
         else
         {
-            GameObject sfxObj = new GameObject(sound.name);
-            AudioSource currentSfx = sfxObj.AddComponent<AudioSource>();
-            currentSfx.pitch = pitch;
+            AudioObject sfxObj = PoolManager.Get<AudioObject>();
+            sfxObj.source.pitch = pitch;
             if (side)
             {
-                currentSfx.outputAudioMixerGroup = instance.sfxSideMixerGroup;
+                sfxObj.source.outputAudioMixerGroup = instance.sfxSideMixerGroup;
             }
             else
             {
-                currentSfx.outputAudioMixerGroup = instance.sfxMixerGroup;
+                sfxObj.source.outputAudioMixerGroup = instance.sfxMixerGroup;
             }
-            currentSfx.PlayOneShot(sound);
-            Destroy(sfxObj, 3f);
+
+            sfxObj.source.PlayOneShot(sound);
         }
     }
 
@@ -174,19 +172,18 @@ public class AudioController : MonoBehaviour
             }
             else
             {
-                GameObject sfxObj = new GameObject(sound.clip.name);
-                AudioSource currentSfx = sfxObj.AddComponent<AudioSource>();
-                currentSfx.pitch = sound.pitch;
+                AudioObject sfxObj = PoolManager.Get<AudioObject>();
+                sfxObj.source.pitch = sound.pitch;
                 if (sound.side)
                 {
-                    currentSfx.outputAudioMixerGroup = instance.sfxSideMixerGroup;
+                    sfxObj.source.outputAudioMixerGroup = instance.sfxSideMixerGroup;
                 }
                 else
                 {
-                    currentSfx.outputAudioMixerGroup = instance.sfxMixerGroup;
+                    sfxObj.source.outputAudioMixerGroup = instance.sfxMixerGroup;
                 }
-                currentSfx.PlayOneShot(sound.clip);
-                Destroy(sfxObj, 3f);
+
+                sfxObj.source.PlayOneShot(sound.clip);
             }
         }
         clipsOnBeatQueue.Clear();
@@ -216,7 +213,7 @@ public class AudioController : MonoBehaviour
         while (music.volume > 0f)
         {
             music.volume = Mathf.MoveTowards(music.volume, 0f, Time.deltaTime * 2f);
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         music.Stop();
     }

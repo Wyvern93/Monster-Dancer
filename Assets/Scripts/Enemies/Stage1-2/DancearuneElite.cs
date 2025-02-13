@@ -38,7 +38,7 @@ public class DancearuneElite : Enemy
         bulletSpawnEffect.transform.position = transform.position;
         bulletSpawnEffect.finalScale = 1f;
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
-        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
         if (diagonal)
         {
@@ -125,13 +125,13 @@ public class DancearuneElite : Enemy
         animator.Play(moveAnimation);
         while (time <= BeatManager.GetBeatDuration() / 2)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
             velocity = Vector2.zero;
             transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * speed * 6);
             if (transform.position == targetPos) break;
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         animator.Play(idleAnimation);
         AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
@@ -155,11 +155,11 @@ public class DancearuneElite : Enemy
         animator.Play(moveAnimation);
         while (time <= BeatManager.GetBeatDuration() / 2)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
             velocity = dir * speed * 6;
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         animator.Play(idleAnimation);
         AudioController.PlaySound(AudioController.instance.sounds.bossWalk);

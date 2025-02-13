@@ -58,7 +58,7 @@ public abstract class Enemy : MonoBehaviour
         // Stage 1-1
         {EnemyType.ZombieThief, new EnemyData(EnemyType.ZombieThief, EnemyClass.Runner, EnemyArchetype.AllRounder, new List<StageEventType>() { StageEventType.SpawnSpreadGroup, StageEventType.SpawnCircleHordeGroup, StageEventType.SpawnHordeChaseEvent }) },
         {EnemyType.StayinUndead, new EnemyData(EnemyType.StayinUndead, EnemyClass.Runner, EnemyArchetype.Menacer, new List<StageEventType>() { StageEventType.SpawnSpreadGroup}) },
-        {EnemyType.ZombieBride, new EnemyData(EnemyType.ZombieBride,EnemyClass.Bomber, EnemyArchetype.Rusher, new List<StageEventType>() { StageEventType.SpawnSpreadGroup, StageEventType.SpawnHordeChaseEvent}) },
+        {EnemyType.ZombieBride, new EnemyData(EnemyType.ZombieBride,EnemyClass.Shooter, EnemyArchetype.Rusher, new List<StageEventType>() { StageEventType.SpawnSpreadGroup, StageEventType.SpawnHordeChaseEvent}) },
         {EnemyType.StayinUndeadElite, new EnemyData(EnemyType.StayinUndeadElite, EnemyClass.Elite, EnemyArchetype.Elite, new List<StageEventType>() { StageEventType.SpawnElite}) },
         {EnemyType.Skeleko, new EnemyData(EnemyType.Skeleko, EnemyClass.Runner, EnemyArchetype.AllRounder, new List<StageEventType>() { StageEventType.SpawnSpreadGroup, StageEventType.SpawnCircleHordeGroup}) },
         {EnemyType.ClawRiff, new EnemyData(EnemyType.ClawRiff, EnemyClass.Runner, EnemyArchetype.Swarm, new List<StageEventType>() { StageEventType.SpawnSpreadGroup, StageEventType.SpawnHordeChaseEvent}) },
@@ -316,7 +316,7 @@ public abstract class Enemy : MonoBehaviour
         if (!stunStatus.isStunned())
         {
             OnBehaviourUpdate();
-            if (BeatManager.isGameBeat)
+            if (BeatManager.isBeat)
             {
                 OnBeat();
             }
@@ -331,12 +331,12 @@ public abstract class Enemy : MonoBehaviour
             }
         }
         
-        if (BeatManager.isGameBeat && stunStatus.duration > 0)
+        if (BeatManager.isBeat && stunStatus.duration > 0)
         {
             if (stunStatus.duration == 1) OnStunEnd();
             stunStatus.duration--;
         }
-        if (BeatManager.isGameBeat && slownessStatus.duration > 0)
+        if (BeatManager.isBeat && slownessStatus.duration > 0)
         {
             slownessStatus.duration--;
         }
@@ -418,14 +418,19 @@ public abstract class Enemy : MonoBehaviour
 
     protected Vector2 WithStageVelocity(Vector2 velocity)
     {
+        float speedMargin = 0.1f;
         // Sum the velocities
         Vector2 StageVelocity = PlayerCamera.instance.camVelocity;
+        float minimumSpeed = PlayerCamera.instance.camVelocity.magnitude + speedMargin;
+        float targetSpeed = Mathf.Max(speed, minimumSpeed);
+        return velocity.normalized * targetSpeed;
+        /*
         Vector2 differenceVector = StageVelocity.normalized - velocity.normalized;
         float difference = differenceVector.magnitude * 2; // So it can go against the velocity too
         float velocityAdded = Mathf.Clamp(1 - difference, -1, 1) * StageVelocity.magnitude;
         float velocityMagnitude = velocity.magnitude;
         velocity = velocity.normalized * (velocityMagnitude + velocityAdded);
-        return velocity;
+        return velocity;*/
     }
 
    protected virtual IEnumerator JumpCoroutine()
@@ -452,7 +457,7 @@ public abstract class Enemy : MonoBehaviour
 
         while (time <= BeatManager.GetBeatDuration() * 0.5f)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
             float beatProgress = time / beatDuration;
             beatTime = Mathf.SmoothStep(1, 0f, beatProgress);
@@ -474,7 +479,7 @@ public abstract class Enemy : MonoBehaviour
                 velocity = dir * speed * spd * beatTime * 1.3f;
             }
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         if (isElite)
         {
@@ -762,7 +767,7 @@ public abstract class Enemy : MonoBehaviour
     public void OnTriggerStay2D(Collider2D collision)
     {
         if (!BeatManager.isPlaying) return;
-        if (!BeatManager.isGameBeat) return;
+        if (!BeatManager.isBeat) return;
         if (isDead) return;
         if (stunStatus.isStunned()) return;
 

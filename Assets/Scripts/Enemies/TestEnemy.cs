@@ -104,7 +104,7 @@ public class TestEnemy : Enemy
         {
             velocity = dir * speed * 8;
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         velocity = Vector2.zero;
         Sprite.transform.localPosition = Vector3.zero;
@@ -121,14 +121,14 @@ public class TestEnemy : Enemy
     private IEnumerator SpawnBullet(Vector2 direction)
     {
         // First beat warning
-        while (!BeatManager.isGameBeat) yield return new WaitForEndOfFrame();
+        while (!BeatManager.isBeat) yield return null;
         BulletSpawnEffect spawnEffect = PoolManager.Get<BulletSpawnEffect>();
         spawnEffect.source = this;
         spawnEffect.transform.position = new Vector3(transform.position.x + direction.x, transform.position.y + direction.y);
-        yield return new WaitForEndOfFrame();
+        yield return null;
 
         // Second beat finish
-        while (spawnEffect.gameObject.activeSelf) yield return new WaitForEndOfFrame();
+        while (spawnEffect.gameObject.activeSelf) yield return null;
 
         // Spawn
         Bullet bullet = PoolManager.Get<Bullet>();

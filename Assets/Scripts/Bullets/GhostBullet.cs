@@ -49,7 +49,7 @@ public class GhostBullet : Bullet
             transform.position += (Vector3)waveDir.normalized * speed * Time.deltaTime;
             //transform.position = Vector3.Lerp(transform.position, (Vector3)targetPos, time / 1.5f);
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         yield break;

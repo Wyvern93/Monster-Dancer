@@ -40,14 +40,14 @@ public class CarrotJuiceBottle : MonoBehaviour, IDespawneable
         Vector3 origin = transform.position;
         while (Vector2.Distance(transform.position, end) > 0.01f)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused) yield return null;
 
             bottleSpr.transform.localPosition = new Vector3(0, height, height * 2);
             bottleSpr.transform.localEulerAngles = new Vector3(0, 0, bottleSpr.transform.localEulerAngles.z + Time.deltaTime * 1200f);
             height = CalculateHeight(transform.position);
             transform.position = Vector3.MoveTowards(transform.position, end, Time.deltaTime * 8f);
 
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         CarrotJuice carrotJuice = PoolManager.Get<CarrotJuice>();

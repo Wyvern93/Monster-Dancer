@@ -34,7 +34,7 @@ public class BulletSpawnEffect : MonoBehaviour
     {
         transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one * finalScale, Time.deltaTime * 2);
         transform.eulerAngles = new Vector3(45f, 0f, transform.eulerAngles.z + (30 * Time.deltaTime));
-        if (BeatManager.isGameBeat) beats++;
+        if (BeatManager.isBeat) beats++;
 
         if (!source.gameObject.activeSelf && !isDespawning)
         {

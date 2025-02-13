@@ -139,10 +139,10 @@ public class Stage1a : Stage
         yield return new WaitForSeconds(2f);
 
         UIManager.Instance.cutsceneManager.StartCutscene(CutsceneType.StageEnd);
-        yield return new WaitForEndOfFrame();
+        yield return null;
         PlayerCamera.instance.SetCameraPos(bossArea.transform.position);
         PoolManager.Return(boss.gameObject, boss.GetType());
-        while (!UIManager.Instance.cutsceneManager.hasFinished) yield return new WaitForEndOfFrame();
+        while (!UIManager.Instance.cutsceneManager.hasFinished) yield return null;
         yield return new WaitForSeconds(1f);
         UIManager.Instance.cutsceneManager.hasFinished = false;
 

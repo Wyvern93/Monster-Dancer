@@ -17,7 +17,7 @@ public class RhythMaiden : Enemy
         bulletSpawnEffect.source = this;
         bulletSpawnEffect.transform.position = transform.position;
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
-        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
         Vector2 playerdir = Player.instance.GetClosestPlayer(transform.position + (-Vector3.up * 0.4f)) - transform.position;
         playerdir.Normalize();
@@ -33,9 +33,9 @@ public class RhythMaiden : Enemy
         float time = BeatManager.GetBeatDuration();
         while (time > 0)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
             time -= Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
         bulletSpawnEffect.Despawn();

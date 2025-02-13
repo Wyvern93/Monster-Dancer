@@ -65,7 +65,7 @@ public class AudioCalibrationMenu : MonoBehaviour
         while (canvasGroup.alpha < 1)
         {
             canvasGroup.alpha = Mathf.MoveTowards(canvasGroup.alpha, 1f, Time.unscaledDeltaTime * 2f);
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         canvasGroup.interactable = true;
         canvasGroup.blocksRaycasts = true;
@@ -81,7 +81,7 @@ public class AudioCalibrationMenu : MonoBehaviour
         while (canvasGroup.alpha > 0)
         {
             canvasGroup.alpha = Mathf.MoveTowards(canvasGroup.alpha, 0f, Time.unscaledDeltaTime * 2f);
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
     }
     // Start is called before the first frame update

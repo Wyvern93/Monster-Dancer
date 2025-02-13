@@ -73,7 +73,7 @@ public class BulletBase : Bullet
             if (!isInitialized) yield break;
             while (GameManager.isPaused || stunStatus.isStunned())
             {
-                yield return new WaitForEndOfFrame();
+                yield return null;
             }
             float beatProgress = time / beatDuration;
             beatTime = Mathf.Lerp(1, 0f, beatProgress);
@@ -86,7 +86,7 @@ public class BulletBase : Bullet
             direction = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
             transform.position += ((Vector3)direction * speed * beatTime * Time.deltaTime);
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         yield break;
@@ -111,7 +111,7 @@ public class BulletBase : Bullet
     {
         if (!BeatManager.isPlaying) return;
         if (GameManager.isPaused) return;
-        if (!BeatManager.isGameBeat) return;
+        if (!BeatManager.isBeat) return;
 
         if (collision.CompareTag("Player") && collision.name == "Player")
         {

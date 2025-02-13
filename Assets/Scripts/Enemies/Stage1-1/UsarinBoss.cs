@@ -144,11 +144,11 @@ public class UsarinBoss : Boss
         float time = BeatManager.GetBeatDuration() * (reset ? 3f : 2f);
         while (time > 0)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused) yield return null;
             time -= Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
-        while (!BeatManager.isGameBeat) yield return new WaitForEndOfFrame();
+        while (!BeatManager.isBeat) yield return null;
 
         isPreparingAttack = false;
         if (reset) attackBeat = 0;
@@ -241,9 +241,9 @@ public class UsarinBoss : Boss
         float time = BeatManager.GetBeatDuration() * 3f;
         while (time > 0)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
             time -= Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         foreach (Bullet b in bullets) b.lifetime = 8;
@@ -484,9 +484,9 @@ public class UsarinBoss : Boss
         float time = BeatManager.GetBeatDuration() * 4f;
         while (time > 0)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused) yield return null;
             time -= Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         Vector2 arenaPos = Stage.Instance.bossArea.transform.position;
         for (int i = 0; i < 21; i++)
@@ -623,12 +623,12 @@ public class UsarinBoss : Boss
         animator.Play("usarin_move");
         while (time <= BeatManager.GetBeatDuration() / 2)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
             velocity = Vector2.zero;
             transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * speed * 6);
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         if (transform.position == targetPos) animator.Play("usarin_dance");
         else animator.Play("usarin_move");
@@ -653,11 +653,11 @@ public class UsarinBoss : Boss
         animator.Play("usarin_move");
         while (time <= BeatManager.GetBeatDuration() / 2)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
             
             velocity = dir * speed * 6;
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         animator.Play("usarin_normal");
         AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
@@ -707,10 +707,10 @@ public class UsarinBoss : Boss
         float time = 2f;
         while (time > 0)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused) yield return null;
             Camera.main.transform.position = Vector3.MoveTowards(Camera.main.transform.position, target, Time.deltaTime * 2f);
             time -= Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         PlayerCamera.instance.SetCameraPos(target);
         PlayerCamera.instance.followPlayer = true;

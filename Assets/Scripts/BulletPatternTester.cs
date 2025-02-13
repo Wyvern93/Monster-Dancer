@@ -154,7 +154,7 @@ public class BulletPatternTester : MonoBehaviour
         {
             while (GameManager.isPaused)//|| stunStatus.isStunned())
             {
-                yield return new WaitForEndOfFrame();
+                yield return null;
             }
             float beatProgress = time / beatDuration;
             beatTime = Mathf.Lerp(1, 0f, beatProgress);
@@ -165,7 +165,7 @@ public class BulletPatternTester : MonoBehaviour
             clone2.transform.position = new Vector3(transform.position.x + ((cloneDistance * 2f) * Mathf.Cos(clone2Angle * Mathf.Deg2Rad)), transform.position.y + ((cloneDistance / 2f) * Mathf.Sin(clone2Angle * Mathf.Deg2Rad)), 10);
             //transform.position += ((Vector3)direction * speed * beatTime * Time.deltaTime);
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         yield break;
@@ -473,11 +473,11 @@ public class BulletPatternTester : MonoBehaviour
         float time = 0;
         while (time <= BeatManager.GetBeatDuration() * 2f)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame(); // isStunned!
+            while (GameManager.isPaused) yield return null; // isStunned!
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
-        while (!BeatManager.isGameBeat) yield return new WaitForEndOfFrame();
+        while (!BeatManager.isBeat) yield return null;
 
         AudioController.PlaySound(AudioController.instance.sounds.bulletwaveShootSound);
         SpawnMagicComet(circlePos);
@@ -606,11 +606,11 @@ public class BulletPatternTester : MonoBehaviour
         float time = 0;
         while (time <= BeatManager.GetBeatDuration() * 2f)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame(); // isStunned!
+            while (GameManager.isPaused) yield return null; // isStunned!
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
-        while (!BeatManager.isGameBeat) yield return new WaitForEndOfFrame();
+        while (!BeatManager.isBeat) yield return null;
 
         for (int i = 0; i < positions.Count; i++)
         {
@@ -677,11 +677,11 @@ public class BulletPatternTester : MonoBehaviour
         float time = BeatManager.GetBeatDuration() * (reset ? 3f : 2f);
         while (time > 0)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused) yield return null;
             time -= Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
-        while (!BeatManager.isGameBeat) yield return new WaitForEndOfFrame();
+        while (!BeatManager.isBeat) yield return null;
 
         isPreparingAttack = false;
         if (reset) attackBeat = 0;

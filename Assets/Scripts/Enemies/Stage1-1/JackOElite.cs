@@ -163,10 +163,10 @@ public class JackOElite : Enemy
         boxCollider.enabled = false;
         while (Sprite.color.a > 0.05f)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused) yield return null;
             Sprite.color = Color.Lerp(Sprite.color, new Color(1, 1, 1, 0), Time.deltaTime * 16f);
             shadow.color = Sprite.color;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         Sprite.color = new Color(1, 1, 1, 0);
         shadow.color = Sprite.color;
@@ -179,10 +179,10 @@ public class JackOElite : Enemy
         animator.speed = 1f / BeatManager.GetBeatDuration();
         while (Sprite.color.a < 0.95f)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused) yield return null;
             Sprite.color = Color.Lerp(Sprite.color, new Color(1, 1, 1, 1), Time.deltaTime * 16f);
             shadow.color = Sprite.color;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         Sprite.color = Color.white;
         shadow.color = Sprite.color;
@@ -201,10 +201,10 @@ public class JackOElite : Enemy
         boxCollider.enabled = false;
         while (Sprite.color.a > 0.05f)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused) yield return null;
             Sprite.color = Color.Lerp(Sprite.color, new Color(1, 1, 1, 0), Time.deltaTime * 16f);
             shadow.color = Sprite.color;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         Sprite.color = new Color(1, 1, 1, 0);
 
@@ -219,10 +219,10 @@ public class JackOElite : Enemy
 
         while (Sprite.color.a < 0.95f)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused) yield return null;
             Sprite.color = Color.Lerp(Sprite.color, new Color(1, 1, 1, 1), Time.deltaTime * 16f);
             shadow.color = Sprite.color;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         boxCollider.enabled = true;
         Sprite.color = Color.white;
@@ -247,7 +247,7 @@ public class JackOElite : Enemy
         bulletSpawnEffect.transform.position = transform.position;
         bulletSpawnEffect.finalScale = 1f;
         yield return new WaitForSeconds(BeatManager.GetBeatDuration());
-        while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+        while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
         Vector2 dir = Player.instance.GetClosestPlayer(transform.position) - transform.position;
         dir.Normalize();
@@ -256,7 +256,7 @@ public class JackOElite : Enemy
         float diff = 360f / 12f;
         for (int i = 0; i < 12; i++)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
             tempbullets.Add(SpawnBullet(i * diff, 10 + (i % 3), 1 + ((i % 3) / 2f)));
             yield return new WaitForSeconds(BeatManager.GetBeatDuration() / 12f);
@@ -268,9 +268,9 @@ public class JackOElite : Enemy
         float time = BeatManager.GetBeatDuration();
         while (time > 0)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
             time -= Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         bulletSpawnEffect.Despawn();
         isAttacking = false;
@@ -343,13 +343,13 @@ public class JackOElite : Enemy
         animator.Play(moveAnimation);
         while (time <= BeatManager.GetBeatDuration() / 2)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
             velocity = Vector2.zero;
             transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * speed * 6);
             if (transform.position == targetPos) break;
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         animator.Play(idleAnimation);
 
@@ -371,11 +371,11 @@ public class JackOElite : Enemy
         animator.Play(moveAnimation);
         while (time <= BeatManager.GetBeatDuration() / 2)
         {
-            while (GameManager.isPaused || stunStatus.isStunned()) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
             velocity = dir * speed * 6;
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         animator.Play(idleAnimation);
         velocity = Vector2.zero;

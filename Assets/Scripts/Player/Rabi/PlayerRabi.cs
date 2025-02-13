@@ -178,7 +178,7 @@ public class PlayerRabi : Player
         animator.Play("Rabi_Dead");
 
         UIManager.Instance.PlayerUI.HideUI();
-        yield return new WaitForEndOfFrame();
+        yield return null;
         Time.timeScale = 0.01f;
 
         UIManager.Instance.SetGameOverBG(true);
@@ -202,16 +202,16 @@ public class PlayerRabi : Player
 
         while (time <= duration)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused) yield return null;
             time += Time.deltaTime;
             
             transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * 4f);
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
 
         animator.speed = 1f / BeatManager.GetBeatDuration();
         animator.Play("Rabi_Idle");
-        yield return new WaitForEndOfFrame();
+        yield return null;
         Sprite.transform.localPosition = Vector3.zero;
     }
 
@@ -239,7 +239,7 @@ public class PlayerRabi : Player
         float duration = BeatManager.GetBeatDuration() * 0.5f;
         while (time <= duration)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused) yield return null;
             if (BeatManager.GetBeatSuccess() == BeatTrigger.PERFECT && time < duration / 2f)//(time <= 0.05f)
             {
                 if (InputManager.ActionHold(InputActionType.ABILITY) && activeAbility.CanCast())
@@ -271,12 +271,12 @@ public class PlayerRabi : Player
             
             rb.velocity = dir * currentStats.Speed * (isCrouching ? 2f : 4) * 1.3f;
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         rb.velocity = Vector2.zero;
         animator.speed = 1f / BeatManager.GetBeatDuration();
         animator.Play("Rabi_Idle");
-        yield return new WaitForEndOfFrame();
+        yield return null;
         Sprite.transform.localPosition = Vector3.zero;
 
         isPerformingAction = false;
@@ -342,13 +342,13 @@ public class PlayerRabi : Player
         AudioController.PlaySound(dashSound);
         while (time <= BeatManager.GetBeatDuration() * 0.8f)
         {
-            while (GameManager.isPaused) yield return new WaitForEndOfFrame();
+            while (GameManager.isPaused) yield return null;
             if (Stage.isWallAt(targetPos) || Stage.isWaterAt(targetPos)) targetPos = originPos;
             
             float lerpedvalue = Mathf.Lerp(0,1f, time / (BeatManager.GetBeatDuration() * 0.8f));
             transform.position = Vector3.Lerp(originPos, (Vector3)targetPos, lerpedvalue);
             time += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            yield return null;
         }
         spriteTrail.Stop();
         transform.position = targetPos;
