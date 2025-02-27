@@ -1,16 +1,23 @@
-﻿using System.Collections;
+﻿using JetBrains.Annotations;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 using UnityEngine.UI;
 
 public class BeatManager : MonoBehaviour
 {
-    private static BeatManager instance;
+    [SerializeField] AudioClip testClip;
+    public static BeatManager instance;
 
     [SerializeField] private AudioSource music, beatTest;
     [SerializeField] private float offset, tempo;
     public static float audio_offset;
+    public static int compassStartBeat;
 
+    [SerializeField] SpriteRenderer skillZBeatIndicator, skillXBeatIndicator, skillCBeatIndicator;
+    [SerializeField] Transform skillIndicatorTransform;
     // secondsPerBeat remains the same
     public float secondsPerBeat;
 
@@ -22,6 +29,20 @@ public class BeatManager : MonoBehaviour
     public float nextQuarterBeat, lastQuarterBeat;
     public static bool isMidBeat, isQuarterBeat;
     public int midbeats, quarterBeats;
+    
+    private List<BeatObject> activeTimelineObjects = new List<BeatObject>();
+    private List<BeatObject> activeZBeatObjects = new List<BeatObject>();
+    private List<BeatObject> activeXBeatObjects = new List<BeatObject>();
+    private List<BeatObject> activeCBeatObjects = new List<BeatObject>();
+    [SerializeField] Animator beatPulse;
+
+    [SerializeField] Sprite compassSprite, beatSprite, midBeatSprite;
+    [SerializeField] Sprite zSprite, xSprite, cSprite;
+
+    [SerializeField] GameObject beatObjectPrefab;
+    [SerializeField] GameObject beatSucceedEffectPrefab;
+    [SerializeField] Transform beatObjectsParent;
+    [SerializeField] Transform timelineObjectsParent;
 
     [Header("Loop")]
     public float loopStartOffset;
@@ -56,6 +77,8 @@ public class BeatManager : MonoBehaviour
 
     // NEW: Store the dsp time at which the music starts playing.
     private double dspStartTime;
+    public MidBeat currentMidBeat;
+    private List<MidBeat> midbeatList;
 
     public static void UpdatePulseAnimator()
     {
@@ -87,6 +110,24 @@ public class BeatManager : MonoBehaviour
         instance.loopStartOffset = track.loopStart;
         instance.loopTriggerOffset = track.loopEnd;
         instance.currentTime = 0;
+        compassStartBeat = track.compassStartBeat;
+        instance.GenerateMidBeats();
+    }
+
+    private void GenerateMidBeats()
+    {
+        float initialBeat = instance.nextMidBeat;
+        float musicLength = instance.music.clip.length;
+        float midBeatLength = (secondsPerBeat / 2f);
+
+        int midBeatsTotal = (int)(musicLength / midBeatLength) + 1;
+        Debug.Log($"There is a total of {midBeatsTotal} generated");
+
+        midbeatList = new List<MidBeat>();
+        for (int i = 0; i < midBeatsTotal; i++)
+        {
+            midbeatList.Add(new MidBeat(initialBeat + (i * midBeatLength), GetMidBeat(i)));
+        }
     }
 
     public static void Stop()
@@ -114,6 +155,9 @@ public class BeatManager : MonoBehaviour
 
         instance.targetBeatPulseAlpha = 1;
         isPlaying = true;
+        double nextMidBeatTime = instance.dspStartTime + (instance.nextMidBeat - audio_offset);
+        //instance.currentMidBeat = new MidBeat(nextMidBeatTime);
+        instance.ClearBeatObjects();
         // (nextBeat, etc., were set already in SetTrack.)
     }
 
@@ -155,6 +199,7 @@ public class BeatManager : MonoBehaviour
     private void Awake()
     {
         instance = this;
+        StartBeatObjects();
         beatPulseSprite = beatPulseAnimator.GetComponent<SpriteRenderer>();
     }
 
@@ -181,6 +226,22 @@ public class BeatManager : MonoBehaviour
         return instance.dspStartTime + (instance.nextBeat - audio_offset);
     }
 
+    public static double GetNextMidBeatDSPTime()
+    {
+        // Convert the nextBeat (which is in "music time") to DSP time.
+        // Using: musicTime = (AudioSettings.dspTime - dspStartTime) + audio_offset,
+        // we have dspTime = dspStartTime + (musicTime - audio_offset)
+        return instance.dspStartTime + (instance.nextMidBeat - audio_offset);
+    }
+
+    public static double GetNextQuarterDSPTime()
+    {
+        // Convert the nextBeat (which is in "music time") to DSP time.
+        // Using: musicTime = (AudioSettings.dspTime - dspStartTime) + audio_offset,
+        // we have dspTime = dspStartTime + (musicTime - audio_offset)
+        return instance.dspStartTime + (instance.nextQuarterBeat - audio_offset);
+    }
+
     public static bool closestIsNextBeat()
     {
         float difftolast = Mathf.Abs(instance.currentTime - instance.lastBeat);
@@ -196,6 +257,10 @@ public class BeatManager : MonoBehaviour
     // We compute “music time” as the elapsed dsp time since music start plus audio_offset.
     void Update()
     {
+        if (InputManager.ActionPress(InputActionType.FIRST_SKILL))
+        {
+            //AudioController.PlaySoundWithoutWait(testClip);
+        }
         if (isPlaying)
         {
             currentTime = (float)(AudioSettings.dspTime - dspStartTime) + audio_offset;
@@ -243,7 +308,9 @@ public class BeatManager : MonoBehaviour
             midbeats++;
             lastMidBeat = nextMidBeat;
             nextMidBeat = offset + audio_offset + ((secondsPerBeat / 2f) * midbeats);
+            OnMidBeat();
             isMidBeat = true;
+            //currentMidBeat = new MidBeat(offset + audio_offset + ((secondsPerBeat / 2f) * midbeats));
         }
 
         if (currentTime >= nextQuarterBeat)
@@ -252,9 +319,144 @@ public class BeatManager : MonoBehaviour
             lastQuarterBeat = nextQuarterBeat;
             nextQuarterBeat = offset + audio_offset + ((secondsPerBeat / 4f) * quarterBeats);
             isQuarterBeat = true;
+            OnQuarterBeat();
         }
 
+        if (Player.instance == null)
+        {
+            skillZBeatIndicator.color = Color.clear;
+            skillXBeatIndicator.color = Color.clear;
+            skillCBeatIndicator.color = Color.clear;
+        }
+        UpdateTimeline();
         UpdateUI();
+    }
+
+    // Update the timeline's beat objects based on the current time
+    private void UpdateTimeline()
+    {
+        // Lines
+        while (activeTimelineObjects.Count < 16)
+        {
+            float nextBeatTime = nextMidBeat + ((secondsPerBeat / 2) * activeTimelineObjects.Count);
+            int midbeat = midbeats + 1 + activeTimelineObjects.Count;
+
+            Sprite targetSprite;
+            string animation = "";
+            if (CheckBeat(midbeat, BeatType.Compass))
+            {
+                targetSprite = compassSprite;
+                animation = "pulsecompass";
+            }
+            else if (CheckBeat(midbeat, BeatType.Beat))
+            {
+                targetSprite = beatSprite;
+                animation = "pulsebeat";
+            }
+            else
+            {
+                targetSprite = midBeatSprite;
+                animation = "pulsemidbeat";
+            }
+
+            BeatObject beatObjectLeft = PoolManager.Get<BeatObject>();
+            beatObjectLeft.transform.parent = timelineObjectsParent.transform;
+            beatObjectLeft.transform.localScale = Vector3.one;
+            beatObjectLeft.OnInit(nextBeatTime, false, midbeat, targetSprite, 0);  // Left side
+            activeTimelineObjects.Add(beatObjectLeft);
+
+
+            if (targetSprite)
+                beatPulse.Play(animation);
+        }
+
+        // Create each beatObject 
+        while (activeZBeatObjects.Count < 16)
+        {
+            float nextBeatTime = nextMidBeat + ((secondsPerBeat / 2) * activeZBeatObjects.Count);
+            int midbeat = midbeats + 1 + activeZBeatObjects.Count;
+
+            bool isZbeat = false;
+            if (Player.instance != null)
+            {
+                if (Player.instance.equippedPassiveAbilities.Count > 0)
+                {
+                    if (CheckBeat(midbeat, Player.instance.equippedPassiveAbilities[0].getBeatTrigger())) isZbeat = true;
+                }
+            }
+
+            BeatObject beatObjectLeft = PoolManager.Get<BeatObject>();
+            beatObjectLeft.transform.parent = beatObjectsParent.transform;
+            beatObjectLeft.transform.localScale = Vector3.one;
+            beatObjectLeft.OnInit(nextBeatTime, false, midbeat, isZbeat ? zSprite : null, 10);  // Left side
+            activeZBeatObjects.Add(beatObjectLeft);
+        }
+
+        while (activeXBeatObjects.Count < 16)
+        {
+            float nextBeatTime = nextMidBeat + ((secondsPerBeat / 2) * activeXBeatObjects.Count);
+            int midbeat = midbeats + 1 + activeXBeatObjects.Count;
+
+            bool isXbeat = false;
+            if (Player.instance != null)
+            {
+                if (Player.instance.equippedPassiveAbilities.Count > 1)
+                {
+                    if (CheckBeat(midbeat, Player.instance.equippedPassiveAbilities[1].getBeatTrigger())) isXbeat = true;
+                }
+            }
+
+            BeatObject beatObjectLeft = PoolManager.Get<BeatObject>();
+            beatObjectLeft.transform.parent = beatObjectsParent.transform;
+            beatObjectLeft.transform.localScale = Vector3.one;
+            beatObjectLeft.OnInit(nextBeatTime, false, midbeat, isXbeat ? xSprite : null, 0);  // Left side
+            activeXBeatObjects.Add(beatObjectLeft);
+        }
+
+        while (activeCBeatObjects.Count < 16)
+        {
+            float nextBeatTime = nextMidBeat + ((secondsPerBeat / 2) * activeCBeatObjects.Count);
+            int midbeat = midbeats + 1 + activeCBeatObjects.Count;
+
+            bool isCbeat = false;
+            if (Player.instance != null)
+            {
+                if (Player.instance.equippedPassiveAbilities.Count > 2)
+                {
+                    if (CheckBeat(midbeat, Player.instance.equippedPassiveAbilities[2].getBeatTrigger())) isCbeat = true;
+                }
+            }
+
+            BeatObject beatObjectLeft = PoolManager.Get<BeatObject>();
+            beatObjectLeft.transform.parent = beatObjectsParent.transform;
+            beatObjectLeft.transform.localScale = Vector3.one;
+            beatObjectLeft.OnInit(nextBeatTime, false, midbeat, isCbeat ? cSprite : null, -10);  // Left side
+            activeCBeatObjects.Add(beatObjectLeft);
+        }
+    }
+
+    public bool CheckBeat(int midbeatNum, BeatType beatType)
+    {
+        int numBeat = midbeatNum - compassStartBeat;
+        if (beatType == BeatType.Mid) return true;
+        if (beatType == BeatType.Beat) return numBeat % 2 == 0;
+        if (beatType == BeatType.MidCompass) return numBeat % 4 == 0;
+        if (beatType == BeatType.Compass) return numBeat % 8 == 0;
+        return false;
+    }
+
+    public BeatType GetMidBeat(int midbeatNum)
+    {
+        int numBeat = midbeatNum - compassStartBeat;
+        if (numBeat % 8 == 0) return BeatType.Compass;
+        else if (numBeat % 4 == 0) return BeatType.MidCompass;
+        else if (numBeat % 2 == 0) return BeatType.Beat;
+        else return BeatType.Mid;
+    }
+
+    private void OnQuarterBeat()
+    {
+        
     }
 
     // Recalculate beat times from a given “music time” (this is unchanged aside from the fact that “time” here is DSP‐based music time).
@@ -275,7 +477,7 @@ public class BeatManager : MonoBehaviour
 
     private void CheckForGameBeat()
     {
-        currentFrameState = GetBeatSuccess();
+        //currentFrameState = GetBeatSuccess(BeatType.Beat);
         isBeat = false;
         menuGameBeat = false;
 
@@ -288,9 +490,56 @@ public class BeatManager : MonoBehaviour
     {
         // We want: currentTime = (AudioSettings.dspTime - dspStartTime) + audio_offset == loopStartOffset.
         // Solve for dspStartTime:
+        music.time = loopStartOffset;
         dspStartTime = AudioSettings.dspTime + audio_offset - loopStartOffset;
         currentTime = (float)(AudioSettings.dspTime - dspStartTime) + audio_offset;
         CalculateNextBeat(loopStartOffset);
+        ClearBeatObjects();
+        foreach (MidBeat mid in midbeatList)
+        {
+            mid.used = false;
+            // We only reset the beats ahead
+            //if (mid.maximumTime < currentTime) mid.used = false;
+        }
+    }
+
+    public void ClearBeatObjects()
+    {
+        foreach (BeatObject beat in activeTimelineObjects)
+        {
+            PoolManager.Return(beat.gameObject, typeof(BeatObject));
+        }
+        foreach (BeatObject beat in activeZBeatObjects)
+        {
+            PoolManager.Return(beat.gameObject, typeof(BeatObject));
+        }
+        foreach (BeatObject beat in activeXBeatObjects)
+        {
+            PoolManager.Return(beat.gameObject, typeof(BeatObject));
+        }
+        foreach (BeatObject beat in activeCBeatObjects)
+        {
+            PoolManager.Return(beat.gameObject, typeof(BeatObject));
+        }
+        activeTimelineObjects.Clear();
+        activeZBeatObjects.Clear();
+        activeXBeatObjects.Clear();
+        activeCBeatObjects.Clear();
+    }
+
+    public void OnBeatObjectBeat(BeatObject beatObject)
+    {
+        beatObject.beatTime = nextBeat + ((nextBeat - currentTime) * 16);
+    }
+
+    private void StartBeatObjects()
+    {
+        PoolManager.CreatePool(typeof(BeatObject), beatObjectPrefab, 200);
+        PoolManager.CreatePool(typeof(BeatSucessEffect), beatSucceedEffectPrefab, 12);
+        activeTimelineObjects = new List<BeatObject>();
+        activeZBeatObjects = new List<BeatObject>();
+        activeXBeatObjects = new List<BeatObject>();
+        activeCBeatObjects = new List<BeatObject>();
     }
 
     public static void SetRingPosition(Vector3 position)
@@ -307,6 +556,34 @@ public class BeatManager : MonoBehaviour
         menuGameBeat = true;
         isBeat = true;
         beatTest.Play();
+    }
+
+    private void OnMidBeat()
+    {
+        isMidBeat = true;
+        if (activeTimelineObjects.Count > 0)
+        {
+            PoolManager.Return(activeTimelineObjects[0].gameObject, typeof(BeatObject));
+            activeTimelineObjects.Remove(activeTimelineObjects[0]);
+        }
+        if (activeZBeatObjects.Count > 0)
+        {
+            PoolManager.Return(activeZBeatObjects[0].gameObject, typeof(BeatObject));
+            activeZBeatObjects.Remove(activeZBeatObjects[0]);
+        }
+        if (activeXBeatObjects.Count > 0)
+        {
+            PoolManager.Return(activeXBeatObjects[0].gameObject, typeof(BeatObject));
+            activeXBeatObjects.Remove(activeXBeatObjects[0]);
+        }
+        if (activeCBeatObjects.Count > 0)
+        {
+            PoolManager.Return(activeCBeatObjects[0].gameObject, typeof(BeatObject));
+            activeCBeatObjects.Remove(activeCBeatObjects[0]);
+        }
+
+        //Debug.Log("Midbeat time: " + Time.time);
+        //AudioController.PlaySoundWithoutWait(testClip);
     }
 
     private void UpdateUI()
@@ -342,22 +619,115 @@ public class BeatManager : MonoBehaviour
         return difftolast < difftonext;
     }
 
-    public static BeatTrigger GetBeatSuccess()
+    public enum BeatType
+    {
+        Beat,
+        Mid,
+        Quarter,
+        MidCompass,
+        Compass
+    }
+
+    public void UseMidBeat()
+    {
+        currentMidBeat.used = true;
+    }
+
+    public static BeatTrigger GetBeatSuccess(BeatType type, bool special = false)
     {
         if (compassless) return BeatTrigger.PERFECT;
-        float successRange = instance.secondsPerBeat / 3f;
-        float perfectRange = instance.secondsPerBeat / 12f;
+        float currentTime = (float)(AudioSettings.dspTime - instance.dspStartTime) + audio_offset;
+        if (special)
+        {
+            float beatWindow = instance.secondsPerBeat / 3f; // // 3 -> Normal, 3.5 -> Hard, 4 -> Dancer
+            float closestTime = -1;
 
-        instance.currentTime = (float)(AudioSettings.dspTime - instance.dspStartTime) + audio_offset;
+            float lastMin = instance.lastBeat - beatWindow;
+            float lastMax = instance.lastBeat + beatWindow;
 
-        float difftolast = Mathf.Abs(instance.currentTime - instance.lastBeat);
-        float difftonext = Mathf.Abs(instance.nextBeat - instance.currentTime);
+            float nextMin = instance.nextBeat - beatWindow;
+            float nextMax = instance.nextBeat + beatWindow;
 
-        float diff = difftolast < difftonext ? difftolast : difftonext;
+            if (currentTime > lastMin && currentTime < lastMax) return BeatTrigger.PERFECT;
+            if (currentTime > nextMin && currentTime < nextMax) return BeatTrigger.PERFECT;
+            return BeatTrigger.FAIL;
+        }
 
-        if (diff <= perfectRange) return BeatTrigger.PERFECT;
-        else if (diff <= successRange) return BeatTrigger.SUCCESS;
-        else return BeatTrigger.FAIL;
+        // Find the closest MidBeat unused
+        List<MidBeat> unusedBeats = instance.midbeatList.FindAll(x => x.used == false);
+        if (unusedBeats.Count == 0) return BeatTrigger.FAIL;
+
+        float range = instance.secondsPerBeat;
+        for (int i = 0; i < unusedBeats.Count; i++)
+        {
+            Debug.Log($"Input: {instance.currentTime} | BeatTimes: {unusedBeats[i].minimumTime} ~ {unusedBeats[i].maximumTime}");
+            if (unusedBeats[i].minimumTime > instance.currentTime + range)
+            {
+                unusedBeats[i].used = true;
+                continue; // This Midbeat is too far ahead
+            }
+            if (unusedBeats[i].maximumTime < instance.currentTime - range)
+            {
+                unusedBeats[i].used = true; // If it's behind time it can't be reused
+                continue; //return BeatTrigger.FAIL; // This Midbeat is too far behind
+            }
+            
+            // Unused midbeat in the time window
+
+            if (instance.currentTime > unusedBeats[i].maximumTime)
+            {
+                unusedBeats[i].used = true;
+                continue;
+            }
+            if (instance.currentTime >= unusedBeats[i].minimumTime && instance.currentTime <= unusedBeats[i].maximumTime)
+            {
+                unusedBeats[i].used = true;
+                int id = instance.midbeatList.IndexOf(unusedBeats[i]);
+                int testingMidbeat = instance.midbeatList.IndexOf(instance.midbeatList[id]);
+                BeatType beatType = instance.GetMidBeat(testingMidbeat + 9);
+                Debug.Log($"Last MidBeat: {instance.midbeats} | Trying to ask {testingMidbeat}");
+                Debug.Log(beatType);
+                if (instance.CheckBeat(testingMidbeat + 9, type))
+                {
+
+                    return BeatTrigger.PERFECT;
+                }
+                else
+                {
+                    Debug.Log("not the beat expected");
+                    return BeatTrigger.FAIL;
+                }
+                //return BeatTrigger.PERFECT;
+            }
+            else
+            {
+            }
+            unusedBeats[i].used = false;
+            return BeatTrigger.FAIL;
+        }
+
+        return BeatTrigger.FAIL; // If nothing works, there's no beat 
+        /*
+        // Default to full beat values.
+        double beatDuration = instance.secondsPerBeat / 2f;
+        double lastBeatTime = instance.currentMidBeat.minimumTime;
+        double nextBeatTime = instance.currentMidBeat.maximumTime;
+
+        float currentTime = (float)(AudioSettings.dspTime - instance.dspStartTime) + audio_offset;
+
+        float diff = Mathf.Abs((float)(currentTime - instance.currentMidBeat.baseTime));
+
+        if (diff <= beatDuration * 0.8f)
+            return BeatTrigger.SUCCESS;
+        else 
+            return BeatTrigger.FAIL;*/
+        /*
+        if (diff <= perfectRange)
+            return BeatTrigger.PERFECT;
+        else if (diff <= successRange)
+            return BeatTrigger.SUCCESS;
+        else
+            return BeatTrigger.FAIL;*/
     }
 
     public static void TriggerBeatScore(BeatTrigger trigger)

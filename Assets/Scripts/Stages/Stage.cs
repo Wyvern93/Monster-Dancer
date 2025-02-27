@@ -333,22 +333,9 @@ public class Stage : MonoBehaviour
     public static Enemy GetClosestEnemyTo(Vector2 basePos, float range = 6)
     {
         if (Instance.enemiesAlive.Count == 0) return null;
-        List<Enemy> closeEnemies = new List<Enemy>();
         Enemy e = null;
-        int attempts = 40;
-
-        while (true)
-        {
-            if (attempts <= 0) break;
-            attempts--;
-            e = Instance.enemiesAlive[Random.Range(0, Instance.enemiesAlive.Count - 1)];
-            if (e.CurrentHP <= 0) continue;
-            if (Vector2.Distance(e.transform.position, basePos) < range) closeEnemies.Add(e);
-        }
-        if (closeEnemies.Count == 0) return null;
-
-        float dist = 999;
-        foreach (Enemy enemy in closeEnemies)
+        float dist = 9999;
+        foreach (Enemy enemy in Instance.enemiesAlive)
         {
             float enemyDist = Vector2.Distance(enemy.transform.position, basePos);
             if (enemyDist < dist)

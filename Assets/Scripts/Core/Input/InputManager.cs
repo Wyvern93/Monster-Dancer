@@ -27,6 +27,7 @@ public class InputManager : MonoBehaviour
             instance = this;
             playerInput = InputType.Keyboard;
             playerDevice = InputDeviceType.Keyboard;
+            InputSystem.pollingFrequency = 10f;
         }
     }
 
@@ -104,7 +105,13 @@ public class InputManager : MonoBehaviour
                 case InputActionType.ATTACK:
                     return Mouse.current.leftButton;
                 case InputActionType.ULTIMATE:
-                    return Mouse.current.rightButton;
+                    return Keyboard.current.leftShiftKey;
+                case InputActionType.FIRST_SKILL:
+                    return Keyboard.current.zKey;
+                case InputActionType.SECOND_SKILL:
+                    return Keyboard.current.xKey;
+                case InputActionType.THIRD_SKILL:
+                    return Keyboard.current.cKey;
             }
         }
         else
@@ -129,6 +136,12 @@ public class InputManager : MonoBehaviour
                     return pGamepad.leftShoulder;
                 case InputActionType.ULTIMATE:
                     return pGamepad.rightShoulder;
+                case InputActionType.FIRST_SKILL:
+                    return pGamepad.buttonWest;
+                case InputActionType.SECOND_SKILL:
+                    return pGamepad.buttonSouth;
+                case InputActionType.THIRD_SKILL:
+                    return pGamepad.buttonEast;
             }
         }
         

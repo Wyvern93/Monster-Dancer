@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-public class Player : MonoBehaviour
+public abstract class Player : MonoBehaviour
 {
     [SerializeField] public Rigidbody2D rb;
     public static Player instance;
@@ -14,10 +14,11 @@ public class Player : MonoBehaviour
     public PlayerCamera cam;
 
     public Sprite icon;
+    [SerializeField] SpriteRenderer waveSprite;
     public string charactername = "SHIKAMI RABI";
     public Animator animator;
 
-    protected Vector2 direction, oldDir;
+    public Vector2 direction, oldDir;
     public bool isMoving, canDoAnything;
     public bool facingRight;
 
@@ -75,6 +76,7 @@ public class Player : MonoBehaviour
     public float invulTime;
 
     public GameObject Exclamation;
+    [SerializeField] protected GameObject skillSucessEffect;
     public int poisonStatus;
     public List<IDespawneable> despawneables;
 
@@ -84,6 +86,8 @@ public class Player : MonoBehaviour
     public Color rechargeFXcolor;
 
     public int fireStars, waterStars, earthStars, windStars, lightStars, darkStars;
+
+    protected abstract void EquipUltimate();
 
     public bool isPoisoned()
     {
@@ -185,7 +189,9 @@ public class Player : MonoBehaviour
     public bool CanMove()
     {
         if (isPerformingAction) return false;
-        else return BeatManager.GetBeatSuccess() != BeatTrigger.FAIL;
+        if (UIManager.Instance.cutsceneManager.isInCutscene()) return false;
+        if (GameManager.isPaused) return false;
+        return true;
     }
 
     public int getPassiveAbilityIndex(System.Type abilityType)
@@ -231,7 +237,6 @@ public class Player : MonoBehaviour
         CurrentHP = (int)currentStats.MaxHP;
 
         grazeSprite.color = Color.clear;
-
         UIManager.Instance.PlayerUI.UpdateHealth();
         UIManager.Instance.PlayerUI.UpdateExp();
         UIManager.Instance.PlayerUI.UpdateSpecial(0,0);
@@ -341,10 +346,6 @@ public class Player : MonoBehaviour
             return;
         }
 
-        if (Keyboard.current.digit1Key.wasPressedThisFrame && equippedPassiveAbilities.Count > 0) SetEquippedAbility(0);
-        if (Keyboard.current.digit2Key.wasPressedThisFrame && equippedPassiveAbilities.Count > 1) SetEquippedAbility(1);
-        if (Keyboard.current.digit3Key.wasPressedThisFrame && equippedPassiveAbilities.Count > 2) SetEquippedAbility(2);
-
         invulTime = Mathf.MoveTowards(invulTime, 0, Time.deltaTime);
 
         foreach (PlayerAbility ability in equippedPassiveAbilities)
@@ -431,19 +432,13 @@ public class Player : MonoBehaviour
         direction = dir;
     }
 
-    public virtual void OnPassiveAbilityUse() { }
+    public virtual void OnPassiveAbilityUse(int id) { }
 
     public virtual void OnActiveAbilityUse() { }
 
     public virtual void OnUltimateUse() { }
-
     void HandleInput()
     {
-        if (BeatManager.compassless)
-        {
-            HandleCompasslessInput();
-            return;
-        }
         if (InputManager.playerDevice == InputManager.InputDeviceType.Keyboard)
         {
             direction.x = Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed ? -1 : Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed ? 1 : 0;
@@ -455,11 +450,165 @@ public class Player : MonoBehaviour
             direction.x = leftStick.x > 0.4f ? 1 : leftStick.x < -0.4f ? -1 : 0;
             direction.y = leftStick.y > 0.4f ? 1 : leftStick.y < -0.4f ? -1 : 0;
         }
-        
-        if (direction !=  Vector2.zero) {
+
+        if (direction != Vector2.zero)
+        {
             oldDir = direction;
         }
 
+        if (CanMove())
+        {
+            if (direction != Vector2.zero)
+            {
+                rb.velocity = direction.normalized * currentStats.Speed * 3.2f;
+                animator.SetBool("moving", true);
+            }
+            else
+            {
+                rb.velocity = Vector2.zero;
+                animator.SetBool("moving", false);
+            }
+        }
+        facingRight = direction.x > 0;
+
+        /*
+        if (BeatManager.compassless)
+        {
+            HandleCompasslessInput();
+            return;
+        }*/
+        BeatTrigger beatTrigger;
+        float reductionMultiplier;
+        if (InputManager.ActionPress(InputActionType.FIRST_SKILL))
+        {
+            beatTrigger = BeatManager.GetBeatSuccess(equippedPassiveAbilities[0].getBeatTrigger());
+            if (beatTrigger == BeatTrigger.SUCCESS || beatTrigger == BeatTrigger.PERFECT)
+            {
+                OnPassiveAbilityUse(0);
+                BeatSucessEffect effect = PoolManager.Get<BeatSucessEffect>();
+                effect.animator.Play("skillZSuccessEffect");
+                effect.transform.position = transform.position + new Vector3(0, 0.5f, 0f);
+                if (ultimateAbility != null)
+                {
+                    reductionMultiplier = 1 + Mathf.Clamp(UIManager.Instance.PlayerUI.combo * 0.03f, 0, 100f);
+                    ultimateAbility.currentCooldown = Mathf.Clamp(ultimateAbility.currentCooldown - (equippedPassiveAbilities[0].GetBeatSize() * reductionMultiplier), 0, 9999);
+                }
+                UIManager.Instance.PlayerUI.AddToComboCounter((int)(equippedPassiveAbilities[0].GetBeatSize() * 2));
+            }
+            else
+            {
+                AudioController.PlaySoundWithoutCooldown(AudioController.instance.sounds.beatFailSfx);
+                PlayerCamera.TriggerCameraShake(0.2f, 0.3f);
+                UIManager.Instance.PlayerUI.FailCombo();
+            }
+            BeatManager.TriggerBeatScore(beatTrigger);
+        }
+
+        if (equippedPassiveAbilities.Count > 1)
+        {
+            
+            if (InputManager.ActionPress(InputActionType.SECOND_SKILL))
+            {
+                beatTrigger = BeatManager.GetBeatSuccess(equippedPassiveAbilities[1].getBeatTrigger());
+                if (beatTrigger == BeatTrigger.SUCCESS || beatTrigger == BeatTrigger.PERFECT)
+                {
+                    OnPassiveAbilityUse(1);
+                    BeatSucessEffect effect = PoolManager.Get<BeatSucessEffect>();
+                    effect.animator.Play("skillXSuccessEffect");
+                    effect.transform.position = transform.position + new Vector3(0, 0.5f, 0f);
+                    if (ultimateAbility != null)
+                    {
+                        reductionMultiplier = 1 + Mathf.Clamp(UIManager.Instance.PlayerUI.combo * 0.03f, 0, 100f);
+                        ultimateAbility.currentCooldown = Mathf.Clamp(ultimateAbility.currentCooldown - (equippedPassiveAbilities[1].GetBeatSize() * reductionMultiplier), 0, 9999);
+                    }
+                    UIManager.Instance.PlayerUI.AddToComboCounter((int)(equippedPassiveAbilities[1].GetBeatSize() * 2));
+                }
+                else
+                {
+                    AudioController.PlaySoundWithoutCooldown(AudioController.instance.sounds.beatFailSfx);
+                    PlayerCamera.TriggerCameraShake(0.2f, 0.3f);
+                    UIManager.Instance.PlayerUI.FailCombo();
+                }
+                BeatManager.TriggerBeatScore(beatTrigger);
+            }
+        }
+
+        if (equippedPassiveAbilities.Count > 2)
+        {
+            if (InputManager.ActionPress(InputActionType.THIRD_SKILL))
+            {
+                beatTrigger = BeatManager.GetBeatSuccess(equippedPassiveAbilities[2].getBeatTrigger());
+                if (beatTrigger == BeatTrigger.SUCCESS || beatTrigger == BeatTrigger.PERFECT)
+                {
+                    OnPassiveAbilityUse(2);
+                    BeatSucessEffect effect = PoolManager.Get<BeatSucessEffect>();
+                    effect.animator.Play("skillCSuccessEffect");
+                    effect.transform.position = transform.position + new Vector3(0, 0.5f, 0f);
+                    if (ultimateAbility != null)
+                    {
+                        reductionMultiplier = 1 + Mathf.Clamp(UIManager.Instance.PlayerUI.combo * 0.03f, 0, 100f);
+                        ultimateAbility.currentCooldown = Mathf.Clamp(ultimateAbility.currentCooldown - (equippedPassiveAbilities[2].GetBeatSize() * reductionMultiplier), 0, 9999);
+                    }
+                    UIManager.Instance.PlayerUI.AddToComboCounter((int)(equippedPassiveAbilities[2].GetBeatSize() * 2));
+                }
+                else
+                {
+                    AudioController.PlaySoundWithoutCooldown(AudioController.instance.sounds.beatFailSfx);
+                    PlayerCamera.TriggerCameraShake(0.2f, 0.3f);
+                    UIManager.Instance.PlayerUI.FailCombo();
+                }
+                BeatManager.TriggerBeatScore(beatTrigger);
+            }
+        }
+
+
+
+        if (InputManager.ActionPress(InputActionType.ABILITY) && activeAbility.CanCast())
+        {
+            beatTrigger = BeatManager.GetBeatSuccess(BeatManager.BeatType.Beat, true);
+            if (beatTrigger == BeatTrigger.SUCCESS || beatTrigger == BeatTrigger.PERFECT)
+            {
+                OnActiveAbilityUse();
+                BeatSucessEffect effect = PoolManager.Get<BeatSucessEffect>();
+                effect.transform.position = transform.position + new Vector3(0, 0.5f, 0f);
+                effect.animator.Play("skillSuccessEffect");
+                if (ultimateAbility != null)
+                {
+                    reductionMultiplier = 1 + Mathf.Clamp(UIManager.Instance.PlayerUI.combo * 0.03f, 0, 100f);
+                    ultimateAbility.currentCooldown = Mathf.Clamp(ultimateAbility.currentCooldown - (activeAbility.GetMaxCooldown() * reductionMultiplier), 0, 9999);
+                }
+                UIManager.Instance.PlayerUI.AddToComboCounter(1);
+            }
+            else
+            {
+                AudioController.PlaySoundWithoutCooldown(AudioController.instance.sounds.beatFailSfx);
+                PlayerCamera.TriggerCameraShake(0.2f, 0.3f);
+                UIManager.Instance.PlayerUI.FailCombo();
+            }
+            BeatManager.TriggerBeatScore(beatTrigger);
+        }
+
+        if (ultimateAbility != null)
+        {
+            if (InputManager.ActionPress(InputActionType.ULTIMATE) && ultimateAbility.CanCast())
+            {
+                beatTrigger = BeatManager.GetBeatSuccess(BeatManager.BeatType.Beat, true);
+                if (beatTrigger == BeatTrigger.SUCCESS || beatTrigger == BeatTrigger.PERFECT)
+                {
+                    OnUltimateUse();
+                    UIManager.Instance.PlayerUI.AddToComboCounter(1);
+                }
+                else
+                {
+                    AudioController.PlaySoundWithoutCooldown(AudioController.instance.sounds.beatFailSfx);
+                    PlayerCamera.TriggerCameraShake(0.2f, 0.3f);
+                }
+                BeatManager.TriggerBeatScore(beatTrigger);
+            }
+        }
+        
+
+        /*
         if (!isMoving)
         {
             if (InputManager.IsStickMovementThisFrame())
@@ -480,11 +629,9 @@ public class Player : MonoBehaviour
                 if (difference.x < 0) facingRight = false;
                 if (difference.x > 0) facingRight = true;
             }
-        }
+        }*/
 
-        
-
-
+        /*
         if (InputManager.ActionHold(InputActionType.ATTACK)) isShooting = true;
         else isShooting = false;
 
@@ -497,7 +644,7 @@ public class Player : MonoBehaviour
         {
             if (ultimateAbility != null)
             {
-                BeatTrigger result = BeatManager.GetBeatSuccess();
+                BeatTrigger result = BeatManager.GetBeatSuccess(BeatManager.BeatType.Full);
                 if (result != BeatTrigger.FAIL && !waitForNextBeat && ultimateAbility.CanCast())
                 {
                     OnUltimateUse();
@@ -510,12 +657,12 @@ public class Player : MonoBehaviour
                 }
             }
         }
-
-
+        */
+        /*
         // Handle Movement
         if (!waitForNextBeat && !isMoving)
         {
-            BeatTrigger score = BeatManager.GetBeatSuccess();
+            BeatTrigger score = BeatManager.GetBeatSuccess(BeatManager.BeatType.Full);
             if (action != PlayerAction.None)
             {
                 // Too late to the beat = fail
@@ -535,7 +682,7 @@ public class Player : MonoBehaviour
                 }
                 else
                 {
-                    if (BeatManager.GetBeatSuccess() == BeatTrigger.SUCCESS || score == BeatTrigger.PERFECT)
+                    if (BeatManager.GetBeatSuccess(BeatManager.BeatType.Full) == BeatTrigger.SUCCESS || score == BeatTrigger.PERFECT)
                     {
                         BeatManager.TriggerBeatScore(score);
                         PerformAction(action);
@@ -545,10 +692,10 @@ public class Player : MonoBehaviour
             }
         }
 
-        if (waitForNextBeat && !BeatManager.closestIsNextBeat() && BeatManager.GetBeatSuccess() == BeatTrigger.FAIL)
+        if (waitForNextBeat && !BeatManager.closestIsNextBeat() && BeatManager.GetBeatSuccess(BeatManager.BeatType.Full) == BeatTrigger.FAIL)
         {
             waitForNextBeat = false;
-        }
+        }*/
     }
 
     void HandleCompasslessInput()
@@ -622,7 +769,7 @@ public class Player : MonoBehaviour
     {
         if (direction.x < 0) facingRight = false;
         else facingRight = true;
-        OnPassiveAbilityUse();
+        //OnPassiveAbilityUse();
     }
 
     private void PerformAction(PlayerAction Playeraction)
@@ -750,6 +897,16 @@ public class Player : MonoBehaviour
         Sprite.flipX = !facingRight;
         emissionColor = Color.Lerp(emissionColor, new Color(1, 0, 0, 0), Time.deltaTime * 16f);
         spriteRendererMat.SetColor("_EmissionColor", emissionColor);
+        if (BeatManager.isBeat)
+        {
+            waveSprite.transform.localScale = Vector3.one * 0.5f;
+            waveSprite.color = Color.white;
+        }
+        else
+        {
+            waveSprite.transform.localScale = Vector3.MoveTowards(waveSprite.transform.localScale, Vector3.one, Time.deltaTime / BeatManager.GetBeatDuration());
+            waveSprite.color = Color.Lerp(waveSprite.color, new Color(1, 1, 1, 0), Time.deltaTime * 8f);
+        }
     }
 
    

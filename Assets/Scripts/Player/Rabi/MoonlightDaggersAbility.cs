@@ -7,8 +7,8 @@ public class MoonlightDaggersAbility : PlayerAbility, IPlayerProjectile
     public MoonlightDaggersAbility() : base()
     {
         baseAmmo = 2;
-        baseAttackSpeed = 0.25f;
-        baseCooldown = 2;
+        baseAttackSpeed = 0.5f;
+        baseCooldown = 0.5f;
         baseDamage = 12;
         baseDuration = 0.5f;
         baseSpeed = 12;
@@ -20,9 +20,14 @@ public class MoonlightDaggersAbility : PlayerAbility, IPlayerProjectile
         currentCooldown = 0;
     }
 
+    public override BeatManager.BeatType getBeatTrigger()
+    {
+        return BeatManager.BeatType.Mid;
+    }
+
     public override bool CanCast()
     {
-        return currentCooldown == 0 && currentAttackSpeedCD == 0;
+        return BeatManager.GetBeatSuccess(BeatManager.BeatType.Mid) != BeatTrigger.FAIL;
     }
 
     public override Color GetTooltipColor()
@@ -73,6 +78,7 @@ public class MoonlightDaggersAbility : PlayerAbility, IPlayerProjectile
 
     public override void OnCast()
     {
+        /*
         if (currentAmmo - 1 > 0)
         {
             currentAmmo--;
@@ -84,9 +90,11 @@ public class MoonlightDaggersAbility : PlayerAbility, IPlayerProjectile
             currentCooldown = GetMaxCooldown();
             currentAttackSpeedCD = GetAttackSpeed();
             AudioController.PlaySound(AudioController.instance.sounds.reloadSfx);
-        }
-        UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, GetMaxAmmo());
+        }*/
+        //AudioController.PlaySound(AudioController.instance.sounds.reloadSfx);
+        //UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, GetMaxAmmo());
         ShootWave();
+        //BeatManager.instance.UseMidBeat();
     }
 
     public IEnumerator CastCoroutine(int level)
@@ -118,6 +126,7 @@ public class MoonlightDaggersAbility : PlayerAbility, IPlayerProjectile
     public void ShootWave()
     {
         MoonlightDaggerWave wave = PoolManager.Get<MoonlightDaggerWave>();
+        AudioController.PlaySoundWithoutCooldown(wave.attackSound);
         wave.quarterbeats = GetDuration();
         wave.velocity = GetSpeed();
         wave.dmg = GetDamage();

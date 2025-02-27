@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Timeline;
+using UnityEngine.InputSystem.Layouts;
+using UnityEngine.UI;
 
 public class AudioCalibrationMenu : MonoBehaviour
 {
@@ -11,11 +12,15 @@ public class AudioCalibrationMenu : MonoBehaviour
 
     [SerializeField] TextMeshProUGUI titleText;
     [SerializeField] TextMeshProUGUI text;
-    [SerializeField] TextMeshProUGUI calibrationNumber;
+    [SerializeField] TextMeshProUGUI audioCalibrationOffset;
+    [SerializeField] TextMeshProUGUI inputCalibrationOffset;
 
     [SerializeField] TextMeshProUGUI continueText;
 
     [SerializeField] MapTrack calibrationTrack;
+    [SerializeField] Image inputImage, visualImage;
+
+    List<float> inputDelays;
     public void OnContinueClick()
     {
         AudioController.FadeOut();
@@ -42,7 +47,7 @@ public class AudioCalibrationMenu : MonoBehaviour
         continueText.text = "Continue"; //Localization.GetLocalizedString("audiocalibration.continue");
         titleText.text = "Audio Calibration"; // Localization.GetLocalizedString("audiocalibration.title");
         text.text = "Use the arrow keys to change the audio offset and sync it with the indicator"; //Localization.GetLocalizedString("audiocalibration.text");
-        calibrationNumber.text = (Mathf.RoundToInt(BeatManager.audio_offset * 100f)).ToString();
+        audioCalibrationOffset.text = "Audio: " + (Mathf.RoundToInt(BeatManager.audio_offset * 100f)).ToString();
         StartCoroutine(OpenCoroutine());
     }
 
@@ -55,6 +60,7 @@ public class AudioCalibrationMenu : MonoBehaviour
 
     public void Awake()
     {
+        inputDelays = new List<float>();
         canvasGroup.alpha = 0;
         canvasGroup.interactable = false;
         canvasGroup.blocksRaycasts = false;
@@ -93,33 +99,33 @@ public class AudioCalibrationMenu : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Keyboard.current.bKey.wasPressedThisFrame)
-        {
-            AudioController.PlaySound(AudioController.instance.sounds.bossPhaseEnd, side: true);
-        }
         if (canvasGroup.alpha == 0) return;
         if (InputManager.playerDevice == InputManager.InputDeviceType.Keyboard)
         {
             if (Keyboard.current.leftArrowKey.wasPressedThisFrame || Keyboard.current.aKey.wasPressedThisFrame)
             {
                 BeatManager.audio_offset -= 0.01f;
-                calibrationNumber.text = (Mathf.RoundToInt(BeatManager.audio_offset * 100f)).ToString();
+                audioCalibrationOffset.text = (Mathf.RoundToInt(BeatManager.audio_offset * 100f)).ToString();
+                BeatManager.instance.ClearBeatObjects();
             }
             if (Keyboard.current.rightArrowKey.wasPressedThisFrame || Keyboard.current.dKey.wasPressedThisFrame)
             {
                 BeatManager.audio_offset += 0.01f;
-                calibrationNumber.text = (Mathf.RoundToInt(BeatManager.audio_offset * 100f)).ToString();
+                audioCalibrationOffset.text = (Mathf.RoundToInt(BeatManager.audio_offset * 100f)).ToString();
+                BeatManager.instance.ClearBeatObjects();
             }
 
             if (Keyboard.current.upArrowKey.wasPressedThisFrame || Keyboard.current.wKey.wasPressedThisFrame)
             {
                 BeatManager.audio_offset -= 0.1f;
-                calibrationNumber.text = (Mathf.RoundToInt(BeatManager.audio_offset * 100f)).ToString();
+                audioCalibrationOffset.text = (Mathf.RoundToInt(BeatManager.audio_offset * 100f)).ToString();
+                BeatManager.instance.ClearBeatObjects();
             }
             if (Keyboard.current.downArrowKey.wasPressedThisFrame || Keyboard.current.sKey.wasPressedThisFrame)
             {
                 BeatManager.audio_offset += 0.1f;
-                calibrationNumber.text = (Mathf.RoundToInt(BeatManager.audio_offset * 100f)).ToString();
+                audioCalibrationOffset.text = (Mathf.RoundToInt(BeatManager.audio_offset * 100f)).ToString();
+                BeatManager.instance.ClearBeatObjects();
             }
         }
         else
@@ -127,27 +133,63 @@ public class AudioCalibrationMenu : MonoBehaviour
             if (Gamepad.current.leftStick.left.wasPressedThisFrame)
             {
                 BeatManager.audio_offset -= 0.01f;
-                calibrationNumber.text = (Mathf.RoundToInt(BeatManager.audio_offset * 100f)).ToString();
+                audioCalibrationOffset.text = (Mathf.RoundToInt(BeatManager.audio_offset * 100f)).ToString();
+                BeatManager.instance.ClearBeatObjects();
             }
 
             if (Gamepad.current.leftStick.right.wasPressedThisFrame)
             {
                 BeatManager.audio_offset += 0.01f;
-                calibrationNumber.text = (Mathf.RoundToInt(BeatManager.audio_offset * 100f)).ToString();
+                audioCalibrationOffset.text = (Mathf.RoundToInt(BeatManager.audio_offset * 100f)).ToString();
+                BeatManager.instance.ClearBeatObjects();
             }
 
             if (Gamepad.current.leftStick.up.wasPressedThisFrame)
             {
                 BeatManager.audio_offset -= 0.1f;
-                calibrationNumber.text = (Mathf.RoundToInt(BeatManager.audio_offset * 100f)).ToString();
+                audioCalibrationOffset.text = (Mathf.RoundToInt(BeatManager.audio_offset * 100f)).ToString();
+                BeatManager.instance.ClearBeatObjects();
             }
             if (Gamepad.current.leftStick.down.wasPressedThisFrame)
             {
                 BeatManager.audio_offset += 0.1f;
-                calibrationNumber.text = (Mathf.RoundToInt(BeatManager.audio_offset * 100f)).ToString();
+                audioCalibrationOffset.text = (Mathf.RoundToInt(BeatManager.audio_offset * 100f)).ToString();
+                BeatManager.instance.ClearBeatObjects();
             }
 
         }
         
+        if (BeatManager.isBeat)
+        {
+            visualImage.color = Color.white;
+        }
+        if (InputManager.ActionPress(InputActionType.ABILITY))
+        {
+            inputImage.color = Color.white;
+            if (inputDelays.Count < 10)
+            {
+                inputDelays.Add(GetInputDelay());
+            }
+            else
+            {
+                inputDelays.RemoveAt(0);
+                inputDelays.Add(GetInputDelay());
+            }
+        }
+        visualImage.color = Color.Lerp(visualImage.color, Color.black, Time.deltaTime * 32f);
+        inputImage.color = Color.Lerp(inputImage.color, Color.black, Time.deltaTime * 32f);
+    }
+
+    float GetInputDelay()
+    {
+        double musicTime = BeatManager.instance.currentTime;
+        float timeToLast = (float)musicTime - BeatManager.instance.lastBeat;
+        float timeToNext = BeatManager.instance.nextBeat - (float)musicTime;
+
+        bool isAfter = timeToLast < timeToNext;
+        float diff = timeToLast > timeToNext ? timeToNext : timeToLast;
+        if (!isAfter) diff = -diff;
+        inputCalibrationOffset.text = "Input: " + (Mathf.RoundToInt((float)diff * 100f)).ToString();
+        return 0;
     }
 }

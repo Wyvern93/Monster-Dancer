@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MoonlightDaggerWave : MonoBehaviour, IDespawneable, IPlayerProjectile
 {
-    [SerializeField] AudioClip attackSound;
+    public AudioClip attackSound;
     [SerializeField] Animator animator;
     Vector3 dir;
     public float quarterbeats;
@@ -16,9 +16,12 @@ public class MoonlightDaggerWave : MonoBehaviour, IDespawneable, IPlayerProjecti
     {
         dir = Vector3.zero;
         animator.speed = 1f / BeatManager.GetBeatDuration() * 2f;
-        AudioController.PlaySoundWithoutCooldown(attackSound);
+        //AudioController.PlaySoundWithoutCooldown(attackSound);
 
-        Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
+        Vector2 crosshairPos;
+        Enemy closestEnemy = Stage.GetClosestEnemyTo(Player.instance.transform.position, 15);
+        if (closestEnemy != null) crosshairPos = closestEnemy.transform.position;
+        else crosshairPos = Player.instance.transform.position; //UIManager.Instance.PlayerUI.crosshair.transform.position;
         Vector2 difference = (crosshairPos - (Vector2)Player.instance.transform.position).normalized;
         Vector2 animDir;
 

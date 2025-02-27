@@ -20,6 +20,8 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] GameObject spHud;
     [SerializeField] Image spBar;
     private RectTransform spTransform;
+    [SerializeField] Sprite Special_Normal, Special_Blink;
+    private float spBlink;
 
     [SerializeField] Image expBar;
     private RectTransform expTransform;
@@ -60,13 +62,18 @@ public class PlayerUI : MonoBehaviour
 
     [SerializeField] CombatCursorHandler combatcursor1, combatcursor2, combatcursor3;
     [SerializeField] TextMeshProUGUI cursorAmmoText;
+    [SerializeField] TextMeshProUGUI comboCounter;
+    private RectTransform comboCounterTransform;
+    public int combo;
 
     private bool bossBarActive;
 
     // Start is called before the first frame update
     void Awake()
     {
+        comboCounter.text = "";
         bossBarActive = false;
+        comboCounterTransform = comboCounter.GetComponent<RectTransform>();
         hpTransform = hpBar.GetComponent<RectTransform>();
         hpBar_mini_Transform = hpBar_mini.transform.parent.GetComponent<RectTransform>();
         hpBar_mini_Transform.gameObject.SetActive(false);
@@ -86,11 +93,7 @@ public class PlayerUI : MonoBehaviour
         abilityIcon2.cooldown = 0;
         abilityIcon3.cooldown = 0;
 
-        abilityIcon1.SetFrame(true);
-        abilityIcon2.SetFrame(false);
-        abilityIcon3.SetFrame(false);
-
-        combatcursor1.SetVisibility(true);
+        combatcursor1.SetVisibility(false);
         combatcursor2.SetVisibility(false);
         combatcursor3.SetVisibility(false);
 
@@ -103,6 +106,22 @@ public class PlayerUI : MonoBehaviour
         combatcursor3.SetCooldown(1, 0);
         combatcursor3.SetCooldown(2, 0);
         OnOpenMenu();
+    }
+
+    public void AddToComboCounter(int num)
+    {
+        comboCounter.color = Color.white;
+        combo += num;
+        comboCounter.text = "x" + combo.ToString();
+        comboCounterTransform.localScale = Vector3.one * ((num * 0.1f) + 1.1f);
+    }
+
+    public void FailCombo()
+    {
+        combo = 0;
+        comboCounter.text = "X";
+        comboCounter.color = Color.red;
+        comboCounterTransform.localScale = Vector3.one * 2f;
     }
 
     public void OnOpenMenu()
@@ -145,11 +164,7 @@ public class PlayerUI : MonoBehaviour
         abilityIcon2.cooldown = 0;
         abilityIcon3.cooldown = 0;
 
-        abilityIcon1.SetFrame(true);
-        abilityIcon2.SetFrame(false);
-        abilityIcon3.SetFrame(false);
-
-        combatcursor1.SetVisibility(true);
+        combatcursor1.SetVisibility(false);
         combatcursor2.SetVisibility(false);
         combatcursor3.SetVisibility(false);
 
@@ -199,7 +214,7 @@ public class PlayerUI : MonoBehaviour
     {
         playerIcon.sprite = icon;
         playerName.text = name;
-        combatcursor1.SetVisibility(true);
+        combatcursor1.SetVisibility(false);
         combatcursor2.SetVisibility(false);
         combatcursor3.SetVisibility(false);
     }
@@ -230,7 +245,13 @@ public class PlayerUI : MonoBehaviour
         hurtEffect.color = Color.Lerp(hurtEffect.color, new Color(1, 1, 1, 0), Time.unscaledDeltaTime * 8f);
         if (InputManager.playerDevice == InputManager.InputDeviceType.Keyboard || Player.instance == null)
         {
-            crosshair_transform.localPosition = Mouse.current.position.value / new Vector2(Screen.width, Screen.height) * new Vector2(640, 360) - new Vector2(320, 180);
+            Vector2 offset = Vector2.zero;
+            if (Player.instance) offset = Player.instance.direction.normalized;
+            if (GameManager.isPaused || Player.instance == null || Stage.Instance == null) crosshair_transform.localPosition = Mouse.current.position.value / new Vector2(Screen.width, Screen.height) * new Vector2(640, 360) - new Vector2(320, 180);
+            else
+            {
+                crosshair_transform.position = Player.instance.transform.position + (Vector3)offset * 2;
+            }
         }
         else
         {
@@ -256,28 +277,10 @@ public class PlayerUI : MonoBehaviour
     void UpdateAbilityUI()
     {
         int currentAbility = Player.instance.currentWeapon;
-        if (currentAbility == 0)
-        {
-            abilityIcon1.SetFrame(true);
-            abilityIcon2.SetFrame(false);
-            abilityIcon3.SetFrame(false);
-        }
-        if (currentAbility == 1)
-        {
-            abilityIcon1.SetFrame(false);
-            abilityIcon2.SetFrame(true);
-            abilityIcon3.SetFrame(false);
-        }
-        if (currentAbility == 2)
-        {
-            abilityIcon1.SetFrame(false);
-            abilityIcon2.SetFrame(false);
-            abilityIcon3.SetFrame(true);
-        }
-
+        /*
         if (Player.instance.equippedPassiveAbilities.Count == 1)
         {
-            combatcursor1.SetVisibility(true);
+            combatcursor1.SetVisibility(false);
             combatcursor2.SetVisibility(false);
             combatcursor3.SetVisibility(false);
             combatcursor1.SetCooldown(0, GetAbilityPercent(0));
@@ -298,7 +301,10 @@ public class PlayerUI : MonoBehaviour
             combatcursor3.SetCooldown(0, GetAbilityPercent(0));
             combatcursor3.SetCooldown(1, GetAbilityPercent(1));
             combatcursor3.SetCooldown(2, GetAbilityPercent(2));
-        }
+        }*/
+        combatcursor1.SetVisibility(false);
+        combatcursor2.SetVisibility(false);
+        combatcursor3.SetVisibility(false);
 
         if (Player.instance.equippedPassiveAbilities.Count > 0)
         {
@@ -314,6 +320,21 @@ public class PlayerUI : MonoBehaviour
         }
         ammoNumber.text = $"{Player.instance.equippedPassiveAbilities[currentAbility].currentAmmo}/{Player.instance.equippedPassiveAbilities[currentAbility].GetMaxAmmo()}";
         cursorAmmoText.text = $"{Player.instance.equippedPassiveAbilities[currentAbility].currentAmmo}/{Player.instance.equippedPassiveAbilities[currentAbility].GetMaxAmmo()}";
+        if (spTransform.sizeDelta.y >= 158)
+        {
+            if (spBlink < 1) spBlink += Time.deltaTime * 100;
+            if (spBlink >= 1) spBlink = 0;
+
+            if (spBlink < 0.45f) spBar.sprite = Special_Normal;
+            else spBar.sprite = Special_Blink;
+        }
+        else
+        {
+            spBlink = 0;
+            spBar.sprite = Special_Normal;
+        }
+        comboCounterTransform.transform.localScale = Vector3.Lerp(comboCounterTransform.transform.localScale, Vector3.one, Time.deltaTime * 3f);
+        comboCounter.color = Color.Lerp(comboCounter.color, combo == 0 ? Color.clear : Color.white, Time.deltaTime);
     }
 
     public void SetStageText(string text)
@@ -431,7 +452,7 @@ public class PlayerUI : MonoBehaviour
     public void UpdateSpecial(float current, float max)
     {
         float special = current / max;
-        spBar.fillAmount = 1 - special;
+        spTransform.sizeDelta = new Vector2(16, 7 + ((1 - special) * 151f));
         //spTransform.sizeDelta = new Vector2(width, spTransform.sizeDelta.y);
     }
 

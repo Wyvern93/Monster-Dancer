@@ -24,6 +24,10 @@ public class LunarRainAbility : PlayerAbility
         currentCooldown = 0;
     }
 
+    public override BeatManager.BeatType getBeatTrigger()
+    {
+        return BeatManager.BeatType.MidCompass;
+    }
     public override string getAbilityDescription()
     {
         string starColor = GetStarColorText();

@@ -66,6 +66,7 @@ public class GameManager : MonoBehaviour
         runData.currentMap = "Stage1a";
         runData.characterPrefab = selectedCharacter;
         runData.isInfinite = false;
+        runData.ultimateChosen = typeof(EclipseAbility);
 
         PoolManager.CreatePool(typeof(SpriteRenderer), spriteTrailPrefab, 100);
         

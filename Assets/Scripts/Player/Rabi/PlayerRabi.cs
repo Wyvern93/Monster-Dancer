@@ -108,6 +108,7 @@ public class PlayerRabi : Player
             new MoonlightFlowerAbilityEnhancement()
         };
         
+        // Active
         BunnyHopAbility hop = new BunnyHopAbility();
         hop.OnEquip();
         activeAbility = hop;
@@ -115,9 +116,26 @@ public class PlayerRabi : Player
         UIManager.Instance.PlayerUI.activeCDImage.fillAmount = 0;
         activeAbility.currentCooldown = 0;
 
+        // Ultimate
+        EquipUltimate();
+
         // Moonlight Daggers Spell-Shot
         MoonlightDaggersEnhancement attack = new MoonlightDaggersEnhancement();
         attack.OnEquip();
+    }
+
+    protected override void EquipUltimate()
+    {
+        if (GameManager.runData.ultimateChosen == typeof(EclipseAbility))
+        {
+            EclipseAbilityEnhancement eclipseAbility = new EclipseAbilityEnhancement();
+            eclipseAbility.OnEquip();
+        }
+        else if (GameManager.runData.ultimateChosen == typeof(CarrotDeliveryAbility))
+        {
+            CarrotDeliveryAbilityEnhancement deliveryAbility = new CarrotDeliveryAbilityEnhancement();
+            deliveryAbility.OnEquip();
+        }
     }
 
     public override void Despawn()
@@ -240,7 +258,7 @@ public class PlayerRabi : Player
         while (time <= duration)
         {
             while (GameManager.isPaused) yield return null;
-            if (BeatManager.GetBeatSuccess() == BeatTrigger.PERFECT && time < duration / 2f)//(time <= 0.05f)
+            if (BeatManager.GetBeatSuccess(BeatManager.BeatType.Beat) == BeatTrigger.PERFECT && time < duration / 2f)//(time <= 0.05f)
             {
                 if (InputManager.ActionHold(InputActionType.ABILITY) && activeAbility.CanCast())
                 {
@@ -376,10 +394,18 @@ public class PlayerRabi : Player
         isCastingBunnyHop = false;
     }
 
-    public override void OnPassiveAbilityUse()
+    public override void OnPassiveAbilityUse(int id)
     {
-        PlayerAbility a = equippedPassiveAbilities[currentWeapon];
-        if (a.CanCast()) a.OnCast();
+        PlayerAbility a = equippedPassiveAbilities[id];
+
+        a.OnCast();
+        /*
+        if (a.CanCast())
+        {
+            
+            BeatSucessEffect effect = PoolManager.Get<BeatSucessEffect>();
+            effect.transform.position = transform.position + new Vector3(0, 0.5f, 0f);
+        }*/
         /*
         foreach (PlayerAbility ability in equippedPassiveAbilities)
         {

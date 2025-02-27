@@ -17,3 +17,4 @@ MonoBehaviour:
   offset: 0.607
   loopStart: 0.607
   loopEnd: 9.69
+  compassStartBeat: 1

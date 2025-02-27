@@ -14,7 +14,10 @@ public class CarrotBuster : MonoBehaviour
         animator.Play(left ? "carrotbuster_left" : "carrotbuster_right");
         AudioController.PlaySound(sfx, Random.Range(0.95f, 1.05f));
 
-        Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
+        Vector2 crosshairPos;
+        Enemy closestEnemy = Stage.GetClosestEnemyTo(Player.instance.transform.position, 15);
+        if (closestEnemy != null) crosshairPos = closestEnemy.transform.position;
+        else crosshairPos = Player.instance.transform.position; //UIManager.Instance.PlayerUI.crosshair.transform.position;
         Vector2 difference = (crosshairPos - (Vector2)Player.instance.transform.position).normalized;
         Vector2 animDir;
 

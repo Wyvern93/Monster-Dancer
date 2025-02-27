@@ -65,6 +65,7 @@ public abstract class Enhancement
             Player.instance.AddItemToInventory(getItem());
         }
         Player.instance.CalculateStats();
+        BeatManager.instance.ClearBeatObjects();
     }
 
     public bool isUnlocked()

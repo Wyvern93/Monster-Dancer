@@ -95,7 +95,7 @@ public class EclipseAbility : PlayerAbility
 
     public override void OnUpdate()
     {
-        if (BeatManager.isQuarterBeat && currentCooldown > 0) currentCooldown -= 0.25f;
+        //if (BeatManager.isQuarterBeat && currentCooldown > 0) currentCooldown -= 0.25f;
         UIManager.Instance.PlayerUI.UpdateSpecial(currentCooldown, GetMaxCooldown());
     }
 }

@@ -34,6 +34,25 @@ public abstract class PlayerAbility : PlayerInventoryObject
         return rawCooldown;
     }
 
+    public virtual BeatManager.BeatType getBeatTrigger()
+    {
+        return BeatManager.BeatType.Beat;
+    }
+
+    public float GetBeatSize()
+    {
+        BeatManager.BeatType beatTrigger = getBeatTrigger();
+        switch (beatTrigger)
+        {
+            default:
+            case BeatManager.BeatType.Beat: return 1f;
+            case BeatManager.BeatType.Mid: return 0.5f;
+            case BeatManager.BeatType.Quarter: return 0.25f;
+            case BeatManager.BeatType.MidCompass: return 2f;
+            case BeatManager.BeatType.Compass: return 4f;
+        }
+    }
+
     public virtual float GetAttackSpeed()
     {
         float rawAttackSpeed = Mathf.Clamp((baseAttackSpeed + itemValues["bonusAtkSpeed"]) * itemValues["atkSpeedMultiplier"], 0, 100);
