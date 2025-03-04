@@ -105,7 +105,6 @@ public class GameManager : MonoBehaviour
         if (Keyboard.current.f1Key.wasPressedThisFrame)
         {
             BeatManager.compassless = !BeatManager.compassless;
-            BeatManager.UpdatePulseAnimator();
         }
 
         if (Keyboard.current.f7Key.wasPressedThisFrame)

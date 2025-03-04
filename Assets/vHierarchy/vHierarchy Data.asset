@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a9752b0c8e144801967e6897679604b, type: 3}
+  m_Name: vHierarchy Data
+  m_EditorClassIdentifier: 
+  sceneDatas_byGuid:
+    keys:
+    - 3fca84b542a10f14187fff089fbc6aad
+    values:
+    - goDatas_byGlobalId:
+        keys:
+        - globalObjectIdString: GlobalObjectId_V1-2-3fca84b542a10f14187fff089fbc6aad-767326771-0
+        - globalObjectIdString: GlobalObjectId_V1-2-3fca84b542a10f14187fff089fbc6aad-1220506776-0
+        - globalObjectIdString: GlobalObjectId_V1-2-3fca84b542a10f14187fff089fbc6aad-1457422558-0
+        - globalObjectIdString: GlobalObjectId_V1-2-3fca84b542a10f14187fff089fbc6aad-2055704223-0
+        - globalObjectIdString: GlobalObjectId_V1-2-3fca84b542a10f14187fff089fbc6aad-1136607951-0
+        - globalObjectIdString: GlobalObjectId_V1-2-3fca84b542a10f14187fff089fbc6aad-1480571486-0
+        - globalObjectIdString: GlobalObjectId_V1-2-3fca84b542a10f14187fff089fbc6aad-1451280026-0
+        - globalObjectIdString: GlobalObjectId_V1-2-3fca84b542a10f14187fff089fbc6aad-121888108-0
+        - globalObjectIdString: GlobalObjectId_V1-2-3fca84b542a10f14187fff089fbc6aad-1111830911-0
+        - globalObjectIdString: GlobalObjectId_V1-2-3fca84b542a10f14187fff089fbc6aad-1143981914-0
+        - globalObjectIdString: GlobalObjectId_V1-2-3fca84b542a10f14187fff089fbc6aad-695976542-0
+        - globalObjectIdString: GlobalObjectId_V1-2-3fca84b542a10f14187fff089fbc6aad-1410411420-0
+        - globalObjectIdString: GlobalObjectId_V1-2-3fca84b542a10f14187fff089fbc6aad-7051745-0
+        values:
+        - colorIndex: 8
+          iconNameOrGuid: Settings Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 7
+          iconNameOrGuid: ScriptableObject Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 2
+          iconNameOrGuid: AudioClip Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 2
+          iconNameOrGuid: 
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 2
+          iconNameOrGuid: 
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 3
+          iconNameOrGuid: StandaloneInputModule Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 3
+          iconNameOrGuid: 
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 3
+          iconNameOrGuid: 
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: Canvas Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: Canvas Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 4
+          iconNameOrGuid: Camera Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: Canvas Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: BoxCollider2D Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+  bookmarks: []
+  bookmarkedScenePaths: []

@@ -16,8 +16,6 @@ public class BeatManager : MonoBehaviour
     public static float audio_offset;
     public static int compassStartBeat;
 
-    [SerializeField] SpriteRenderer skillZBeatIndicator, skillXBeatIndicator, skillCBeatIndicator;
-    [SerializeField] Transform skillIndicatorTransform;
     // secondsPerBeat remains the same
     public float secondsPerBeat;
 
@@ -322,12 +320,6 @@ public class BeatManager : MonoBehaviour
             OnQuarterBeat();
         }
 
-        if (Player.instance == null)
-        {
-            skillZBeatIndicator.color = Color.clear;
-            skillXBeatIndicator.color = Color.clear;
-            skillCBeatIndicator.color = Color.clear;
-        }
         UpdateTimeline();
         UpdateUI();
     }
