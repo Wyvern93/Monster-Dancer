@@ -97,6 +97,7 @@ public class CarrotDeliveryAbility : PlayerAbility, IPlayerProjectile
     }
     public override void OnEquip()
     {
+        currentCooldown = GetMaxCooldown();
         UIManager.Instance.PlayerUI.UpdateSpecial(currentCooldown, GetMaxCooldown());
     }
 

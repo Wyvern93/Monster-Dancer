@@ -81,6 +81,7 @@ MonoBehaviour:
   idleAnimation: nekomander_normal
   moveAnimation: nekomander_move
   shootAnimation: nekomander_preattack
+  canBeKnocked: 1
   beatContact: 0
   isElite: 0
   Sprite: {fileID: 6757894220494492538}
@@ -99,6 +100,8 @@ MonoBehaviour:
   slownessStatus: {fileID: 0}
   enemyType: 27
   group: {fileID: 0}
+  shouldMove: 0
+  moveToggle: 0
 --- !u!95 &6723147761156784378
 Animator:
   serializedVersion: 5

@@ -184,6 +184,8 @@ MonoBehaviour:
   slownessStatus: {fileID: 0}
   enemyType: 37
   group: {fileID: 0}
+  shouldMove: 0
+  moveToggle: 0
   boxCollider: {fileID: 7351202717007107798}
 --- !u!95 &6914396188996239605
 Animator:

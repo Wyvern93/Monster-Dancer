@@ -12,6 +12,7 @@ public class JackO : Enemy
 
     private IEnumerator ShootBulletsCoroutine()
     {
+        isAttacking = true;
         // Begin the pre-attack animation.
         animator.Play("boojr_preattack");
         animator.speed = 1f / BeatManager.GetBeatDuration();
@@ -46,8 +47,9 @@ public class JackO : Enemy
         bulletSpawnEffect.Despawn();
 
         // Reset animator speed and play the normal animation.
-        animator.speed = (1f / BeatManager.GetBeatDuration()) * 2f;
-        animator.Play("boojr_normal");
+        animator.speed = (1f / BeatManager.GetBeatDuration());
+        animator.Play("boojr_move");
+        isAttacking = false;
         yield break;
     }
 

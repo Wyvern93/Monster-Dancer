@@ -12,6 +12,7 @@ public class RhythMaiden : Enemy
 
     private IEnumerator ShootBulletsCoroutine()
     {
+        isAttacking = true;
         animator.Play("rhythmaiden_normal");
         BulletSpawnEffect bulletSpawnEffect = PoolManager.Get<BulletSpawnEffect>();
         bulletSpawnEffect.source = this;
@@ -40,7 +41,7 @@ public class RhythMaiden : Enemy
         AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
         bulletSpawnEffect.Despawn();
         isAttacking = false;
-        animator.Play("rhythmaiden_normal");
+        animator.Play("rhythmaiden_move");
         yield break;
         
     }

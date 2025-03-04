@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class StayinUndeadElite : Enemy
 {
@@ -21,6 +22,7 @@ public class StayinUndeadElite : Enemy
 
     public override void OnSpawn()
     {
+        shouldMove = false;
         shootDisco = false;
         phase = 0;
         beatCD = -1;
@@ -32,8 +34,43 @@ public class StayinUndeadElite : Enemy
         canBeKnocked = false;
     }
 
+    public override void MoveUpdate()
+    {
+        if (GameManager.isPaused || stunStatus.isStunned())
+        {
+            velocity = Vector2.zero;
+            return;
+        }
+
+        if (!shouldMove || !CanMove() || isAttacking)
+        {
+            velocity = Vector2.zero;
+            return;
+        }
+        AnimatorClipInfo animInfo = animator.GetCurrentAnimatorClipInfo(0)[0];
+        if (transform.position != targetPos && animInfo.clip.name == "stayinundead_normal")
+        {
+            animator.Play("stayinundead_move");
+        }
+        if (transform.position == targetPos && animInfo.clip.name == "stayinundead_move")
+        {
+            animator.Play("stayinundead_normal");
+        }
+
+        facingRight = transform.position.x < targetPos.x;
+        velocity = Vector2.zero;
+
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, speed * 3 * Time.deltaTime);
+    }
+
     protected override void OnBeat()
     {
+        // Move Behaviour
+        if (CanMove())
+        {
+            if (shouldMove) animator.Play(moveAnimation);
+            else animator.Play(idleAnimation);
+        }
         switch (phase)
         {
             case 0:
@@ -66,6 +103,7 @@ public class StayinUndeadElite : Enemy
 
     private IEnumerator SpinCoroutine()
     {
+        shouldMove = false;
         AudioController.PlaySound(AudioController.instance.sounds.chargeBulletSound);
         BulletSpawnEffect bulletSpawnEffect = PoolManager.Get<BulletSpawnEffect>();
         bulletSpawnEffect.source = this;
@@ -132,9 +170,13 @@ public class StayinUndeadElite : Enemy
     {
         if (shootDisco)
         {
-             if (balls <= 3) StartCoroutine(DiscoMoveCoroutine());
+             if (balls <= 3)
+             {
+                StartCoroutine(DiscoMoveCoroutine());
+             } 
              else
              {
+                shouldMove = false;
                 phase = 2;
                 beatCD = -1;
                 balls = 0;
@@ -155,7 +197,7 @@ public class StayinUndeadElite : Enemy
 
         while ((Vector2)transform.position != (Vector2)targetPos)
         {
-            if (BeatManager.isBeat && CanMove()) StartCoroutine(MoveToTarget());
+            if (BeatManager.isBeat && CanMove()) shouldMove = true;//StartCoroutine(MoveToTarget());
             yield return null;
         }
         // Charge it
@@ -183,10 +225,10 @@ public class StayinUndeadElite : Enemy
             time += Time.deltaTime;
             yield return null;
         }
-
+        shouldMove = true;
         // Dance left
         targetPos = transform.position - Vector3.left * 2f;
-        StartCoroutine(MoveToTarget());
+        //StartCoroutine(MoveToTarget());
         time = 0;
         while (time <= BeatManager.GetBeatDuration())
         {
@@ -197,7 +239,7 @@ public class StayinUndeadElite : Enemy
 
         // Dance right
         targetPos = transform.position - Vector3.right * 2f;
-        StartCoroutine(MoveToTarget());
+        //StartCoroutine(MoveToTarget());
         time = 0;
         while (time <= BeatManager.GetBeatDuration())
         {
@@ -207,7 +249,7 @@ public class StayinUndeadElite : Enemy
         }
         // Dance left
         targetPos = transform.position - Vector3.left * 2f;
-        StartCoroutine(MoveToTarget());
+        //StartCoroutine(MoveToTarget());
         time = 0;
         while (time <= BeatManager.GetBeatDuration())
         {
@@ -218,7 +260,7 @@ public class StayinUndeadElite : Enemy
 
         // Dance right
         targetPos = transform.position - Vector3.right * 2f;
-        StartCoroutine(MoveToTarget());
+        //StartCoroutine(MoveToTarget());
         time = 0;
         while (time <= BeatManager.GetBeatDuration())
         {
@@ -230,6 +272,7 @@ public class StayinUndeadElite : Enemy
         // Finish
         balls++;
         shootDisco = true;
+        shouldMove = false;
         yield break;
     }
 
@@ -238,12 +281,13 @@ public class StayinUndeadElite : Enemy
         targetPos = (Vector2)Camera.main.transform.position;
         if ((Vector2)transform.position == (Vector2)targetPos)
         {
+            shouldMove = false;
             phase = 0;
             beatCD = -1;
         }
         else
         {
-            if (CanMove()) StartCoroutine(MoveToTarget());
+            if (CanMove()) shouldMove = true;//StartCoroutine(MoveToTarget());
         }
     }
 

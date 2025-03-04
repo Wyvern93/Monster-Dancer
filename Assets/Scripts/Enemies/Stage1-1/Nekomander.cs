@@ -17,6 +17,7 @@ public class Nekomander : Enemy
 
     private IEnumerator ShootBulletsCoroutine()
     {
+        isAttacking = true;
         animator.Play("nekomander_preattack");
         BulletSpawnEffect bulletSpawnEffect = PoolManager.Get<BulletSpawnEffect>();
         bulletSpawnEffect.source = this;
@@ -37,8 +38,8 @@ public class Nekomander : Enemy
         AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
 
         bulletSpawnEffect.Despawn();
-
-        animator.Play("dancearune_normal");
+        if (shouldMove) animator.Play("dancearune_move");
+        else animator.Play("dancearune_normal");
         isAttacking = false;
         yield break;
     }

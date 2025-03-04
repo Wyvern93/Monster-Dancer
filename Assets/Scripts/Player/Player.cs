@@ -471,19 +471,18 @@ public abstract class Player : MonoBehaviour
         }
         facingRight = direction.x > 0;
 
-        /*
-        if (BeatManager.compassless)
-        {
-            HandleCompasslessInput();
-            return;
-        }*/
         BeatTrigger beatTrigger;
         float reductionMultiplier;
-        if (InputManager.ActionPress(InputActionType.FIRST_SKILL))
+
+        bool canUseASkill = true;
+        if (BeatManager.compassless && !BeatManager.isMidBeat) canUseASkill = false;
+
+        if ((InputManager.ActionPress(InputActionType.FIRST_SKILL) && !BeatManager.compassless) && canUseASkill || (InputManager.ActionHold(InputActionType.FIRST_SKILL) && BeatManager.compassless && canUseASkill))
         {
             beatTrigger = BeatManager.GetBeatSuccess(equippedPassiveAbilities[0].getBeatTrigger());
             if (beatTrigger == BeatTrigger.SUCCESS || beatTrigger == BeatTrigger.PERFECT)
             {
+                canUseASkill = false;
                 OnPassiveAbilityUse(0);
                 BeatSucessEffect effect = PoolManager.Get<BeatSucessEffect>();
                 effect.animator.Play("skillZSuccessEffect");
@@ -494,21 +493,22 @@ public abstract class Player : MonoBehaviour
                     ultimateAbility.currentCooldown = Mathf.Clamp(ultimateAbility.currentCooldown - (equippedPassiveAbilities[0].GetBeatSize() * reductionMultiplier), 0, 9999);
                 }
                 UIManager.Instance.PlayerUI.AddToComboCounter((int)(equippedPassiveAbilities[0].GetBeatSize() * 2));
+                BeatManager.TriggerBeatScore(beatTrigger);
             }
-            else
+            else if (!BeatManager.compassless)
             {
                 AudioController.PlaySoundWithoutCooldown(AudioController.instance.sounds.beatFailSfx);
                 PlayerCamera.TriggerCameraShake(0.2f, 0.3f);
                 UIManager.Instance.PlayerUI.FailCombo();
+                BeatManager.TriggerBeatScore(beatTrigger);
             }
-            BeatManager.TriggerBeatScore(beatTrigger);
         }
 
         if (equippedPassiveAbilities.Count > 1)
         {
-            
-            if (InputManager.ActionPress(InputActionType.SECOND_SKILL))
+            if ((InputManager.ActionPress(InputActionType.SECOND_SKILL) && !BeatManager.compassless && canUseASkill) || (InputManager.ActionHold(InputActionType.SECOND_SKILL) && BeatManager.compassless && canUseASkill))
             {
+                canUseASkill = false;
                 beatTrigger = BeatManager.GetBeatSuccess(equippedPassiveAbilities[1].getBeatTrigger());
                 if (beatTrigger == BeatTrigger.SUCCESS || beatTrigger == BeatTrigger.PERFECT)
                 {
@@ -522,21 +522,23 @@ public abstract class Player : MonoBehaviour
                         ultimateAbility.currentCooldown = Mathf.Clamp(ultimateAbility.currentCooldown - (equippedPassiveAbilities[1].GetBeatSize() * reductionMultiplier), 0, 9999);
                     }
                     UIManager.Instance.PlayerUI.AddToComboCounter((int)(equippedPassiveAbilities[1].GetBeatSize() * 2));
+                    BeatManager.TriggerBeatScore(beatTrigger);
                 }
-                else
+                else if (!BeatManager.compassless)
                 {
                     AudioController.PlaySoundWithoutCooldown(AudioController.instance.sounds.beatFailSfx);
                     PlayerCamera.TriggerCameraShake(0.2f, 0.3f);
                     UIManager.Instance.PlayerUI.FailCombo();
+                    BeatManager.TriggerBeatScore(beatTrigger);
                 }
-                BeatManager.TriggerBeatScore(beatTrigger);
             }
         }
 
         if (equippedPassiveAbilities.Count > 2)
         {
-            if (InputManager.ActionPress(InputActionType.THIRD_SKILL))
+            if ((InputManager.ActionPress(InputActionType.THIRD_SKILL) && !BeatManager.compassless && canUseASkill) || (InputManager.ActionHold(InputActionType.THIRD_SKILL) && BeatManager.compassless && canUseASkill))
             {
+                canUseASkill = false;
                 beatTrigger = BeatManager.GetBeatSuccess(equippedPassiveAbilities[2].getBeatTrigger());
                 if (beatTrigger == BeatTrigger.SUCCESS || beatTrigger == BeatTrigger.PERFECT)
                 {
@@ -550,20 +552,21 @@ public abstract class Player : MonoBehaviour
                         ultimateAbility.currentCooldown = Mathf.Clamp(ultimateAbility.currentCooldown - (equippedPassiveAbilities[2].GetBeatSize() * reductionMultiplier), 0, 9999);
                     }
                     UIManager.Instance.PlayerUI.AddToComboCounter((int)(equippedPassiveAbilities[2].GetBeatSize() * 2));
+                    BeatManager.TriggerBeatScore(beatTrigger);
                 }
-                else
+                else if (!BeatManager.compassless)
                 {
                     AudioController.PlaySoundWithoutCooldown(AudioController.instance.sounds.beatFailSfx);
                     PlayerCamera.TriggerCameraShake(0.2f, 0.3f);
                     UIManager.Instance.PlayerUI.FailCombo();
+                    BeatManager.TriggerBeatScore(beatTrigger);
                 }
-                BeatManager.TriggerBeatScore(beatTrigger);
             }
         }
 
 
 
-        if (InputManager.ActionPress(InputActionType.ABILITY) && activeAbility.CanCast())
+        if ((InputManager.ActionPress(InputActionType.ABILITY) && activeAbility.CanCast() && !BeatManager.compassless) || (InputManager.ActionHold(InputActionType.ABILITY) && activeAbility.CanCast() && BeatManager.compassless && BeatManager.isBeat))
         {
             beatTrigger = BeatManager.GetBeatSuccess(BeatManager.BeatType.Beat, true);
             if (beatTrigger == BeatTrigger.SUCCESS || beatTrigger == BeatTrigger.PERFECT)
@@ -578,32 +581,34 @@ public abstract class Player : MonoBehaviour
                     ultimateAbility.currentCooldown = Mathf.Clamp(ultimateAbility.currentCooldown - (activeAbility.GetMaxCooldown() * reductionMultiplier), 0, 9999);
                 }
                 UIManager.Instance.PlayerUI.AddToComboCounter(1);
+                BeatManager.TriggerBeatScore(beatTrigger);
             }
-            else
+            else if (!BeatManager.compassless)
             {
                 AudioController.PlaySoundWithoutCooldown(AudioController.instance.sounds.beatFailSfx);
                 PlayerCamera.TriggerCameraShake(0.2f, 0.3f);
                 UIManager.Instance.PlayerUI.FailCombo();
+                BeatManager.TriggerBeatScore(beatTrigger);
             }
-            BeatManager.TriggerBeatScore(beatTrigger);
         }
 
         if (ultimateAbility != null)
         {
-            if (InputManager.ActionPress(InputActionType.ULTIMATE) && ultimateAbility.CanCast())
+            if (((InputManager.ActionPress(InputActionType.ULTIMATE) && ultimateAbility.CanCast() && !BeatManager.compassless) || (InputManager.ActionHold(InputActionType.ULTIMATE) && ultimateAbility.CanCast() && BeatManager.compassless && BeatManager.isBeat)))
             {
                 beatTrigger = BeatManager.GetBeatSuccess(BeatManager.BeatType.Beat, true);
                 if (beatTrigger == BeatTrigger.SUCCESS || beatTrigger == BeatTrigger.PERFECT)
                 {
                     OnUltimateUse();
                     UIManager.Instance.PlayerUI.AddToComboCounter(1);
+                    BeatManager.TriggerBeatScore(beatTrigger);
                 }
-                else
+                else if (!BeatManager.compassless)
                 {
                     AudioController.PlaySoundWithoutCooldown(AudioController.instance.sounds.beatFailSfx);
                     PlayerCamera.TriggerCameraShake(0.2f, 0.3f);
+                    BeatManager.TriggerBeatScore(beatTrigger);
                 }
-                BeatManager.TriggerBeatScore(beatTrigger);
             }
         }
         

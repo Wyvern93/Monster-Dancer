@@ -26,6 +26,8 @@ public class Bullet : MonoBehaviour
     public StunEffect stunStatus;
     public bool forcedDespawn;
     protected bool isInitialized;
+    protected float beatCD;
+
     private void Awake()
     {
         stunStatus = new StunEffect();
@@ -79,6 +81,24 @@ public class Bullet : MonoBehaviour
     {
         if (!BeatManager.isPlaying) return;
         if (GameManager.isPaused) return;
+
+        if (beatCD <= 0)
+        {
+            beatCD += BeatManager.GetBeatDuration();
+            if (!stunStatus.isStunned()) OnBeat();
+            beatScale = 1.25f;
+            if (stunStatus.duration > 0)
+            {
+                if (stunStatus.duration == 1) OnStunEnd();
+                stunStatus.duration--;
+            }
+        }
+        else
+        {
+            beatCD -= Time.deltaTime;
+        }
+
+        /*
         if (BeatManager.isBeat)
         {
             if (!stunStatus.isStunned()) OnBeat();
@@ -90,7 +110,7 @@ public class Bullet : MonoBehaviour
         {
             if (stunStatus.duration == 1) OnStunEnd();
             stunStatus.duration--;
-        }
+        }*/
 
         emission -= Time.deltaTime * 1f;
         if (emission < -0.1) emission = 0.03f;
@@ -183,7 +203,7 @@ public class Bullet : MonoBehaviour
         boxCollider.enabled = false;
         circleCollider.enabled = false;
         float time = 0;
-        while (time <= BeatManager.GetBeatDuration() / 2f)
+        while (time <= BeatManager.GetBeatDuration())
         {
             spriteRenderer.transform.localScale = Vector3.Lerp(spriteRenderer.transform.localScale, Vector3.one * 1.5f, Time.deltaTime * 8f);
             spriteRenderer.color = Color.Lerp(spriteRenderer.color, new Color(1, 0, 0, 0), Time.deltaTime * 8f);

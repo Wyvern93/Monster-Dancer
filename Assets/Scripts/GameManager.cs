@@ -38,6 +38,24 @@ public class GameManager : MonoBehaviour
         IconList.instance = iconList;
     }
 
+    public static void DoHitPause()
+    {
+        instance.StopCoroutine("hitPauseCoroutine");
+        instance.StartCoroutine(instance.hitPauseCoroutine());
+    }
+
+    private IEnumerator hitPauseCoroutine()
+    {
+        float startTime = Time.unscaledTime;
+        Time.timeScale = 0;
+        while (true)
+        {
+            yield return null;
+            if (Time.unscaledTime >= startTime + 0.08f) break;
+        }
+        Time.timeScale = 1;
+    }
+
     public static void SetSettings()
     {
         List<Resolution> resolutions = Screen.resolutions.ToList();

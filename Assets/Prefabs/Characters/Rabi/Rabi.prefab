@@ -385,7 +385,7 @@ MonoBehaviour:
     ExpMulti: 1
     Haste: 0
     Rerolls: 0
-    Speed: 1.3
+    Speed: 1.1
   perLevelStats:
     MaxHP: 0
     Def: 0

@@ -13,6 +13,7 @@ public class ZombieBride : Enemy
 
     private IEnumerator ShootBulletsCoroutine()
     {
+        isAttacking = true;
         // Begin the pre-attack animation.
         animator.Play("zombiebride_normal");
         animator.speed = 1f / BeatManager.GetBeatDuration();
@@ -49,15 +50,16 @@ public class ZombieBride : Enemy
         {
             float angle = baseAngle + (j * 12f);
             Vector2 bulletDir = BulletBase.angleToVector(angle);
-            SpawnBullet(bulletDir, 11);
-            SpawnBullet(bulletDir, 14);
+            SpawnBullet(bulletDir, 10);
+            SpawnBullet(bulletDir, 12);
         }
         AudioController.PlaySound(AudioController.instance.sounds.bulletwaveShootSound);
         bulletSpawnEffect.Despawn();
 
         // Reset animator speed and play the normal animation.
-        animator.speed = (1f / BeatManager.GetBeatDuration()) * 2f;
-        animator.Play("zombiebride_normal");
+        animator.speed = (1f / BeatManager.GetBeatDuration());
+        animator.Play("zombiebride_move");
+        isAttacking = false;
         yield break;
     }
 

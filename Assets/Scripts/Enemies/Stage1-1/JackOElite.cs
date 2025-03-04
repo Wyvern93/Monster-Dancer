@@ -12,18 +12,46 @@ public class JackOElite : Enemy
     [SerializeField] BoxCollider2D boxCollider;
     public override void OnSpawn()
     {
+        shouldMove = false;
+        rb.velocity = Vector3.zero;
+        targetPos = (Vector2)Camera.main.transform.position;
         lightAttackAngleBase = 0;
         beatCD = -1;
         base.OnSpawn();
         UIManager.Instance.PlayerUI.SetBossBarName("King Jack 'o");
         UIManager.Instance.PlayerUI.ShowBossBar(true);
         UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
-        speed = 1.0f;
+        speed = 1.6f;
         canBeKnocked = false;
+    }
+
+    public override void MoveUpdate()
+    { 
+        if (GameManager.isPaused || stunStatus.isStunned())
+        {
+            velocity = Vector2.zero;
+            return;
+        }
+        if (!shouldMove || !CanMove() || isAttacking)
+        {
+            velocity = Vector2.zero;
+            return;
+        }
+
+        facingRight = transform.position.x < targetPos.x;
+        velocity = Vector2.zero;
+
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, speed * 3 * Time.deltaTime);
     }
 
     protected override void OnBeat()
     {
+        // Move Behaviour
+        if (CanMove())
+        {
+            if (shouldMove) animator.Play(moveAnimation);
+            else animator.Play(idleAnimation);
+        }
         switch (phase)
         {
             case 0:
@@ -44,6 +72,7 @@ public class JackOElite : Enemy
 
     private void HandleSpiralPhase()
     {
+        shouldMove = false;
         canBeKnocked = false;
         beatCD++;
         if (isAttacking) return;
@@ -65,13 +94,16 @@ public class JackOElite : Enemy
         beatCD++;
         if (beatCD < 24)
         {
-            if (beatCD == 0 || beatCD == 8 || beatCD == 16)
+            if (beatCD == 0 || beatCD == 4 || beatCD == 8 || beatCD == 12 || beatCD == 16)
             {
+                shouldMove = false;
                 StartCoroutine(HideAndReappear());
             }
             else if(CanMove())
             {
-                MoveTowardsPlayer();
+                targetPos = Player.instance.GetClosestPlayer(transform.position);
+                shouldMove = true;
+                //MoveTowardsPlayer();
             }
 
         }
@@ -85,6 +117,7 @@ public class JackOElite : Enemy
 
     private void HandleLightPhase()
     {
+        shouldMove = false;
         beatCD++;
         if (beatCD == 0) StartCoroutine(Hide());
         else if (beatCD == 12) StartCoroutine(Show());
@@ -143,14 +176,16 @@ public class JackOElite : Enemy
 
     private void HandleMoveToSpiral()
     {
+        shouldMove = true;
         canBeKnocked = false;
         if ((Vector2)transform.position != (Vector2)Camera.main.transform.position)
         {
             targetPos = (Vector2)Camera.main.transform.position;
-            if (CanMove()) StartCoroutine(MoveToTarget());
+            //if (CanMove()) StartCoroutine(MoveToTarget());
         }
         else
         {
+            shouldMove = false;
             phase = 0;
             beatCD = -1;
         }
@@ -195,6 +230,7 @@ public class JackOElite : Enemy
 
     private IEnumerator HideAndReappear()
     {
+        shouldMove = false;
         isMoving = true;
         animator.Play("boojr_preattack");
         animator.speed = 1f / BeatManager.GetBeatDuration();
@@ -211,9 +247,9 @@ public class JackOElite : Enemy
         Vector2 cameraPos = Camera.main.transform.position;
         Vector2 targetSpawn = cameraPos;
         targetSpawn = ((Vector2)Player.instance.transform.position + Random.insideUnitCircle.normalized * 6f);
-        while (targetSpawn.x > cameraPos.x + 10 || targetSpawn.x < cameraPos.x - 10 || targetSpawn.y > cameraPos.y + 5 || targetSpawn.y < cameraPos.y - 5)
+        while (targetSpawn.x > cameraPos.x + 14 || targetSpawn.x < cameraPos.x - 14 || targetSpawn.y > cameraPos.y + 8 || targetSpawn.y < cameraPos.y - 8)
         {
-            targetSpawn = ((Vector2)Player.instance.transform.position + Random.insideUnitCircle.normalized * 6f);
+            targetSpawn = ((Vector2)Player.instance.transform.position + Random.insideUnitCircle.normalized * 10f);
         }
         transform.position = targetSpawn;
 
@@ -228,7 +264,8 @@ public class JackOElite : Enemy
         Sprite.color = Color.white;
         isMoving = false;
         animator.Play("boojr_normal");
-        animator.speed = 1f / BeatManager.GetBeatDuration() * 2f;
+        animator.speed = 1f / BeatManager.GetBeatDuration();
+        shouldMove = true;
         yield break;
     }
 
@@ -239,6 +276,8 @@ public class JackOElite : Enemy
 
     private IEnumerator SpiralCoroutine()
     {
+        shouldMove = false;
+        isAttacking = true;
         AudioController.PlaySound(AudioController.instance.sounds.chargeBulletSound);
         animator.Play("boojr_preattack");
         animator.speed = 1f / BeatManager.GetBeatDuration();
@@ -276,6 +315,7 @@ public class JackOElite : Enemy
         isAttacking = false;
         animator.speed = 1f / BeatManager.GetBeatDuration() * 2f;
         animator.Play("boojr_normal");
+        shouldMove = true;
         yield break;
 
     }
@@ -335,18 +375,19 @@ public class JackOElite : Enemy
 
     IEnumerator MoveToTarget()
     {
+        shouldMove = false;
         isMoving = true;
 
         float time = 0;
         Vector2 dir = (targetPos - transform.position).normalized;
         facingRight = dir.x > 0;
         animator.Play(moveAnimation);
-        while (time <= BeatManager.GetBeatDuration() / 2)
+        while (time <= BeatManager.GetBeatDuration())
         {
             while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
             velocity = Vector2.zero;
-            transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * speed * 6);
+            transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * speed * 3);
             if (transform.position == targetPos) break;
             time += Time.deltaTime;
             yield return null;
@@ -362,6 +403,7 @@ public class JackOElite : Enemy
 
     protected override IEnumerator JumpCoroutine()
     {
+        shouldMove = false;
         isMoving = true;
 
         float time = 0;
@@ -369,11 +411,11 @@ public class JackOElite : Enemy
         Vector2 dir = (targetPos - transform.position).normalized;
         facingRight = dir.x > 0;
         animator.Play(moveAnimation);
-        while (time <= BeatManager.GetBeatDuration() / 2)
+        while (time <= BeatManager.GetBeatDuration())
         {
             while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
-            velocity = dir * speed * 6;
+            velocity = dir * speed * 3;
             time += Time.deltaTime;
             yield return null;
         }
@@ -382,6 +424,7 @@ public class JackOElite : Enemy
         Sprite.transform.localPosition = Vector3.zero;
 
         isMoving = false;
+        shouldMove = true;
         yield break;
     }
 }

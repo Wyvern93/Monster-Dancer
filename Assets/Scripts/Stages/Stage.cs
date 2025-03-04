@@ -352,7 +352,7 @@ public class Stage : MonoBehaviour
         PoolManager.CreatePool(typeof(Gem), gemPrefab, 30);
         PoolManager.CreatePool(typeof(BulletGem), bulletgemPrefab, 100);
         PoolManager.CreatePool(typeof(Coin), coinPrefab, 50);
-        PoolManager.CreatePool(typeof(KillEffect), killEffectPrefab, 10);
+        PoolManager.CreatePool(typeof(KillEffect), killEffectPrefab, 50);
         PoolManager.CreatePool(typeof(SpawnEffect), enemySpawnPrefab, 10);
         PoolManager.CreatePool(typeof(BulletBase), bulletBasePrefab, 500);
         PoolManager.CreatePool(typeof(BulletSpawnEffect), bulletSpawnPrefab, 100);

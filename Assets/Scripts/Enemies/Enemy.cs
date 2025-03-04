@@ -32,6 +32,7 @@ public abstract class Enemy : MonoBehaviour
     protected Color emissionColor = new Color(1, 0, 0, 0);
 
     public bool isDead;
+    private float flashCD;
     public int experience;
     public int atk = 1;
     public float speed;
@@ -52,6 +53,8 @@ public abstract class Enemy : MonoBehaviour
 
     public EnemyType enemyType;
     public EnemyGroup group;
+    public bool shouldMove = true;
+    public bool moveToggle;
 
     public static Dictionary<EnemyType, EnemyData> enemyData = new Dictionary<EnemyType, EnemyData>()
     {
@@ -249,6 +252,8 @@ public abstract class Enemy : MonoBehaviour
 
     private void OnEnable()
     {
+        flashCD = 0;
+        shouldMove = true;
         canBeKnocked = true;
         isDead = false;
         Sprite.color = Color.white;
@@ -304,14 +309,32 @@ public abstract class Enemy : MonoBehaviour
         if (Player.instance == null) return;
         if (isDead)
         {
-            transform.position += (Vector3)(deathDir * 4 * Time.deltaTime);
-            Sprite.color = ColorMoveTowards(Sprite.color, new Color(1, 0, 0, 0), Time.deltaTime * 4f);
-            if (Sprite.color.a <= 0f)
+            rb.velocity = Vector3.zero;
+            velocity = Vector3.zero;
+            transform.position += (Vector3)(deathDir * Time.deltaTime);
+            deathDir = Vector2.MoveTowards(deathDir, Vector2.zero, Time.deltaTime * 24f);
+            //Sprite.color = ColorMoveTowards(Sprite.color, new Color(1, 0, 0, 0), Time.deltaTime * 2f);
+            //emissionColor = Color.Lerp(emissionColor, Color.white, Time.deltaTime * 24f);
+            if (flashCD <= 0)
+            {
+                if (Sprite.color.a == 0) Sprite.color = new Color(1, 1, 1, 1);
+                else Sprite.color = Color.clear;
+                flashCD = 0.02f;
+            }
+            else flashCD -= Time.deltaTime;
+            spriteRendererMat.SetColor("_EmissionColor", emissionColor);
+            if (BeatManager.isBeat)
             {
                 Stage.Instance.enemiesAlive.Remove(this);
+                PlayerCamera.TriggerCameraShake(0.3f, 0.2f);
+                SpawnDeathEffect();
                 PoolManager.Return(gameObject, GetType());
             }
             return;
+        }
+        if (flashCD > 0)
+        {
+            flashCD -= Time.deltaTime;
         }
         if (!stunStatus.isStunned())
         {
@@ -348,9 +371,49 @@ public abstract class Enemy : MonoBehaviour
             Vector3 speed = slownessStatus.isSlowed() ? slownessStatus.ApplySlow(velocity.magnitude) * velocity.normalized : velocity;
             rb.velocity = speed + (knockback * 2);
         }
-        
+        MoveUpdate();
         HandleSprite();
         HandleKnockback();
+    }
+
+    public virtual void MoveUpdate()
+    {
+        if (GameManager.isPaused || stunStatus.isStunned())
+        {
+            velocity = Vector2.zero;
+            return;
+        }
+        if (!shouldMove || !CanMove() || isAttacking)
+        {
+            velocity = Vector2.zero; 
+            return;
+        }
+
+        
+        Vector2 dir = GetDirectionFromAI();
+        facingRight = dir.x > 0;
+        float spd = 2f * (moveToggle ? 2f : 1f);
+
+        if (aiType == EnemyAIType.CircleHorde) spd += 0.2f;
+        //if (dir.x > 0) spd += (dir.x * Time.deltaTime);
+        velocity = dir * speed * spd;
+        velocity = WithStageVelocity(velocity);
+
+        if (aiType == EnemyAIType.Orbital)
+        {
+            float anglePerEnemy = 360f / group.totalEnemies;
+
+            float currentAngle = group.orbitAngle + (anglePerEnemy * SpawnIndex);
+
+            Vector3 center = group.GetCenter();
+            Vector3 targetPosition = new Vector3(center.x + (Mathf.Cos(currentAngle * Mathf.Deg2Rad) * group.orbitDistance), center.y + (Mathf.Sin(currentAngle * Mathf.Deg2Rad) * group.orbitDistance));
+            transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * spd * Time.deltaTime);//speed * spd * beatTime * Time.deltaTime);
+            velocity = Vector3.zero;
+        }
+        else
+        {
+            velocity = dir * speed * spd;//beatTime * 1.3f;
+        }
     }
     public virtual void OnSpawn()
     {
@@ -362,7 +425,7 @@ public abstract class Enemy : MonoBehaviour
         isMoving = false;
         Sprite.transform.localPosition = Vector3.zero;
         animator.Play(idleAnimation);
-        animator.speed = 1f / BeatManager.GetBeatDuration() * 2;
+        animator.speed = 1f / BeatManager.GetBeatDuration();
         beat = BeatManager.beats % 8;
         isAttacking = false;
     }
@@ -384,30 +447,23 @@ public abstract class Enemy : MonoBehaviour
 
     protected virtual void OnBeat()
     {
+        // Move Behaviour
+        if (CanMove())
+        {
+            if (moveToggle) shouldMove = !shouldMove;
+            if (shouldMove) animator.Play(moveAnimation);
+            else animator.Play(idleAnimation);
+        }
+
         switch (enemyData[enemyType].enemyClass)
         {
-            case EnemyClass.Runner:
-            case EnemyClass.Bomber:
-                if (CanMove()) StartCoroutine(JumpCoroutine());
-                break;
             case EnemyClass.Shooter:
                 beat--;
-                if (beat > 0)
-                {
-                    if (CanMove()) StartCoroutine(JumpCoroutine());
-                    break;
-                }
-                else if (beat <= 0)
+                if (beat <= 0)
                 {
                     if (isCloseEnoughToShoot())
                     {
-                        if (aiType == EnemyAIType.Orbital) StartCoroutine(JumpCoroutine());
                         Shoot();
-                    }
-                    else if (aiType == EnemyAIType.Orbital) StartCoroutine(JumpCoroutine()); 
-                    else if (CanMove())
-                    {
-                        StartCoroutine(JumpCoroutine());
                     }
                     beat = 8;
                     break;
@@ -441,7 +497,7 @@ public abstract class Enemy : MonoBehaviour
 
         facingRight = dir.x > 0;
         animator.Play(moveAnimation);
-        animator.speed = 1f / BeatManager.GetBeatDuration() * 1.5f;
+        animator.speed = 1f / BeatManager.GetBeatDuration();// * 1.5f;
         //animator.speed *= 2;
 
         float time = 0;
@@ -452,10 +508,10 @@ public abstract class Enemy : MonoBehaviour
         velocity = dir * speed * spd;
         velocity = WithStageVelocity(velocity);
 
-        float beatDuration = BeatManager.GetBeatDuration() * 0.5f;
+        float beatDuration = BeatManager.GetBeatDuration();// * 0.5f;
         float beatTime = 1;
 
-        while (time <= BeatManager.GetBeatDuration() * 0.5f)
+        while (time <= BeatManager.GetBeatDuration())// * 0.5f)
         {
             while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
@@ -469,14 +525,14 @@ public abstract class Enemy : MonoBehaviour
 
                 Vector3 center = group.GetCenter();
                 Vector3 targetPosition = new Vector3(center.x + (Mathf.Cos(currentAngle * Mathf.Deg2Rad) * group.orbitDistance), center.y + (Mathf.Sin(currentAngle * Mathf.Deg2Rad) * group.orbitDistance));
-                transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * spd * beatTime * Time.deltaTime);
+                transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * spd * Time.deltaTime);//speed * spd * beatTime * Time.deltaTime);
                 velocity = Vector3.zero;
             }
             else
             {
                 //dir += group.dirToPlayer;
                 //dir.Normalize();
-                velocity = dir * speed * spd * beatTime * 1.3f;
+                velocity = dir * speed * spd;//beatTime * 1.3f;
             }
             time += Time.deltaTime;
             yield return null;
@@ -486,8 +542,12 @@ public abstract class Enemy : MonoBehaviour
             AudioController.PlaySound(AudioController.instance.sounds.bossWalk);
             PlayerCamera.TriggerCameraShake(0.5f, 0.2f);
         }
-        animator.Play(idleAnimation);
-        animator.speed = 1f / BeatManager.GetBeatDuration();
+        if (moveToggle)
+        {
+            animator.Play(idleAnimation);
+            animator.speed = 1f / BeatManager.GetBeatDuration();
+        }
+        
         velocity = Vector2.zero;
         Sprite.transform.localPosition = Vector3.zero;
 
@@ -551,7 +611,8 @@ public abstract class Enemy : MonoBehaviour
         SpriteX = Mathf.MoveTowards(SpriteX, facingRight ? 1 : -1, Time.deltaTime * 24f);
         Sprite.transform.localScale = new Vector3(SpriteX, 1, 1) * SpriteSize;
 
-        emissionColor = Color.Lerp(emissionColor, new Color(1, 1, 1, 0), Time.deltaTime * 24f);
+        if (flashCD <= 0 && emissionColor.a > 0) emissionColor.a = 0;
+        //emissionColor = Color.Lerp(emissionColor, new Color(1, 1, 1, 0), Time.deltaTime * 16f);
         spriteRendererMat.SetColor("_EmissionColor", emissionColor);
     }
 
@@ -568,6 +629,7 @@ public abstract class Enemy : MonoBehaviour
         //Player.TriggerCameraShake(0.4f, 0.2f);
         AudioController.PlaySoundOnBeat(AudioController.instance.sounds.enemyHurtSound, Random.Range(0.95f, 1.05f));
         emissionColor = new Color(1, 1, 1, 1f);
+        flashCD = 0.04f;
         UIManager.Instance.PlayerUI.SpawnDamageText(transform.position, Mathf.RoundToInt(damage), isCritical ? DamageTextType.Critical : DamageTextType.Normal);
 
         if (isElite)
@@ -585,9 +647,11 @@ public abstract class Enemy : MonoBehaviour
         if (this is Boss) return;
         if (sound)
         {
-            //AudioController.PlaySound(AudioController.instance.sounds.enemyDeathSound);
-            //KillEffect deathFx = PoolManager.Get<KillEffect>();
-            //deathFx.transform.position = transform.position;
+            AudioController.PlaySoundOnBeat(AudioController.instance.sounds.enemyDeathSound);
+            KillEffect deathFx = PoolManager.Get<KillEffect>();
+            deathFx.transform.position = Sprite.transform.position;
+            deathFx.transform.localScale = transform.localScale * 1.3f;
+            PlayerCamera.TriggerCameraShake(0.4f, 0.2f);
         }
 
         stunStatus.duration = 0;
@@ -607,13 +671,22 @@ public abstract class Enemy : MonoBehaviour
         }
         else
         {
-            group.enemies.Remove(this);
+            if (group != null) group.enemies.Remove(this);
         }
 
         isDead = true;
-        deathDir = (transform.position - Player.instance.transform.position).normalized;
+        deathDir = (transform.position - Player.instance.transform.position).normalized * 8f;
 
         
+    }
+
+    protected void SpawnDeathEffect()
+    {
+        KillEffect deathFx = PoolManager.Get<KillEffect>();
+        deathFx.transform.position = Sprite.transform.position + (Vector3.up * 0.5f);
+        deathFx.transform.localScale = transform.localScale * 1.3f;
+        AudioController.PlaySound(AudioController.instance.sounds.enemyDeathSound);
+        PlayerCamera.TriggerCameraShake(0.4f, 0.3f);
     }
 
     public virtual void Die()
@@ -631,15 +704,14 @@ public abstract class Enemy : MonoBehaviour
             Stage.Instance.canSpawnEnemies = true;
             // Should also spawn a chest
         }
+        emissionColor = Color.clear;
         isDead = true;
-        deathDir = (transform.position - Player.instance.transform.position).normalized;
+        deathDir = (transform.position - Player.instance.transform.position).normalized * 8f;
         stunStatus.duration = 0;
         burnStatus.Clear();
         slownessStatus.duration = 0;
         if (!isElite && group != null) group.enemies.Remove(this);
-
-        //KillEffect deathFx = PoolManager.Get<KillEffect>();
-        //deathFx.transform.position = transform.position;
+ 
         //Map.Instance.enemiesAlive.Remove(this);
         //PoolManager.Return(gameObject, GetType());
     }

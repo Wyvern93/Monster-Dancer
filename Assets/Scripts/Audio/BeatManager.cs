@@ -635,7 +635,7 @@ public class BeatManager : MonoBehaviour
 
     public static BeatTrigger GetBeatSuccess(BeatType type, bool special = false)
     {
-        if (compassless) return BeatTrigger.PERFECT;
+        //if (compassless) return BeatTrigger.PERFECT;
         float currentTime = (float)(AudioSettings.dspTime - instance.dspStartTime) + audio_offset;
         if (special)
         {

@@ -147,6 +147,7 @@ MonoBehaviour:
   idleAnimation: onibi_normal
   moveAnimation: onibi_move
   shootAnimation: 
+  canBeKnocked: 1
   beatContact: 0
   isElite: 0
   Sprite: {fileID: 1878338833598715381}
@@ -165,6 +166,8 @@ MonoBehaviour:
   slownessStatus: {fileID: 0}
   enemyType: 34
   group: {fileID: 0}
+  shouldMove: 1
+  moveToggle: 0
 --- !u!58 &6186746487706593971
 CircleCollider2D:
   m_ObjectHideFlags: 0
