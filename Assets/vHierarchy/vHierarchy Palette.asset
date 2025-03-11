@@ -65,6 +65,7 @@ MonoBehaviour:
   - builtinIcons: []
     customIcons:
     - BoxCollider2D Icon
+    - SpriteAtlas Icon
     enabled: 1
   - builtinIcons:
     - AudioSource Icon

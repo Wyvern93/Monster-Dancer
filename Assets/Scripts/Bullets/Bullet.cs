@@ -7,12 +7,14 @@ using UnityEngine.SceneManagement;
 public class Bullet : MonoBehaviour
 {
     [SerializeField] public SpriteRenderer spriteRenderer;
+    [SerializeField] protected SpriteRenderer shadow;
     [SerializeField] protected CircleCollider2D circleCollider;
     [SerializeField] protected BoxCollider2D boxCollider;
     public bool boxHitbox;
     public Vector2 direction;
     public int lifetime;
     public float speed;
+    public bool frozen;
 
     public bool superGrazed, grazed;
     protected SpriteRenderer grazePulse;
@@ -26,7 +28,7 @@ public class Bullet : MonoBehaviour
     public StunEffect stunStatus;
     public bool forcedDespawn;
     protected bool isInitialized;
-    protected float beatCD;
+    public float beatCD;
 
     private void Awake()
     {
@@ -79,6 +81,7 @@ public class Bullet : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        shadow.color = new Color(1, 1, 1, spriteRenderer.color.a);
         if (!BeatManager.isPlaying) return;
         if (GameManager.isPaused) return;
 
@@ -128,6 +131,7 @@ public class Bullet : MonoBehaviour
     public void OnEnable()
     {
         if (Stage.Instance != null) SceneManager.MoveGameObjectToScene(gameObject, Stage.Instance.gameObject.scene);
+        beatCD = 0;
     }
     public virtual void OnSpawn()
     {
@@ -144,6 +148,12 @@ public class Bullet : MonoBehaviour
         if (BeatManager.isBeat) OnBeat();
         
         
+    }
+
+    public void PlaySound(AudioClip clip)
+    {
+        if (lifetime <= 0) return;
+        AudioController.PlaySound(clip);
     }
 
     protected IEnumerator BulletSpawnCoroutine()
@@ -172,6 +182,7 @@ public class Bullet : MonoBehaviour
         if (lifetime > 0)
         {
             lifetime = 0;
+            frozen = false;
         }
         if (!gameObject.activeSelf) return;
         StartCoroutine(DespawnCoroutine(false));
@@ -180,6 +191,7 @@ public class Bullet : MonoBehaviour
     public virtual void ForceDespawn()
     {
         StopAllCoroutines();
+        frozen = false;
         lifetime = 0;
         if (!gameObject.activeSelf) return;
         StartCoroutine(DespawnCoroutine(true));
@@ -207,6 +219,7 @@ public class Bullet : MonoBehaviour
         {
             spriteRenderer.transform.localScale = Vector3.Lerp(spriteRenderer.transform.localScale, Vector3.one * 1.5f, Time.deltaTime * 8f);
             spriteRenderer.color = Color.Lerp(spriteRenderer.color, new Color(1, 0, 0, 0), Time.deltaTime * 8f);
+            shadow.color = new Color(1, 1, 1, spriteRenderer.color.a);
             time += Time.deltaTime;
             yield return null;
         }
@@ -222,6 +235,8 @@ public class Bullet : MonoBehaviour
 
         if (!forced && Stage.Instance != null) Stage.Instance.bulletsSpawned.Remove(this);
         transform.parent = null;
+        StopAllCoroutines();
+        frozen = false;
         PoolManager.Return(gameObject, GetType());
     }
 

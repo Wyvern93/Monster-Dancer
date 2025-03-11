@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -10,6 +9,7 @@ public class VampiLoliElite : Enemy
     int beatCD;
     private Vector3 targetPos;
     private int phase;
+    bool isBat;
 
     private List<Vector2> anchors = new List<Vector2>()
     {
@@ -24,8 +24,10 @@ public class VampiLoliElite : Enemy
     };
     public override void OnSpawn()
     {
+        isBat = false;
         base.OnSpawn();
-        speed = 0.8f;
+        shouldMove = false;
+        speed = 1.1f;
         beatCD = -1;
         phase = 0;
         facingRight = transform.position.x < Player.instance.transform.position.x;
@@ -34,10 +36,77 @@ public class VampiLoliElite : Enemy
         UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
     }
 
-  
+    public override void MoveUpdate()
+    {
+        facingRight = transform.position.x < targetPos.x;
+        if (GameManager.isPaused || stunStatus.isStunned())
+        {
+            velocity = Vector2.zero;
+            return;
+        }
+
+        if (!shouldMove || !CanMove() || isAttacking)
+        {
+            UpdateAnimation();
+            velocity = Vector2.zero;
+            return;
+        }
+        AnimatorClipInfo animInfo = animator.GetCurrentAnimatorClipInfo(0)[0];
+        if (!isBat)
+        {
+            if (transform.position != targetPos && animInfo.clip.name == "vampiloli_normal")
+            {
+                animator.Play("vampiloli_move");
+            }
+            if (transform.position == targetPos && animInfo.clip.name == "vampiloli_move")
+            {
+                animator.Play("vampiloli_normal");
+            }
+        }
+
+        if (isBat && beatCD < 16)
+        {
+            Vector2 center = Player.instance.transform.position;
+            float radius = 5f;
+            float angle = BulletBase.VectorToAngle(((Vector2)transform.position - center).normalized);
+            angle += 45f;
+            angle *= Mathf.Deg2Rad;
+            targetPos = center + new Vector2(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius);
+            transform.position = Vector3.MoveTowards(transform.position, targetPos, speed * 3 * Time.deltaTime);
+        }
+        else
+        {
+            transform.position = Vector3.MoveTowards(transform.position, targetPos, speed * 3 * Time.deltaTime);
+        }
+        velocity = Vector2.zero;
+
+        
+    }
+
+    private void UpdateAnimation()
+    {
+        AnimatorClipInfo animInfo = animator.GetCurrentAnimatorClipInfo(0)[0];
+        if (!isBat)
+        {
+            if (transform.position != targetPos && animInfo.clip.name == "vampiloli_normal")
+            {
+                animator.Play("vampiloli_move");
+            }
+            if (transform.position == targetPos && animInfo.clip.name == "vampiloli_move")
+            {
+                animator.Play("vampiloli_normal");
+            }
+        }
+    }
 
     protected override void OnBeat()
     {
+        // Move Behaviour
+        if (CanMove() && !isBat)
+        {
+            if (shouldMove) UpdateAnimation();//animator.Play(moveAnimation);
+            else animator.Play(idleAnimation);
+        }
         switch (phase)
         {
             case 0:
@@ -58,12 +127,14 @@ public class VampiLoliElite : Enemy
         beatCD++;
         if (beatCD == 0 || beatCD == 4 || beatCD == 8)
         {
+            shouldMove = false;
             StartCoroutine(ShootBlood());
         }
         else
         {
-            bool shouldMove = FindFurtherAnchor();
-            if (CanMove() && shouldMove && !isAttacking) StartCoroutine(MoveToTarget());
+            bool toAnchorMove = FindFurtherAnchor();
+            shouldMove = true;
+            //if (CanMove() && toAnchorMove && !isAttacking) shouldMove = true;//StartCoroutine(MoveToTarget());
         }
         if (beatCD >= 12)
         {
@@ -74,12 +145,18 @@ public class VampiLoliElite : Enemy
 
     private void SpearPhase()
     {
+        shouldMove = false;
         canBeKnocked = false;
         if ((Vector2)transform.position != (Vector2)Camera.main.transform.position + anchors[2])
         {
+            shouldMove = true;
             targetPos = (Vector2)Camera.main.transform.position + anchors[2];
-            if (CanMove()) StartCoroutine(MoveToTarget());
+            //if (CanMove()) StartCoroutine(MoveToTarget());
             return;
+        }
+        else
+        {
+            shouldMove = false;
         }
         beatCD++;
         if (beatCD == 0 || beatCD == 8) StartCoroutine(SpearAttackCoroutine());
@@ -93,18 +170,21 @@ public class VampiLoliElite : Enemy
 
     private void BatPhase()
     {
+        shouldMove = true;
         beatCD++;
         if (beatCD == 0)
         {
+            isBat = true;
             TransformEffect();
-            speed = 1.5f;
+            speed = 2f;
             animator.Play("vampiloli_bat_move");
+            AudioController.PlaySound(AudioController.instance.sounds.chargeBulletSound);
         }
         if (beatCD < 16)
         {
-            StartCoroutine(OrbitPlayer());
+            //StartCoroutine(OrbitPlayer());
         }
-        if (beatCD < 16 && beatCD % 2 == 0)
+        if (beatCD < 16)
         {
             StartCoroutine(BatShootCoroutine());
         }
@@ -114,11 +194,12 @@ public class VampiLoliElite : Enemy
             targetPos = (Vector2)Camera.main.transform.position + anchors[2];
             if ((Vector2)transform.position != (Vector2)Camera.main.transform.position + anchors[2])
             {
-                if (CanMove()) StartCoroutine(MoveToTarget(true));
+                //if (CanMove()) StartCoroutine(MoveToTarget(true));
             }
             else
             {
-                speed = 0.8f;
+                isBat = false;
+                speed = 1.1f;
                 canBeKnocked = true;
                 TransformEffect();
                 animator.Play("vampiloli_normal");
@@ -171,8 +252,8 @@ public class VampiLoliElite : Enemy
     }
     private IEnumerator BatShootCoroutine()
     {
-        isAttacking = true;
-        AudioController.PlaySound(AudioController.instance.sounds.chargeBulletSound);
+        isAttacking = false;
+        //AudioController.PlaySound(AudioController.instance.sounds.chargeBulletSound);
         BulletSpawnEffect bulletSpawnEffect = PoolManager.Get<BulletSpawnEffect>();
         bulletSpawnEffect.source = this;
         bulletSpawnEffect.transform.position = transform.position;
@@ -186,7 +267,7 @@ public class VampiLoliElite : Enemy
 
         for (int j = -1; j < 2; j ++)
         {
-            float angle = baseAngle + (j * 15f);
+            float angle = baseAngle + (j * 22f);
             Vector2 dir = BulletBase.angleToVector(angle);
             SpawnSmallBloodBullet(dir);
         }
@@ -200,6 +281,7 @@ public class VampiLoliElite : Enemy
 
     private IEnumerator SpearAttackCoroutine(float offset = 0)
     {
+        shouldMove = false;
         isAttacking = true;
         animator.Play("vampiloli_preattack");
         BulletSpawnEffect bulletSpawnEffect = PoolManager.Get<BulletSpawnEffect>();
@@ -210,12 +292,6 @@ public class VampiLoliElite : Enemy
 
         float time = 0;
         yield return null;
-        while (!BeatManager.isBeat)
-        {
-            while (GameManager.isPaused) yield return null; // isStunned!
-            time += Time.deltaTime;
-            yield return null;
-        }
         float spearOffset = 2.75f;
         for (int i = -2; i < 3; i++)
         {
@@ -231,7 +307,7 @@ public class VampiLoliElite : Enemy
             bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteLookAngleBehaviour() { start = 0, end = -1 },
-                new SpeedOverTimeBehaviour() { start = 1, end = -1, speedPerBeat = 20, targetSpeed = 20 }
+                new SpeedOverTimeBehaviour() { start = 2, end = -1, speedPerBeat = 200, targetSpeed = 30 }
             };
             bullet.animator.Play("rurispear");
             bullet.enemySource = this;
@@ -255,6 +331,7 @@ public class VampiLoliElite : Enemy
 
     private IEnumerator ShootBlood()
     {
+        shouldMove = false;
         isAttacking = true;
         animator.Play("vampiloli_preattack");
         AudioController.PlaySound(AudioController.instance.sounds.chargeBulletSound);
@@ -271,7 +348,7 @@ public class VampiLoliElite : Enemy
 
         for (int j = -2; j < 3; j++)
         {
-            float angle = baseAngle + (j * 15f);
+            float angle = baseAngle + (j * 18f);
             Vector2 dir = BulletBase.angleToVector(angle);
             ShootBloodBullet(dir);
         }
@@ -280,6 +357,7 @@ public class VampiLoliElite : Enemy
 
         bulletSpawnEffect.Despawn();
         isAttacking = false;
+        shouldMove = true;
         animator.Play("vampiloli_normal");
         yield break;
     }
@@ -290,7 +368,7 @@ public class VampiLoliElite : Enemy
 
         bullet.transform.position = transform.position + (Vector3)(attackDir * 0.5f) + (Vector3.up * 0.5f);
         bullet.direction = attackDir;
-        bullet.speed = 10;
+        bullet.speed = 12;
         bullet.atk = 5;
         bullet.lifetime = 5;
         bullet.transform.localScale = Vector3.one;
@@ -309,9 +387,9 @@ public class VampiLoliElite : Enemy
         BulletBase bullet = PoolManager.Get<BulletBase>();
         bullet.transform.position = transform.position + (Vector3)(attackDir * 0.5f) + (Vector3.up * 0.5f);
         bullet.direction = attackDir;
-        bullet.speed = 12;
-        bullet.atk = 5;
-        bullet.lifetime = 4;
+        bullet.speed = 10;
+        bullet.atk = 4;
+        bullet.lifetime = 6;
         bullet.transform.localScale = Vector3.one;
         bullet.startOnBeat = true;
         bullet.enemySource = this;

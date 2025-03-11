@@ -126,12 +126,12 @@ public class PlayerRabi : Player
 
     protected override void EquipUltimate()
     {
-        if (GameManager.runData.ultimateChosen == typeof(EclipseAbility))
+        if (GameManager.runData.ultimateChosen == PlayerAbilityID.ECLIPSE)
         {
             EclipseAbilityEnhancement eclipseAbility = new EclipseAbilityEnhancement();
             eclipseAbility.OnEquip();
         }
-        else if (GameManager.runData.ultimateChosen == typeof(CarrotDeliveryAbility))
+        else if (GameManager.runData.ultimateChosen == PlayerAbilityID.CARROT_DELIVERY)
         {
             CarrotDeliveryAbilityEnhancement deliveryAbility = new CarrotDeliveryAbilityEnhancement();
             deliveryAbility.OnEquip();
@@ -210,27 +210,24 @@ public class PlayerRabi : Player
 
     protected override IEnumerator MoveTowardsCoroutine(Vector2 targetPos)
     {
-        animator.Play("Rabi_Move");
-        animator.speed = 1f / BeatManager.GetBeatDuration() / 0.5f;
-        float duration = BeatManager.GetBeatDuration() * 0.5f;
-        float time = 0;
+        rb.velocity = Vector2.zero;
+        animator.SetBool("moving", true);
+        //animator.Play("Rabi_Move");
 
         if (transform.position.x < targetPos.x) facingRight = true;
         else facingRight = false;
 
-        while (time <= duration)
+        while ((Vector2)transform.position != targetPos)
         {
             while (GameManager.isPaused) yield return null;
-            time += Time.deltaTime;
-            
             transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * 4f);
             yield return null;
         }
 
         animator.speed = 1f / BeatManager.GetBeatDuration();
-        animator.Play("Rabi_Idle");
+        animator.SetBool("moving", false);
         yield return null;
-        Sprite.transform.localPosition = Vector3.zero;
+        //Sprite.transform.localPosition = Vector3.zero;
     }
 
     protected override IEnumerator MoveCoroutine(Vector2 targetPos)

@@ -104,7 +104,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1416260490434876236
 Transform:
   m_ObjectHideFlags: 0
@@ -210,6 +210,7 @@ MonoBehaviour:
   idleAnimation: boojr_normal
   moveAnimation: boojr_move
   shootAnimation: boojr_preattack
+  canBeKnocked: 1
   beatContact: 0
   isElite: 1
   Sprite: {fileID: 6395615806549453988}
@@ -228,6 +229,8 @@ MonoBehaviour:
   slownessStatus: {fileID: 0}
   enemyType: 6
   group: {fileID: 0}
+  shouldMove: 0
+  moveToggle: 0
   shadow: {fileID: 8499657330549682496}
   boxCollider: {fileID: 4226089749421728471}
 --- !u!95 &1552738515932654621

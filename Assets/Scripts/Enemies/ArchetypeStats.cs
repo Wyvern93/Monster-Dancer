@@ -53,7 +53,7 @@ public class ArchetypeStats
                 baseAttack = 8f;
                 break;
             case EnemyArchetype.Elite:
-                baseHP = 350f;
+                baseHP = 650f;// 350
                 baseSpeed = 0.8f;
                 baseAttack = 10f;
                 break;
@@ -71,6 +71,7 @@ public class ArchetypeStats
         finalStats.baseHP = baseHP;
         finalStats.baseSpeed = baseSpeed;
         finalStats.baseAttack = baseAttack;
+        return finalStats;
 
         if (archetypeType == EnemyArchetype.Elite)
         {

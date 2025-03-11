@@ -10,7 +10,7 @@ public class RunData
     public GameObject characterPrefab;
     public string currentMap;
     public int coins;
-    public Type ultimateChosen;
+    public PlayerAbilityID ultimateChosen;
 
     public List<Enhancement> possibleStatEnhancements, possibleSkillEnhancements, possibleItemEnhancements;
 

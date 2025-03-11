@@ -95,9 +95,9 @@ public class InputManager : MonoBehaviour
                 case InputActionType.MENU_DOWN:
                     return Keyboard.current.downArrowKey;
                 case InputActionType.MENU_OK:
-                    return Keyboard.current.spaceKey;
+                    return Keyboard.current.zKey;
                 case InputActionType.MENU_CANCEL:
-                    return Keyboard.current.escapeKey;
+                    return Keyboard.current.xKey;
                 case InputActionType.CANCEL:
                     return Mouse.current.rightButton;
                 case InputActionType.ABILITY:

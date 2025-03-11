@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb59ed5d976221a45aff0fe606ad14f9, type: 3}
+  m_Name: DefaultTestingTemplate
+  m_EditorClassIdentifier: 
+  playerPrefab: {fileID: 1877061861415643658, guid: fc241a4d9a41c20418e444865ff58dc4, type: 3}
+  startingSkills: 00000000
+  ultimateSkill: 4
+  track: {fileID: 11400000, guid: 559954c822df3a9458ce377d43b1b53b, type: 2}
+  poolLists:
+  - {fileID: 11400000, guid: 31fef5324fd7f8d44abd5adac556a8dc, type: 2}
+  - {fileID: 11400000, guid: 8837ba5c9542b1c4c9aa808c4c22e765, type: 2}
+  enemyToSpawn: 17
+  enemyAIType: 0

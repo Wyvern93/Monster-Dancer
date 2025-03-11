@@ -1,6 +1,6 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public abstract class PlayerAbility : PlayerInventoryObject
@@ -17,6 +17,9 @@ public abstract class PlayerAbility : PlayerInventoryObject
     public float baseKnockback;
     public float baseCritChance;
     public float baseSpread;
+
+    public int level;
+    public float currentExp, maxExp;
 
     public float currentCooldown = 0;
     public float currentAttackSpeedCD = 0;
@@ -123,8 +126,67 @@ public abstract class PlayerAbility : PlayerInventoryObject
         return false;
     }
 
+    public int CalculateExpCurve(int lv)
+    {
+        if (lv == 1) return 50;
+
+        //float a = Mathf.Pow(4 * (lv + 1), 1.7f);
+        //float b = Mathf.Pow(4 * lv + 1, 1.7f);
+        //int exp = (int)(Mathf.Round(a) - Mathf.Round(b));
+        int value = (int)(maxExp + (10 * lv));
+        
+        return value;
+    }
+
+    public int TotalExpForLevelRange(int startLevel, int endLevel)
+    {
+        int totalExp = 0;
+        for (int lv = startLevel; lv < endLevel; lv++)
+        {
+            totalExp += CalculateExpCurve(lv);
+        }
+        return totalExp;
+    }
+
+    public void AddExp(int n)
+    {
+        //n = (int)(n * instance.currentStats.ExpMulti);
+        //if (Player.instance.isDead) return;
+        currentExp += n;
+        if (currentExp >= maxExp)
+        {
+            currentExp -= maxExp;
+            level++;
+            OnLevelUp();
+        }
+        UpdateExp();
+    }
+
+    public void OnLevelUp()
+    {
+        maxExp = CalculateExpCurve(level);
+        AudioController.PlaySound(AudioController.instance.sounds.playerLvlUpSfx);
+        Player.instance.StartCoroutine(OpenEnhancementMenuCoroutine());
+    }
+
+    protected IEnumerator OpenEnhancementMenuCoroutine()
+    {
+        while (!BeatManager.isBeat) yield return null;
+        BeatManager.isBeat = false;
+        EnhancementMenu.instance.Open();
+    }
+
+    public void UpdateExp()
+    {
+        float exp = currentExp / maxExp;
+        UIManager.Instance.PlayerUI.UpdateSkillExp(this, level, exp);
+    }
+
     public PlayerAbility()
     {
+        level = 1;
+        maxExp = CalculateExpCurve(level);
+        currentExp = 0;
         equippedItems = new PlayerItem[6];
         itemValues = new Dictionary<string, float>
         {

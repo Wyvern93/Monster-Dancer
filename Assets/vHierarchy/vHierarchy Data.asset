@@ -15,6 +15,7 @@ MonoBehaviour:
   sceneDatas_byGuid:
     keys:
     - 3fca84b542a10f14187fff089fbc6aad
+    - cf5c9d8f82691ff4293310c284c29738
     values:
     - goDatas_byGlobalId:
         keys:
@@ -31,6 +32,7 @@ MonoBehaviour:
         - globalObjectIdString: GlobalObjectId_V1-2-3fca84b542a10f14187fff089fbc6aad-695976542-0
         - globalObjectIdString: GlobalObjectId_V1-2-3fca84b542a10f14187fff089fbc6aad-1410411420-0
         - globalObjectIdString: GlobalObjectId_V1-2-3fca84b542a10f14187fff089fbc6aad-7051745-0
+        - globalObjectIdString: GlobalObjectId_V1-2-3fca84b542a10f14187fff089fbc6aad-210992481-0
         values:
         - colorIndex: 8
           iconNameOrGuid: Settings Icon
@@ -82,6 +84,18 @@ MonoBehaviour:
           isColorRecursive: 0
         - colorIndex: 0
           iconNameOrGuid: BoxCollider2D Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+        - colorIndex: 0
+          iconNameOrGuid: SpriteAtlas Icon
+          isIconRecursive: 0
+          isColorRecursive: 0
+    - goDatas_byGlobalId:
+        keys:
+        - globalObjectIdString: GlobalObjectId_V1-2-cf5c9d8f82691ff4293310c284c29738-790112788-0
+        values:
+        - colorIndex: 9
+          iconNameOrGuid: StandaloneInputModule Icon
           isIconRecursive: 0
           isColorRecursive: 0
   bookmarks: []

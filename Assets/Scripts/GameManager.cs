@@ -8,7 +8,7 @@ using static UnityEngine.GraphicsBuffer;
 
 public class GameManager : MonoBehaviour
 {
-    private static GameManager instance;
+    public static GameManager instance;
     public static string currentScene = "";
     public static RunData runData;
     public static bool isPaused;
@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        isLoading = true;
         instance = this;
         DontDestroyOnLoad(gameObject);
         iconList.abilityAtlas = Resources.LoadAll<Sprite>("UI/AbilityList");
@@ -84,13 +85,15 @@ public class GameManager : MonoBehaviour
         runData.currentMap = "Stage1a";
         runData.characterPrefab = selectedCharacter;
         runData.isInfinite = false;
-        runData.ultimateChosen = typeof(EclipseAbility);
+        runData.ultimateChosen = PlayerAbilityID.ECLIPSE;
 
         PoolManager.CreatePool(typeof(SpriteRenderer), spriteTrailPrefab, 100);
         
         //LoadPlayer(runData.characterPrefab);
         //LoadMap(runData.currentMap);
-        UIManager.Instance.OpenCalibrationMenu();
+
+        if (!TestingEnvironment.Instance) UIManager.Instance.OpenCalibrationMenu();
+
     }
 
 

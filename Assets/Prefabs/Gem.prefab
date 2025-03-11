@@ -19,7 +19,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3439856067508608174
 Transform:
   m_ObjectHideFlags: 0
@@ -99,7 +99,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 209acb2b9ecdcd14d9ce4bec6d8d166a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animator: {fileID: 2982078934106290733}
+  followPlayer: 0
   dir: {x: 0, y: 0}
+  exp: 0
 --- !u!58 &7574766796267934941
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -132,7 +135,7 @@ CircleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.4375}
+  m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
 --- !u!95 &2982078934106290733

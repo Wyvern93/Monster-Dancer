@@ -117,7 +117,7 @@ public class MoonBeamAbility : PlayerAbility
                 maxEnemies = around;
             }
         }
-        Debug.Log(maxEnemies);
+        //Debug.Log(maxEnemies);
         return target;
     }
 

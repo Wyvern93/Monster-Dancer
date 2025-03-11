@@ -188,7 +188,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1340564523866890853
 Transform:
   m_ObjectHideFlags: 0
@@ -315,6 +315,7 @@ MonoBehaviour:
   idleAnimation: buzzbee_normal
   moveAnimation: buzzbee_move
   shootAnimation: buzzbee_normal
+  canBeKnocked: 1
   beatContact: 0
   isElite: 0
   Sprite: {fileID: 2124085565172903039}
@@ -333,6 +334,8 @@ MonoBehaviour:
   slownessStatus: {fileID: 0}
   enemyType: 40
   group: {fileID: 0}
+  shouldMove: 0
+  moveToggle: 0
 --- !u!58 &1286746568267627091
 CircleCollider2D:
   m_ObjectHideFlags: 0

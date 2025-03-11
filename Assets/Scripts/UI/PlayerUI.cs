@@ -39,7 +39,6 @@ public class PlayerUI : MonoBehaviour
     public GameObject menuCursorObj, crosshairCursorObj;
 
     [SerializeField] CanvasGroup canvasGroup;
-    [SerializeField] SpriteRenderer beatIndicatorSpr;
 
     [SerializeField] Image bossBar;
     private RectTransform bossBarTransform;
@@ -85,9 +84,9 @@ public class PlayerUI : MonoBehaviour
         bossBarTransform = bossBar.GetComponent<RectTransform>();
         bossBarGroup.alpha = 0;
 
-        abilityIcon1.SetAbilityIcon(null, false);
-        abilityIcon2.SetAbilityIcon(null, false);
-        abilityIcon3.SetAbilityIcon(null, false);
+        abilityIcon1.SetAbilityIcon(null, 0);
+        abilityIcon2.SetAbilityIcon(null, 0);
+        abilityIcon3.SetAbilityIcon(null, 0);
 
         abilityIcon1.cooldown = 0;
         abilityIcon2.cooldown = 0;
@@ -156,9 +155,9 @@ public class PlayerUI : MonoBehaviour
 
     public void OnReset()
     {
-        abilityIcon1.SetAbilityIcon(null, false);
-        abilityIcon2.SetAbilityIcon(null, false);
-        abilityIcon3.SetAbilityIcon(null, false);
+        abilityIcon1.SetAbilityIcon(null, 0);
+        abilityIcon2.SetAbilityIcon(null, 0);
+        abilityIcon3.SetAbilityIcon(null, 0);
 
         abilityIcon1.cooldown = 0;
         abilityIcon2.cooldown = 0;
@@ -247,17 +246,13 @@ public class PlayerUI : MonoBehaviour
         {
             Vector2 offset = Vector2.zero;
             if (Player.instance) offset = Player.instance.direction.normalized;
-            if (GameManager.isPaused || Player.instance == null || Stage.Instance == null) crosshair_transform.localPosition = Mouse.current.position.value / new Vector2(Screen.width, Screen.height) * new Vector2(640, 360) - new Vector2(320, 180);
-            else
-            {
-                crosshair_transform.position = Player.instance.transform.position + (Vector3)offset * 2;
-            }
+            crosshair_transform.localPosition = Mouse.current.position.value / new Vector2(Screen.width, Screen.height) * new Vector2(640, 360) - new Vector2(320, 180);
         }
         else
         {
-            Vector2 offset = (Vector2)Player.instance.transform.position + (InputManager.GetRightStick().normalized * 128f);
-            if (InputManager.GetRightStick() == Vector2.zero) offset = crosshair_transform.localPosition;
-            crosshair_transform.localPosition = Vector3.MoveTowards(crosshair_transform.localPosition, offset, Time.unscaledDeltaTime * 1280f); //Mouse.current.position.value / new Vector2(Screen.width, Screen.height) * new Vector2(640, 360) - new Vector2(320, 180);
+            //Vector2 offset = (Vector2)Player.instance.transform.position + (InputManager.GetRightStick().normalized * 128f);
+            //if (InputManager.GetRightStick() == Vector2.zero) offset = crosshair_transform.localPosition;
+            //crosshair_transform.localPosition = Vector3.MoveTowards(crosshair_transform.localPosition, offset, Time.unscaledDeltaTime * 1280f); //Mouse.current.position.value / new Vector2(Screen.width, Screen.height) * new Vector2(640, 360) - new Vector2(320, 180);
         }
         
         if (Stage.Instance != null) 
@@ -318,8 +313,8 @@ public class PlayerUI : MonoBehaviour
         {
             abilityIcon3.setCooldown(GetAbilityPercent(2));
         }
-        ammoNumber.text = $"{Player.instance.equippedPassiveAbilities[currentAbility].currentAmmo}/{Player.instance.equippedPassiveAbilities[currentAbility].GetMaxAmmo()}";
-        cursorAmmoText.text = $"{Player.instance.equippedPassiveAbilities[currentAbility].currentAmmo}/{Player.instance.equippedPassiveAbilities[currentAbility].GetMaxAmmo()}";
+        //ammoNumber.text = $"{Player.instance.equippedPassiveAbilities[currentAbility].currentAmmo}/{Player.instance.equippedPassiveAbilities[currentAbility].GetMaxAmmo()}";
+        //cursorAmmoText.text = $"{Player.instance.equippedPassiveAbilities[currentAbility].currentAmmo}/{Player.instance.equippedPassiveAbilities[currentAbility].GetMaxAmmo()}";
         if (spTransform.sizeDelta.y >= 158)
         {
             if (spBlink < 1) spBlink += Time.deltaTime * 100;
@@ -357,28 +352,17 @@ public class PlayerUI : MonoBehaviour
 
     public void SetPassiveIcon(Sprite sprite, int id)
     {
-        //abilityIcons[id].Display(sprite, level, maxed, false);
-        if (id == 0) abilityIcon1.SetAbilityIcon(sprite, false);
-        if (id == 1) abilityIcon2.SetAbilityIcon(sprite, false);
-        if (id == 2) abilityIcon3.SetAbilityIcon(sprite, false);
-
-        if (Player.instance.equippedPassiveAbilities.Count == 1)
+        if (Player.instance.equippedPassiveAbilities.Count > id)
         {
-            combatcursor1.SetVisibility(true);
-            combatcursor2.SetVisibility(false);
-            combatcursor3.SetVisibility(false);
+            if (id == 0) abilityIcon1.SetAbilityIcon(sprite, Player.instance.equippedPassiveAbilities[id].level);
+            if (id == 1) abilityIcon2.SetAbilityIcon(sprite, Player.instance.equippedPassiveAbilities[id].level);
+            if (id == 2) abilityIcon3.SetAbilityIcon(sprite, Player.instance.equippedPassiveAbilities[id].level);
         }
-        else if (Player.instance.equippedPassiveAbilities.Count == 2)
+        else
         {
-            combatcursor1.SetVisibility(false);
-            combatcursor2.SetVisibility(true);
-            combatcursor3.SetVisibility(false);
-        }
-        else if (Player.instance.equippedPassiveAbilities.Count == 3)
-        {
-            combatcursor1.SetVisibility(false);
-            combatcursor2.SetVisibility(false);
-            combatcursor3.SetVisibility(true);
+            if (id == 0) abilityIcon1.SetAbilityIcon(sprite, 0);
+            if (id == 1) abilityIcon2.SetAbilityIcon(sprite, 0);
+            if (id == 2) abilityIcon3.SetAbilityIcon(sprite, 0);
         }
     }
 
@@ -465,6 +449,14 @@ public class PlayerUI : MonoBehaviour
         expTransform.sizeDelta = new Vector2(width, expTransform.sizeDelta.y);
     }
 
+    public void UpdateSkillExp(PlayerAbility ability, float level, float exp)
+    {
+        int id = Player.instance.equippedPassiveAbilities.IndexOf(ability);
+        if (id == 0) abilityIcon1.UpdateExp(level, exp);
+        if (id == 1) abilityIcon2.UpdateExp(level, exp);
+        if (id == 2) abilityIcon3.UpdateExp(level, exp);
+    }
+
     public void UpdateStageTime()
     {
         MapTimeText.text = Stage.Instance.showWaveTimer ? GetRemainingStageTime() : "";
@@ -494,12 +486,10 @@ public class PlayerUI : MonoBehaviour
     public void HideUI()
     {
         canvasGroup.alpha = 0;
-        beatIndicatorSpr.color = Color.clear;
     }
 
     public void ShowUI()
     {
         canvasGroup.alpha = 1;
-        beatIndicatorSpr.color = Color.white;
     }
 }

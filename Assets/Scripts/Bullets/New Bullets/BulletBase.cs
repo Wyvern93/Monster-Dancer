@@ -8,7 +8,7 @@ public class BulletBase : Bullet
     public Animator animator;
 
     public float angle;
-    protected float beatTime;
+    public float beatTime;
     public List<BulletBehaviour> behaviours;
     public bool startOnBeat;
 
@@ -34,7 +34,8 @@ public class BulletBase : Bullet
         {
             behaviour.OnSpawn(this);
         }
-        OnBeat();
+        if (!frozen) OnBeat();
+
     }
 
     public static Vector2 angleToVector(float degrees)
@@ -49,6 +50,7 @@ public class BulletBase : Bullet
 
     public override void OnBeat()
     {
+        if (frozen) return;
         beat++;
         lifetime--;
         if (superGrazed) Pulse();
@@ -58,6 +60,13 @@ public class BulletBase : Bullet
             Despawn();
         }
         StartCoroutine(BeatCoroutine());
+    }
+
+    public void ResetBeat()
+    {
+        StopCoroutine(BeatCoroutine());
+        beatCD = 0;
+        beatTime = 0;
     }
 
     public IEnumerator BeatCoroutine()
@@ -132,6 +141,7 @@ public class BulletBase : Bullet
         {
             behaviour.OnDespawn(this);
         }
+        behaviours.Clear();
         base.Despawn();
     }
 }

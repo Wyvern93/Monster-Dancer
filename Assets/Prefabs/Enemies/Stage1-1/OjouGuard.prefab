@@ -188,7 +188,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7555485788011329589
 Transform:
   m_ObjectHideFlags: 0
@@ -294,6 +294,7 @@ MonoBehaviour:
   idleAnimation: ojouguard_normal
   moveAnimation: ojouguard_move
   shootAnimation: 
+  canBeKnocked: 1
   beatContact: 0
   isElite: 0
   Sprite: {fileID: 4977498180393348215}
@@ -312,6 +313,8 @@ MonoBehaviour:
   slownessStatus: {fileID: 0}
   enemyType: 30
   group: {fileID: 0}
+  shouldMove: 0
+  moveToggle: 0
 --- !u!95 &1909167052486913919
 Animator:
   serializedVersion: 5

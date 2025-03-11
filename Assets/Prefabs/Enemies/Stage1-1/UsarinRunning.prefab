@@ -188,7 +188,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7094921529839752513
 Transform:
   m_ObjectHideFlags: 0
@@ -294,6 +294,7 @@ MonoBehaviour:
   idleAnimation: 
   moveAnimation: 
   shootAnimation: 
+  canBeKnocked: 1
   beatContact: 0
   isElite: 1
   Sprite: {fileID: 7292069710259428833}
@@ -312,6 +313,8 @@ MonoBehaviour:
   slownessStatus: {fileID: 0}
   enemyType: 32
   group: {fileID: 0}
+  shouldMove: 0
+  moveToggle: 0
 --- !u!95 &8611527824120997884
 Animator:
   serializedVersion: 5

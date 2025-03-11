@@ -188,7 +188,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &574956694495860046
 Transform:
   m_ObjectHideFlags: 0
@@ -294,6 +294,7 @@ MonoBehaviour:
   idleAnimation: rhythmia_normal
   moveAnimation: rhythmia_normal
   shootAnimation: rhythmia_preattack
+  canBeKnocked: 1
   beatContact: 0
   isElite: 0
   Sprite: {fileID: 8210852461834543947}
@@ -312,6 +313,8 @@ MonoBehaviour:
   slownessStatus: {fileID: 0}
   enemyType: 21
   group: {fileID: 0}
+  shouldMove: 0
+  moveToggle: 0
 --- !u!95 &3711549056988489619
 Animator:
   serializedVersion: 5

@@ -110,14 +110,10 @@ public class StayinUndeadElite : Enemy
         bulletSpawnEffect.transform.position = transform.position;
         bulletSpawnEffect.finalScale = 1f;
         float time = 0;
-        while (time <= BeatManager.GetBeatDuration())
-        {
-            while (GameManager.isPaused) yield return null; // isStunned!
-            time += Time.deltaTime;
-            yield return null;
-        }
-        while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
-        while (!BeatManager.isBeat) yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        yield return null;
+        yield return new WaitUntil(() => BeatManager.isBeat && !GameManager.isPaused && !stunStatus.isStunned());
+        yield return null;
+        yield return new WaitUntil(() => BeatManager.isBeat && !GameManager.isPaused && !stunStatus.isStunned());
         ShootCircle(0);
         ShootCircle(-1f);
         ShootCircle(-2f);
@@ -155,6 +151,7 @@ public class StayinUndeadElite : Enemy
 
     private void ShootCircle(float speedchange)
     {
+        AudioController.PlaySound(AudioController.instance.sounds.bulletwaveShootSound);
         float diff = 360f / 6f;
 
         for (int i = 0; i < 6; i++)
@@ -320,7 +317,6 @@ public class StayinUndeadElite : Enemy
 
     private BulletBase SpawnStarBullet(float angle, float speed, float dist, float speeddiff)
     {
-        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
         Vector2 dir = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
 
         BulletBase bullet = PoolManager.Get<BulletBase>();

@@ -32,7 +32,7 @@ public abstract class Enemy : MonoBehaviour
     protected Color emissionColor = new Color(1, 0, 0, 0);
 
     public bool isDead;
-    private float flashCD;
+    protected float flashCD;
     public int experience;
     public int atk = 1;
     public float speed;
@@ -424,10 +424,18 @@ public abstract class Enemy : MonoBehaviour
         emissionColor = new Color(1, 1, 1, 0);
         isMoving = false;
         Sprite.transform.localPosition = Vector3.zero;
-        animator.Play(idleAnimation);
+        
         animator.speed = 1f / BeatManager.GetBeatDuration();
         beat = BeatManager.beats % 8;
         isAttacking = false;
+        if (shouldMove)
+        {
+            animator.Play(moveAnimation);
+        }
+        else
+        {
+            animator.Play(idleAnimation);
+        }
     }
 
     protected void HandleKnockback()
@@ -661,7 +669,6 @@ public abstract class Enemy : MonoBehaviour
         if (isDead) return;
         if (isElite)
         {
-            Debug.Log("elite defeated");
             Stage.Instance.elitesDefeated++;
             Stage.Instance.playingWave.isFinalized = true;
             Stage.Instance.currentStagePoint.OnEventFinish();
@@ -698,7 +705,8 @@ public abstract class Enemy : MonoBehaviour
             AudioController.PlaySound(AudioController.instance.sounds.bossPhaseEnd, side:true);
             Stage.Instance.elitesDefeated++;
             Stage.Instance.playingWave.isFinalized = true;
-            Stage.Instance.currentStagePoint.OnEventFinish();
+            if (Stage.Instance.currentStagePoint != null) Stage.Instance.currentStagePoint.OnEventFinish();
+
             Stage.Instance.isEliteAlive = false;
             UIManager.Instance.PlayerUI.ShowBossBar(false);
             Stage.Instance.canSpawnEnemies = true;
@@ -790,11 +798,12 @@ public abstract class Enemy : MonoBehaviour
             }
             else if (expToUse <= 10)
             {
-                BulletGem gem = PoolManager.Get<BulletGem>();
+                Gem gem = PoolManager.Get<Gem>();
                 gem.dir = Random.insideUnitCircle * 2.4f;
                 gem.transform.position = transform.position;//(Vector2)transform.position + (Random.insideUnitCircle * 0.4f);
                 gem.exp = expToUse;
                 expToUse -= expToUse;
+                gem.animator.Play("SmallGem");
             }
         }
 

@@ -6,6 +6,6 @@ public class SpeedOverTimeBehaviour : BulletBehaviour
     public float speedPerBeat;
     public override void UpdateBehaviour(BulletBase bullet, float beatTime)
     {
-        bullet.speed = Mathf.MoveTowards(bullet.speed, targetSpeed, speedPerBeat * (Time.deltaTime / beatTime ));
+        bullet.speed = Mathf.MoveTowards(bullet.speed, targetSpeed, speedPerBeat * (Time.deltaTime / BeatManager.GetBeatDuration() ));
     }
 }

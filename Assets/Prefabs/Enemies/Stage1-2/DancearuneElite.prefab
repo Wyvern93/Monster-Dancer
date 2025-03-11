@@ -188,7 +188,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3847588827964904188
 Transform:
   m_ObjectHideFlags: 0
@@ -294,6 +294,7 @@ MonoBehaviour:
   idleAnimation: dancearune_normal
   moveAnimation: dancearune_normal
   shootAnimation: dancearune_preattack
+  canBeKnocked: 1
   beatContact: 0
   isElite: 1
   Sprite: {fileID: 8896018991275145105}
@@ -312,6 +313,8 @@ MonoBehaviour:
   slownessStatus: {fileID: 0}
   enemyType: 13
   group: {fileID: 0}
+  shouldMove: 0
+  moveToggle: 0
 --- !u!95 &2279922677172364795
 Animator:
   serializedVersion: 5

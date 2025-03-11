@@ -224,7 +224,9 @@ public class NekomanderElite : Enemy
         bulletSpawnEffect.transform.position = transform.position;
         bulletSpawnEffect.finalScale = 1f;
         yield return null;
-        while (!BeatManager.isBeat) yield return null;
+        yield return new WaitUntil(() => BeatManager.isBeat && !GameManager.isPaused && !stunStatus.isStunned());
+        yield return null;
+        yield return new WaitUntil(() => BeatManager.isBeat && !GameManager.isPaused && !stunStatus.isStunned());
 
         Vector2 playerdir = Player.instance.GetClosestPlayer(transform.position + (-Vector3.up * 0.4f)) - transform.position;
         playerdir.Normalize();
@@ -233,7 +235,7 @@ public class NekomanderElite : Enemy
 
         for (int j = -1; j < 2; j++)
         {
-            float angle = baseAngle + (j * 15f);
+            float angle = baseAngle + (j * 20f);
             Vector2 dir = BulletBase.angleToVector(angle);
             ShootBellBullet(dir);
         }
@@ -257,7 +259,7 @@ public class NekomanderElite : Enemy
         animator.speed = 1f / BeatManager.GetBeatDuration();
         enemies = new List<Enemy>();
         base.OnSpawn();
-        speed = 1.1f;
+        speed = 1f;
         beatCD = -1;
         phase = 0;
         UIManager.Instance.PlayerUI.SetBossBarName("Nekomander");
@@ -271,15 +273,15 @@ public class NekomanderElite : Enemy
 
         bullet.transform.position = transform.position + (Vector3)(attackDir * 0.5f) + (Vector3.up * 0.5f);
         bullet.direction = attackDir;
-        bullet.speed = 12;
+        bullet.speed = 15;
         bullet.atk = 5;
-        bullet.lifetime = 6;
+        bullet.lifetime = 5;
         bullet.transform.localScale = Vector3.one;
         bullet.startOnBeat = true;
         bullet.behaviours = new List<BulletBehaviour>
             {
-                new SpriteSpinBehaviour() { start = 0, end = -1 },
-                new SpeedOverTimeBehaviour() {start = 0, end = -1, speedPerBeat = 0.25f, targetSpeed = 0 }
+                //new SpriteSpinBehaviour() { start = 0, end = -1 },
+                new SpeedOverTimeBehaviour() {start = 0, end = -1, speedPerBeat = 3f, targetSpeed = 0f }
             };
         bullet.animator.Play("bellbullet");
         bullet.enemySource = this;

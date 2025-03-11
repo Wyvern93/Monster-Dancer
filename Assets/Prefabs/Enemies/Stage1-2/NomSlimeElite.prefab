@@ -104,7 +104,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7741303993434987915
 Transform:
   m_ObjectHideFlags: 0
@@ -210,6 +210,7 @@ MonoBehaviour:
   idleAnimation: nomslime_normal
   moveAnimation: nomslime_elite_move
   shootAnimation: nomslime_normal
+  canBeKnocked: 1
   beatContact: 0
   isElite: 1
   Sprite: {fileID: 8676073250041908439}
@@ -228,6 +229,8 @@ MonoBehaviour:
   slownessStatus: {fileID: 0}
   enemyType: 3
   group: {fileID: 0}
+  shouldMove: 0
+  moveToggle: 0
   bc: {fileID: 6915472006047351383}
 --- !u!95 &3398356773717718008
 Animator:

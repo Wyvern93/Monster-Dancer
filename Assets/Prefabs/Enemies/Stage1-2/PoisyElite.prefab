@@ -188,7 +188,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1033155383590306726
 Transform:
   m_ObjectHideFlags: 0
@@ -294,6 +294,7 @@ MonoBehaviour:
   idleAnimation: poisy_normal
   moveAnimation: poisy_move
   shootAnimation: poisy_normal
+  canBeKnocked: 1
   beatContact: 0
   isElite: 1
   Sprite: {fileID: 4749180817687290756}
@@ -312,6 +313,8 @@ MonoBehaviour:
   slownessStatus: {fileID: 0}
   enemyType: 11
   group: {fileID: 0}
+  shouldMove: 0
+  moveToggle: 0
 --- !u!95 &6458465657977353221
 Animator:
   serializedVersion: 5

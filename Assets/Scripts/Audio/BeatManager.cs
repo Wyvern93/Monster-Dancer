@@ -33,6 +33,7 @@ public class BeatManager : MonoBehaviour
     private List<BeatObject> activeXBeatObjects = new List<BeatObject>();
     private List<BeatObject> activeCBeatObjects = new List<BeatObject>();
     [SerializeField] Animator beatPulse;
+    [SerializeField] CanvasGroup timelineCanvasGroup;
 
     [SerializeField] Sprite compassSprite, beatSprite, midBeatSprite;
     [SerializeField] Sprite zSprite, xSprite, cSprite;
@@ -50,12 +51,7 @@ public class BeatManager : MonoBehaviour
     public static int beats;
 
     [Header("UI")]
-    [SerializeField] public Animator beatPulseAnimator;
-    SpriteRenderer beatPulseSprite;
     [SerializeField] GameObject playerRing;
-    [SerializeField] SpriteRenderer beatScore;
-    private float beatScoreSpeed;
-    private float beatScoreAlpha;
 
     [SerializeField] Sprite failSprite;
     [SerializeField] Sprite successSprite;
@@ -78,10 +74,6 @@ public class BeatManager : MonoBehaviour
     public MidBeat currentMidBeat;
     private List<MidBeat> midbeatList;
 
-    public static void UpdatePulseAnimator()
-    {
-        // instance.beatPulseAnimator.gameObject.SetActive(!compassless);
-    }
 
     // SetTrack is called before starting the music.
     // We set our tempo, offsets, and also (for now) schedule the first beats relative to “music time.”
@@ -131,7 +123,6 @@ public class BeatManager : MonoBehaviour
     public static void Stop()
     {
         isPlaying = false;
-        instance.beatPulseSprite.color = Color.clear;
         instance.music.Stop();
         beats = 0;
         instance.quarterBeats = 0;
@@ -143,7 +134,6 @@ public class BeatManager : MonoBehaviour
     // That start time becomes our “zero” (or reference) for all beat calculations.
     public static void StartTrack()
     {
-        instance.beatPulseSprite.color = Color.white;
         instance.music.volume = 1f;
 
         // Give the system a tiny delay so we can schedule the start.
@@ -198,7 +188,6 @@ public class BeatManager : MonoBehaviour
     {
         instance = this;
         StartBeatObjects();
-        beatPulseSprite = beatPulseAnimator.GetComponent<SpriteRenderer>();
     }
 
     public static float GetActionDuration()
@@ -255,10 +244,6 @@ public class BeatManager : MonoBehaviour
     // We compute “music time” as the elapsed dsp time since music start plus audio_offset.
     void Update()
     {
-        if (InputManager.ActionPress(InputActionType.FIRST_SKILL))
-        {
-            //AudioController.PlaySoundWithoutWait(testClip);
-        }
         if (isPlaying)
         {
             currentTime = (float)(AudioSettings.dspTime - dspStartTime) + audio_offset;
@@ -268,11 +253,6 @@ public class BeatManager : MonoBehaviour
             currentTime = 0;
         }
 
-        beatPulseSprite.color = new Color(1, 1, 1, Mathf.MoveTowards(beatPulseSprite.color.a, targetBeatPulseAlpha, Time.deltaTime * 4f));
-        if (!isBeat)
-        {
-            beatPulseAnimator.ResetTrigger("OnBeat");
-        }
         if (isBeat) isBeat = false;
         if (isQuarterBeat) isQuarterBeat = false;
         if (isMidBeat) isMidBeat = false;
@@ -321,12 +301,22 @@ public class BeatManager : MonoBehaviour
         }
 
         UpdateTimeline();
-        UpdateUI();
     }
 
     // Update the timeline's beat objects based on the current time
     private void UpdateTimeline()
     {
+        if (Player.instance)
+        {
+            if (Player.instance.transform.position.y < Camera.main.transform.position.y - 3f)
+            {
+                timelineCanvasGroup.alpha = 0.6f;
+            }
+            else
+            {
+                timelineCanvasGroup.alpha = 1f;
+            }
+        }
         // Lines
         while (activeTimelineObjects.Count < 16)
         {
@@ -544,7 +534,6 @@ public class BeatManager : MonoBehaviour
     // a frame in advance. In this example, we assume OnBeat is called as close as possible to the desired moment.)
     private void OnBeat()
     {
-        beatPulseAnimator.SetTrigger("OnBeat");
         menuGameBeat = true;
         isBeat = true;
         beatTest.Play();
@@ -578,29 +567,9 @@ public class BeatManager : MonoBehaviour
         //AudioController.PlaySoundWithoutWait(testClip);
     }
 
-    private void UpdateUI()
-    {
-        if (beatScoreAlpha > 0)
-        {
-            beatScoreAlpha -= Time.deltaTime * 8f;
-            beatScoreSpeed -= Time.deltaTime * 8f;
-            beatScore.transform.localPosition = new Vector3(0, beatScore.transform.localPosition.y + beatScoreSpeed * Time.deltaTime, 0);
-        }
-        beatScore.color = new Color(1, 1, 1, beatScoreAlpha);
-        if (!music.isPlaying) beatPulseAnimator.speed = 0f;
-        else beatPulseAnimator.speed = 1 / secondsPerBeat;
-    }
-
     public void StartMusic()
     {
-        beatPulseAnimator.GetComponent<SpriteRenderer>().color = Color.white;
         music.Play();
-    }
-
-    public void StopMusic()
-    {
-        beatPulseAnimator.speed = 0;
-        beatPulseAnimator.GetComponent<SpriteRenderer>().color = Color.clear;
     }
 
     public static bool isBeatAfter()
@@ -652,7 +621,7 @@ public class BeatManager : MonoBehaviour
         float range = instance.secondsPerBeat;
         for (int i = 0; i < unusedBeats.Count; i++)
         {
-            Debug.Log($"Input: {instance.currentTime} | BeatTimes: {unusedBeats[i].minimumTime} ~ {unusedBeats[i].maximumTime}");
+            //Debug.Log($"Input: {instance.currentTime} | BeatTimes: {unusedBeats[i].minimumTime} ~ {unusedBeats[i].maximumTime}");
             if (unusedBeats[i].minimumTime > instance.currentTime + range)
             {
                 unusedBeats[i].used = true;
@@ -677,8 +646,8 @@ public class BeatManager : MonoBehaviour
                 int id = instance.midbeatList.IndexOf(unusedBeats[i]);
                 int testingMidbeat = instance.midbeatList.IndexOf(instance.midbeatList[id]);
                 BeatType beatType = instance.GetMidBeat(testingMidbeat + 9);
-                Debug.Log($"Last MidBeat: {instance.midbeats} | Trying to ask {testingMidbeat}");
-                Debug.Log(beatType);
+                //Debug.Log($"Last MidBeat: {instance.midbeats} | Trying to ask {testingMidbeat}");
+                //Debug.Log(beatType);
                 if (instance.CheckBeat(testingMidbeat + 9, type))
                 {
 
@@ -686,7 +655,6 @@ public class BeatManager : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("not the beat expected");
                     return BeatTrigger.FAIL;
                 }
                 //return BeatTrigger.PERFECT;
@@ -720,16 +688,5 @@ public class BeatManager : MonoBehaviour
             return BeatTrigger.SUCCESS;
         else
             return BeatTrigger.FAIL;*/
-    }
-
-    public static void TriggerBeatScore(BeatTrigger trigger)
-    {
-        instance.beatScoreSpeed = 2f;
-        if (trigger == BeatTrigger.FAIL) instance.beatScore.sprite = instance.failSprite;
-        else if (trigger == BeatTrigger.SUCCESS) instance.beatScore.sprite = instance.successSprite;
-        else instance.beatScore.sprite = instance.perfectSprite;
-
-        instance.beatScoreAlpha = 2.0f;
-        instance.beatScore.transform.localPosition = new Vector3(0, 0.5f, 0f);
     }
 }

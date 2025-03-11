@@ -2,9 +2,6 @@ using UnityEngine;
 
 public class HolyOrb : Drop
 {
-    
-    public Vector2 dir;
-
     void Update()
     {
         transform.position = Vector3.MoveTowards(transform.position, Player.instance.transform.position, Time.deltaTime * speed);

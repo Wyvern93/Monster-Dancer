@@ -336,7 +336,7 @@ public abstract class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (GameManager.isLoading || GameManager.isPaused || !canDoAnything)
+        if (GameManager.isLoading || GameManager.isPaused)
         {
             UIManager.Instance.PlayerUI.activeCDImage.fillAmount = 0;
             activeAbility.currentCooldown = 0;
@@ -441,8 +441,8 @@ public abstract class Player : MonoBehaviour
     {
         if (InputManager.playerDevice == InputManager.InputDeviceType.Keyboard)
         {
-            direction.x = Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed ? -1 : Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed ? 1 : 0;
-            direction.y = Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed ? -1 : Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed ? 1 : 0;
+            direction.x = Keyboard.current.leftArrowKey.isPressed ? -1 : Keyboard.current.rightArrowKey.isPressed ? 1 : 0;
+            direction.y = Keyboard.current.downArrowKey.isPressed ? -1 : Keyboard.current.upArrowKey.isPressed ? 1 : 0;
         }
         else
         {
@@ -455,7 +455,18 @@ public abstract class Player : MonoBehaviour
         {
             oldDir = direction;
         }
-
+        if (!canDoAnything)
+        {
+            rb.velocity = Vector2.zero;
+            return;
+        }
+        if (UIManager.Instance.cutsceneManager.isInCutscene() || GameManager.isPaused)
+        {
+            rb.velocity = Vector2.zero;
+            facingRight = direction.x > 0;
+            StopAllCoroutines();
+            return;
+        }
         if (CanMove())
         {
             if (direction != Vector2.zero)
@@ -493,14 +504,12 @@ public abstract class Player : MonoBehaviour
                     ultimateAbility.currentCooldown = Mathf.Clamp(ultimateAbility.currentCooldown - (equippedPassiveAbilities[0].GetBeatSize() * reductionMultiplier), 0, 9999);
                 }
                 UIManager.Instance.PlayerUI.AddToComboCounter((int)(equippedPassiveAbilities[0].GetBeatSize() * 2));
-                BeatManager.TriggerBeatScore(beatTrigger);
             }
             else if (!BeatManager.compassless)
             {
                 AudioController.PlaySoundWithoutCooldown(AudioController.instance.sounds.beatFailSfx);
                 PlayerCamera.TriggerCameraShake(0.2f, 0.3f);
                 UIManager.Instance.PlayerUI.FailCombo();
-                BeatManager.TriggerBeatScore(beatTrigger);
             }
         }
 
@@ -522,14 +531,12 @@ public abstract class Player : MonoBehaviour
                         ultimateAbility.currentCooldown = Mathf.Clamp(ultimateAbility.currentCooldown - (equippedPassiveAbilities[1].GetBeatSize() * reductionMultiplier), 0, 9999);
                     }
                     UIManager.Instance.PlayerUI.AddToComboCounter((int)(equippedPassiveAbilities[1].GetBeatSize() * 2));
-                    BeatManager.TriggerBeatScore(beatTrigger);
                 }
                 else if (!BeatManager.compassless)
                 {
                     AudioController.PlaySoundWithoutCooldown(AudioController.instance.sounds.beatFailSfx);
                     PlayerCamera.TriggerCameraShake(0.2f, 0.3f);
                     UIManager.Instance.PlayerUI.FailCombo();
-                    BeatManager.TriggerBeatScore(beatTrigger);
                 }
             }
         }
@@ -552,14 +559,12 @@ public abstract class Player : MonoBehaviour
                         ultimateAbility.currentCooldown = Mathf.Clamp(ultimateAbility.currentCooldown - (equippedPassiveAbilities[2].GetBeatSize() * reductionMultiplier), 0, 9999);
                     }
                     UIManager.Instance.PlayerUI.AddToComboCounter((int)(equippedPassiveAbilities[2].GetBeatSize() * 2));
-                    BeatManager.TriggerBeatScore(beatTrigger);
                 }
                 else if (!BeatManager.compassless)
                 {
                     AudioController.PlaySoundWithoutCooldown(AudioController.instance.sounds.beatFailSfx);
                     PlayerCamera.TriggerCameraShake(0.2f, 0.3f);
                     UIManager.Instance.PlayerUI.FailCombo();
-                    BeatManager.TriggerBeatScore(beatTrigger);
                 }
             }
         }
@@ -581,14 +586,12 @@ public abstract class Player : MonoBehaviour
                     ultimateAbility.currentCooldown = Mathf.Clamp(ultimateAbility.currentCooldown - (activeAbility.GetMaxCooldown() * reductionMultiplier), 0, 9999);
                 }
                 UIManager.Instance.PlayerUI.AddToComboCounter(1);
-                BeatManager.TriggerBeatScore(beatTrigger);
             }
             else if (!BeatManager.compassless)
             {
                 AudioController.PlaySoundWithoutCooldown(AudioController.instance.sounds.beatFailSfx);
                 PlayerCamera.TriggerCameraShake(0.2f, 0.3f);
                 UIManager.Instance.PlayerUI.FailCombo();
-                BeatManager.TriggerBeatScore(beatTrigger);
             }
         }
 
@@ -601,13 +604,11 @@ public abstract class Player : MonoBehaviour
                 {
                     OnUltimateUse();
                     UIManager.Instance.PlayerUI.AddToComboCounter(1);
-                    BeatManager.TriggerBeatScore(beatTrigger);
                 }
                 else if (!BeatManager.compassless)
                 {
                     AudioController.PlaySoundWithoutCooldown(AudioController.instance.sounds.beatFailSfx);
                     PlayerCamera.TriggerCameraShake(0.2f, 0.3f);
-                    BeatManager.TriggerBeatScore(beatTrigger);
                 }
             }
         }
@@ -965,7 +966,7 @@ public abstract class Player : MonoBehaviour
     }
 
     public static void AddExp(int n)
-    {
+    {/*
         n = (int)(n * instance.currentStats.ExpMulti);
         if (instance.isDead) return;
         instance.CurrentExp += n;
@@ -975,7 +976,13 @@ public abstract class Player : MonoBehaviour
             instance.Level++;
             instance.OnLevelUp();
         }
-        UIManager.Instance.PlayerUI.UpdateExp();
+        UIManager.Instance.PlayerUI.UpdateExp();*/
+        if (instance.isDead) return;
+        n = (int)(n * instance.currentStats.ExpMulti);
+        foreach (PlayerAbility ability in instance.equippedPassiveAbilities)
+        {
+            ability.AddExp(n);
+        }
     }
 
     public void OnLevelUp()

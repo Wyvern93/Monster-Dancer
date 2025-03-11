@@ -7,21 +7,20 @@ public class JackOElite : Enemy
     int beatCD;
     private Vector3 targetPos;
     private int phase;
-    private float lightAttackAngleBase;
     [SerializeField] SpriteRenderer shadow;
     [SerializeField] BoxCollider2D boxCollider;
+    private bool lightAttackToggle;
     public override void OnSpawn()
     {
         shouldMove = false;
         rb.velocity = Vector3.zero;
         targetPos = (Vector2)Camera.main.transform.position;
-        lightAttackAngleBase = 0;
         beatCD = -1;
         base.OnSpawn();
         UIManager.Instance.PlayerUI.SetBossBarName("King Jack 'o");
         UIManager.Instance.PlayerUI.ShowBossBar(true);
         UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
-        speed = 1.6f;
+        speed = 1.4f;
         canBeKnocked = false;
     }
 
@@ -92,7 +91,7 @@ public class JackOElite : Enemy
     {
         canBeKnocked = true;
         beatCD++;
-        if (beatCD < 24)
+        if (beatCD < 20)
         {
             if (beatCD == 0 || beatCD == 4 || beatCD == 8 || beatCD == 12 || beatCD == 16)
             {
@@ -135,43 +134,51 @@ public class JackOElite : Enemy
 
     private void SpawnLightAttack()
     {
-        LightAttack centerAttack = PoolManager.Get<LightAttack>();
         AudioController.PlaySound(AudioController.instance.sounds.warningWaveSound);
-        centerAttack.playSound = true;
         Vector2 center = (Vector2)Camera.main.transform.position;
-        centerAttack.transform.position = center;
 
-        float aAngle = lightAttackAngleBase;
-        float bAngle = lightAttackAngleBase + 45;
-        float cAngle = lightAttackAngleBase + 90;
+        Vector2 start = new Vector2(center.x - 8f, center.y - 4f);
+        Vector2 offset = new Vector2(4f, 2.8f);
 
-        float diff = 360f / 5f;
-
-        for (int a = 0; a < 5; a++)
+        bool playedSound = false;
+        for (int x = 0; x < 5; x++)
         {
-            float angle = (aAngle + (a * diff)) * Mathf.Deg2Rad;
-            LightAttack attack = PoolManager.Get<LightAttack>();
-            attack.transform.position = new Vector2(center.x + (5 * Mathf.Cos(angle)), center.y + (3f * Mathf.Sin(angle)));
-            attack.playSound = false;
+            for (int y = 0; y < 4; y++)
+            {
+                if (lightAttackToggle)
+                {
+                    if ((x + y - 1) % 2 == 0)
+                    {
+                        LightAttack attack = PoolManager.Get<LightAttack>();
+                        attack.transform.position = new Vector2(start.x + (offset.x * x), start.y + (offset.y * y));
+                        attack.playSound = false;
+                        if (!playedSound)
+                        {
+                            attack.playSound = true;
+                            AudioController.PlaySound(AudioController.instance.sounds.warningWaveSound);
+                            playedSound = true;
+                        }
+                    }
+                }
+                else
+                {
+                    if ((x + y) % 2 == 0)
+                    {
+                        LightAttack attack = PoolManager.Get<LightAttack>();
+                        attack.transform.position = new Vector2(start.x + (offset.x * x), start.y + (offset.y * y));
+                        attack.playSound = false;
+                        if (!playedSound)
+                        {
+                            attack.playSound = true;
+                            AudioController.PlaySound(AudioController.instance.sounds.warningWaveSound);
+                            playedSound = true;
+                        }
+                    }
+                }
+                
+            }
         }
-
-        for (int b = 0; b < 5; b++)
-        {
-            float angle = (bAngle + (b * diff)) * Mathf.Deg2Rad;
-            LightAttack attack = PoolManager.Get<LightAttack>();
-            attack.transform.position = new Vector2(center.x + (10 * Mathf.Cos(angle)), center.y + (6f * Mathf.Sin(angle)));
-            attack.playSound = false;
-        }
-
-        for (int c = 0; c < 5; c++)
-        {
-            float angle = cAngle + ((c * diff)) * Mathf.Deg2Rad;
-            LightAttack attack = PoolManager.Get<LightAttack>();
-            attack.transform.position = new Vector2(center.x + (15 * Mathf.Cos(angle)), center.y + (9f * Mathf.Sin(angle)));
-            attack.playSound = false;
-        }
-
-        lightAttackAngleBase += 45f;
+        lightAttackToggle = !lightAttackToggle;
     }
 
     private void HandleMoveToSpiral()
@@ -298,11 +305,13 @@ public class JackOElite : Enemy
             while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 
             tempbullets.Add(SpawnBullet(i * diff, 10 + (i % 3), 1 + ((i % 3) / 2f)));
-            yield return new WaitForSeconds(BeatManager.GetBeatDuration() / 12f);
+            yield return new WaitForSeconds(BeatManager.GetBeatDuration() / 8f);
         }
         foreach (BulletBase bullet in tempbullets)
         {
-            bullet.beat = 1;
+            bullet.ResetBeat();
+            bullet.frozen = false;
+            bullet.beat = 0;
         }
         float time = BeatManager.GetBeatDuration();
         while (time > 0)
@@ -322,7 +331,7 @@ public class JackOElite : Enemy
 
     private BulletBase SpawnBullet(float angle, float speed, float dist)
     {
-        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
+        AudioController.PlaySoundWithoutCooldown(AudioController.instance.sounds.shootBullet);
         Vector2 dir = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
 
         BulletBase bullet = PoolManager.Get<BulletBase>();
@@ -334,6 +343,7 @@ public class JackOElite : Enemy
         bullet.lifetime = 10;
         bullet.transform.localScale = Vector3.one * 2f;
         bullet.startOnBeat = false;
+        bullet.frozen = true;
         bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteLookAngleBehaviour() { start = 0, end = -1 },
