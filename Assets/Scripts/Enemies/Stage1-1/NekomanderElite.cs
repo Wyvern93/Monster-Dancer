@@ -10,8 +10,45 @@ public class NekomanderElite : Enemy
     private int phase;
     private List<Enemy> enemies;
     [SerializeField] BoxCollider2D boxCollider;
+
+    public override void MoveUpdate()
+    {
+        facingRight = transform.position.x < targetPos.x;
+        if (GameManager.isPaused || stunStatus.isStunned())
+        {
+            velocity = Vector2.zero;
+            return;
+        }
+
+        if (!shouldMove || !CanMove() || isAttacking)
+        {
+            velocity = Vector2.zero;
+            return;
+        }
+        AnimatorClipInfo animInfo = animator.GetCurrentAnimatorClipInfo(0)[0];
+        if (transform.position != targetPos && animInfo.clip.name == "nekomander_normal")
+        {
+            animator.Play("nekomander_move");
+        }
+        if (transform.position == targetPos && animInfo.clip.name == "nekomander_move")
+        {
+            animator.Play("nekomander_normal");
+        }
+
+        
+        velocity = Vector2.zero;
+
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, speed * 3 * Time.deltaTime);
+    }
+
     protected override void OnBeat()
     {
+        // Move Behaviour
+        if (CanMove())
+        {
+            if (shouldMove) animator.Play(moveAnimation);
+            else animator.Play(idleAnimation);
+        }
         switch (phase)
         {
             case 0:
@@ -33,7 +70,7 @@ public class NekomanderElite : Enemy
         {
             StartCoroutine(SummonEnemies());
         }
-        if (beatCD >= 6) 
+        if (beatCD >= 4) 
         {
             beatCD = -1;
             phase = 1;
@@ -42,6 +79,7 @@ public class NekomanderElite : Enemy
 
     private IEnumerator SummonEnemies()
     {
+        shouldMove = false;
         facingRight = transform.position.x < Player.instance.transform.position.x;
         AudioController.PlaySound(AudioController.instance.sounds.chargeBulletSound);
         animator.Play("nekomander_preattack");
@@ -100,6 +138,7 @@ public class NekomanderElite : Enemy
 
     private void JumpOnPlayer()
     {
+        shouldMove = false;
         beatCD++;
         targetPos = Player.instance.transform.position;
         if (beatCD == 0) StartCoroutine(JumpToPlayerCoroutine());
@@ -107,6 +146,7 @@ public class NekomanderElite : Enemy
 
     protected IEnumerator JumpToPlayerCoroutine()
     {
+        shouldMove = false;
         isMoving = true;
 
         boxCollider.enabled = false;
@@ -115,6 +155,7 @@ public class NekomanderElite : Enemy
         Vector2 dir = (playerPos - transform.position).normalized;
         facingRight = dir.x > 0;
         animator.Play("nekomander_jump");
+        animator.speed = 1f / BeatManager.GetBeatDuration() * 2;
         velocity = Vector3.zero;
         while (time <= BeatManager.GetBeatDuration() * 2)
         {
@@ -131,6 +172,7 @@ public class NekomanderElite : Enemy
 
         isMoving = false;
         animator.Play("nekomander_normal");
+        animator.speed = 1f / BeatManager.GetBeatDuration();
 
         time = 0;
         while (time <= BeatManager.GetBeatDuration() * 2f)
@@ -142,6 +184,7 @@ public class NekomanderElite : Enemy
 
         beatCD = -1;
         phase = 2;
+        shouldMove = false;
         yield break;
     }
 
@@ -150,18 +193,22 @@ public class NekomanderElite : Enemy
         beatCD++;
         if (beatCD == 0 || beatCD == 8 || beatCD == 16) // Attack
         {
+            shouldMove = false;
             StartCoroutine(ConeAttack());
         }
         else
         {
             if (beatCD == 24)
             {
+                shouldMove = false;
                 beatCD = -1;
                 phase = 0;
             }
             else if(!isAttacking && CanMove()) // Move
             {
-                StartCoroutine(MoveToTarget());
+                shouldMove = true;
+                targetPos = Player.instance.GetClosestPlayer(transform.position);
+                //StartCoroutine(MoveToTarget());
             }
 
         }
@@ -176,8 +223,10 @@ public class NekomanderElite : Enemy
         bulletSpawnEffect.source = this;
         bulletSpawnEffect.transform.position = transform.position;
         bulletSpawnEffect.finalScale = 1f;
-        yield return new WaitForSeconds(BeatManager.GetBeatDuration());
-        while (!BeatManager.isBeat) yield return new WaitForSeconds(BeatManager.GetBeatDuration());
+        yield return null;
+        yield return new WaitUntil(() => BeatManager.isBeat && !GameManager.isPaused && !stunStatus.isStunned());
+        yield return null;
+        yield return new WaitUntil(() => BeatManager.isBeat && !GameManager.isPaused && !stunStatus.isStunned());
 
         Vector2 playerdir = Player.instance.GetClosestPlayer(transform.position + (-Vector3.up * 0.4f)) - transform.position;
         playerdir.Normalize();
@@ -186,7 +235,7 @@ public class NekomanderElite : Enemy
 
         for (int j = -1; j < 2; j++)
         {
-            float angle = baseAngle + (j * 15f);
+            float angle = baseAngle + (j * 20f);
             Vector2 dir = BulletBase.angleToVector(angle);
             ShootBellBullet(dir);
         }
@@ -206,8 +255,11 @@ public class NekomanderElite : Enemy
 
     public override void OnSpawn()
     {
+        shouldMove = false;
+        animator.speed = 1f / BeatManager.GetBeatDuration();
         enemies = new List<Enemy>();
         base.OnSpawn();
+        speed = 1f;
         beatCD = -1;
         phase = 0;
         UIManager.Instance.PlayerUI.SetBossBarName("Nekomander");
@@ -221,15 +273,15 @@ public class NekomanderElite : Enemy
 
         bullet.transform.position = transform.position + (Vector3)(attackDir * 0.5f) + (Vector3.up * 0.5f);
         bullet.direction = attackDir;
-        bullet.speed = 12;
+        bullet.speed = 15;
         bullet.atk = 5;
-        bullet.lifetime = 8;
+        bullet.lifetime = 5;
         bullet.transform.localScale = Vector3.one;
         bullet.startOnBeat = true;
         bullet.behaviours = new List<BulletBehaviour>
             {
-                new SpriteSpinBehaviour() { start = 0, end = -1 },
-                new SpeedOverTimeBehaviour() {start = 0, end = -1, speedPerBeat = 0.25f, targetSpeed = 0 }
+                //new SpriteSpinBehaviour() { start = 0, end = -1 },
+                new SpeedOverTimeBehaviour() {start = 0, end = -1, speedPerBeat = 3f, targetSpeed = 0f }
             };
         bullet.animator.Play("bellbullet");
         bullet.enemySource = this;
@@ -315,7 +367,7 @@ public class NekomanderElite : Enemy
         facingRight = dir.x > 0;
         animator.Play(moveAnimation);
         velocity = Vector3.zero;
-        while (time <= BeatManager.GetBeatDuration() / 2)
+        while (time <= BeatManager.GetBeatDuration())
         {
             while (GameManager.isPaused || stunStatus.isStunned()) yield return null;
 

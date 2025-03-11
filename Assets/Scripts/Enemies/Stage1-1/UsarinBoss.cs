@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Net.Http.Headers;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UIElements;
@@ -17,6 +16,7 @@ public class UsarinBoss : Boss
     private UsarinBossState usarinState;
     private bool isPreparingAttack;
     private int attackBeat;
+    bool isDancing;
 
     private int hpThreshold1, hpThreshold2;
 
@@ -35,15 +35,18 @@ public class UsarinBoss : Boss
     public override void OnSpawn()
     {
         base.OnSpawn();
-
+        isDancing = false;
+        canBeKnocked = false;
+        speed = 1.5f;
+        shouldMove = false;
         allBullets = new List<Bullet>();
         allEnemies = new List<Enemy>();
-        Stage.Instance.enemiesAlive.Add(this);
-        CurrentHP = MaxHP;
-        emissionColor = new Color(1, 1, 1, 0);
-        isMoving = false;
-        Sprite.transform.localPosition = Vector3.zero;
-        State = BossState.Introduction;// FALTA LA ANIMACION DE INTRODUCCION DEL JEFE
+        //Stage.Instance.enemiesAlive.Add(this);
+        //CurrentHP = MaxHP;
+        //emissionColor = new Color(1, 1, 1, 0);
+        //isMoving = false;
+        //Sprite.transform.localPosition = Vector3.zero;
+        //State = BossState.Introduction;// FALTA LA ANIMACION DE INTRODUCCION DEL JEFE
         usarinState = UsarinBossState.Dance1;
         attackBeat = 0;
         isPreparingAttack = true;
@@ -57,8 +60,16 @@ public class UsarinBoss : Boss
 
         animator.Play("usarin_normal");
         animator.speed = 1f / BeatManager.GetBeatDuration();
-        UIManager.Instance.cutsceneManager.StartCutscene(CutsceneType.Boss);
-        State = BossState.Dialogue;
+        if (TestingEnvironment.Instance)
+        {
+            State = BossState.Dialogue;
+        }
+        else
+        {
+            UIManager.Instance.cutsceneManager.StartCutscene(CutsceneType.Boss);
+            State = BossState.Dialogue;
+        }
+        
         transform.localScale = Vector3.one * 2f;
     }
 
@@ -83,10 +94,58 @@ public class UsarinBoss : Boss
         
     }
 
+    public override void MoveUpdate()
+    {
+        facingRight = transform.position.x < targetPos.x;
+        if (GameManager.isPaused || stunStatus.isStunned())
+        {
+            velocity = Vector2.zero;
+            return;
+        }
+        UpdateAnimation();
+        if (!shouldMove || !CanMove() || isAttacking)
+        {
+            velocity = Vector2.zero;
+            return;
+        }
+
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, speed * 3 * Time.deltaTime);
+        velocity = Vector2.zero;
+    }
+
+    private void UpdateAnimation()
+    {
+        AnimatorClipInfo animInfo = animator.GetCurrentAnimatorClipInfo(0)[0];
+        if (shouldMove)
+        {
+            if ((Vector2)transform.position != (Vector2)targetPos) // Moving and not on target
+            {
+                if (animInfo.clip.name != "usarin_move")
+                {
+                    animator.Play("usarin_move");
+                }
+            }
+            else // If should move but are on target
+            {
+                if (isDancing && animInfo.clip.name != "usarin_dance") animator.Play("usarin_dance");
+                if (!isDancing && animInfo.clip.name != "usarin_normal") animator.Play("usarin_normal");
+            }
+        }
+        else
+        {
+            if (isDancing && animInfo.clip.name != "usarin_dance") animator.Play("usarin_dance");
+            if (!isDancing && animInfo.clip.name != "usarin_normal") animator.Play("usarin_normal");
+        }
+    }
+
     protected override void OnBeat()
     {
         while (GameManager.isPaused) return;
         if (State == BossState.Introduction) return;
+
+        // Move Behaviour
+        UpdateAnimation();
+
         if (Player.instance.transform.position.x < transform.position.x) facingRight = false;
         else facingRight = true;
         if (State == BossState.Phase1)
@@ -96,6 +155,14 @@ public class UsarinBoss : Boss
             if (usarinState == UsarinBossState.Dance3) OnPattern3();
         }
     }
+    protected void OnMidBeat()
+    {
+        if (usarinState == UsarinBossState.Dance2)
+        {
+            if (isPreparingAttack) return; // Wait until the attack is charged;
+            StartCoroutine(ShootBulletsPhase2());
+        }
+    }
     
     protected override void OnBehaviourUpdate()
     {
@@ -103,6 +170,7 @@ public class UsarinBoss : Boss
         switch (State)
         {
             case BossState.Dialogue:
+                shouldMove = false;
                 if (UIManager.Instance.cutsceneManager.hasFinished)
                 {
                     State = BossState.Phase4;
@@ -113,6 +181,7 @@ public class UsarinBoss : Boss
             case BossState.Phase1:
                 if (usarinState == UsarinBossState.Dance1) UpdatePhase1();
                 if (usarinState == UsarinBossState.Dance2) UpdatePhase2();
+                if (BeatManager.isMidBeat) OnMidBeat();
                 break;
         }
 
@@ -161,6 +230,8 @@ public class UsarinBoss : Boss
         // Charge attack for 2 seconds
         if (attackBeat == 0 && isPreparingAttack)
         {
+            isDancing = false;
+            shouldMove = false;
             AudioController.PlaySound(AudioController.instance.sounds.bossChargeAttack);
             attackBeat = -1;
             magicCircle.color = new Color(1, 1, 1, 0);
@@ -171,23 +242,28 @@ public class UsarinBoss : Boss
         }
         if (isPreparingAttack) return; // Wait until the attack is charged;
 
-        if (attackBeat >= 2 && attackBeat <= 6) // Carrot Bullets
+        if (attackBeat >= 4 && attackBeat <= 8) // Carrot Bullets
         {
-            animator.Play("usarin_dance");
-
+            //animator.Play("usarin_dance");
+            isDancing = true;
+            shouldMove = false;
             StartCoroutine(ShootBulletsPhase1());
         }
         if (attackBeat == 0) // Bunnies
         {
+            shouldMove = false;
+            isDancing = true;
             animator.Play("usarin_dance");
             StartCoroutine(ShootSecondCarrots());
         }
 
-        if (attackBeat == 6) FindTargetPositionAroundPlayer();
-        if (attackBeat > 6)
+        if (attackBeat == 8) FindTargetPositionAroundPlayer();
+        if (attackBeat > 8)
         {
-            if (attackBeat == 10) attackBeat = -1;
-            Move();
+            isDancing = false;
+            if (attackBeat == 12) attackBeat = -1;
+            shouldMove = true;
+            //Move();
 
         }
         attackBeat++;
@@ -196,10 +272,10 @@ public class UsarinBoss : Boss
     private IEnumerator ShootBulletsPhase1()
     {
         float angle = 0;
-        if (attackBeat == 2) angle = 225;
-        else if (attackBeat == 3) angle = 315;
-        else if (attackBeat == 4) angle = 150;
-        else if (attackBeat == 5) angle = 25;
+        if (attackBeat == 4) angle = 225;
+        else if (attackBeat == 5) angle = 315;
+        else if (attackBeat == 6) angle = 150;
+        else if (attackBeat == 7) angle = 25;
         else yield break;
 
         yield return ShootCircleOfBullets(angle);
@@ -213,16 +289,17 @@ public class UsarinBoss : Boss
         {
             float offsetAngle = i * 45f;
             Vector2 offsetDir = new Vector2(Mathf.Cos(offsetAngle * Mathf.Deg2Rad), Mathf.Sin(offsetAngle * Mathf.Deg2Rad));
-            AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
+            AudioController.PlaySoundWithoutCooldown(AudioController.instance.sounds.shootBullet);
             BulletBase bullet = PoolManager.Get<BulletBase>();
-            bullet.transform.position = transform.position + (Vector3.up * 0.5f) + (Vector3)(offsetDir * 0.8f) + (Vector3)(patternDir * (1.5f));
+            bullet.transform.position = transform.position + (Vector3.up * 0.5f) + (Vector3)(offsetDir * 0.6f) + (Vector3)(patternDir * (1.5f));
             bullet.direction = patternDir;
             bullet.speed = 0;
             bullet.atk = 3;
-            bullet.lifetime = 8;
+            bullet.lifetime = 6;
             bullet.transform.localScale = Vector3.one;
             bullet.startOnBeat = false;
             bullet.enemySource = this;
+            bullet.frozen = true;
             bullet.behaviours = new List<BulletBehaviour>
             {
                 new SpriteLookAngleBehaviour() { start = 0, end = -1 },
@@ -255,12 +332,15 @@ public class UsarinBoss : Boss
         }
 
         center /= 8f;
-        Vector3 playerPos = Player.instance.transform.position;
+        Vector3 playerPos = Player.instance.transform.position + (Vector3)(Random.insideUnitCircle.normalized * 2);
         Vector2 dir = (playerPos - center).normalized;
 
         foreach (BulletBase bullet in bullets)
         {
-            bullet.behaviours.Add(new SpeedOverTimeBehaviour() { speedPerBeat = 1, start = 3, end = 6, targetSpeed = 12 });
+            bullet.ResetBeat();
+            bullet.frozen = false;
+            bullet.beat = 0;
+            bullet.behaviours.Add(new SpeedOverTimeBehaviour() { speedPerBeat = 100, start = -1, end = -1, targetSpeed = 14 });
             bullet.direction = dir;
             bullet.angle = Vector2.SignedAngle(Vector2.down, dir) - 90;
             bullet.speed = 9;
@@ -270,26 +350,26 @@ public class UsarinBoss : Boss
 
     private IEnumerator ShootSecondCarrots()
     {
-        for (int i = 0; i < 36; i++)
+        for (int i = 0; i < 48; i++)
         {
-            float offsetAngle = i * 10f;
+            float offsetAngle = i * 7.5f;
             Vector2 offsetDir = new Vector2(Mathf.Cos(offsetAngle * Mathf.Deg2Rad), Mathf.Sin(offsetAngle * Mathf.Deg2Rad));
 
             BulletBase bullet = PoolManager.Get<BulletBase>();
 
             bullet.transform.position = transform.position + (Vector3.up * 0.5f) + (Vector3)(offsetDir * 0.3f);
             bullet.direction = offsetDir;
-            bullet.speed = 8;
+            bullet.speed = 10;
             bullet.atk = 10;
-            bullet.lifetime = 10;
+            bullet.lifetime = 8;
             bullet.transform.localScale = Vector3.one;
             bullet.startOnBeat = true;
             bullet.enemySource = this;
             bullet.behaviours = new List<BulletBehaviour>
             {
-                new SpeedOverTimeBehaviour() { speedPerBeat = 1, start = 0, end = 3, targetSpeed = 6 },
+                new SpeedOverTimeBehaviour() { speedPerBeat = 1, start = 0, end = -1, targetSpeed = 6 },
                 new SpriteWaveBehaviour() { start = 0, end = -1 },
-                new RotateOverBeatBehaviour() { start = 0, end = -1, rotateAmount = 70 }
+                new RotateOverBeatBehaviour() { start = 0, end = -1, rotateAmount = 90 }
             };
             bullet.animator.Play("notebullet");
             bullet.OnSpawn();
@@ -305,6 +385,8 @@ public class UsarinBoss : Boss
         // Charge attack for 2 seconds
         if (attackBeat == 0 && isPreparingAttack)
         {
+            isDancing = false;
+            shouldMove = false;
             AudioController.PlaySound(AudioController.instance.sounds.bossChargeAttack);
             attackBeat = -1;
             magicCircle.color = new Color(1, 1, 1, 0);
@@ -315,6 +397,7 @@ public class UsarinBoss : Boss
         }
         if (isPreparingAttack) return; // Wait until the attack is charged;
 
+        isDancing = true;
         if (attackBeat % 18 == 0)
         {
             orbitRight = !orbitRight;
@@ -324,7 +407,7 @@ public class UsarinBoss : Boss
         {
             StartCoroutine(ShootBigBullets());
         }
-        StartCoroutine(ShootBulletsPhase2());
+        //StartCoroutine(ShootBulletsPhase2());
         if (attackBeat == -1) orbitRight = !orbitRight;
         attackBeat++;
     }
@@ -340,7 +423,7 @@ public class UsarinBoss : Boss
 
             bullet.transform.position = transform.position + (Vector3.up) + (Vector3)(angleDir * 0.5f);
             bullet.direction = angleDir;
-            bullet.speed = 6;
+            bullet.speed = 8;
             bullet.atk = 10;
             bullet.lifetime = 10;
             bullet.transform.localScale = Vector3.one;
@@ -354,8 +437,8 @@ public class UsarinBoss : Boss
             bullet.OnSpawn();
             allBullets.Add(bullet);
         }
-        AudioController.PlaySound(AudioController.instance.sounds.shootBullet);
-        orbitalBaseAngle += orbitRight ? 8 : -8;
+        AudioController.PlaySoundWithoutCooldown(AudioController.instance.sounds.shootBullet);
+        orbitalBaseAngle += orbitRight ? 4 : -4;
 
         yield break;
     }
@@ -402,6 +485,9 @@ public class UsarinBoss : Boss
         // Charge attack for 2 seconds
         if (attackBeat == 0 && isPreparingAttack)
         {
+            isDancing = false;
+            shouldMove = true;
+            //shouldMove = false;
             AudioController.PlaySound(AudioController.instance.sounds.bossChargeAttack);
             attackBeat = -1;
             magicCircle.color = new Color(1, 1, 1, 0);
@@ -414,7 +500,13 @@ public class UsarinBoss : Boss
 
         if (transform.position != targetPos)
         {
-            StartCoroutine(MoveToTarget());
+            shouldMove = true;
+            isDancing = false;
+        }
+        else
+        {
+            isDancing = true;
+            shouldMove = false;
         }
         if (isPreparingAttack) return; // Wait until the attack is charged;
 
@@ -493,7 +585,7 @@ public class UsarinBoss : Boss
         {
             float xoffset = i - 10;
             bullets[i].transform.position = arenaPos + (Vector2.up * 10) + (Vector2.right * xoffset);
-            bullets[i].speed = 5;
+            bullets[i].speed = 6;
             bullets[i].angle = -90 + Random.Range(-20f, 20f);
             bullets[i].direction = Vector2.down;
         }

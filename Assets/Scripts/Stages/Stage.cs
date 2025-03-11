@@ -13,7 +13,6 @@ public class Stage : MonoBehaviour
     protected float SpawnRadius = 8f;
 
     public GameObject gemPrefab;
-    public GameObject bulletgemPrefab;
     public GameObject killEffectPrefab;
     public GameObject enemySpawnPrefab;
     //public GameObject bulletPrefab;
@@ -24,6 +23,7 @@ public class Stage : MonoBehaviour
     public GameObject burningPrefab;
     public GameObject enemyGroupPrefab;
     public GameObject smallCirclePrefab;
+    public GameObject gemCollectFXPrefab;
     public bool canSpawnEnemies;
 
     //public GameObject bossAPrefab;
@@ -46,6 +46,7 @@ public class Stage : MonoBehaviour
     public string stageID;
 
     public List<Enemy> enemiesAlive;
+    public int enemyAliveCount;
     public List<Bullet> bulletsSpawned;
     public List<Drop> dropsSpawned;
 
@@ -64,7 +65,7 @@ public class Stage : MonoBehaviour
     public Boss currentBoss;
     public SpriteRenderer bossArea;
 
-    private float spawnAngle;
+    protected float spawnAngle;
     [SerializeField] public Animator CutsceneAnimator;
 
     public GameObject actors;
@@ -108,9 +109,11 @@ public class Stage : MonoBehaviour
 
         foreach (Enemy e in Instance.enemiesAlive)
         {
+            if (e is Boss) continue;
             e.ForceDespawn();
         }
-        Instance.enemiesAlive.Clear();
+        Instance.enemiesAlive.RemoveAll(x => x is not Boss);
+        //Instance.enemiesAlive.Clear();
     }
 
     public static void ForceDespawnBullets()
@@ -130,7 +133,7 @@ public class Stage : MonoBehaviour
         }
         Instance.dropsSpawned.Clear();
     }
-    protected void Awake()
+    protected virtual void Awake()
     {
         Instance = this;
         isBossWave = false;
@@ -204,6 +207,8 @@ public class Stage : MonoBehaviour
         Player.instance.ForceDespawnAbilities(false);
         Player.instance.ResetAbilities();
 
+        Player.instance.animator.SetBool("moving", false);
+        Player.instance.rb.velocity = Vector2.zero;
         Player.instance.Exclamation.SetActive(true);
         AudioController.PlaySound(AudioController.instance.sounds.surpriseSfx);
         canSpawnEnemies = false;
@@ -220,25 +225,32 @@ public class Stage : MonoBehaviour
         PlayerCamera.instance.SetCameraBoundaries(false);
 
         // Move Camera to the boss trigger
-        currentStagePoint = currentStagePoint.next;
-        PlayerCamera.instance.followPlayer = false;
-        while ((Vector2)PlayerCamera.instance.transform.position != (Vector2)currentStagePoint.transform.position)
+        if (TestingEnvironment.Instance)
         {
-            while (GameManager.isPaused) yield return null;
-            PlayerCamera.instance.SetCameraPos(Vector2.MoveTowards(PlayerCamera.instance.transform.position, currentStagePoint.transform.position, Time.deltaTime * 20f));
-            yield return null;
+
         }
+        else
+        {
+            currentStagePoint = currentStagePoint.next;
+            PlayerCamera.instance.followPlayer = false;
+            while ((Vector2)PlayerCamera.instance.transform.position != (Vector2)currentStagePoint.transform.position)
+            {
+                while (GameManager.isPaused) yield return null;
+                PlayerCamera.instance.SetCameraPos(Vector2.MoveTowards(PlayerCamera.instance.transform.position, currentStagePoint.transform.position, Time.deltaTime * 20f));
+                yield return null;
+            }
+        }
+        
+        
 
         Vector3 bossSpawnPos = BossPosition.position;
         Vector3 playerStartPos = PlayerCutsceneStartPosition.position;
         Vector3 targetPos = PlayerPositionOnBoss.position;
 
         Player.instance.transform.position = playerStartPos;
-
+        Player.instance.MoveTowards(targetPos);
         while ((Vector2)Player.instance.transform.position != (Vector2)targetPos)
         {
-            while (GameManager.isPaused) yield return null;
-            if (BeatManager.isBeat) Player.instance.MoveTowards(targetPos);
             yield return null;
         }
 
@@ -271,6 +283,7 @@ public class Stage : MonoBehaviour
         bossArea.color = new Color(1, 1, 1, 0.8f);
         bossArea.transform.localScale = Vector3.one;
 
+
         // Boss Camera
         float time = 2;
         Vector3 c = PlayerCamera.instance.transform.position;
@@ -285,6 +298,8 @@ public class Stage : MonoBehaviour
         }
 
         enemy.OnStart();
+        Player.instance.canDoAnything = true;
+
         yield break;
     }
 
@@ -333,22 +348,9 @@ public class Stage : MonoBehaviour
     public static Enemy GetClosestEnemyTo(Vector2 basePos, float range = 6)
     {
         if (Instance.enemiesAlive.Count == 0) return null;
-        List<Enemy> closeEnemies = new List<Enemy>();
         Enemy e = null;
-        int attempts = 40;
-
-        while (true)
-        {
-            if (attempts <= 0) break;
-            attempts--;
-            e = Instance.enemiesAlive[Random.Range(0, Instance.enemiesAlive.Count - 1)];
-            if (e.CurrentHP <= 0) continue;
-            if (Vector2.Distance(e.transform.position, basePos) < range) closeEnemies.Add(e);
-        }
-        if (closeEnemies.Count == 0) return null;
-
-        float dist = 999;
-        foreach (Enemy enemy in closeEnemies)
+        float dist = 9999;
+        foreach (Enemy enemy in Instance.enemiesAlive)
         {
             float enemyDist = Vector2.Distance(enemy.transform.position, basePos);
             if (enemyDist < dist)
@@ -362,10 +364,10 @@ public class Stage : MonoBehaviour
 
     public virtual void SetPools()
     {
-        PoolManager.CreatePool(typeof(Gem), gemPrefab, 30);
-        PoolManager.CreatePool(typeof(BulletGem), bulletgemPrefab, 100);
+        PoolManager.CreatePool(typeof(Gem), gemPrefab, 100);
+        PoolManager.CreatePool(typeof(GemCollectFX), gemCollectFXPrefab, 100);
         PoolManager.CreatePool(typeof(Coin), coinPrefab, 50);
-        PoolManager.CreatePool(typeof(KillEffect), killEffectPrefab, 10);
+        PoolManager.CreatePool(typeof(KillEffect), killEffectPrefab, 50);
         PoolManager.CreatePool(typeof(SpawnEffect), enemySpawnPrefab, 10);
         PoolManager.CreatePool(typeof(BulletBase), bulletBasePrefab, 500);
         PoolManager.CreatePool(typeof(BulletSpawnEffect), bulletSpawnPrefab, 100);
@@ -376,8 +378,9 @@ public class Stage : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
+        enemyAliveCount = enemiesAlive.Count;
         if (!GameManager.isPaused) spawnAngle += Time.deltaTime * 30;
 
         HandleStageLoop();
@@ -598,6 +601,7 @@ public class Stage : MonoBehaviour
         PoolManager.RemovePool(typeof(BurningVisualEffect));
         PoolManager.RemovePool(typeof(EnemyGroup));
         PoolManager.RemovePool(typeof(SmallMagicCircle));
+        PoolManager.RemovePool(typeof(GemCollectFX));
     }
 
     public List<int> spawnDirections = new List<int>();

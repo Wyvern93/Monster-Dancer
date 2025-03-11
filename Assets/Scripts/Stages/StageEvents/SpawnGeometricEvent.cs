@@ -33,7 +33,7 @@ public class SpawnGeometricEvent : StageEvent
         enemyGroup.enemies.Clear();
 
         ArchetypeStats stats = new ArchetypeStats(Enemy.enemyData[enemyType].archetype).getStatsAtWave(Stage.Instance.currentWave);
-        enemyGroup.orbitSpeed = stats.baseSpeed;
+        enemyGroup.orbitSpeed = stats.baseSpeed * 3f;
 
         //Enemy enemy = Enemy.GetEnemyOfType(data.enemyType);
         //enemy.aiType = data.AItype;

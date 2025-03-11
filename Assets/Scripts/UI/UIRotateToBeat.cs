@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using static UnityEngine.InputSystem.OnScreen.OnScreenStick;
 
 public class UIRotateToBeat : MonoBehaviour
 {
@@ -8,11 +7,17 @@ public class UIRotateToBeat : MonoBehaviour
     float beatTime;
     float speed = 45f;
 
-    float angle;
+    float angle = 0;
 
     public void Update()
     {
-        if (BeatManager.isBeat) StartCoroutine(Rotate());
+        if (BeatManager.instance == null) return;
+        if (BeatManager.isBeat && BeatManager.isPlaying) StartCoroutine(Rotate());
+    }
+
+    private void Awake()
+    {
+        angle = 0;
     }
 
     public IEnumerator Rotate()

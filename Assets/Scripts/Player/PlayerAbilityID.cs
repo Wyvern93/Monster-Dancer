@@ -1,0 +1,12 @@
+public enum PlayerAbilityID
+{
+    // RABI ABILITIES
+    MOONLIGHT_DAGGERS,
+    CARROT_BUSTER,
+    MOONBEAM,
+    MOONLIGHT_FLOWER,
+
+    // ULTIMATES
+    ECLIPSE,
+    CARROT_DELIVERY
+}

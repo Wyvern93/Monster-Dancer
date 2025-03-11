@@ -31,6 +31,7 @@ public class CutsceneManager : MonoBehaviour
     public void Awake()
     {
         group.alpha = 0;
+        entries = new List<CutsceneEvent>();
     }
 
     public void StartCutscene(CutsceneType cutsceneType)//(List<CutsceneEvent> entries)
@@ -231,6 +232,12 @@ public class CutsceneManager : MonoBehaviour
 
     public void Update()
     {
+        if (TestingEnvironment.Instance)
+        {
+            hasFinished = true;
+            return;
+        }
+
         if (index >= entries.Count)
         {
             if (!hasFinished) OnCutsceneEnd();
@@ -281,7 +288,7 @@ public class CutsceneManager : MonoBehaviour
             DialogueEntry currentDialogue = entries[index] as DialogueEntry;
             if (isWriting)
             {
-                if (Keyboard.current.spaceKey.wasPressedThisFrame || Mouse.current.leftButton.wasPressedThisFrame)
+                if (InputManager.ActionPress(InputActionType.MENU_OK) || Mouse.current.leftButton.wasPressedThisFrame)
                 {
                     group.alpha = 1;
                     StopAllCoroutines();
@@ -292,7 +299,7 @@ public class CutsceneManager : MonoBehaviour
             }
             else
             {
-                if (Keyboard.current.spaceKey.wasPressedThisFrame || Mouse.current.leftButton.wasPressedThisFrame)
+                if (InputManager.ActionPress(InputActionType.MENU_OK) || Mouse.current.leftButton.wasPressedThisFrame)
                 {
                     index++;
                     if (index >= entries.Count) Close();

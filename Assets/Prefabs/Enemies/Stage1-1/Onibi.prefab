@@ -20,7 +20,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5959188013133863146
 Transform:
   m_ObjectHideFlags: 0
@@ -147,6 +147,7 @@ MonoBehaviour:
   idleAnimation: onibi_normal
   moveAnimation: onibi_move
   shootAnimation: 
+  canBeKnocked: 1
   beatContact: 0
   isElite: 0
   Sprite: {fileID: 1878338833598715381}
@@ -165,6 +166,8 @@ MonoBehaviour:
   slownessStatus: {fileID: 0}
   enemyType: 34
   group: {fileID: 0}
+  shouldMove: 1
+  moveToggle: 0
 --- !u!58 &6186746487706593971
 CircleCollider2D:
   m_ObjectHideFlags: 0

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 public class MoonBeamAbility : PlayerAbility
 {
     public int minCooldown = 1;
@@ -20,6 +21,11 @@ public class MoonBeamAbility : PlayerAbility
         currentAmmo = GetMaxAmmo();
         currentAttackSpeedCD = 0;
         currentCooldown = 0;
+    }
+
+    public override BeatManager.BeatType getBeatTrigger()
+    {
+        return BeatManager.BeatType.Compass;
     }
 
     public override string getAbilityDescription()
@@ -51,7 +57,7 @@ public class MoonBeamAbility : PlayerAbility
 
     public override bool CanCast()
     {
-        return currentCooldown == 0 && currentAttackSpeedCD == 0;
+        return BeatManager.GetBeatSuccess(BeatManager.BeatType.Compass) != BeatTrigger.FAIL;
     }
 
     public override string getAbilityName()
@@ -73,7 +79,7 @@ public class MoonBeamAbility : PlayerAbility
         return false;
     }
     public override void OnCast()
-    {
+    {/*
         if (currentAmmo - 1 > 0)
         {
             currentAmmo--;
@@ -86,12 +92,33 @@ public class MoonBeamAbility : PlayerAbility
             currentAttackSpeedCD = GetAttackSpeed();
             AudioController.PlaySound(AudioController.instance.sounds.reloadSfx);
         }
-        UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, GetMaxAmmo());
+        UIManager.Instance.PlayerUI.SetAmmo(currentAmmo, GetMaxAmmo());*/
         MoonbeamLaser laser = PoolManager.Get<MoonbeamLaser>();
         laser.abilitySource = this;
         laser.abilityDamage = GetDamage();
-        laser.Init(GetDuration(), GetSize());
+        laser.Init(GetDuration(), GetSize(), GetTargetPosition(laser.mask));
         PlayerCamera.TriggerCameraShake(0.6f, 0.4f);
+    }
+
+    private Vector3 GetTargetPosition(LayerMask mask)
+    {
+        Vector2 target = Vector2.zero;
+        float maxEnemies = 0;
+        float angleDiff = 360f / 180f;
+
+        for (int i = 0; i < 180; i++)
+        {
+            float angle = i * angleDiff;
+            int around = Physics2D.RaycastAll(Player.instance.transform.position, BulletBase.angleToVector(angle), 12, mask).Length;
+
+            if (around > maxEnemies)
+            {
+                target = BulletBase.angleToVector(angle);
+                maxEnemies = around;
+            }
+        }
+        //Debug.Log(maxEnemies);
+        return target;
     }
 
     public override Sprite GetReloadIcon()

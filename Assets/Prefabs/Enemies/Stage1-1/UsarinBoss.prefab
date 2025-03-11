@@ -20,7 +20,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4331260047074159078
 Transform:
   m_ObjectHideFlags: 0
@@ -127,6 +127,7 @@ MonoBehaviour:
   idleAnimation: 
   moveAnimation: 
   shootAnimation: 
+  canBeKnocked: 1
   beatContact: 0
   isElite: 0
   Sprite: {fileID: 8386087377965295929}
@@ -145,6 +146,8 @@ MonoBehaviour:
   slownessStatus: {fileID: 0}
   enemyType: 17
   group: {fileID: 0}
+  shouldMove: 0
+  moveToggle: 0
   State: 0
   bossTrack: {fileID: 11400000, guid: 5f7a898fdf9a4a24b8325a9b191abf25, type: 2}
   defeatEffect: {fileID: 5748955037701923418, guid: b4f414eef991b904c9caf749c4ee0a1e, type: 3}

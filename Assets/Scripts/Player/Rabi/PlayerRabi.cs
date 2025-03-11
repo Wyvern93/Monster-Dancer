@@ -108,6 +108,7 @@ public class PlayerRabi : Player
             new MoonlightFlowerAbilityEnhancement()
         };
         
+        // Active
         BunnyHopAbility hop = new BunnyHopAbility();
         hop.OnEquip();
         activeAbility = hop;
@@ -115,9 +116,26 @@ public class PlayerRabi : Player
         UIManager.Instance.PlayerUI.activeCDImage.fillAmount = 0;
         activeAbility.currentCooldown = 0;
 
+        // Ultimate
+        EquipUltimate();
+
         // Moonlight Daggers Spell-Shot
         MoonlightDaggersEnhancement attack = new MoonlightDaggersEnhancement();
         attack.OnEquip();
+    }
+
+    protected override void EquipUltimate()
+    {
+        if (GameManager.runData.ultimateChosen == PlayerAbilityID.ECLIPSE)
+        {
+            EclipseAbilityEnhancement eclipseAbility = new EclipseAbilityEnhancement();
+            eclipseAbility.OnEquip();
+        }
+        else if (GameManager.runData.ultimateChosen == PlayerAbilityID.CARROT_DELIVERY)
+        {
+            CarrotDeliveryAbilityEnhancement deliveryAbility = new CarrotDeliveryAbilityEnhancement();
+            deliveryAbility.OnEquip();
+        }
     }
 
     public override void Despawn()
@@ -192,27 +210,24 @@ public class PlayerRabi : Player
 
     protected override IEnumerator MoveTowardsCoroutine(Vector2 targetPos)
     {
-        animator.Play("Rabi_Move");
-        animator.speed = 1f / BeatManager.GetBeatDuration() / 0.5f;
-        float duration = BeatManager.GetBeatDuration() * 0.5f;
-        float time = 0;
+        rb.velocity = Vector2.zero;
+        animator.SetBool("moving", true);
+        //animator.Play("Rabi_Move");
 
         if (transform.position.x < targetPos.x) facingRight = true;
         else facingRight = false;
 
-        while (time <= duration)
+        while ((Vector2)transform.position != targetPos)
         {
             while (GameManager.isPaused) yield return null;
-            time += Time.deltaTime;
-            
             transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * 4f);
             yield return null;
         }
 
         animator.speed = 1f / BeatManager.GetBeatDuration();
-        animator.Play("Rabi_Idle");
+        animator.SetBool("moving", false);
         yield return null;
-        Sprite.transform.localPosition = Vector3.zero;
+        //Sprite.transform.localPosition = Vector3.zero;
     }
 
     protected override IEnumerator MoveCoroutine(Vector2 targetPos)
@@ -240,7 +255,7 @@ public class PlayerRabi : Player
         while (time <= duration)
         {
             while (GameManager.isPaused) yield return null;
-            if (BeatManager.GetBeatSuccess() == BeatTrigger.PERFECT && time < duration / 2f)//(time <= 0.05f)
+            if (BeatManager.GetBeatSuccess(BeatManager.BeatType.Beat) == BeatTrigger.PERFECT && time < duration / 2f)//(time <= 0.05f)
             {
                 if (InputManager.ActionHold(InputActionType.ABILITY) && activeAbility.CanCast())
                 {
@@ -376,10 +391,18 @@ public class PlayerRabi : Player
         isCastingBunnyHop = false;
     }
 
-    public override void OnPassiveAbilityUse()
+    public override void OnPassiveAbilityUse(int id)
     {
-        PlayerAbility a = equippedPassiveAbilities[currentWeapon];
-        if (a.CanCast()) a.OnCast();
+        PlayerAbility a = equippedPassiveAbilities[id];
+
+        a.OnCast();
+        /*
+        if (a.CanCast())
+        {
+            
+            BeatSucessEffect effect = PoolManager.Get<BeatSucessEffect>();
+            effect.transform.position = transform.position + new Vector3(0, 0.5f, 0f);
+        }*/
         /*
         foreach (PlayerAbility ability in equippedPassiveAbilities)
         {

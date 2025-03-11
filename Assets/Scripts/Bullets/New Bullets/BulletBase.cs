@@ -8,13 +8,14 @@ public class BulletBase : Bullet
     public Animator animator;
 
     public float angle;
-    protected float beatTime;
+    public float beatTime;
     public List<BulletBehaviour> behaviours;
     public bool startOnBeat;
 
     public override void OnSpawn()
     {
         StopAllCoroutines();
+        beatTime = 0;
         forcedDespawn = false;
         animator.speed = 1f / BeatManager.GetBeatDuration();
         if (Stage.Instance != null) Stage.Instance.bulletsSpawned.Add(this);
@@ -27,11 +28,14 @@ public class BulletBase : Bullet
         spriteRenderer.color = Color.clear;
         isInitialized = true;
         StartCoroutine(BulletSpawnCoroutine());
-        if (startOnBeat) OnBeat();
+        //if (startOnBeat) OnBeat();
+        beatCD = BeatManager.GetBeatDuration();
         foreach (BulletBehaviour behaviour in behaviours)
         {
             behaviour.OnSpawn(this);
         }
+        if (!frozen) OnBeat();
+
     }
 
     public static Vector2 angleToVector(float degrees)
@@ -46,6 +50,7 @@ public class BulletBase : Bullet
 
     public override void OnBeat()
     {
+        if (frozen) return;
         beat++;
         lifetime--;
         if (superGrazed) Pulse();
@@ -55,6 +60,13 @@ public class BulletBase : Bullet
             Despawn();
         }
         StartCoroutine(BeatCoroutine());
+    }
+
+    public void ResetBeat()
+    {
+        StopCoroutine(BeatCoroutine());
+        beatCD = 0;
+        beatTime = 0;
     }
 
     public IEnumerator BeatCoroutine()
@@ -84,7 +96,7 @@ public class BulletBase : Bullet
             }
 
             direction = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
-            transform.position += ((Vector3)direction * speed * beatTime * Time.deltaTime);
+            transform.position += ((Vector3)direction * speed * Time.deltaTime * 0.5f);//beatTime * Time.deltaTime);
             time += Time.deltaTime;
             yield return null;
         }
@@ -129,6 +141,7 @@ public class BulletBase : Bullet
         {
             behaviour.OnDespawn(this);
         }
+        behaviours.Clear();
         base.Despawn();
     }
 }

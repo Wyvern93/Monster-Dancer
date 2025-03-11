@@ -68,6 +68,6 @@ public class BunnyHopAbility : PlayerAbility
 
     public override void OnUpdate()
     {
-        if (BeatManager.isQuarterBeat && currentCooldown > 0) currentCooldown-= 0.25f;
+        if (BeatManager.isBeat && currentCooldown > 0) currentCooldown -= 1f;
     }
 }

@@ -16,7 +16,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5198666266949912992
 Transform:
   m_ObjectHideFlags: 0
@@ -48,3 +48,8 @@ MonoBehaviour:
   centerIsLead: 0
   enemies: []
   dirToPlayer: {x: 0, y: 0}
+  orbitDistance: 0
+  clockwise: 0
+  orbitAngle: 0
+  orbitSpeed: 0
+  totalEnemies: 0

@@ -112,7 +112,8 @@ public class EnemyGroup : MonoBehaviour
                 break;
             case EnemyAIType.Orbital:
                 dirToPlayer = ((Vector2)playerPos - GetCenter()).normalized;
-                if (BeatManager.isBeat) StartCoroutine(OrbitalUpdate());
+                //if (BeatManager.isBeat) StartCoroutine(OrbitalUpdateCoroutine());
+                OrbitalUpdate();
                 break;
             case EnemyAIType.CircleHorde:
                 if (Mathf.Abs(GetCenter().x - PlayerCamera.instance.transform.position.x) > 15) Respawn();
@@ -121,7 +122,19 @@ public class EnemyGroup : MonoBehaviour
         }
     }
 
-    private IEnumerator OrbitalUpdate()
+    private void OrbitalUpdate()
+    {
+        if (GameManager.isPaused) return;
+
+        if(clockwise) orbitAngle += 90f * (orbitSpeed / orbitDistance) * Time.deltaTime;
+        else orbitAngle -= 90f * (orbitSpeed / orbitDistance) * Time.deltaTime;
+
+        dirToPlayer = (Player.instance.transform.position - transform.position).normalized;
+
+        transform.position = Vector3.MoveTowards(transform.position, Player.instance.transform.position, 5f * orbitSpeed * Time.deltaTime);
+    }
+
+    private IEnumerator OrbitalUpdateCoroutine()
     {
         float beatDuration = BeatManager.GetBeatDuration() / 1.5f;
         float beatTime = 1;

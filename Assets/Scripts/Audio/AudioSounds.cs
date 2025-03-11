@@ -21,6 +21,7 @@ public class AudioSounds
     public AudioClip surpriseSfx;
     public AudioClip playerSpecialUseSfx;
     public AudioClip reloadSfx;
+    public AudioClip beatFailSfx;
     public AudioClip abilityReadySfx;
 
     [Header("Enemy Sounds")]

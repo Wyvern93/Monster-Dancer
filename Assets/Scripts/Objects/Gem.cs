@@ -4,31 +4,7 @@ using UnityEngine;
 
 public class Gem : Drop
 {
-    public Vector2 dir;
     public int exp;
-
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (dir.magnitude > 0)
-        {
-            transform.position += (Vector3)dir * 3f * Time.deltaTime;
-            dir = Vector2.MoveTowards(dir, Vector2.zero, Time.deltaTime * 5f);
-        }
-
-        if (followPlayer)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, Player.instance.transform.position, Time.deltaTime * speed);
-            speed = Mathf.Clamp(speed + Time.deltaTime * 16f, 0, 64f);
-        }
-    }
 
     public void OnTriggerEnter2D(Collider2D collision)
     {
@@ -37,6 +13,8 @@ public class Gem : Drop
         {
             AudioController.PlaySound(AudioController.instance.sounds.gemSound);
             Player.AddExp(exp);
+            GemCollectFX fx = PoolManager.Get<GemCollectFX>();
+            fx.transform.position = transform.position;
             PoolManager.Return(gameObject, GetType());
         }
         if (collision.name == "GemTrigger")

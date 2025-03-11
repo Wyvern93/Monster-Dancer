@@ -209,7 +209,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1058114657622472707
 Transform:
   m_ObjectHideFlags: 0
@@ -315,6 +315,7 @@ MonoBehaviour:
   idleAnimation: slimedancer_normal
   moveAnimation: slimedancer_normal
   shootAnimation: slimedancer_preattack
+  canBeKnocked: 1
   beatContact: 0
   isElite: 0
   Sprite: {fileID: 8626814897227013347}
@@ -333,6 +334,8 @@ MonoBehaviour:
   slownessStatus: {fileID: 0}
   enemyType: 4
   group: {fileID: 0}
+  shouldMove: 0
+  moveToggle: 0
 --- !u!58 &8036671093737067652
 CircleCollider2D:
   m_ObjectHideFlags: 0

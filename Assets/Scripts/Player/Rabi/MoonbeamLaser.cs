@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class MoonbeamLaser : MonoBehaviour
@@ -13,45 +14,52 @@ public class MoonbeamLaser : MonoBehaviour
     public Vector3 start, end;
     public float abilityDamage;
     Vector2 diff;
+    public LayerMask mask;
+    Vector2 origDir;
 
     void OnEnable()
     {
         AudioController.PlaySound(sound);
+        transform.position = Player.instance.Sprite.transform.position + new Vector3(0, 0, 3);
+        lineRenderer.SetPosition(0, Vector3.zero);
         // Assign the sprite sheet texture to the LineRenderer
         lineRenderer.startColor = Color.white;
         lineRenderer.endColor = Color.white;
+        start = Vector3.zero;
     }
 
-    public void Init(float duration, float size)
+    public void Init(float duration, float size, Vector2 direction)
     {
         animator.speed = (1f / BeatManager.GetBeatDuration()) / duration;
         edgeCollider.edgeRadius = size * 0.6f;
         lineRenderer.widthMultiplier = size * 2;
         lineRenderer.textureScale = new Vector2(0.5f / size, 1);
-        SetPosition();
+        origDir = direction;
+        SetPosition(direction);
     }
 
-    public void SetPosition()
+    public void SetPosition(Vector2 direction)
     {
-        Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
-        Vector2 difference = (crosshairPos - (Vector2)Player.instance.transform.position).normalized;
+        //Vector2 crosshairPos = direction;// UIManager.Instance.PlayerUI.crosshair.transform.position;
+        //Vector2 difference = (crosshairPos - (Vector2)Player.instance.transform.position).normalized;
 
-        if (difference == Vector2.zero) difference = Vector2.right;
+        //if (difference == Vector2.zero) difference = Vector2.right;
 
-        transform.position = Player.instance.Sprite.transform.position + ((Vector3)difference) + new Vector3(0,0,3);
+        transform.position = Player.instance.Sprite.transform.position + ((Vector3)direction) + new Vector3(0,0,3);
 
         start = Vector3.zero;
-        end = difference * 12;
+        end = direction * 24;
         diff = end / 4f;
 
         lineRenderer.SetPosition(0, Vector3.zero);
         lineRenderer.SetPosition(5, end);
-        for (int i = 1; i < 3; i++)
+        for (int i = 1; i < 5; i++)
         {
             lineRenderer.SetPosition(i, (diff * i) + (Random.insideUnitCircle * 0.5f));
         }
         
     }
+
 
     private void Update()
     {
@@ -60,12 +68,7 @@ public class MoonbeamLaser : MonoBehaviour
             lineRenderer.SetPosition(i, (diff * i) + (Random.insideUnitCircle * 0.5f));
         }
 
-        Vector2 crosshairPos = UIManager.Instance.PlayerUI.crosshair.transform.position;
-        Vector2 difference = (crosshairPos - (Vector2)Player.instance.transform.position).normalized;
-
-        if (difference == Vector2.zero) difference = Vector2.right;
-
-        transform.position = Player.instance.Sprite.transform.position + ((Vector3)difference * 0.2f);
+        transform.position = Player.instance.Sprite.transform.position + ((Vector3)origDir * 0.2f);
         SetCollisions();
     }
 

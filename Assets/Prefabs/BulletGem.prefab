@@ -19,7 +19,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3543350615458625550
 Transform:
   m_ObjectHideFlags: 0
@@ -134,7 +134,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea83d45d8ab19684a807c34fe39d94a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  animator: {fileID: 3876583818388416492}
+  followPlayer: 0
   dir: {x: 0, y: 0}
+  exp: 0
 --- !u!95 &3876583818388416492
 Animator:
   serializedVersion: 5

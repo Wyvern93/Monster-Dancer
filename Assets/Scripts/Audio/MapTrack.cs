@@ -10,4 +10,5 @@ public class MapTrack : ScriptableObject
     public float offset;
     public float loopStart;
     public float loopEnd;
+    public int compassStartBeat;
 }

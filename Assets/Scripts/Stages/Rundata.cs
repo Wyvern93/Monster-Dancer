@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,6 +10,7 @@ public class RunData
     public GameObject characterPrefab;
     public string currentMap;
     public int coins;
+    public PlayerAbilityID ultimateChosen;
 
     public List<Enhancement> possibleStatEnhancements, possibleSkillEnhancements, possibleItemEnhancements;
 

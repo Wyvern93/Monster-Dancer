@@ -1,7 +1,5 @@
-using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Boss : Enemy
@@ -11,13 +9,16 @@ public class Boss : Enemy
     [SerializeField] GameObject defeatEffect;
     public override void OnSpawn()
     {
-        base.OnSpawn();
+        //base.OnSpawn();
+        CalculateHealth();
         Stage.Instance.enemiesAlive.Add(this);
         CurrentHP = MaxHP;
         emissionColor = new Color(1, 1, 1, 0);
         isMoving = false;
         Sprite.transform.localPosition = Vector3.zero;
-        State = BossState.Introduction;// FALTA LA ANIMACION DE INTRODUCCION DEL JEFE
+        animator.speed = 1f / BeatManager.GetBeatDuration();
+        animator.Play(idleAnimation);
+        State = BossState.Introduction;
         Player.instance.facingRight = transform.position.x > Player.instance.transform.position.x;
     }
 
@@ -59,6 +60,8 @@ public class Boss : Enemy
     public override void TakeDamage(float damage, bool isCritical)
     {
         if (State == BossState.Introduction || State == BossState.Dialogue || State == BossState.Defeat) return;
+        emissionColor = new Color(1, 1, 1, 1f);
+        flashCD = 0.04f;
         base.TakeDamage(damage, isCritical);
         UIManager.Instance.PlayerUI.UpdateBossBar(CurrentHP, MaxHP);
     }

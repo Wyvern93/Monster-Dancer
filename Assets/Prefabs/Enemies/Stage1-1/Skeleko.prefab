@@ -20,7 +20,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7433631493249385710
 Transform:
   m_ObjectHideFlags: 0
@@ -126,6 +126,7 @@ MonoBehaviour:
   idleAnimation: skeleko_normal
   moveAnimation: skeleko_move
   shootAnimation: 
+  canBeKnocked: 1
   beatContact: 0
   isElite: 0
   Sprite: {fileID: 8926938699364407547}
@@ -144,6 +145,8 @@ MonoBehaviour:
   slownessStatus: {fileID: 0}
   enemyType: 14
   group: {fileID: 0}
+  shouldMove: 0
+  moveToggle: 0
 --- !u!95 &7868305416208311360
 Animator:
   serializedVersion: 5

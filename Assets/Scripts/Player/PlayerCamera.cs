@@ -40,7 +40,8 @@ public class PlayerCamera : MonoBehaviour
 
     public static void TriggerCameraShake(float strength, float time)
     {
-        if (strength > instance.ScreenShakeStrength) instance.ScreenShakeStrength = strength;
+        //if (strength > instance.ScreenShakeStrength)
+        instance.ScreenShakeStrength = strength;
         if (time > instance.ScreenShakeTime) instance.ScreenShakeTime = time;
     }
 
@@ -75,6 +76,10 @@ public class PlayerCamera : MonoBehaviour
             ScreenShakeTime = Mathf.MoveTowards(ScreenShakeTime, 0, Time.deltaTime);
             float currentShakeStrength = ScreenShakeStrength * ScreenShakeTime;
             ScreenShakeDir = Random.insideUnitCircle * currentShakeStrength;
+        }
+        else
+        {
+            ScreenShakeStrength = 0;
         }
         CameraOffset = Vector3.MoveTowards(CameraOffset, ScreenShakeDir, Time.deltaTime * 24f);
 

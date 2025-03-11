@@ -9,10 +9,10 @@ public class CarrotBusterAbility : PlayerAbility
         baseAmmo = 2;
         baseAttackSpeed = 1f;
         baseCooldown = 2;
-        baseDamage = 25;
+        baseDamage = 12;
         baseDuration = 2;
         baseSize = 1f;
-        baseKnockback = 5;
+        baseKnockback = 1;
         baseCritChance = 0;
 
         currentAmmo = GetMaxAmmo();
@@ -36,6 +36,11 @@ public class CarrotBusterAbility : PlayerAbility
         return description;
     }
 
+    public override BeatManager.BeatType getBeatTrigger()
+    {
+        return BeatManager.BeatType.Beat;
+    }
+
     public override string getTags()
     {
         return "Tags: Melee, Carrot, Knockback";
@@ -48,7 +53,7 @@ public class CarrotBusterAbility : PlayerAbility
 
     public override bool CanCast()
     {
-        return currentCooldown == 0 && currentAttackSpeedCD == 0;
+        return BeatManager.GetBeatSuccess(BeatManager.BeatType.Beat) != BeatTrigger.FAIL;
     }
 
     public override string getAbilityName()
